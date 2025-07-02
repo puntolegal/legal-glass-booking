@@ -2,8 +2,16 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import ReservationForm from "./ReservationForm";
 
-const HeroSection = () => {
+interface HeroSectionProps {
+  title?: string;
+  subtitle?: string;
+}
+
+const HeroSection = ({ title, subtitle }: HeroSectionProps) => {
   const [showForm, setShowForm] = useState(false);
+
+  const defaultTitle = "Consulta Legal Online";
+  const defaultSubtitle = "por Despido Injustificado";
 
   return (
     <section id="inicio" className="min-h-screen flex items-center justify-center pt-20 px-6">
@@ -12,10 +20,10 @@ const HeroSection = () => {
           <div className="animate-float">
             <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
               <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                Consulta Legal Online
+                {title || defaultTitle}
               </span>
               <br />
-              <span className="text-foreground">por Despido Injustificado</span>
+              <span className="text-foreground">{subtitle || defaultSubtitle}</span>
             </h1>
           </div>
           

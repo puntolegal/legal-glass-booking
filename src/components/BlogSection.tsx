@@ -1,5 +1,18 @@
-const BlogSection = () => {
-  const blogPosts = [
+interface BlogPost {
+  title: string;
+  excerpt: string;
+  image: string;
+  readTime?: string;
+  category?: string;
+}
+
+interface BlogSectionProps {
+  title?: string;
+  posts?: BlogPost[];
+}
+
+const BlogSection = ({ title = "Blog Legal", posts }: BlogSectionProps) => {
+  const defaultPosts = [
     {
       image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=250&fit=crop",
       title: "¿Cuándo un despido es considerado injustificado?",
@@ -30,13 +43,15 @@ const BlogSection = () => {
     }
   ];
 
+  const blogPostsList = posts || defaultPosts;
+
   return (
     <section id="blog" className="py-20 px-6">
       <div className="container mx-auto">
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-bold mb-6">
             <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-              Blog Legal
+              {title}
             </span>
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
@@ -46,36 +61,39 @@ const BlogSection = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {blogPosts.map((post, index) => (
+          {blogPostsList.map((post, index) => (
             <article 
               key={index} 
-              className="glass rounded-3xl overflow-hidden hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 group cursor-pointer"
+              className="glass rounded-2xl overflow-hidden hover:scale-105 transition-transform duration-300 group"
             >
               <div className="relative overflow-hidden">
                 <img 
                   src={post.image} 
                   alt={post.title}
-                  className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-500"
+                  className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-300"
                 />
-                <div className="absolute top-4 left-4">
-                  <span className="bg-primary/90 text-primary-foreground px-3 py-1 rounded-full text-xs font-semibold">
+                {post.category && (
+                  <div className="absolute top-4 left-4 bg-primary text-primary-foreground px-3 py-1 rounded-full text-sm font-medium">
                     {post.category}
-                  </span>
-                </div>
+                  </div>
+                )}
               </div>
               
               <div className="p-6">
-                <h3 className="text-lg font-bold mb-3 text-foreground group-hover:text-primary transition-colors line-clamp-2">
+                <h3 className="text-lg font-bold text-foreground mb-3 group-hover:text-primary transition-colors">
                   {post.title}
                 </h3>
-                
-                <p className="text-muted-foreground text-sm mb-4 line-clamp-3">
+                <p className="text-muted-foreground text-sm mb-4 leading-relaxed">
                   {post.excerpt}
                 </p>
                 
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-muted-foreground">{post.readTime}</span>
-                  <button className="text-primary hover:text-accent transition-colors text-sm font-semibold">
+                  {post.readTime && (
+                    <span className="text-xs text-muted-foreground">
+                      {post.readTime}
+                    </span>
+                  )}
+                  <button className="text-primary hover:text-accent transition-colors text-sm font-medium">
                     Leer más →
                   </button>
                 </div>
@@ -84,9 +102,9 @@ const BlogSection = () => {
           ))}
         </div>
 
-        <div className="text-center mt-12">
-          <button className="glass rounded-lg px-8 py-3 hover:bg-accent/10 transition-colors border border-primary/30">
-            Ver todos los artículos
+        <div className="text-center mt-16">
+          <button className="btn-primary px-8 py-3 rounded-xl text-primary-foreground font-semibold hover:scale-105 transition-transform">
+            Ver Todos los Artículos
           </button>
         </div>
       </div>
