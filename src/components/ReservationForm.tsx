@@ -2,8 +2,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { useState } from "react";
-import PaymentForm from "./PaymentForm";
+import { useState, useEffect } from "react";
+import { validateRUT } from "@/lib/utils";
+import { 
+  getAvailableTimeSlots, 
+  createReservation,
+  type TimeSlot 
+} from "@/services/reservationService";
+import AvailabilityCalendar from "./AvailabilityCalendar";
 
 interface ReservationFormProps {
   onClose: () => void;
@@ -19,24 +25,50 @@ const ReservationForm = ({ onClose }: ReservationFormProps) => {
     fecha: "",
     hora: ""
   });
-  const [showPayment, setShowPayment] = useState(false);
+  const [rutError, setRutError] = useState("");
+  const [availableSlots, setAvailableSlots] = useState<TimeSlot[]>([]);
+  const [showCalendar, setShowCalendar] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  useEffect(() => {
+    if (formData.fecha) {
+      getAvailableTimeSlots(formData.fecha).then(slots => {
+        setAvailableSlots(slots);
+        if (formData.hora && !slots.find(slot => slot.hora === formData.hora)?.disponible) {
+          setFormData(prev => ({ ...prev, hora: "" }));
+        }
+      });
+    }
+  }, [formData.fecha]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Validar que todos los campos estén completos
+    if (!validateRUT(formData.rut)) {
+      setRutError("RUT inválido. Por favor ingresa un RUT válido.");
+      return;
+    } else {
+      setRutError("");
+    }
     if (Object.values(formData).some(value => !value)) {
       alert("Por favor completa todos los campos");
       return;
     }
-    // Mostrar formulario de pago
-    setShowPayment(true);
-  };
-
-  const handlePaymentSuccess = () => {
-    // Aquí iría la lógica para guardar la reserva y enviar confirmación
-    console.log("Pago exitoso, reserva confirmada:", formData);
-    alert("¡Pago exitoso! Tu consulta ha sido agendada. Te enviaremos un email con los detalles.");
-    onClose();
+    const selectedSlot = availableSlots.find(slot => slot.hora === formData.hora);
+    if (!selectedSlot?.disponible) {
+      alert("El horario seleccionado ya no está disponible. Por favor selecciona otro horario.");
+      return;
+    }
+    setLoading(true);
+    try {
+      await createReservation(formData);
+      alert("¡Reserva exitosa! Te enviaremos un correo de confirmación con los detalles de tu consulta.");
+      onClose();
+    } catch (error) {
+      alert("Error al guardar la reserva. Por favor intenta nuevamente.");
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -44,6 +76,15 @@ const ReservationForm = ({ onClose }: ReservationFormProps) => {
       ...formData,
       [e.target.name]: e.target.value
     });
+  };
+
+  const handleDateSelect = (date: string) => {
+    setFormData(prev => ({ ...prev, fecha: date }));
+    setShowCalendar(false);
+  };
+
+  const handleTimeSelect = (time: string) => {
+    setFormData(prev => ({ ...prev, hora: time }));
   };
 
   return (
@@ -72,7 +113,6 @@ const ReservationForm = ({ onClose }: ReservationFormProps) => {
                 required
               />
             </div>
-            
             <div className="space-y-2">
               <Label htmlFor="rut">RUT *</Label>
               <Input
@@ -84,6 +124,7 @@ const ReservationForm = ({ onClose }: ReservationFormProps) => {
                 placeholder="12.345.678-9"
                 required
               />
+              {rutError && <p className="text-red-500 text-xs mt-1">{rutError}</p>}
             </div>
           </div>
 
@@ -101,7 +142,6 @@ const ReservationForm = ({ onClose }: ReservationFormProps) => {
                 required
               />
             </div>
-            
             <div className="space-y-2">
               <Label htmlFor="telefono">Teléfono *</Label>
               <Input
@@ -110,7 +150,7 @@ const ReservationForm = ({ onClose }: ReservationFormProps) => {
                 value={formData.telefono}
                 onChange={handleChange}
                 className="glass border-white/20"
-                placeholder="+56 9 1234 5678"
+                placeholder="+569 6232 1883"
                 required
               />
             </div>
@@ -129,54 +169,96 @@ const ReservationForm = ({ onClose }: ReservationFormProps) => {
             />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="fecha">Fecha Preferida *</Label>
-              <Input
-                id="fecha"
-                name="fecha"
-                type="date"
-                value={formData.fecha}
-                onChange={handleChange}
-                className="glass border-white/20"
-                required
-              />
+              <Label>Seleccionar Fecha y Hora *</Label>
+              <div className="flex flex-col sm:flex-row gap-4">
+                <div className="flex-1">
+                  <Input
+                    id="fecha"
+                    name="fecha"
+                    type="date"
+                    value={formData.fecha}
+                    onChange={handleChange}
+                    className="glass border-white/20"
+                    min={new Date().toISOString().split('T')[0]}
+                    required
+                  />
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setShowCalendar(!showCalendar)}
+                  className="px-4"
+                >
+                  {showCalendar ? "Ocultar Calendario" : "Ver Calendario"}
+                </Button>
+              </div>
             </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="hora">Hora Preferida *</Label>
-              <select
-                name="hora"
-                value={formData.hora}
-                onChange={handleChange}
-                className="glass border-white/20 rounded-md px-3 py-2 w-full bg-input text-foreground"
-                required
-              >
-                <option value="">Selecciona una hora</option>
-                <option value="09:00">09:00 AM</option>
-                <option value="10:00">10:00 AM</option>
-                <option value="11:00">11:00 AM</option>
-                <option value="12:00">12:00 PM</option>
-                <option value="14:00">02:00 PM</option>
-                <option value="15:00">03:00 PM</option>
-                <option value="16:00">04:00 PM</option>
-                <option value="17:00">05:00 PM</option>
-                <option value="18:00">06:00 PM</option>
-              </select>
-            </div>
+
+            {showCalendar && (
+              <div className="glass rounded-2xl p-6 border border-primary/30">
+                <AvailabilityCalendar
+                  selectedDate={formData.fecha}
+                  onDateSelect={handleDateSelect}
+                  onTimeSelect={handleTimeSelect}
+                  selectedTime={formData.hora}
+                />
+              </div>
+            )}
+
+            {formData.fecha && (
+              <div className="space-y-2">
+                <Label htmlFor="hora">Hora Preferida *</Label>
+                <select
+                  name="hora"
+                  value={formData.hora}
+                  onChange={handleChange}
+                  className="glass border-white/20 rounded-md px-3 py-2 w-full bg-input text-foreground"
+                  required
+                >
+                  <option value="">Selecciona una hora</option>
+                  {availableSlots.map((slot) => (
+                    <option 
+                      key={slot.hora} 
+                      value={slot.hora}
+                      disabled={!slot.disponible}
+                    >
+                      {slot.hora === "09:00" && "09:00 AM"}
+                      {slot.hora === "10:00" && "10:00 AM"}
+                      {slot.hora === "11:00" && "11:00 AM"}
+                      {slot.hora === "12:00" && "12:00 PM"}
+                      {slot.hora === "14:00" && "02:00 PM"}
+                      {slot.hora === "15:00" && "03:00 PM"}
+                      {slot.hora === "16:00" && "04:00 PM"}
+                      {slot.hora === "17:00" && "05:00 PM"}
+                      {!slot.disponible && " - OCUPADO"}
+                    </option>
+                  ))}
+                </select>
+                {availableSlots.length > 0 && (
+                  <p className="text-xs text-muted-foreground">
+                    {availableSlots.filter(slot => slot.disponible).length} de {availableSlots.length} horarios disponibles
+                  </p>
+                )}
+              </div>
+            )}
           </div>
 
           <div className="glass rounded-2xl p-6 border border-primary/30">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold">Resumen de Pago</h3>
-              <span className="text-2xl font-bold text-primary">$15.000 CLP</span>
+              <span className="text-2xl font-bold text-primary">
+                <span className="line-through mr-2">$15.000 CLP</span>
+                <span className="text-green-500 font-bold">Oferta de Lanzamiento: Consulta Gratis</span>
+              </span>
             </div>
             <ul className="text-sm text-muted-foreground space-y-2">
               <li className="flex items-center">
                 <svg className="w-4 h-4 text-primary mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
-                Consulta legal especializada (60 min)
+                Consulta legal especializada (45 min)
               </li>
               <li className="flex items-center">
                 <svg className="w-4 h-4 text-primary mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -199,6 +281,7 @@ const ReservationForm = ({ onClose }: ReservationFormProps) => {
               variant="glass" 
               className="flex-1"
               onClick={onClose}
+              disabled={loading}
             >
               Cancelar
             </Button>
@@ -206,8 +289,9 @@ const ReservationForm = ({ onClose }: ReservationFormProps) => {
               type="submit" 
               variant="primary" 
               className="flex-1"
+              disabled={loading}
             >
-              Continuar al Pago
+              Agendar Consulta
               <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
               </svg>
@@ -215,15 +299,6 @@ const ReservationForm = ({ onClose }: ReservationFormProps) => {
           </div>
         </form>
       </div>
-
-      {showPayment && (
-        <PaymentForm
-          onClose={() => setShowPayment(false)}
-          onSuccess={handlePaymentSuccess}
-          amount={15000}
-          description="Consulta Legal Especializada"
-        />
-      )}
     </div>
   );
 };

@@ -27,7 +27,7 @@ const TestimonialsSection = () => {
   ];
 
   return (
-    <section className="py-20 px-6">
+    <section id="casos-exito" className="py-20 px-6">
       <div className="container mx-auto">
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-bold mb-6">
@@ -96,10 +96,26 @@ const TestimonialsSection = () => {
               Únete a los cientos de trabajadores que han recuperado sus derechos con nuestra ayuda
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button className="btn-primary px-8 py-3 rounded-lg font-semibold">
+              <button 
+                className="btn-primary px-8 py-3 rounded-lg font-semibold"
+                onClick={() => {
+                  const element = document.getElementById('inicio');
+                  if (element) {
+                    element.scrollIntoView({ behavior: 'smooth' });
+                  }
+                }}
+              >
                 Agenda tu Consulta
               </button>
-              <button className="glass px-8 py-3 rounded-lg border border-primary/30 hover:bg-primary/10 transition-colors">
+              <button 
+                className="glass px-8 py-3 rounded-lg border border-primary/30 hover:bg-primary/10 transition-colors"
+                onClick={() => {
+                  const element = document.getElementById('casos-exito');
+                  if (element) {
+                    element.scrollIntoView({ behavior: 'smooth' });
+                  }
+                }}
+              >
                 Ver más casos
               </button>
             </div>

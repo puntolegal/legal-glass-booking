@@ -28,9 +28,9 @@ const Footer = () => {
           <div>
             <h3 className="text-lg font-semibold text-foreground mb-4">Servicios</h3>
             <ul className="space-y-3">
-              <li><a href="#" className="text-muted-foreground hover:text-primary transition-colors">Despido Injustificado</a></li>
-              <li><a href="#" className="text-muted-foreground hover:text-primary transition-colors">Despido Indebido</a></li>
-              <li><a href="#" className="text-muted-foreground hover:text-primary transition-colors">Tutela de Derechos</a></li>
+              <li><a href="/laboral" className="text-muted-foreground hover:text-primary transition-colors">Derecho Laboral</a></li>
+              <li><a href="/familia" className="text-muted-foreground hover:text-primary transition-colors">Derecho de Familia</a></li>
+              <li><a href="/herencias" className="text-muted-foreground hover:text-primary transition-colors">Herencias</a></li>
             </ul>
           </div>
 
@@ -55,7 +55,7 @@ const Footer = () => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
-                Metro el Golf
+                Metro el Golf,
                 <br />
                 Santiago, Chile
               </li>
@@ -78,6 +78,13 @@ const Footer = () => {
               </a>
               <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
                 Aviso Legal
+              </a>
+              <a 
+                href="/admin" 
+                className="text-muted-foreground hover:text-primary transition-colors opacity-30 hover:opacity-100"
+                title="Panel de Administración"
+              >
+                Admin
               </a>
             </div>
           </div>
