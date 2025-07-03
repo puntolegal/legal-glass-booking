@@ -3,6 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useState } from "react";
+import PaymentForm from "./PaymentForm";
 
 interface ReservationFormProps {
   onClose: () => void;
@@ -18,11 +19,24 @@ const ReservationForm = ({ onClose }: ReservationFormProps) => {
     fecha: "",
     hora: ""
   });
+  const [showPayment, setShowPayment] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Aquí iría la lógica de pago y agendamiento
-    console.log("Formulario enviado:", formData);
+    // Validar que todos los campos estén completos
+    if (Object.values(formData).some(value => !value)) {
+      alert("Por favor completa todos los campos");
+      return;
+    }
+    // Mostrar formulario de pago
+    setShowPayment(true);
+  };
+
+  const handlePaymentSuccess = () => {
+    // Aquí iría la lógica para guardar la reserva y enviar confirmación
+    console.log("Pago exitoso, reserva confirmada:", formData);
+    alert("¡Pago exitoso! Tu consulta ha sido agendada. Te enviaremos un email con los detalles.");
+    onClose();
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -193,7 +207,7 @@ const ReservationForm = ({ onClose }: ReservationFormProps) => {
               variant="primary" 
               className="flex-1"
             >
-              Pagar y Reservar
+              Continuar al Pago
               <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
               </svg>
@@ -201,6 +215,15 @@ const ReservationForm = ({ onClose }: ReservationFormProps) => {
           </div>
         </form>
       </div>
+
+      {showPayment && (
+        <PaymentForm
+          onClose={() => setShowPayment(false)}
+          onSuccess={handlePaymentSuccess}
+          amount={15000}
+          description="Consulta Legal Especializada"
+        />
+      )}
     </div>
   );
 };

@@ -10,8 +10,8 @@ interface HeroSectionProps {
 const HeroSection = ({ title, subtitle }: HeroSectionProps) => {
   const [showForm, setShowForm] = useState(false);
 
-  const defaultTitle = "Consulta Legal Online";
-  const defaultSubtitle = "por Despido Injustificado";
+  const defaultTitle = "Asesoría Legal Especializada";
+  const defaultSubtitle = "en Derecho Laboral";
 
   return (
     <section id="inicio" className="min-h-screen flex items-center justify-center pt-20 px-6">

@@ -20,9 +20,9 @@ const TestimonialsSection = () => {
       name: "Ana Martínez",
       role: "Administradora",
       avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face",
-      testimonial: "La consulta online fue muy conveniente. Obtuve asesoría legal de calidad sin salir de mi casa. El seguimiento fue excelente.",
+      testimonial: "Excelente asesoría legal. Me ayudaron a resolver mi caso de despido indebido de manera profesional y eficiente. El seguimiento fue excelente.",
       rating: 5,
-      case: "Consulta Online - Orientación legal efectiva"
+      case: "Despido Indebido - Caso resuelto favorablemente"
     }
   ];
 

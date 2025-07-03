@@ -99,7 +99,7 @@ const ServicesSection = ({ title = "Nuestros Servicios", services }: ServicesSec
   const servicesList = services ? services.map(service => ({
     ...service,
     icon: renderIcon(service.icon),
-    features: ["Asesoría especializada", "Consulta online", "Seguimiento del caso"]
+    features: ["Asesoría especializada", "Seguimiento del caso", "Defensa legal completa"]
   })) : defaultServices;
 
   return (
