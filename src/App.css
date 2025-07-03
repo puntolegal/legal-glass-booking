@@ -40,3 +40,36 @@
 .read-the-docs {
   color: #888;
 }
+
+/* Barra de desplazamiento moderna y oscura */
+::-webkit-scrollbar {
+  width: 12px;
+  background: #1a1a1a;
+}
+::-webkit-scrollbar-thumb {
+  background: #ff6600;
+  border-radius: 8px;
+  border: 2px solid #1a1a1a;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #ff8800;
+}
+/* Para Firefox */
+html {
+  scrollbar-color: #ff6600 #1a1a1a;
+  scrollbar-width: thin;
+}
+
+body {
+  background: #ffefe0 !important;
+}
+
+/* Si hay clases específicas para el fondo, también actualizarlas */
+.bg-white, .bg-background, .glass-strong {
+  background: #ffefe0 !important;
+}
+
+header, .sidebar, .glass-strong.header, .glass-strong.sidebar {
+  background: #1a1a1a !important;
+  color: #fff !important;
+}

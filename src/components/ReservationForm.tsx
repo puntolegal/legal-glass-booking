@@ -20,7 +20,7 @@ const ReservationForm = ({ onClose }: ReservationFormProps) => {
     nombre: "",
     rut: "",
     email: "",
-    telefono: "",
+    telefono: "+569 1234 5678",
     descripcion: "",
     fecha: "",
     hora: ""
@@ -150,7 +150,7 @@ const ReservationForm = ({ onClose }: ReservationFormProps) => {
                 value={formData.telefono}
                 onChange={handleChange}
                 className="glass border-white/20"
-                placeholder="+569 6232 1883"
+                placeholder="+569 1234 5678"
                 required
               />
             </div>
@@ -250,7 +250,7 @@ const ReservationForm = ({ onClose }: ReservationFormProps) => {
               <h3 className="text-lg font-semibold">Resumen de Pago</h3>
               <span className="text-2xl font-bold text-primary">
                 <span className="line-through mr-2">$15.000 CLP</span>
-                <span className="text-green-500 font-bold">Oferta de Lanzamiento: Consulta Gratis</span>
+                <span className="text-green-600 font-extrabold text-lg animate-pulse">Oferta de Lanzamiento: Consulta Gratis</span>
               </span>
             </div>
             <ul className="text-sm text-muted-foreground space-y-2">

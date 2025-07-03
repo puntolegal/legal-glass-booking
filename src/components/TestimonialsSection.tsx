@@ -3,7 +3,6 @@ const TestimonialsSection = () => {
     {
       name: "María González",
       role: "Ejecutiva de Ventas",
-      avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b47c?w=100&h=100&fit=crop&crop=face",
       testimonial: "Excelente servicio. Me ayudaron a recuperar mi indemnización completa tras un despido injustificado. El proceso fue claro y transparente desde el inicio.",
       rating: 5,
       case: "Despido Injustificado - Recuperó $2.8M CLP"
@@ -11,7 +10,6 @@ const TestimonialsSection = () => {
     {
       name: "Carlos Rodríguez",
       role: "Ingeniero Industrial",
-      avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face",
       testimonial: "Profesionales muy competentes. Resolvieron mi caso de discriminación laboral de manera eficiente. Recomiendo sus servicios al 100%.",
       rating: 5,
       case: "Tutela de Derechos - Caso resuelto favorablemente"
@@ -19,7 +17,6 @@ const TestimonialsSection = () => {
     {
       name: "Ana Martínez",
       role: "Administradora",
-      avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face",
       testimonial: "Excelente asesoría legal. Me ayudaron a resolver mi caso de despido indebido de manera profesional y eficiente. El seguimiento fue excelente.",
       rating: 5,
       case: "Despido Indebido - Caso resuelto favorablemente"
@@ -54,16 +51,9 @@ const TestimonialsSection = () => {
                 </svg>
               </div>
 
-              <div className="flex items-center mb-6">
-                <img 
-                  src={testimonial.avatar} 
-                  alt={testimonial.name}
-                  className="w-12 h-12 rounded-full mr-4 border-2 border-primary/30"
-                />
-                <div>
-                  <h4 className="font-semibold text-foreground">{testimonial.name}</h4>
-                  <p className="text-sm text-muted-foreground">{testimonial.role}</p>
-                </div>
+              <div className="mb-6">
+                <h4 className="font-semibold text-foreground">{testimonial.name}</h4>
+                <p className="text-sm text-muted-foreground">{testimonial.role}</p>
               </div>
 
               <div className="flex mb-4">

@@ -5,10 +5,15 @@ import ReservationForm from "./ReservationForm";
 interface HeroSectionProps {
   title?: string;
   subtitle?: string;
+  showForm?: boolean;
+  setShowForm?: (show: boolean) => void;
 }
 
-const HeroSection = ({ title, subtitle }: HeroSectionProps) => {
-  const [showForm, setShowForm] = useState(false);
+const HeroSection = ({ title, subtitle, showForm, setShowForm }: HeroSectionProps) => {
+  const [internalShowForm, internalSetShowForm] = useState(false);
+  const isControlled = typeof showForm === 'boolean' && typeof setShowForm === 'function';
+  const actualShowForm = isControlled ? showForm : internalShowForm;
+  const actualSetShowForm = isControlled ? setShowForm : internalSetShowForm;
 
   const defaultTitle = "Asesoría Legal Especializada";
   const defaultSubtitle = "en Derecho Laboral";
@@ -38,7 +43,7 @@ const HeroSection = ({ title, subtitle }: HeroSectionProps) => {
               variant="primary" 
               size="lg" 
               className="text-lg px-8 py-6 animate-glow"
-              onClick={() => setShowForm(true)}
+              onClick={() => actualSetShowForm(true)}
             >
               Agendar Ahora
               <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -98,7 +103,7 @@ const HeroSection = ({ title, subtitle }: HeroSectionProps) => {
         </div>
       </div>
 
-      {showForm && <ReservationForm onClose={() => setShowForm(false)} />}
+      {actualShowForm && <ReservationForm onClose={() => actualSetShowForm(false)} />}
     </section>
   );
 };

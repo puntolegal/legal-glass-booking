@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 
-const Header = () => {
+const Header = ({ onAgendarClick }: { onAgendarClick?: () => void }) => {
   return (
     <header className="fixed top-0 w-full z-50 glass border-b border-white/10">
       <div className="container mx-auto px-6 py-4">
@@ -21,14 +21,14 @@ const Header = () => {
                 Servicios
               </span>
               <div className="absolute top-full left-0 mt-2 glass rounded-lg p-4 min-w-[220px] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
-                <a href="#" className="block text-muted-foreground hover:text-primary transition-colors py-2">
-                  Despido Injustificado
+                <a href="/laboral" className="block text-muted-foreground hover:text-primary transition-colors py-2">
+                  Derecho Laboral
                 </a>
-                <a href="#" className="block text-muted-foreground hover:text-primary transition-colors py-2">
-                  Despido Indebido
+                <a href="/familia" className="block text-muted-foreground hover:text-primary transition-colors py-2">
+                  Derecho de Familia
                 </a>
-                <a href="#" className="block text-muted-foreground hover:text-primary transition-colors py-2">
-                  Tutela de Derechos
+                <a href="/herencias" className="block text-muted-foreground hover:text-primary transition-colors py-2">
+                  Herencias y Testamentos
                 </a>
               </div>
             </div>
@@ -38,8 +38,12 @@ const Header = () => {
             <a href="#contacto" className="text-muted-foreground hover:text-primary transition-colors">
               Contacto
             </a>
-            <Button variant="primary" size="sm">
-              Consulta Ahora
+            <Button 
+              variant="primary" 
+              size="sm"
+              onClick={onAgendarClick}
+            >
+              Agendar Ahora
             </Button>
           </nav>
 

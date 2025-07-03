@@ -5,23 +5,22 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
           {/* Logo y descripción */}
           <div className="md:col-span-2">
-            <div className="flex items-center space-x-2 mb-6">
-              <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
-                <span className="text-primary-foreground font-bold text-xl">P</span>
+            <div className="flex items-center space-x-2">
+              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+                <span className="text-primary-foreground font-bold text-lg">P</span>
               </div>
-              <span className="text-2xl font-bold text-foreground">Punto Legal</span>
-            </div>
-            <p className="text-muted-foreground mb-6 max-w-md leading-relaxed">
-              Especialistas en derecho laboral con más de 10 años de experiencia 
-              defendiendo los derechos de los trabajadores en Chile.
-            </p>
-            <div className="flex space-x-4">
-              <a href="#" className="w-10 h-10 glass rounded-lg flex items-center justify-center hover:bg-primary/20 transition-colors">
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-                </svg>
+              <a href="https://www.facebook.com/puntolegalchile" target="_blank" rel="noopener noreferrer" className="ml-2">
+                <span className="w-8 h-8 rounded-full bg-gray-400 flex items-center justify-center">
+                  <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M22.675 0h-21.35C.595 0 0 .592 0 1.326v21.348C0 23.408.595 24 1.325 24h11.495v-9.294H9.692v-3.622h3.128V8.413c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.797.143v3.24l-1.918.001c-1.504 0-1.797.715-1.797 1.763v2.313h3.587l-.467 3.622h-3.12V24h6.116C23.406 24 24 23.408 24 22.674V1.326C24 .592 23.406 0 22.675 0"/>
+                  </svg>
+                </span>
               </a>
+              <span className="text-xl font-bold text-foreground text-justify">Punto Legal</span>
             </div>
+            <p className="text-muted-foreground mt-2 text-justify">
+              Especialistas en derecho laboral con más de 10 años de experiencia defendiendo los derechos de los trabajadores en Chile.
+            </p>
           </div>
 
           {/* Servicios */}
@@ -30,7 +29,7 @@ const Footer = () => {
             <ul className="space-y-3">
               <li><a href="/laboral" className="text-muted-foreground hover:text-primary transition-colors">Derecho Laboral</a></li>
               <li><a href="/familia" className="text-muted-foreground hover:text-primary transition-colors">Derecho de Familia</a></li>
-              <li><a href="/herencias" className="text-muted-foreground hover:text-primary transition-colors">Herencias</a></li>
+              <li><a href="/herencias" className="text-muted-foreground hover:text-primary transition-colors">Herencias y Testamentos</a></li>
             </ul>
           </div>
 
