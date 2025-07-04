@@ -31,14 +31,6 @@ const App = () => (
             <Route path="/herencias" element={<HerenciasPage />} />
             <Route path="/admin" element={<AdminPage />} />
             <Route path="/auth" element={<AuthPage />} />
-            
-            {/* Specialized Landing Pages */}
-            <Route path="/corporativo" element={<CorporativoPage />} />
-            <Route path="/laboral-especializado" element={<LaboralSpecializedPage />} />
-            <Route path="/tributario" element={<TributarioPage />} />
-            <Route path="/transito" element={<TransitoPage />} />
-            <Route path="/inmobiliario" element={<InmobiliarioPage />} />
-            
             <Route path="/blog/calculo-indemnizacion" element={<BlogPost1 />} />
             <Route path="/blog/ley-karin" element={<BlogPost2 />} />
             <Route path="/blog/pensiones-alimentos" element={<BlogPost3 />} />
