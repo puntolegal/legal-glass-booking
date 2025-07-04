@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import AvailabilityCalendar from "./AvailabilityCalendar";
+import IndemnizationChart from "./IndemnizationChart";
 
 interface ReservationFormProps {
   onClose: () => void;
@@ -20,6 +21,7 @@ const ReservationForm = ({ onClose }: ReservationFormProps) => {
     caseDescription: "",
   });
   const [selectedDateTime, setSelectedDateTime] = useState<{date: Date, time: string} | null>(null);
+  const [showCalculator, setShowCalculator] = useState(false);
 
   const handleDateTimeSelect = (date: Date, time: string) => {
     setSelectedDateTime({ date, time });
@@ -37,14 +39,53 @@ const ReservationForm = ({ onClose }: ReservationFormProps) => {
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
-      <div className="w-full max-w-4xl grid grid-cols-1 lg:grid-cols-2 gap-6 my-8">
-        {/* Calendar Section */}
-        <div>
-          <AvailabilityCalendar onDateSelect={handleDateTimeSelect} />
+      <div className="w-full max-w-6xl my-8">
+        {/* Success Story Section */}
+        <div className="mb-6">
+          <Card className="glass-intense border-glass-border mb-4">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center space-x-4">
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-r from-primary to-accent flex items-center justify-center">
+                    <span className="text-white font-bold text-lg">S</span>
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-foreground">Sebastián Soto</h3>
+                    <p className="text-sm text-muted-foreground">Caso de éxito reciente</p>
+                  </div>
+                </div>
+                <Badge variant="secondary" className="bg-neon-green/20 text-neon-green border-neon-green/30">
+                  $13.000.000 CLP
+                </Badge>
+              </div>
+              <p className="text-muted-foreground mb-4">
+                <strong>Sebastián fue despedido injustificadamente</strong> y con nuestra asesoría legal especializada 
+                obtuvo una indemnización de <strong>$13.000.000 CLP</strong> por violación a sus derechos laborales.
+              </p>
+              <Button
+                variant="outline" 
+                onClick={() => setShowCalculator(!showCalculator)}
+                className="btn-glow w-full mb-4"
+              >
+                {showCalculator ? "Ocultar Calculadora" : "Calcular mi Indemnización"}
+              </Button>
+              {showCalculator && (
+                <div className="mt-4">
+                  <IndemnizationChart />
+                </div>
+              )}
+            </CardContent>
+          </Card>
         </div>
 
-        {/* Form Section */}
-        <Card className="glass-intense border-glass-border">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Calendar Section */}
+          <div>
+            <AvailabilityCalendar onDateSelect={handleDateTimeSelect} />
+          </div>
+
+          {/* Form Section */}
+          <Card className="glass-intense border-glass-border">
           <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle className="text-foreground">Datos de Contacto</CardTitle>
@@ -179,6 +220,7 @@ const ReservationForm = ({ onClose }: ReservationFormProps) => {
             </form>
           </CardContent>
         </Card>
+        </div>
       </div>
     </div>
   );

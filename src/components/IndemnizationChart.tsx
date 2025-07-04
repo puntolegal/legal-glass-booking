@@ -17,49 +17,77 @@ interface IndemnizationChartProps {
 }
 
 const IndemnizationChart = ({ chartType = "bar" }: IndemnizationChartProps) => {
-  // Sample data for indemnization based on years of service
+  // Enhanced data with breakdown for Sebastian's case
   const indemnizationData = [
     {
       years: "1",
       indemnization: 450000,
+      tutelaDerechos: 110000,
+      nulidadDespido: 110000,
+      faltaAviso: 50000,
+      indemnizacionLegal: 180000,
       baseSalary: 450000,
-      description: "1 mes de sueldo",
+      description: "1 año de servicio",
     },
     {
       years: "2",
-      indemnization: 900000,
+      indemnization: 1100000,
+      tutelaDerechos: 110000,
+      nulidadDespido: 110000,
+      faltaAviso: 80000,
+      indemnizacionLegal: 800000,
       baseSalary: 450000,
-      description: "2 meses de sueldo",
+      description: "2 años de servicio",
     },
     {
       years: "3",
-      indemnization: 1350000,
+      indemnization: 1850000,
+      tutelaDerechos: 110000,
+      nulidadDespido: 110000,
+      faltaAviso: 130000,
+      indemnizacionLegal: 1500000,
       baseSalary: 450000,
-      description: "3 meses de sueldo",
+      description: "3 años de servicio",
     },
     {
       years: "5",
-      indemnization: 2250000,
+      indemnization: 3350000,
+      tutelaDerechos: 110000,
+      nulidadDespido: 110000,
+      faltaAviso: 180000,
+      indemnizacionLegal: 2950000,
       baseSalary: 450000,
-      description: "5 meses de sueldo",
+      description: "5 años de servicio",
+    },
+    {
+      years: "8",
+      indemnization: 6500000,
+      tutelaDerechos: 110000,
+      nulidadDespido: 110000,
+      faltaAviso: 280000,
+      indemnizacionLegal: 6000000,
+      baseSalary: 450000,
+      description: "8 años de servicio (Caso Sebastián)",
     },
     {
       years: "10",
-      indemnization: 4500000,
+      indemnization: 7500000,
+      tutelaDerechos: 110000,
+      nulidadDespido: 110000,
+      faltaAviso: 350000,
+      indemnizacionLegal: 6930000,
       baseSalary: 450000,
-      description: "10 meses de sueldo",
+      description: "10 años de servicio",
     },
     {
       years: "15",
-      indemnization: 6750000,
+      indemnization: 10500000,
+      tutelaDerechos: 110000,
+      nulidadDespido: 110000,
+      faltaAviso: 480000,
+      indemnizacionLegal: 9800000,
       baseSalary: 450000,
-      description: "11 meses de sueldo + años de servicio",
-    },
-    {
-      years: "20",
-      indemnization: 9000000,
-      baseSalary: 450000,
-      description: "11 meses + años de servicio",
+      description: "15 años de servicio",
     },
   ];
 
@@ -67,15 +95,43 @@ const IndemnizationChart = ({ chartType = "bar" }: IndemnizationChartProps) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
       return (
-        <div className="glass-intense rounded-lg p-4 border border-primary/30">
-          <p className="font-semibold text-foreground">{`${label} años de servicio`}</p>
-          <p className="text-primary font-medium">
-            {`Indemnización: $${data.indemnization.toLocaleString("es-CL")}`}
-          </p>
-          <p className="text-sm text-muted-foreground">{data.description}</p>
-          <p className="text-xs text-muted-foreground mt-1">
-            Sueldo base: ${data.baseSalary.toLocaleString("es-CL")}
-          </p>
+        <div className="glass-intense rounded-lg p-4 border border-primary/30 min-w-[280px]">
+          <p className="font-semibold text-foreground mb-3">{`${label} años de servicio`}</p>
+          <div className="space-y-2">
+            <div className="flex justify-between">
+              <span className="text-sm text-muted-foreground">Tutela de Derechos:</span>
+              <span className="text-sm font-medium text-primary">
+                ${data.tutelaDerechos?.toLocaleString("es-CL") || "0"}
+              </span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-sm text-muted-foreground">Nulidad del Despido:</span>
+              <span className="text-sm font-medium text-primary">
+                ${data.nulidadDespido?.toLocaleString("es-CL") || "0"}
+              </span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-sm text-muted-foreground">Falta de Aviso Previo:</span>
+              <span className="text-sm font-medium text-primary">
+                ${data.faltaAviso?.toLocaleString("es-CL") || "0"}
+              </span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-sm text-muted-foreground">Indemnización Legal:</span>
+              <span className="text-sm font-medium text-primary">
+                ${data.indemnizacionLegal?.toLocaleString("es-CL") || "0"}
+              </span>
+            </div>
+            <div className="border-t border-glass-border pt-2 mt-2">
+              <div className="flex justify-between">
+                <span className="font-medium text-foreground">Total:</span>
+                <span className="font-bold text-neon-green">
+                  ${data.indemnization.toLocaleString("es-CL")}
+                </span>
+              </div>
+            </div>
+          </div>
+          <p className="text-xs text-muted-foreground mt-2">{data.description}</p>
         </div>
       );
     }

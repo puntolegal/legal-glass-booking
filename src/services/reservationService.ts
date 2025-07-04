@@ -25,9 +25,9 @@ export const HORARIOS_DISPONIBLES = [
   '14:00', '15:00', '16:00', '17:00'
 ];
 
-// Función para guardar reservas en localStorage
+// Función para guardar reservas en localStorage (legacy)
 const saveReservas = () => {
-  localStorage.setItem('reservas', JSON.stringify(reservas));
+  // No longer used as we're using Supabase
 };
 
 // Función para verificar si un horario está disponible
@@ -82,14 +82,14 @@ export async function getReservationsByDate(fecha: string): Promise<Reservation[
 }
 
 // Función para limpiar reservas antiguas (más de 30 días)
-export const cleanupOldReservations = () => {
+export const cleanupOldReservations = async () => {
   const thirtyDaysAgo = new Date();
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
   
-  reservas = reservas.filter(r => {
-    const reservationDate = new Date(r.fecha);
-    return reservationDate > thirtyDaysAgo;
-  });
-  
-  saveReservas();
-}; 
+  const { error } = await supabase
+    .from('reservas')
+    .delete()
+    .lt('fecha', thirtyDaysAgo.toISOString().split('T')[0]);
+    
+  if (error) throw error;
+};

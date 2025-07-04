@@ -2,6 +2,7 @@ interface Service {
   title: string;
   description: string;
   icon: string;
+  price?: string;
 }
 
 interface ServicesSectionProps {
@@ -17,9 +18,10 @@ const ServicesSection = ({ title = "Nuestros Servicios", services }: ServicesSec
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
         </svg>
       ),
-      title: "Despido Injustificado",
-      description: "Te ayudamos a determinar si tu despido fue sin causa justa y a obtener la compensación que te corresponde por ley.",
-      features: ["Análisis del contrato", "Revisión de causales", "Cálculo de indemnizaciones"]
+      title: "Tutela de Derechos Fundamentales",
+      description: "Protección ante vulneraciones de derechos fundamentales en el trabajo como discriminación, acoso laboral o mobbing.",
+      features: ["Discriminación laboral", "Acoso en el trabajo", "Protección de derechos"],
+      price: "$110.000"
     },
     {
       icon: (
@@ -27,9 +29,10 @@ const ServicesSection = ({ title = "Nuestros Servicios", services }: ServicesSec
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
         </svg>
       ),
-      title: "Despido Indebido",
+      title: "Nulidad del Despido",
       description: "Asesoría especializada cuando el despido no siguió los procedimientos legales establecidos por el código laboral.",
-      features: ["Procedimientos incorrectos", "Falta de notificación", "Defensa legal completa"]
+      features: ["Procedimientos incorrectos", "Falta de notificación", "Defensa legal completa"],
+      price: "$110.000"
     },
     {
       icon: (
@@ -37,9 +40,10 @@ const ServicesSection = ({ title = "Nuestros Servicios", services }: ServicesSec
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
         </svg>
       ),
-      title: "Tutela de Derechos Fundamentales",
-      description: "Protección ante vulneraciones de derechos fundamentales en el trabajo como discriminación, acoso laboral o mobbing.",
-      features: ["Discriminación laboral", "Acoso en el trabajo", "Protección de derechos"]
+      title: "Asesoría Ley Karin",
+      description: "Asesoría especializada en casos de acoso laboral, sexual y violencia en el trabajo según la Ley Karin.",
+      features: ["Acoso laboral", "Acoso sexual", "Violencia laboral"],
+      price: "$45.000"
     }
   ];
 
@@ -99,7 +103,8 @@ const ServicesSection = ({ title = "Nuestros Servicios", services }: ServicesSec
   const servicesList = services ? services.map(service => ({
     ...service,
     icon: renderIcon(service.icon),
-    features: ["Asesoría especializada", "Seguimiento del caso", "Defensa legal completa"]
+    features: ["Asesoría especializada", "Seguimiento del caso", "Defensa legal completa"],
+    price: service.price
   })) : defaultServices;
 
   return (
@@ -119,26 +124,50 @@ const ServicesSection = ({ title = "Nuestros Servicios", services }: ServicesSec
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {servicesList.map((service, index) => (
-            <div key={index} className="glass rounded-3xl p-8 hover:scale-105 transition-transform duration-300">
-              <div className="text-primary mb-6 flex justify-center">
-                {service.icon}
+            <div key={index} className="group relative">
+              {/* Widget-style card with iPhone-like design */}
+              <div className="glass-intense rounded-3xl p-8 hover:scale-105 transition-all duration-300 border-2 border-glass-border hover:border-primary/30 bg-gradient-to-br from-card/80 via-card/60 to-card/40 backdrop-blur-xl shadow-xl hover:shadow-2xl">
+                {/* Icon section with gradient background */}
+                <div className="w-16 h-16 mx-auto mb-6 rounded-2xl bg-gradient-to-r from-primary to-accent flex items-center justify-center shadow-lg">
+                  <div className="text-white scale-125">
+                    {service.icon}
+                  </div>
+                </div>
+                
+                {/* Title and price */}
+                <div className="text-center mb-4">
+                  <h3 className="text-xl font-bold text-foreground mb-2">
+                    {service.title}
+                  </h3>
+                  {service.price && (
+                    <div className="inline-flex items-center px-3 py-1 rounded-full bg-gradient-to-r from-primary/20 to-accent/20 border border-primary/30">
+                      <span className="text-primary font-bold text-lg">{service.price}</span>
+                    </div>
+                  )}
+                </div>
+                
+                {/* Description */}
+                <p className="text-muted-foreground mb-6 text-center leading-relaxed text-sm">
+                  {service.description}
+                </p>
+                
+                {/* Features with modern styling */}
+                <div className="space-y-3">
+                  {service.features.map((feature, featureIndex) => (
+                    <div key={featureIndex} className="flex items-center space-x-3 p-2 rounded-lg hover:bg-primary/5 transition-colors">
+                      <div className="w-6 h-6 rounded-full bg-gradient-to-r from-neon-green/20 to-cyan-electric/20 flex items-center justify-center flex-shrink-0">
+                        <svg className="w-3 h-3 text-neon-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                        </svg>
+                      </div>
+                      <span className="text-muted-foreground text-sm">{feature}</span>
+                    </div>
+                  ))}
+                </div>
+                
+                {/* Hover glow effect */}
+                <div className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-r from-primary/5 via-transparent to-accent/5 pointer-events-none" />
               </div>
-              <h3 className="text-2xl font-bold text-foreground mb-4 text-center">
-                {service.title}
-              </h3>
-              <p className="text-muted-foreground mb-6 text-center leading-relaxed">
-                {service.description}
-              </p>
-              <ul className="space-y-3">
-                {service.features.map((feature, featureIndex) => (
-                  <li key={featureIndex} className="flex items-center text-muted-foreground">
-                    <svg className="w-5 h-5 text-primary mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                    {feature}
-                  </li>
-                ))}
-              </ul>
             </div>
           ))}
         </div>
