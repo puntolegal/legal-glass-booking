@@ -37,11 +37,13 @@ All colors MUST be HSL.
     --input: 0 0% 100%;
     --ring: 24 100% 58%;
 
-    /* Advanced Color Palette */
-    --cyan-electric: 190 100% 60%;
-    --lavender-soft: 270 50% 75%;
-    --neon-green: 24 90% 55%; /* Orange tone */
-    --warm-white: 30 10% 95%;
+    /* New Color Variables from Expanded Palette */
+    --slate-dark: 210 20% 18%;           /* #1A2730 */
+    --slate-medium: 210 15% 28%;         /* #424048 */
+    --slate-light: 210 12% 35%;          /* #45586C */
+    --blue-gray: 210 22% 76%;            /* #B0CEE2 */
+    --orange-primary: 24 86% 59%;        /* #A63E1B */
+    --orange-secondary: 16 90% 65%;      /* #E95D2C */
     
     /* Light Mode Glass morphism design tokens */
     --glass-bg: 255 255 255 / 0.8;

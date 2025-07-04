@@ -86,28 +86,28 @@ const TestimonialsSection = () => {
               Únete a los cientos de trabajadores que han recuperado sus derechos con nuestra ayuda
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button 
-                className="glass-intense bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white px-8 py-3 rounded-xl font-semibold hover:scale-105 transition-all duration-300 border border-orange-400/20 backdrop-blur-xl shadow-lg hover:shadow-xl"
-                onClick={() => {
-                  const element = document.getElementById('inicio');
-                  if (element) {
-                    element.scrollIntoView({ behavior: 'smooth' });
-                  }
-                }}
-              >
-                Agenda tu Consulta
-              </button>
-              <button 
-                className="glass px-8 py-3 rounded-lg border border-primary/30 hover:bg-primary/10 transition-colors"
-                onClick={() => {
-                  const element = document.getElementById('casos-exito');
-                  if (element) {
-                    element.scrollIntoView({ behavior: 'smooth' });
-                  }
-                }}
-              >
-                Ver más casos
-              </button>
+                <button 
+                  className="glass-intense bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white px-8 py-3 rounded-xl font-semibold hover:scale-105 transition-all duration-300 border border-orange-400/20 backdrop-blur-xl shadow-lg hover:shadow-xl"
+                  onClick={() => {
+                    const element = document.getElementById('inicio');
+                    if (element) {
+                      element.scrollIntoView({ behavior: 'smooth' });
+                    }
+                  }}
+                >
+                  Agendar ahora una reunión - $15.000
+                </button>
+                <button 
+                  className="glass px-8 py-3 rounded-lg border border-primary/30 hover:bg-primary/10 transition-colors"
+                  onClick={() => {
+                    const element = document.getElementById('casos-exito');
+                    if (element) {
+                      element.scrollIntoView({ behavior: 'smooth' });
+                    }
+                  }}
+                >
+                  Contactar por WhatsApp
+                </button>
             </div>
           </div>
         </div>

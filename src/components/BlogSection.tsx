@@ -61,45 +61,55 @@ const BlogSection = ({ title = "Blog Legal", posts }: BlogSectionProps) => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {blogPostsList.map((post, index) => (
-            <article 
-              key={index} 
-              className="glass rounded-2xl overflow-hidden hover:scale-105 transition-transform duration-300 group"
-            >
-              <div className="relative overflow-hidden">
-                <img 
-                  src={post.image} 
-                  alt={post.title}
-                  className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-300"
-                />
-                {post.category && (
-                  <div className="absolute top-4 left-4 bg-primary text-primary-foreground px-3 py-1 rounded-full text-sm font-medium">
-                    {post.category}
-                  </div>
-                )}
-              </div>
-              
-              <div className="p-6">
-                <h3 className="text-lg font-bold text-foreground mb-3 group-hover:text-primary transition-colors">
-                  {post.title}
-                </h3>
-                <p className="text-muted-foreground text-sm mb-4 leading-relaxed">
-                  {post.excerpt}
-                </p>
-                
-                <div className="flex items-center justify-between">
-                  {post.readTime && (
-                    <span className="text-xs text-muted-foreground">
-                      {post.readTime}
-                    </span>
+          {blogPostsList.map((post, index) => {
+            const blogLinks = [
+              "/blog/calculo-indemnizacion",
+              "/blog/ley-karin", 
+              "/blog/pensiones-alimentos",
+              "/blog/calculo-indemnizacion"
+            ];
+            
+            return (
+              <article 
+                key={index} 
+                className="glass rounded-2xl overflow-hidden hover:scale-105 transition-transform duration-300 group cursor-pointer"
+                onClick={() => window.location.href = blogLinks[index]}
+              >
+                <div className="relative overflow-hidden">
+                  <img 
+                    src={post.image} 
+                    alt={post.title}
+                    className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-300"
+                  />
+                  {post.category && (
+                    <div className="absolute top-4 left-4 bg-primary text-primary-foreground px-3 py-1 rounded-full text-sm font-medium">
+                      {post.category}
+                    </div>
                   )}
-                  <button className="text-primary hover:text-accent transition-colors text-sm font-medium">
-                    Leer más →
-                  </button>
                 </div>
-              </div>
-            </article>
-          ))}
+                
+                <div className="p-6">
+                  <h3 className="text-lg font-bold text-foreground mb-3 group-hover:text-primary transition-colors">
+                    {post.title}
+                  </h3>
+                  <p className="text-muted-foreground text-sm mb-4 leading-relaxed">
+                    {post.excerpt}
+                  </p>
+                  
+                  <div className="flex items-center justify-between">
+                    {post.readTime && (
+                      <span className="text-xs text-muted-foreground">
+                        {post.readTime}
+                      </span>
+                    )}
+                    <button className="text-primary hover:text-accent transition-colors text-sm font-medium">
+                      Leer más →
+                    </button>
+                  </div>
+                </div>
+              </article>
+            );
+          })}
         </div>
 
         <div className="text-center mt-16">

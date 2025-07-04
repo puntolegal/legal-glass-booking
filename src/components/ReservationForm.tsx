@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import AvailabilityCalendar from "./AvailabilityCalendar";
-import IndemnizationChart from "./IndemnizationChart";
+import IndemnizationCalculator from "./IndemnizationCalculator";
 
 interface ReservationFormProps {
   onClose: () => void;
@@ -99,12 +99,12 @@ const ReservationForm = ({ onClose }: ReservationFormProps) => {
                 className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-bold py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
                 size="lg"
               >
-                {showCalculator ? "Ocultar Gráfico" : "🧮 Calcular Ahora tu Indemnización"}
+                {showCalculator ? "Ocultar Calculadora" : "🧮 Calcular Ahora tu Indemnización"}
               </Button>
               
               {showCalculator && (
                 <div className="mt-6 animate-calendar-pop">
-                  <IndemnizationChart />
+                  <IndemnizationCalculator />
                 </div>
               )}
             </CardContent>
