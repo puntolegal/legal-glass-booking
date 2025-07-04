@@ -42,11 +42,11 @@ const HeroSection = ({ title, subtitle, showForm, setShowForm }: HeroSectionProp
             <Button 
               variant="ghost" 
               size="lg" 
-              className="text-xl px-12 py-8 glass-intense bg-gradient-to-r from-orange-500/90 to-red-500/90 hover:from-orange-400/95 hover:to-red-400/95 text-white border-2 border-orange-400/30 hover:border-orange-300/50 backdrop-blur-xl shadow-2xl hover:shadow-orange-500/30 transition-all duration-300 hover:scale-105 animate-pulse-neon font-bold rounded-2xl"
+              className="text-lg px-10 py-6 glass-intense bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white border border-orange-400/20 backdrop-blur-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] font-semibold rounded-xl"
               onClick={() => actualSetShowForm(true)}
             >
-              🔥 Agendar Ahora
-              <svg className="w-6 h-6 ml-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              Agendar Ahora
+              <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
             </Button>

@@ -104,7 +104,7 @@ const BlogSection = ({ title = "Blog Legal", posts }: BlogSectionProps) => {
 
         <div className="text-center mt-16">
           <button 
-            className="btn-primary px-8 py-3 rounded-xl text-primary-foreground font-semibold hover:scale-105 transition-transform"
+            className="glass-intense bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white px-8 py-3 rounded-xl font-semibold hover:scale-105 transition-all duration-300 border border-orange-400/20 backdrop-blur-xl shadow-lg"
             onClick={() => {
               // Navigate to blog page or expand to show all articles
               window.location.href = "#blog";

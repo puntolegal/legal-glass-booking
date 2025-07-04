@@ -40,7 +40,7 @@ All colors MUST be HSL.
     /* Advanced Color Palette */
     --cyan-electric: 190 100% 60%;
     --lavender-soft: 270 50% 75%;
-    --neon-green: 120 100% 70%;
+    --neon-green: 24 90% 55%; /* Changed to orange tone */
     --warm-white: 30 10% 95%;
     
     /* Enhanced Glass morphism design tokens */
