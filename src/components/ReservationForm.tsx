@@ -42,35 +42,68 @@ const ReservationForm = ({ onClose }: ReservationFormProps) => {
       <div className="w-full max-w-6xl my-8">
         {/* Success Story Section */}
         <div className="mb-6">
-          <Card className="glass-intense border-glass-border mb-4">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-r from-primary to-accent flex items-center justify-center">
-                    <span className="text-white font-bold text-lg">S</span>
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-semibold text-foreground">Sebastián Soto</h3>
-                    <p className="text-sm text-muted-foreground">Caso de éxito reciente</p>
-                  </div>
+          <Card className="glass-intense border-glass-border mb-4 bg-gradient-to-br from-orange-500/10 via-orange-400/5 to-orange-300/10">
+            <CardContent className="p-8">
+              <div className="text-center mb-6">
+                <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center shadow-lg">
+                  <span className="text-white font-bold text-2xl">S</span>
                 </div>
-                <Badge variant="secondary" className="bg-neon-green/20 text-neon-green border-neon-green/30">
-                  $13.000.000 CLP
-                </Badge>
+                <h3 className="text-2xl font-bold text-foreground mb-2">¡Caso de Éxito!</h3>
+                <div className="inline-flex items-center px-4 py-2 rounded-full bg-gradient-to-r from-neon-green/20 to-green-500/20 border border-neon-green/30">
+                  <span className="text-neon-green font-bold text-xl">$13.000.000 CLP</span>
+                </div>
               </div>
-              <p className="text-muted-foreground mb-4">
-                <strong>Sebastián fue despedido injustificadamente</strong> y con nuestra asesoría legal especializada 
-                obtuvo una indemnización de <strong>$13.000.000 CLP</strong> por violación a sus derechos laborales.
-              </p>
+              
+              <div className="text-center mb-6 space-y-2">
+                <p className="text-lg font-semibold text-foreground">
+                  <span className="text-orange-400">Sebastián Soto</span> fue despedido y obtuvo una indemnización de{" "}
+                  <span className="text-neon-green font-bold">$13.000.000</span>
+                </p>
+                <p className="text-muted-foreground">
+                  Con nuestra asesoría legal especializada defendió sus derechos laborales exitosamente
+                </p>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <div className="glass-intense rounded-xl p-4 text-center bg-gradient-to-br from-orange-500/10 to-red-500/5">
+                  <div className="w-8 h-8 mx-auto mb-2 rounded-lg bg-orange-500/20 flex items-center justify-center">
+                    <svg className="w-4 h-4 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                    </svg>
+                  </div>
+                  <p className="text-xs text-muted-foreground mb-1">Tutela de Derechos Fundamentales</p>
+                  <p className="font-bold text-orange-400">$110.000</p>
+                </div>
+                <div className="glass-intense rounded-xl p-4 text-center bg-gradient-to-br from-orange-500/10 to-red-500/5">
+                  <div className="w-8 h-8 mx-auto mb-2 rounded-lg bg-orange-500/20 flex items-center justify-center">
+                    <svg className="w-4 h-4 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    </svg>
+                  </div>
+                  <p className="text-xs text-muted-foreground mb-1">Nulidad del Despido</p>
+                  <p className="font-bold text-orange-400">$110.000</p>
+                </div>
+                <div className="glass-intense rounded-xl p-4 text-center bg-gradient-to-br from-orange-500/10 to-red-500/5">
+                  <div className="w-8 h-8 mx-auto mb-2 rounded-lg bg-orange-500/20 flex items-center justify-center">
+                    <svg className="w-4 h-4 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <p className="text-xs text-muted-foreground mb-1">Falta de Aviso Previo</p>
+                  <p className="font-bold text-orange-400">Variable</p>
+                </div>
+              </div>
+              
               <Button
-                variant="outline" 
                 onClick={() => setShowCalculator(!showCalculator)}
-                className="btn-glow w-full mb-4"
+                className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-bold py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+                size="lg"
               >
-                {showCalculator ? "Ocultar Calculadora" : "Calcular mi Indemnización"}
+                {showCalculator ? "Ocultar Gráfico" : "🧮 Calcular Ahora tu Indemnización"}
               </Button>
+              
               {showCalculator && (
-                <div className="mt-4">
+                <div className="mt-6 animate-calendar-pop">
                   <IndemnizationChart />
                 </div>
               )}

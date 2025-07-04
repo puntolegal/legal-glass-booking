@@ -44,6 +44,39 @@ const ServicesSection = ({ title = "Nuestros Servicios", services }: ServicesSec
       description: "Asesoría especializada en casos de acoso laboral, sexual y violencia en el trabajo según la Ley Karin.",
       features: ["Acoso laboral", "Acoso sexual", "Violencia laboral"],
       price: "$45.000"
+    },
+    {
+      icon: (
+        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a4 4 0 11-8 0 4 4 0 018 0z" />
+        </svg>
+      ),
+      title: "Derecho de Familia",
+      description: "Asesoría integral en temas familiares, divorcios y pensiones alimenticias.",
+      features: ["Divorcios", "Pensiones alimenticias", "Derecho familiar"],
+      price: "Desde $150.000"
+    },
+    {
+      icon: (
+        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+      ),
+      title: "Herencias y Testamentos",
+      description: "Gestión completa de procesos sucesorios, testamentos y particiones.",
+      features: ["Testamentos ($1.200.000)", "Partición de herencia (2%)", "Procesos sucesorios"],
+      price: "Variable"
+    },
+    {
+      icon: (
+        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+        </svg>
+      ),
+      title: "Pensiones de Alimentos",
+      description: "Tramitación y gestión de pensiones alimenticias para menores y cónyuges.",
+      features: ["Demandas de alimentos", "Modificaciones", "Cumplimiento"],
+      price: "$640.000"
     }
   ];
 
@@ -125,48 +158,53 @@ const ServicesSection = ({ title = "Nuestros Servicios", services }: ServicesSec
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {servicesList.map((service, index) => (
             <div key={index} className="group relative">
-              {/* Widget-style card with iPhone-like design */}
-              <div className="glass-intense rounded-3xl p-8 hover:scale-105 transition-all duration-300 border-2 border-glass-border hover:border-primary/30 bg-gradient-to-br from-card/80 via-card/60 to-card/40 backdrop-blur-xl shadow-xl hover:shadow-2xl">
-                {/* Icon section with gradient background */}
-                <div className="w-16 h-16 mx-auto mb-6 rounded-2xl bg-gradient-to-r from-primary to-accent flex items-center justify-center shadow-lg">
-                  <div className="text-white scale-125">
-                    {service.icon}
+              {/* iPhone Widget-style card with advanced glassmorphism */}
+              <div className="relative group">
+                <div className="glass-intense rounded-[28px] p-6 hover:scale-[1.02] transition-all duration-500 border border-orange-500/20 hover:border-orange-400/40 bg-gradient-to-br from-orange-500/5 via-card/40 to-orange-400/5 backdrop-blur-2xl shadow-2xl hover:shadow-orange-500/20 overflow-hidden">
+                  
+                  {/* Background gradient orb */}
+                  <div className="absolute top-4 right-4 w-16 h-16 bg-gradient-to-br from-orange-500/20 to-red-500/10 rounded-full blur-xl opacity-60" />
+                  
+                  {/* Header with icon and price */}
+                  <div className="relative z-10 flex items-start justify-between mb-4">
+                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center shadow-lg shadow-orange-500/30">
+                      <div className="text-white scale-110">
+                        {service.icon}
+                      </div>
+                    </div>
+                    {service.price && (
+                      <div className="px-3 py-1 rounded-full bg-gradient-to-r from-orange-500/20 to-red-500/20 border border-orange-400/30 backdrop-blur-sm">
+                        <span className="text-orange-400 font-bold text-sm">{service.price}</span>
+                      </div>
+                    )}
                   </div>
-                </div>
-                
-                {/* Title and price */}
-                <div className="text-center mb-4">
-                  <h3 className="text-xl font-bold text-foreground mb-2">
+                  
+                  {/* Title */}
+                  <h3 className="text-lg font-bold text-foreground mb-3 leading-tight">
                     {service.title}
                   </h3>
-                  {service.price && (
-                    <div className="inline-flex items-center px-3 py-1 rounded-full bg-gradient-to-r from-primary/20 to-accent/20 border border-primary/30">
-                      <span className="text-primary font-bold text-lg">{service.price}</span>
-                    </div>
-                  )}
-                </div>
-                
-                {/* Description */}
-                <p className="text-muted-foreground mb-6 text-center leading-relaxed text-sm">
-                  {service.description}
-                </p>
-                
-                {/* Features with modern styling */}
-                <div className="space-y-3">
-                  {service.features.map((feature, featureIndex) => (
-                    <div key={featureIndex} className="flex items-center space-x-3 p-2 rounded-lg hover:bg-primary/5 transition-colors">
-                      <div className="w-6 h-6 rounded-full bg-gradient-to-r from-neon-green/20 to-cyan-electric/20 flex items-center justify-center flex-shrink-0">
-                        <svg className="w-3 h-3 text-neon-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                        </svg>
+                  
+                  {/* Description */}
+                  <p className="text-muted-foreground mb-4 text-sm leading-relaxed line-clamp-3">
+                    {service.description}
+                  </p>
+                  
+                  {/* Features with compact design */}
+                  <div className="space-y-2">
+                    {service.features.slice(0, 3).map((feature, featureIndex) => (
+                      <div key={featureIndex} className="flex items-center space-x-2 p-2 rounded-lg hover:bg-orange-500/5 transition-colors">
+                        <div className="w-4 h-4 rounded-full bg-gradient-to-br from-orange-500/30 to-red-500/20 flex items-center justify-center flex-shrink-0">
+                          <div className="w-2 h-2 rounded-full bg-orange-400" />
+                        </div>
+                        <span className="text-muted-foreground text-xs">{feature}</span>
                       </div>
-                      <span className="text-muted-foreground text-sm">{feature}</span>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
+                  
+                  {/* Hover effects */}
+                  <div className="absolute inset-0 rounded-[28px] opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-br from-orange-500/5 via-transparent to-red-500/5 pointer-events-none" />
+                  <div className="absolute inset-0 rounded-[28px] opacity-0 group-hover:opacity-100 transition-opacity duration-500 shadow-inner shadow-orange-500/10 pointer-events-none" />
                 </div>
-                
-                {/* Hover glow effect */}
-                <div className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-r from-primary/5 via-transparent to-accent/5 pointer-events-none" />
               </div>
             </div>
           ))}
