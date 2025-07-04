@@ -8,7 +8,80 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Punto Legal Advanced Colors - Warm Palette */
+    /* Punto Legal Light Mode - Clean White Palette */
+    --background: 0 0% 98%;
+    --foreground: 220 15% 15%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 220 15% 15%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 15% 15%;
+
+    --primary: 24 100% 58%; /* Corporate Orange */
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 220 10% 95%;
+    --secondary-foreground: 220 15% 15%;
+
+    --muted: 220 10% 92%;
+    --muted-foreground: 220 15% 45%;
+
+    --accent: 24 95% 65%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 220 10% 88%;
+    --input: 0 0% 100%;
+    --ring: 24 100% 58%;
+
+    /* Advanced Color Palette */
+    --cyan-electric: 190 100% 60%;
+    --lavender-soft: 270 50% 75%;
+    --neon-green: 24 90% 55%; /* Orange tone */
+    --warm-white: 30 10% 95%;
+    
+    /* Light Mode Glass morphism design tokens */
+    --glass-bg: 255 255 255 / 0.8;
+    --glass-border: 220 15% 85%;
+    --glass-blur: 20px;
+    --glass-intense: 255 255 255 / 0.9;
+    --glass-glow: 24 100% 58% / 0.1;
+    
+    /* Light Mode Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(24 100% 58%), hsl(24 95% 65%));
+    --gradient-glass: linear-gradient(135deg, hsl(255 255 255 / 0.8), hsl(24 100% 98% / 0.9));
+    --gradient-bg: linear-gradient(135deg, hsl(0 0% 98%), hsl(24 100% 99%));
+    --gradient-neon: linear-gradient(45deg, hsl(24 100% 58%), hsl(14 90% 55%));
+    --gradient-warm: linear-gradient(180deg, hsl(24 100% 58%), hsl(24 95% 65%));
+    
+    /* Light Mode Shadows */
+    --shadow-glass: 0 8px 32px hsl(220 15% 15% / 0.1);
+    --shadow-primary: 0 4px 20px hsl(24 100% 58% / 0.2);
+    --shadow-neon: 0 0 30px hsl(24 100% 58% / 0.3);
+    --shadow-glow: 0 0 40px hsl(24 100% 58% / 0.4);
+    
+    /* Animations */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    --transition-glass: backdrop-filter 0.3s ease-out;
+
+    --radius: 0.5rem;
+
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    /* Dark Mode - Orange Enhanced */
     --background: 220 25% 8%;
     --foreground: 0 0% 98%;
 
@@ -18,8 +91,8 @@ All colors MUST be HSL.
     --popover: 220 20% 12%;
     --popover-foreground: 0 0% 98%;
 
-    --primary: 24 100% 58%; /* Corporate Orange */
-    --primary-foreground: 220 25% 8%;
+    --primary: 24 100% 58%;
+    --primary-foreground: 0 0% 98%;
 
     --secondary: 220 15% 20%;
     --secondary-foreground: 0 0% 98%;
@@ -30,91 +103,33 @@ All colors MUST be HSL.
     --accent: 24 95% 65%;
     --accent-foreground: 220 25% 8%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
 
     --border: 220 15% 25%;
     --input: 220 15% 18%;
     --ring: 24 100% 58%;
-
-    /* Advanced Color Palette */
-    --cyan-electric: 190 100% 60%;
-    --lavender-soft: 270 50% 75%;
-    --neon-green: 24 90% 55%; /* Changed to orange tone */
-    --warm-white: 30 10% 95%;
     
-    /* Enhanced Glass morphism design tokens */
+    /* Dark Mode Glass morphism */
     --glass-bg: 220 20% 12% / 0.15;
     --glass-border: 0 0% 100% / 0.08;
     --glass-blur: 24px;
     --glass-intense: 220 20% 12% / 0.4;
     --glass-glow: 24 100% 58% / 0.2;
     
-    /* Advanced Gradients */
+    /* Dark Mode Gradients */
     --gradient-primary: linear-gradient(135deg, hsl(24 100% 58%), hsl(190 100% 60%));
     --gradient-glass: linear-gradient(135deg, hsl(220 20% 12% / 0.25), hsl(270 50% 75% / 0.1));
     --gradient-bg: linear-gradient(135deg, hsl(220 25% 8%), hsl(220 20% 12%));
-    --gradient-neon: linear-gradient(45deg, hsl(120 100% 70%), hsl(190 100% 60%));
+    --gradient-neon: linear-gradient(45deg, hsl(24 100% 58%), hsl(190 100% 60%));
     --gradient-warm: linear-gradient(180deg, hsl(24 100% 58%), hsl(24 95% 65%));
     
-    /* Enhanced Shadows */
+    /* Dark Mode Shadows */
     --shadow-glass: 0 8px 32px hsl(220 25% 8% / 0.5);
     --shadow-primary: 0 4px 20px hsl(24 100% 58% / 0.3);
-    --shadow-neon: 0 0 30px hsl(120 100% 70% / 0.4);
+    --shadow-neon: 0 0 30px hsl(24 100% 58% / 0.4);
     --shadow-glow: 0 0 40px hsl(24 100% 58% / 0.6);
     
-    /* Animations */
-    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-bounce: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-    --transition-glass: backdrop-filter 0.3s ease-out;
-
-    --radius: 0.5rem;
-
-    --sidebar-background: 0 0% 98%;
-
-    --sidebar-foreground: 240 5.3% 26.1%;
-
-    --sidebar-primary: 240 5.9% 10%;
-
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
-  }
-
-  .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;
@@ -137,8 +152,39 @@ All colors MUST be HSL.
     position: relative;
   }
   
-  /* Enhanced orange orb effects */
-  body::before {
+  /* Light mode orb effects - subtle and elegant */
+  body:not(.dark)::before {
+    content: '';
+    position: fixed;
+    top: 15%;
+    right: 10%;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, hsl(24 100% 88% / 0.15) 0%, hsl(24 90% 85% / 0.08) 50%, transparent 80%);
+    border-radius: 50%;
+    filter: blur(60px);
+    z-index: -1;
+    pointer-events: none;
+    animation: float 8s ease-in-out infinite;
+  }
+  
+  body:not(.dark)::after {
+    content: '';
+    position: fixed;
+    bottom: 20%;
+    left: 5%;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, hsl(14 80% 90% / 0.12) 0%, hsl(24 85% 92% / 0.06) 50%, transparent 80%);
+    border-radius: 50%;
+    filter: blur(40px);
+    z-index: -1;
+    pointer-events: none;
+    animation: float 10s ease-in-out infinite reverse;
+  }
+  
+  /* Dark mode orb effects - vibrant and energetic */
+  body.dark::before {
     content: '';
     position: fixed;
     top: 15%;
@@ -153,7 +199,7 @@ All colors MUST be HSL.
     animation: float 8s ease-in-out infinite, pulse-glow 4s ease-in-out infinite alternate;
   }
   
-  body::after {
+  body.dark::after {
     content: '';
     position: fixed;
     bottom: 20%;
@@ -165,15 +211,6 @@ All colors MUST be HSL.
     filter: blur(60px);
     z-index: -1;
     pointer-events: none;
-    animation: float 10s ease-in-out infinite reverse, pulse-glow 6s ease-in-out infinite;
-  }
-  
-  /* Additional smaller orbs for depth */
-  body {
-    position: relative;
-  }
-  
-  body::after {
     animation: float 10s ease-in-out infinite reverse, pulse-glow 6s ease-in-out infinite;
   }
 }
@@ -226,7 +263,7 @@ All colors MUST be HSL.
   
   .btn-neon:hover {
     transform: scale(1.05);
-    box-shadow: 0 0 50px hsl(120 100% 70% / 0.6);
+    box-shadow: 0 0 50px hsl(24 100% 58% / 0.6);
   }
   
   .btn-glow {
@@ -288,8 +325,8 @@ All colors MUST be HSL.
   }
   
   @keyframes pulse-neon {
-    0%, 100% { box-shadow: 0 0 20px hsl(120 100% 70% / 0.4); }
-    50% { box-shadow: 0 0 40px hsl(120 100% 70% / 0.8); }
+    0%, 100% { box-shadow: 0 0 20px hsl(24 100% 58% / 0.4); }
+    50% { box-shadow: 0 0 40px hsl(24 100% 58% / 0.8); }
   }
   
   @keyframes slide-in-left {
