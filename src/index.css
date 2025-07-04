@@ -8,7 +8,7 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Punto Legal Corporate Colors */
+    /* Punto Legal Advanced Colors - Warm Palette */
     --background: 220 25% 8%;
     --foreground: 0 0% 98%;
 
@@ -18,7 +18,7 @@ All colors MUST be HSL.
     --popover: 220 20% 12%;
     --popover-foreground: 0 0% 98%;
 
-    --primary: 24 100% 58%;
+    --primary: 24 100% 58%; /* Corporate Orange */
     --primary-foreground: 220 25% 8%;
 
     --secondary: 220 15% 20%;
@@ -37,22 +37,36 @@ All colors MUST be HSL.
     --input: 220 15% 18%;
     --ring: 24 100% 58%;
 
-    /* Glass morphism design tokens */
-    --glass-bg: 220 20% 12% / 0.6;
-    --glass-border: 0 0% 100% / 0.1;
-    --glass-blur: 16px;
+    /* Advanced Color Palette */
+    --cyan-electric: 190 100% 60%;
+    --lavender-soft: 270 50% 75%;
+    --neon-green: 120 100% 70%;
+    --warm-white: 30 10% 95%;
     
-    /* Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(24 100% 58%), hsl(24 95% 65%));
-    --gradient-glass: linear-gradient(135deg, hsl(220 20% 12% / 0.8), hsl(220 15% 15% / 0.6));
+    /* Enhanced Glass morphism design tokens */
+    --glass-bg: 220 20% 12% / 0.15;
+    --glass-border: 0 0% 100% / 0.08;
+    --glass-blur: 24px;
+    --glass-intense: 220 20% 12% / 0.4;
+    --glass-glow: 24 100% 58% / 0.2;
+    
+    /* Advanced Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(24 100% 58%), hsl(190 100% 60%));
+    --gradient-glass: linear-gradient(135deg, hsl(220 20% 12% / 0.25), hsl(270 50% 75% / 0.1));
     --gradient-bg: linear-gradient(135deg, hsl(220 25% 8%), hsl(220 20% 12%));
+    --gradient-neon: linear-gradient(45deg, hsl(120 100% 70%), hsl(190 100% 60%));
+    --gradient-warm: linear-gradient(180deg, hsl(24 100% 58%), hsl(24 95% 65%));
     
-    /* Shadows */
+    /* Enhanced Shadows */
     --shadow-glass: 0 8px 32px hsl(220 25% 8% / 0.5);
     --shadow-primary: 0 4px 20px hsl(24 100% 58% / 0.3);
+    --shadow-neon: 0 0 30px hsl(120 100% 70% / 0.4);
+    --shadow-glow: 0 0 40px hsl(24 100% 58% / 0.6);
     
     /* Animations */
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    --transition-glass: backdrop-filter 0.3s ease-out;
 
     --radius: 0.5rem;
 
@@ -124,35 +138,93 @@ All colors MUST be HSL.
 }
 
 @layer components {
-  /* Glass morphism utility classes */
+  /* Advanced Glass morphism utility classes */
   .glass {
     background: hsl(var(--glass-bg));
     backdrop-filter: blur(var(--glass-blur));
     border: 1px solid hsl(var(--glass-border));
     box-shadow: var(--shadow-glass);
+    transition: var(--transition-glass);
   }
   
   .glass-strong {
     background: var(--gradient-glass);
-    backdrop-filter: blur(24px);
+    backdrop-filter: blur(32px);
     border: 1px solid hsl(var(--glass-border));
     box-shadow: var(--shadow-glass);
   }
   
-  /* Button variants */
+  .glass-intense {
+    background: hsl(var(--glass-intense));
+    backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid hsl(var(--glass-border));
+    box-shadow: var(--shadow-glass), inset 0 1px 0 hsl(0 0% 100% / 0.1);
+  }
+  
+  /* Enhanced Button variants */
   .btn-primary {
     background: var(--gradient-primary);
     color: hsl(var(--primary-foreground));
     box-shadow: var(--shadow-primary);
     transition: var(--transition-smooth);
+    position: relative;
+    overflow: hidden;
   }
   
   .btn-primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 32px hsl(24 100% 58% / 0.4);
+    box-shadow: var(--shadow-glow);
   }
   
-  /* Animation keyframes */
+  .btn-neon {
+    background: var(--gradient-neon);
+    color: hsl(220 25% 8%);
+    box-shadow: var(--shadow-neon);
+    transition: var(--transition-bounce);
+  }
+  
+  .btn-neon:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 50px hsl(120 100% 70% / 0.6);
+  }
+  
+  .btn-glow {
+    background: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+    box-shadow: 0 0 20px hsl(var(--primary) / 0.5);
+    border: 2px solid hsl(var(--primary));
+    transition: var(--transition-smooth);
+  }
+  
+  .btn-glow:hover {
+    box-shadow: 0 0 40px hsl(var(--primary) / 0.8), inset 0 0 20px hsl(var(--primary) / 0.2);
+    border-color: hsl(var(--cyan-electric));
+  }
+  
+  /* Mobile Menu Animation */
+  .mobile-menu-enter {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  
+  .mobile-menu-enter-active {
+    transform: translateX(0);
+    opacity: 1;
+    transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+  }
+  
+  .mobile-menu-exit {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  
+  .mobile-menu-exit-active {
+    transform: translateX(-100%);
+    opacity: 0;
+    transition: transform 0.3s ease-in, opacity 0.3s ease-in;
+  }
+  
+  /* Advanced Animation keyframes */
   @keyframes float {
     0%, 100% { transform: translateY(0px); }
     50% { transform: translateY(-10px); }
@@ -163,11 +235,61 @@ All colors MUST be HSL.
     50% { box-shadow: 0 0 40px hsl(24 100% 58% / 0.6); }
   }
   
+  @keyframes pulse-neon {
+    0%, 100% { box-shadow: 0 0 20px hsl(120 100% 70% / 0.4); }
+    50% { box-shadow: 0 0 40px hsl(120 100% 70% / 0.8); }
+  }
+  
+  @keyframes slide-in-left {
+    from { transform: translateX(-100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+  }
+  
+  @keyframes slide-out-left {
+    from { transform: translateX(0); opacity: 1; }
+    to { transform: translateX(-100%); opacity: 0; }
+  }
+  
+  @keyframes calendar-pop {
+    0% { transform: scale(0.8); opacity: 0; }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  
   .animate-float {
     animation: float 3s ease-in-out infinite;
   }
   
   .animate-glow {
     animation: glow 2s ease-in-out infinite;
+  }
+  
+  .animate-pulse-neon {
+    animation: pulse-neon 2s ease-in-out infinite;
+  }
+  
+  .animate-slide-in-left {
+    animation: slide-in-left 0.3s ease-out;
+  }
+  
+  .animate-slide-out-left {
+    animation: slide-out-left 0.3s ease-in;
+  }
+  
+  .animate-calendar-pop {
+    animation: calendar-pop 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  }
+  
+  /* Dark Mode Toggle */
+  .dark-mode-toggle {
+    background: var(--gradient-glass);
+    border: 1px solid hsl(var(--glass-border));
+    backdrop-filter: blur(16px);
+    transition: var(--transition-smooth);
+  }
+  
+  .dark-mode-toggle:hover {
+    background: hsl(var(--glass-intense));
+    box-shadow: var(--shadow-glass);
   }
 }

@@ -1,189 +1,175 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { getAvailableTimeSlots, type TimeSlot } from "@/services/reservationService";
+import { Calendar } from "@/components/ui/calendar";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface AvailabilityCalendarProps {
-  selectedDate: string;
-  onDateSelect: (date: string) => void;
-  onTimeSelect: (time: string) => void;
-  selectedTime?: string;
+  onDateSelect?: (date: Date, time: string) => void;
 }
 
-const AvailabilityCalendar = ({ 
-  selectedDate, 
-  onDateSelect, 
-  onTimeSelect, 
-  selectedTime 
-}: AvailabilityCalendarProps) => {
-  const [currentMonth, setCurrentMonth] = useState(new Date());
-  const [availableSlots, setAvailableSlots] = useState<TimeSlot[]>([]);
+const AvailabilityCalendar = ({ onDateSelect }: AvailabilityCalendarProps) => {
+  const [selectedDate, setSelectedDate] = useState<Date>();
+  const [selectedTime, setSelectedTime] = useState<string>();
+  const [viewMode, setViewMode] = useState<"month" | "week">("month");
 
-  // Generar fechas del mes actual
-  const getDaysInMonth = (date: Date) => {
-    const year = date.getFullYear();
-    const month = date.getMonth();
-    const firstDay = new Date(year, month, 1);
-    const lastDay = new Date(year, month + 1, 0);
-    const daysInMonth = lastDay.getDate();
-    const startingDay = firstDay.getDay();
-
-    const days = [];
-    for (let i = 0; i < startingDay; i++) {
-      days.push(null);
-    }
-    for (let i = 1; i <= daysInMonth; i++) {
-      days.push(new Date(year, month, i));
-    }
-    return days;
-  };
-
-  // Verificar si una fecha tiene horarios disponibles
-  const hasAvailableSlots = (date: Date) => {
-    const dateString = date.toISOString().split('T')[0];
-    const slots = getAvailableTimeSlots(dateString);
-    return slots.some(slot => slot.disponible);
-  };
-
-  // Verificar si una fecha es hoy
-  const isToday = (date: Date) => {
-    const today = new Date();
-    return date.toDateString() === today.toDateString();
-  };
-
-  // Verificar si una fecha es pasada
-  const isPastDate = (date: Date) => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    return date < today;
-  };
-
-  // Actualizar horarios disponibles cuando cambia la fecha seleccionada
-  useEffect(() => {
-    if (selectedDate) {
-      const slots = getAvailableTimeSlots(selectedDate);
-      setAvailableSlots(slots);
-    }
-  }, [selectedDate]);
-
-  const days = getDaysInMonth(currentMonth);
-  const monthNames = [
-    "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
-    "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+  // Available time slots
+  const timeSlots = [
+    "09:00", "09:30", "10:00", "10:30", "11:00", "11:30",
+    "14:00", "14:30", "15:00", "15:30", "16:00", "16:30", "17:00"
   ];
 
+  // Simulate available dates (next 30 days, excluding weekends)
+  const getAvailableDates = () => {
+    const dates = [];
+    const today = new Date();
+    for (let i = 1; i <= 30; i++) {
+      const date = new Date(today);
+      date.setDate(today.getDate() + i);
+      // Skip weekends
+      if (date.getDay() !== 0 && date.getDay() !== 6) {
+        dates.push(date);
+      }
+    }
+    return dates;
+  };
+
+  const availableDates = getAvailableDates();
+
+  const isDateAvailable = (date: Date) => {
+    return availableDates.some(
+      (availableDate) =>
+        availableDate.toDateString() === date.toDateString()
+    );
+  };
+
+  const handleDateSelect = (date: Date | undefined) => {
+    setSelectedDate(date);
+    setSelectedTime(undefined);
+  };
+
+  const handleTimeSelect = (time: string) => {
+    setSelectedTime(time);
+    if (selectedDate) {
+      onDateSelect?.(selectedDate, time);
+    }
+  };
+
+  const formatDate = (date: Date) => {
+    return date.toLocaleDateString("es-CL", {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  };
+
   return (
-    <div className="space-y-6">
-      {/* Navegación del mes */}
-      <div className="flex items-center justify-between">
-        <Button
-          variant="ghost"
-          onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1))}
-          className="p-2"
-        >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
-        </Button>
-        <h3 className="text-lg font-semibold">
-          {monthNames[currentMonth.getMonth()]} {currentMonth.getFullYear()}
-        </h3>
-        <Button
-          variant="ghost"
-          onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1))}
-          className="p-2"
-        >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-          </svg>
-        </Button>
-      </div>
-
-      {/* Días de la semana */}
-      <div className="grid grid-cols-7 gap-1 text-center text-sm font-medium text-muted-foreground">
-        <div>Dom</div>
-        <div>Lun</div>
-        <div>Mar</div>
-        <div>Mié</div>
-        <div>Jue</div>
-        <div>Vie</div>
-        <div>Sáb</div>
-      </div>
-
-      {/* Calendario */}
-      <div className="grid grid-cols-7 gap-1">
-        {days.map((day, index) => (
-          <div key={index} className="h-10">
-            {day ? (
-              <Button
-                variant={selectedDate === day.toISOString().split('T')[0] ? "default" : "ghost"}
-                className={`h-full w-full p-0 text-sm ${
-                  isToday(day) ? "ring-2 ring-primary" : ""
-                } ${
-                  isPastDate(day) ? "opacity-50 cursor-not-allowed" : ""
-                } ${
-                  hasAvailableSlots(day) ? "hover:bg-primary/20" : "opacity-30"
-                }`}
-                disabled={isPastDate(day) || !hasAvailableSlots(day)}
-                onClick={() => {
-                  if (!isPastDate(day) && hasAvailableSlots(day)) {
-                    onDateSelect(day.toISOString().split('T')[0]);
-                  }
-                }}
-              >
-                {day.getDate()}
-                {hasAvailableSlots(day) && !isPastDate(day) && (
-                  <div className="w-1 h-1 bg-primary rounded-full absolute bottom-1"></div>
-                )}
-              </Button>
-            ) : (
-              <div className="h-full"></div>
-            )}
+    <Card className="glass-intense border-glass-border animate-calendar-pop">
+      <CardHeader>
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-foreground">Agenda tu Cita</CardTitle>
+          <div className="flex gap-2">
+            <Button
+              variant={viewMode === "month" ? "default" : "ghost"}
+              size="sm"
+              onClick={() => setViewMode("month")}
+              className="btn-glow"
+            >
+              Mes
+            </Button>
+            <Button
+              variant={viewMode === "week" ? "default" : "ghost"}
+              size="sm"
+              onClick={() => setViewMode("week")}
+              className="btn-glow"
+            >
+              Semana
+            </Button>
           </div>
-        ))}
-      </div>
-
-      {/* Horarios disponibles para la fecha seleccionada */}
-      {selectedDate && availableSlots.length > 0 && (
-        <div className="space-y-3">
-          <h4 className="font-medium text-foreground">
-            Horarios disponibles para {new Date(selectedDate).toLocaleDateString('es-CL', { 
-              weekday: 'long', 
-              year: 'numeric', 
-              month: 'long', 
-              day: 'numeric' 
-            })}
-          </h4>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-            {availableSlots.map((slot) => (
-              <Button
-                key={slot.hora}
-                variant={selectedTime === slot.hora ? "default" : "outline"}
-                size="sm"
-                disabled={!slot.disponible}
-                onClick={() => slot.disponible && onTimeSelect(slot.hora)}
-                className={`${
-                  !slot.disponible ? "opacity-50 cursor-not-allowed" : ""
-                }`}
-              >
-                {slot.hora === "09:00" && "09:00 AM"}
-                {slot.hora === "10:00" && "10:00 AM"}
-                {slot.hora === "11:00" && "11:00 AM"}
-                {slot.hora === "12:00" && "12:00 PM"}
-                {slot.hora === "14:00" && "02:00 PM"}
-                {slot.hora === "15:00" && "03:00 PM"}
-                {slot.hora === "16:00" && "04:00 PM"}
-                {slot.hora === "17:00" && "05:00 PM"}
-                {!slot.disponible && " - OCUPADO"}
-              </Button>
-            ))}
-          </div>
-          <p className="text-xs text-muted-foreground">
-            {availableSlots.filter(slot => slot.disponible).length} de {availableSlots.length} horarios disponibles
-          </p>
         </div>
-      )}
-    </div>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        {/* Calendar */}
+        <div className="glass rounded-lg p-4">
+          <Calendar
+            mode="single"
+            selected={selectedDate}
+            onSelect={handleDateSelect}
+            disabled={(date) => {
+              return date < new Date() || !isDateAvailable(date);
+            }}
+            modifiers={{
+              available: availableDates,
+            }}
+            modifiersClassNames={{
+              available: "bg-green-500/20 text-green-400 font-bold hover:bg-green-500/30",
+            }}
+            className="rounded-md border-0 pointer-events-auto"
+          />
+        </div>
+
+        {/* Selected Date Display */}
+        {selectedDate && (
+          <div className="glass rounded-lg p-4">
+            <h3 className="font-semibold text-foreground mb-2">
+              Fecha seleccionada:
+            </h3>
+            <Badge variant="secondary" className="bg-primary/20 text-primary border-primary/30">
+              {formatDate(selectedDate)}
+            </Badge>
+          </div>
+        )}
+
+        {/* Time Slots */}
+        {selectedDate && (
+          <div className="glass rounded-lg p-4">
+            <h3 className="font-semibold text-foreground mb-4">
+              Horarios disponibles:
+            </h3>
+            <div className="grid grid-cols-3 gap-2">
+              {timeSlots.map((time) => (
+                <Button
+                  key={time}
+                  variant={selectedTime === time ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => handleTimeSelect(time)}
+                  className={`transition-all duration-300 ${
+                    selectedTime === time
+                      ? "btn-neon animate-pulse-neon"
+                      : "glass hover:bg-primary/20 hover:border-primary/50"
+                  }`}
+                >
+                  {time}
+                </Button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Confirmation */}
+        {selectedDate && selectedTime && (
+          <div className="glass-intense rounded-lg p-4 border border-primary/30">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">Cita agendada para:</p>
+                <p className="font-semibold text-foreground">
+                  {formatDate(selectedDate)} a las {selectedTime}
+                </p>
+                <p className="text-sm text-primary font-medium">Valor: $15.000 CLP</p>
+              </div>
+              <div className="flex flex-col gap-2">
+                <Badge variant="secondary" className="bg-green-500/20 text-green-400 border-green-500/30">
+                  ✓ Confirmado
+                </Badge>
+              </div>
+            </div>
+          </div>
+        )}
+      </CardContent>
+    </Card>
   );
 };
 
-export default AvailabilityCalendar; 
+export default AvailabilityCalendar;
