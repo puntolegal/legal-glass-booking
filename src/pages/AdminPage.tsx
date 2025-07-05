@@ -1,32 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { useAuth } from "@/contexts/AuthContext";
-import { useNavigate } from "react-router-dom";
 import ReservationsList from "@/components/ReservationsList";
 import { cleanupOldReservations } from "@/services/reservationService";
 
 const AdminPage = () => {
-  const { user, loading } = useAuth();
-  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'reservations' | 'stats'>('reservations');
-
-  useEffect(() => {
-    if (!loading && !user) {
-      navigate("/auth");
-    }
-  }, [user, loading, navigate]);
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
-        <div className="text-xl text-white">Cargando...</div>
-      </div>
-    );
-  }
-
-  if (!user) {
-    return null;
-  }
 
   const handleCleanup = () => {
     if (confirm('¿Estás seguro de que quieres limpiar las reservas antiguas (más de 30 días)?')) {
@@ -142,10 +120,10 @@ const AdminPage = () => {
         <div className="text-center mt-8">
           <Button
             variant="outline"
-            onClick={() => navigate("/")}
+            onClick={() => window.history.back()}
             className="px-8"
           >
-            Volver al Inicio
+            Volver
           </Button>
         </div>
       </div>
