@@ -385,8 +385,28 @@ All colors MUST be HSL.
   }
 }
 
-/* Mobile-specific improvements */
+/* Mobile viewport and zoom fixes */
 @media (max-width: 768px) {
+  /* Mobile viewport meta is handled in index.html */
+  html {
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    /* Fix iOS zoom issues */
+    -webkit-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+  }
+
+  body {
+    /* Prevent horizontal scroll on mobile */
+    overflow-x: hidden;
+    /* Prevent zoom on double tap */
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    /* Ensure proper font rendering */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
   .scrollbar-hide {
     -ms-overflow-style: none;
     scrollbar-width: none;
@@ -396,30 +416,20 @@ All colors MUST be HSL.
     display: none;
   }
   
-  /* Smooth scrolling for mobile */
-  html {
-    scroll-behavior: smooth;
-    -webkit-overflow-scrolling: touch;
-  }
-  
-  /* Better touch targets */
-  button, a {
+  /* Better touch targets - minimum 44px as per Apple guidelines */
+  button, a, input, textarea, select {
     min-height: 44px;
     min-width: 44px;
   }
   
-  /* Prevent zoom on input focus on iOS */
+  /* Prevent zoom on input focus on iOS Safari */
   input, textarea, select {
     font-size: 16px;
+    border-radius: 0;
+    -webkit-appearance: none;
   }
   
-  /* Mobile viewport fixes */
-  body {
-    -webkit-text-size-adjust: 100%;
-    -webkit-tap-highlight-color: transparent;
-  }
-  
-  /* Improved mobile touch interactions */
+  /* Improved mobile interactions */
   * {
     -webkit-touch-callout: none;
     -webkit-user-select: none;
@@ -429,10 +439,23 @@ All colors MUST be HSL.
   }
   
   /* Re-enable text selection for content */
-  p, span, h1, h2, h3, h4, h5, h6, li {
+  p, span, h1, h2, h3, h4, h5, h6, li, div[class*="text"] {
     -webkit-user-select: text;
     -moz-user-select: text;
     -ms-user-select: text;
     user-select: text;
+  }
+
+  /* Ensure proper container sizing on mobile */
+  .container {
+    max-width: 100%;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  /* Fix potential layout shifts */
+  img {
+    max-width: 100%;
+    height: auto;
   }
 }

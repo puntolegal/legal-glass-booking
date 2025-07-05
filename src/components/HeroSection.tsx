@@ -22,25 +22,27 @@ const HeroSection = ({ title, subtitle, showForm, setShowForm, servicePrice = "$
 
   return (
     <section id="inicio" className="min-h-screen flex items-center justify-center pt-0 lg:pt-16 px-4 relative overflow-hidden">
-      {/* Dark Tech Background Elements - Responsive positioning */}
-      <div className="absolute inset-0 pointer-events-none z-20">
+      {/* Dark Tech Background Elements - Centered and positioned below elements */}
+      <div className="absolute inset-0 pointer-events-none z-10">
+        {/* Legal Elements - Positioned below CTA buttons, centered */}
         <img 
           src="/lovable-uploads/d57965c1-0748-4121-ab53-eeef49835b4c.png" 
           alt="Legal 3D Elements" 
-          className="absolute top-10 lg:top-20 right-4 lg:right-10 w-32 lg:w-48 xl:w-64 h-32 lg:h-48 xl:h-64 opacity-90 animate-float filter drop-shadow-2xl"
+          className="absolute top-1/2 left-1/2 transform -translate-x-1/2 translate-y-12 lg:translate-y-20 w-40 lg:w-56 xl:w-72 h-40 lg:h-56 xl:h-72 opacity-80 lg:opacity-90 animate-float filter drop-shadow-2xl"
           style={{ 
             filter: 'brightness(1.2) contrast(1.1) drop-shadow(0 0 20px rgba(255, 102, 0, 0.3))',
-            zIndex: 20
+            zIndex: 10
           }}
         />
+        {/* Briefcase - Positioned below feature cards, left-center */}
         <img 
           src="/lovable-uploads/5f1723b2-3e90-449b-a43c-8af1d2a8fc2a.png" 
           alt="Legal Briefcase 3D" 
-          className="absolute bottom-10 lg:bottom-20 left-4 lg:left-10 w-24 lg:w-32 xl:w-48 h-24 lg:h-32 xl:h-48 opacity-85 animate-float filter drop-shadow-2xl" 
+          className="absolute bottom-16 lg:bottom-24 left-1/2 transform -translate-x-1/2 translate-x-[-120px] lg:translate-x-[-160px] w-32 lg:w-40 xl:w-56 h-32 lg:h-40 xl:h-56 opacity-75 lg:opacity-85 animate-float filter drop-shadow-2xl" 
           style={{ 
             animationDelay: '2s',
             filter: 'brightness(1.3) contrast(1.2) drop-shadow(0 0 15px rgba(255, 102, 0, 0.4))',
-            zIndex: 20
+            zIndex: 10
           }}
         />
       </div>
@@ -97,35 +99,35 @@ const HeroSection = ({ title, subtitle, showForm, setShowForm, servicePrice = "$
             </Button>
           </div>
 
-          {/* Features Grid - Mobile First Dark Tech */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="glass rounded-2xl p-6 text-center hover:shadow-lg hover:shadow-primary/5 transition-all duration-200">
-              <div className="w-14 h-14 bg-gradient-to-br from-primary/20 to-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <svg className="w-7 h-7 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          {/* Features Grid - Mobile Optimized */}
+          <div className="grid grid-cols-1 gap-4 sm:gap-6 px-4 sm:px-0">
+            <div className="glass rounded-2xl p-4 sm:p-6 text-center hover:shadow-lg hover:shadow-primary/5 transition-all duration-200">
+              <div className="w-12 sm:w-14 h-12 sm:h-14 bg-gradient-to-br from-primary/20 to-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-3 sm:mb-4">
+                <svg className="w-6 sm:w-7 h-6 sm:h-7 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
-              <h3 className="text-lg font-semibold mb-2 text-foreground">Consulta en 24h</h3>
+              <h3 className="text-base sm:text-lg font-semibold mb-2 text-foreground">Consulta en 24h</h3>
               <p className="text-secondary-foreground text-sm">Agenda tu sesión y recibe atención inmediata</p>
             </div>
 
-            <div className="glass rounded-2xl p-6 text-center hover:shadow-lg hover:shadow-primary/5 transition-all duration-200">
-              <div className="w-14 h-14 bg-gradient-to-br from-primary/20 to-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <svg className="w-7 h-7 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="glass rounded-2xl p-4 sm:p-6 text-center hover:shadow-lg hover:shadow-primary/5 transition-all duration-200">
+              <div className="w-12 sm:w-14 h-12 sm:h-14 bg-gradient-to-br from-primary/20 to-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-3 sm:mb-4">
+                <svg className="w-6 sm:w-7 h-6 sm:h-7 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                 </svg>
               </div>
-              <h3 className="text-lg font-semibold mb-2 text-foreground">100% Seguro</h3>
+              <h3 className="text-base sm:text-lg font-semibold mb-2 text-foreground">100% Seguro</h3>
               <p className="text-secondary-foreground text-sm">Pago protegido y confidencialidad garantizada</p>
             </div>
 
-            <div className="glass rounded-2xl p-6 text-center hover:shadow-lg hover:shadow-primary/5 transition-all duration-200">
-              <div className="w-14 h-14 bg-gradient-to-br from-primary/20 to-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <svg className="w-7 h-7 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="glass rounded-2xl p-4 sm:p-6 text-center hover:shadow-lg hover:shadow-primary/5 transition-all duration-200">
+              <div className="w-12 sm:w-14 h-12 sm:h-14 bg-gradient-to-br from-primary/20 to-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-3 sm:mb-4">
+                <svg className="w-6 sm:w-7 h-6 sm:h-7 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                 </svg>
               </div>
-              <h3 className="text-lg font-semibold mb-2 text-foreground">Expertos</h3>
+              <h3 className="text-base sm:text-lg font-semibold mb-2 text-foreground">Expertos</h3>
               <p className="text-secondary-foreground text-sm">Abogados especializados en derecho laboral</p>
             </div>
           </div>
