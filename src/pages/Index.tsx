@@ -3,6 +3,7 @@ import HeroSection from "@/components/HeroSection";
 import ServicesSection from "@/components/ServicesSection";
 import BlogSection from "@/components/BlogSection";
 import TestimonialsSection from "@/components/TestimonialsSection";
+import Footer from "@/components/Footer";
 import { MobileLayout } from "@/components/MobileLayout";
 import { useState } from "react";
 
@@ -32,6 +33,7 @@ const Index = () => {
         <ServicesSection onAgendarClick={handleServiceSelect} />
         <TestimonialsSection />
         <BlogSection />
+        <Footer />
       </div>
     </>
   );
@@ -55,6 +57,7 @@ const Index = () => {
           <ServicesSection onAgendarClick={handleServiceSelect} />
           <TestimonialsSection />
           <BlogSection />
+          <Footer />
         </MobileLayout>
       </div>
     </div>
