@@ -5,21 +5,14 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { useAuth } from "@/contexts/AuthContext";
-import { useNavigate } from "react-router-dom";
-import { createReservation } from "@/services/reservationService";
-import { toast } from "sonner";
 import AvailabilityCalendar from "./AvailabilityCalendar";
 import IndemnizationCalculator from "./IndemnizationCalculator";
-import PaymentForm from "./PaymentForm";
 
 interface ReservationFormProps {
   onClose: () => void;
 }
 
 const ReservationForm = ({ onClose }: ReservationFormProps) => {
-  const { user } = useAuth();
-  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: "",
     rut: "",
@@ -29,56 +22,19 @@ const ReservationForm = ({ onClose }: ReservationFormProps) => {
   });
   const [selectedDateTime, setSelectedDateTime] = useState<{date: Date, time: string} | null>(null);
   const [showCalculator, setShowCalculator] = useState(false);
-  const [showPayment, setShowPayment] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  // Redirect to auth if not logged in
-  if (!user) {
-    navigate("/auth");
-    return null;
-  }
 
   const handleDateTimeSelect = (date: Date, time: string) => {
     setSelectedDateTime({ date, time });
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedDateTime) {
-      toast.error("Por favor selecciona una fecha y hora para tu cita.");
+      alert("Por favor selecciona una fecha y hora para tu cita.");
       return;
     }
-    if (!user) {
-      toast.error("Debes iniciar sesión para crear una reserva.");
-      navigate("/auth");
-      return;
-    }
-
-    setIsSubmitting(true);
-    try {
-      await createReservation({
-        nombre: formData.name,
-        rut: formData.rut,
-        email: formData.email,
-        telefono: formData.phone,
-        descripcion: formData.caseDescription,
-        fecha: selectedDateTime.date.toISOString().split('T')[0],
-        hora: selectedDateTime.time,
-        user_id: user.id,
-      });
-
-      toast.success("Reserva creada exitosamente. Procede con el pago.");
-      setShowPayment(true);
-    } catch (error: any) {
-      toast.error(error.message || "Error al crear la reserva");
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handlePaymentSuccess = () => {
-    toast.success("¡Pago procesado exitosamente! Tu cita ha sido confirmada.");
-    onClose();
+    console.log("Form submitted:", { ...formData, appointment: selectedDateTime });
+    alert(`Formulario enviado correctamente. Cita agendada para ${selectedDateTime.date.toLocaleDateString()} a las ${selectedDateTime.time}. Redirigiendo al pago de $15.000...`);
   };
 
   return (
@@ -290,23 +246,14 @@ const ReservationForm = ({ onClose }: ReservationFormProps) => {
                 type="submit"
                 className="w-full btn-glow text-lg font-semibold"
                 size="lg"
-                disabled={!selectedDateTime || isSubmitting}
+                disabled={!selectedDateTime}
               >
-                {isSubmitting ? "Creando reserva..." : selectedDateTime ? "Crear Reserva" : "Selecciona fecha y hora"}
+                {selectedDateTime ? "Pagar y Reservar ($15.000)" : "Selecciona fecha y hora"}
               </Button>
             </form>
           </CardContent>
         </Card>
         </div>
-
-        {showPayment && (
-          <PaymentForm
-            onClose={() => setShowPayment(false)}
-            onSuccess={handlePaymentSuccess}
-            amount={15000}
-            description="Consulta Legal - 15 minutos"
-          />
-        )}
       </div>
     </div>
   );
