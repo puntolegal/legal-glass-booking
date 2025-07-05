@@ -63,6 +63,12 @@ const contactItems = [
     icon: "💬",
     text: "Chat directo"
   },
+  {
+    title: "Facebook",
+    href: "https://www.facebook.com/profile.php?id=61575610732702",
+    icon: "📘",
+    text: "Síguenos"
+  },
 ];
 
 export function AppSidebar({ onAgendarClick }: AppSidebarProps) {

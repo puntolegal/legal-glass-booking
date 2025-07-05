@@ -20,7 +20,7 @@ const Footer = () => {
               {/* Redes sociales con estilo consistente */}
               <div className="flex space-x-4">
                 <a 
-                  href="https://www.facebook.com/puntolegalchile" 
+                  href="https://www.facebook.com/profile.php?id=61575610732702" 
                   target="_blank" 
                   rel="noopener noreferrer" 
                   className="w-10 h-10 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 flex items-center justify-center hover:scale-105 transition-all duration-300 shadow-lg"
