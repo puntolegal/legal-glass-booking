@@ -4,7 +4,7 @@ import ServicesSection from "@/components/ServicesSection";
 import BlogSection from "@/components/BlogSection";
 import TestimonialsSection from "@/components/TestimonialsSection";
 import Footer from "@/components/Footer";
-
+import { SidebarProvider } from "@/components/ui/sidebar";
 import { useState } from "react";
 
 const Index = () => {
@@ -21,19 +21,23 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header onAgendarClick={() => setShowForm(true)} />
-      <HeroSection 
-        showForm={showForm} 
-        setShowForm={setShowForm}
-        servicePrice={selectedService?.price}
-        serviceName={selectedService?.title}
-      />
-      <ServicesSection onAgendarClick={handleServiceSelect} />
-      <TestimonialsSection />
-      <BlogSection />
-      <Footer />
-    </div>
+    <SidebarProvider defaultOpen={false}>
+      <div className="min-h-screen bg-background flex w-full">
+        <div className="flex-1">
+          <Header onAgendarClick={() => setShowForm(true)} />
+          <HeroSection 
+            showForm={showForm} 
+            setShowForm={setShowForm}
+            servicePrice={selectedService?.price}
+            serviceName={selectedService?.title}
+          />
+          <ServicesSection onAgendarClick={handleServiceSelect} />
+          <TestimonialsSection />
+          <BlogSection />
+          <Footer />
+        </div>
+      </div>
+    </SidebarProvider>
   );
 };
 
