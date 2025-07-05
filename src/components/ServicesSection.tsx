@@ -141,8 +141,18 @@ const ServicesSection = ({ title = "Nuestros Servicios", services }: ServicesSec
   })) : defaultServices;
 
   return (
-    <section id="servicios" className="py-20 px-6">
-      <div className="container mx-auto">
+    <section id="servicios" className="py-20 px-6 relative overflow-hidden">
+      {/* 3D Copper Ball Background */}
+      <div className="absolute inset-0 pointer-events-none">
+        <img 
+          src="/lovable-uploads/208a984c-a991-439e-9065-377f14a69080.png" 
+          alt="3D Copper Ball" 
+          className="absolute bottom-10 right-10 w-80 h-80 opacity-15 animate-float"
+          style={{ animationDelay: '0.5s' }}
+        />
+      </div>
+      
+      <div className="container mx-auto relative z-10">
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-bold mb-6">
             <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">

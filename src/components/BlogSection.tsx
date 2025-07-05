@@ -46,8 +46,18 @@ const BlogSection = ({ title = "Blog Legal", posts }: BlogSectionProps) => {
   const blogPostsList = posts || defaultPosts;
 
   return (
-    <section id="blog" className="py-20 px-6">
-      <div className="container mx-auto">
+    <section id="blog" className="py-20 px-6 relative overflow-hidden">
+      {/* 3D Statistics Wallet Background */}
+      <div className="absolute inset-0 pointer-events-none">
+        <img 
+          src="/lovable-uploads/0720b7af-ea4a-425a-ab11-f9d60e3d2bd1.png" 
+          alt="3D Statistics Wallet" 
+          className="absolute top-20 left-10 w-64 h-64 opacity-20 animate-float"
+          style={{ animationDelay: '1.5s' }}
+        />
+      </div>
+      
+      <div className="container mx-auto relative z-10">
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-bold mb-6">
             <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">

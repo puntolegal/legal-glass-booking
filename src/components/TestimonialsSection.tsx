@@ -24,18 +24,8 @@ const TestimonialsSection = () => {
   ];
 
   return (
-    <section id="casos-exito" className="py-20 px-6 relative overflow-hidden">
-      {/* 3D Statistics Chart Background */}
-      <div className="absolute inset-0 pointer-events-none">
-        <img 
-          src="/lovable-uploads/7be4428e-26bd-43cc-998f-d5627977fb84.png" 
-          alt="Success Statistics 3D Chart" 
-          className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 opacity-20 animate-float"
-          style={{ animationDelay: '1s' }}
-        />
-      </div>
-      
-      <div className="container mx-auto relative z-10">
+    <section id="casos-exito" className="py-20 px-6">
+      <div className="container mx-auto">
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-bold mb-6">
             <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
