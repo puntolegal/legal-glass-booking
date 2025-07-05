@@ -40,9 +40,9 @@ const HeroSection = ({ title, subtitle, showForm, setShowForm }: HeroSectionProp
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
             <Button 
-              variant="ghost" 
-              size="lg" 
-              className="text-lg px-10 py-6 glass-intense bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white border border-orange-400/20 backdrop-blur-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] font-semibold rounded-xl"
+              variant="glass"
+              size="lg"
+              className="text-lg px-10 py-6 glass-intense text-foreground border border-primary/20 backdrop-blur-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] font-semibold rounded-xl bg-background hover:bg-accent/20"
               onClick={() => actualSetShowForm(true)}
             >
               Agendar Ahora

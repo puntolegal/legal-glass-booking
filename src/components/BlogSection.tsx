@@ -14,28 +14,28 @@ interface BlogSectionProps {
 const BlogSection = ({ title = "Blog Legal", posts }: BlogSectionProps) => {
   const defaultPosts = [
     {
-      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=250&fit=crop",
+      image: "/ChatGPT Image 5 jul 2025, 01_04_56 a.m..png",
       title: "¿Cuándo un despido es considerado injustificado?",
       excerpt: "Conoce las principales causales que determinan si tu despido fue sin causa justa y qué derechos tienes como trabajador.",
       readTime: "5 min lectura",
       category: "Despido Injustificado"
     },
     {
-      image: "https://images.unsplash.com/photo-1589994965851-a8f479c573a9?w=400&h=250&fit=crop",
+      image: "/assets_task_01jzcfpd7nf559jc5004m21wze_1751692163_img_1.webp",
       title: "Cómo calcular tu indemnización por años de servicio",
       excerpt: "Guía completa para entender cómo se calcula la indemnización por despido y qué factores influyen en el monto final.",
       readTime: "7 min lectura",
       category: "Indemnizaciones"
     },
     {
-      image: "https://images.unsplash.com/photo-1521791136064-7986c2920216?w=400&h=250&fit=crop",
+      image: "/ChatGPT Image 5 jul 2025, 01_04_56 a.m..png",
       title: "Derechos fundamentales en el trabajo: Lo que debes saber",
       excerpt: "Aprende sobre tus derechos fundamentales como trabajador y qué hacer cuando estos son vulnerados en tu lugar de trabajo.",
       readTime: "6 min lectura",
       category: "Derechos Laborales"
     },
     {
-      image: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=400&h=250&fit=crop",
+      image: "/af88ce1a-f8b0-4484-b841-ada0e059c444.png",
       title: "Casos de éxito: Despidos injustificados resueltos",
       excerpt: "Revisa casos reales de trabajadores que obtuvieron compensaciones justas tras despidos injustificados con nuestra asesoría.",
       readTime: "8 min lectura",

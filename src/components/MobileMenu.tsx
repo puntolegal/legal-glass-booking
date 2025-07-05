@@ -49,15 +49,15 @@ const MobileMenu = ({ onAgendarClick }: MobileMenuProps) => {
 
       {/* Mobile Menu */}
       <div
-        className={`fixed top-0 left-0 h-full w-80 glass-intense z-50 transform transition-transform duration-300 ease-out md:hidden ${
+        className={`fixed top-0 left-0 h-full w-80 glass backdrop-blur-lg bg-background/80 z-50 transform transition-transform duration-300 ease-out md:hidden ${
           isOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
         <div className="flex flex-col p-6 pt-20">
           {/* Logo */}
           <div className="flex items-center space-x-2 mb-8">
-            <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
-              <span className="text-primary-foreground font-bold text-xl">P</span>
+            <div className="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center">
+              <span className="text-white font-bold text-xl">P</span>
             </div>
             <span className="text-xl font-bold text-foreground">Punto Legal</span>
           </div>
