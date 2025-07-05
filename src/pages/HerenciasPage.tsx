@@ -3,7 +3,6 @@ import HeroSection from "@/components/HeroSection";
 import ServicesSection from "@/components/ServicesSection";
 import BlogSection from "@/components/BlogSection";
 import TestimonialsSection from "@/components/TestimonialsSection";
-import Footer from "@/components/Footer";
 
 const HerenciasPage = () => {
   const herenciasData = {
@@ -61,7 +60,6 @@ const HerenciasPage = () => {
         title="Blog de Herencias"
         posts={herenciasData.blogPosts}
       />
-      <Footer />
     </div>
   );
 };
