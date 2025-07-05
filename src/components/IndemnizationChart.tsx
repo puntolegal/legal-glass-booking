@@ -1,281 +1,207 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  LineChart,
-  Line,
-} from "recharts";
+import { Battery } from "lucide-react";
 
 interface IndemnizationChartProps {
-  chartType?: "bar" | "line";
+  selectedYears?: number;
 }
 
-const IndemnizationChart = ({ chartType = "bar" }: IndemnizationChartProps) => {
-  // Enhanced data with breakdown for Sebastian's case
-  const indemnizationData = [
-    {
-      years: "1",
-      indemnization: 450000,
-      tutelaDerechos: 110000,
-      nulidadDespido: 110000,
-      faltaAviso: 50000,
-      indemnizacionLegal: 180000,
-      baseSalary: 450000,
-      description: "1 año de servicio",
-    },
-    {
-      years: "2",
-      indemnization: 1100000,
-      tutelaDerechos: 110000,
-      nulidadDespido: 110000,
-      faltaAviso: 80000,
-      indemnizacionLegal: 800000,
-      baseSalary: 450000,
-      description: "2 años de servicio",
-    },
-    {
-      years: "3",
-      indemnization: 1850000,
-      tutelaDerechos: 110000,
-      nulidadDespido: 110000,
-      faltaAviso: 130000,
-      indemnizacionLegal: 1500000,
-      baseSalary: 450000,
-      description: "3 años de servicio",
-    },
-    {
-      years: "5",
-      indemnization: 3350000,
-      tutelaDerechos: 110000,
-      nulidadDespido: 110000,
-      faltaAviso: 180000,
-      indemnizacionLegal: 2950000,
-      baseSalary: 450000,
-      description: "5 años de servicio",
-    },
-    {
-      years: "8",
-      indemnization: 6500000,
-      tutelaDerechos: 110000,
-      nulidadDespido: 110000,
-      faltaAviso: 280000,
-      indemnizacionLegal: 6000000,
-      baseSalary: 450000,
-      description: "8 años de servicio (Caso Sebastián)",
-    },
-    {
-      years: "10",
-      indemnization: 7500000,
-      tutelaDerechos: 110000,
-      nulidadDespido: 110000,
-      faltaAviso: 350000,
-      indemnizacionLegal: 6930000,
-      baseSalary: 450000,
-      description: "10 años de servicio",
-    },
-    {
-      years: "15",
-      indemnization: 10500000,
-      tutelaDerechos: 110000,
-      nulidadDespido: 110000,
-      faltaAviso: 480000,
-      indemnizacionLegal: 9800000,
-      baseSalary: 450000,
-      description: "15 años de servicio",
-    },
-  ];
-
-  const CustomTooltip = ({ active, payload, label }: any) => {
-    if (active && payload && payload.length) {
-      const data = payload[0].payload;
-      return (
-        <div className="glass-intense rounded-lg p-4 border border-primary/30 min-w-[280px]">
-          <p className="font-semibold text-foreground mb-3">{`${label} años de servicio`}</p>
-          <div className="space-y-2">
-            <div className="flex justify-between">
-              <span className="text-sm text-muted-foreground">Tutela de Derechos:</span>
-              <span className="text-sm font-medium text-primary">
-                ${data.tutelaDerechos?.toLocaleString("es-CL") || "0"}
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-sm text-muted-foreground">Nulidad del Despido:</span>
-              <span className="text-sm font-medium text-primary">
-                ${data.nulidadDespido?.toLocaleString("es-CL") || "0"}
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-sm text-muted-foreground">Falta de Aviso Previo:</span>
-              <span className="text-sm font-medium text-primary">
-                ${data.faltaAviso?.toLocaleString("es-CL") || "0"}
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-sm text-muted-foreground">Indemnización Legal:</span>
-              <span className="text-sm font-medium text-primary">
-                ${data.indemnizacionLegal?.toLocaleString("es-CL") || "0"}
-              </span>
-            </div>
-            <div className="border-t border-glass-border pt-2 mt-2">
-              <div className="flex justify-between">
-                <span className="font-medium text-foreground">Total:</span>
-                <span className="font-bold text-neon-green">
-                  ${data.indemnization.toLocaleString("es-CL")}
-                </span>
-              </div>
-            </div>
-          </div>
-          <p className="text-xs text-muted-foreground mt-2">{data.description}</p>
-        </div>
-      );
-    }
-    return null;
+const IndemnizationChart = ({ selectedYears = 15 }: IndemnizationChartProps) => {
+  // Data for the 15-year case as specified
+  const selectedData = {
+    years: selectedYears,
+    tutelaDerechos: 110000,
+    nulidadDespido: 110000,
+    faltaAviso: 480000,
+    indemnizacionLegal: 9800000,
+    total: 10500000,
+    description: `${selectedYears} años de servicio`
   };
 
+  // Calculate percentages for battery segments
+  const total = selectedData.total;
+  const segments = [
+    { 
+      name: "Tutela", 
+      value: selectedData.tutelaDerechos, 
+      color: "#FF6600",
+      percentage: (selectedData.tutelaDerechos / total) * 100 
+    },
+    { 
+      name: "Nulidad", 
+      value: selectedData.nulidadDespido, 
+      color: "#FFA040",
+      percentage: (selectedData.nulidadDespido / total) * 100 
+    },
+    { 
+      name: "Aviso", 
+      value: selectedData.faltaAviso, 
+      color: "#FFD142",
+      percentage: (selectedData.faltaAviso / total) * 100 
+    },
+    { 
+      name: "Legal", 
+      value: selectedData.indemnizacionLegal, 
+      color: "#22CC88",
+      percentage: (selectedData.indemnizacionLegal / total) * 100 
+    }
+  ];
+
   return (
-    <Card className="glass-intense border-glass-border">
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <CardTitle className="text-foreground">
+    <div 
+      className="relative p-8 rounded-2xl backdrop-blur-xl border border-white/10 shadow-2xl overflow-hidden"
+      style={{
+        background: 'rgba(30, 30, 30, 0.8)',
+        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+      }}
+    >
+      {/* Warm glow effect */}
+      <div 
+        className="absolute inset-0 opacity-20 blur-xl"
+        style={{
+          background: 'radial-gradient(ellipse at top, #FF6600 0%, transparent 70%)'
+        }}
+      />
+      
+      {/* Header */}
+      <div className="relative z-10 mb-8">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-2xl font-bold text-white">
             Calculadora de Indemnización por Despido
-          </CardTitle>
-          <Badge variant="secondary" className="bg-neon-green/20 text-neon-green border-neon-green/30">
+          </h2>
+          <Badge 
+            variant="secondary" 
+            className="bg-gradient-to-r from-orange-500/20 to-red-500/20 text-orange-300 border-orange-400/30 backdrop-blur-sm"
+          >
             Interactivo
           </Badge>
         </div>
-        <p className="text-sm text-muted-foreground">
+        <p className="text-gray-300 text-sm">
           Indemnización estimada según años de servicio (sueldo base: $450.000)
         </p>
-      </CardHeader>
-      <CardContent>
-        <div className="h-80 w-full">
-          <ResponsiveContainer width="100%" height="100%">
-            {chartType === "bar" ? (
-              <BarChart
-                data={indemnizationData}
-                margin={{
-                  top: 20,
-                  right: 30,
-                  left: 20,
-                  bottom: 5,
+      </div>
+
+      {/* Battery Meter */}
+      <div className="relative z-10 mb-8">
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex-1 max-w-4xl">
+            {/* Battery Frame */}
+            <div 
+              className="relative rounded-xl p-1 h-24"
+              style={{
+                background: '#121212',
+                border: '4px solid #121212',
+                boxShadow: 'inset 0 2px 8px rgba(0, 0, 0, 0.5)'
+              }}
+            >
+              {/* Battery Segments */}
+              <div className="flex h-full rounded-lg overflow-hidden">
+                {segments.map((segment, index) => (
+                  <div
+                    key={segment.name}
+                    className="relative flex-1 flex items-center justify-center text-white text-xs font-medium transition-all duration-300 hover:brightness-110"
+                    style={{
+                      background: `linear-gradient(135deg, ${segment.color} 0%, ${segment.color}CC 100%)`,
+                      boxShadow: `inset 0 0 20px ${segment.color}40, 0 0 10px ${segment.color}30`,
+                      borderRight: index < segments.length - 1 ? '1px solid rgba(0,0,0,0.2)' : 'none'
+                    }}
+                  >
+                    <div className="text-center">
+                      <div className="font-semibold text-white drop-shadow-lg">
+                        {segment.name}: ${(segment.value / 1000).toFixed(0)}K
+                      </div>
+                    </div>
+                    
+                    {/* Glow effect */}
+                    <div 
+                      className="absolute inset-0 opacity-30 blur-md"
+                      style={{
+                        background: `linear-gradient(to bottom, ${segment.color}80 0%, transparent 100%)`
+                      }}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+          
+          {/* Total Display */}
+          <div className="ml-8 flex items-center gap-4">
+            <div className="text-right">
+              <div 
+                className="text-3xl font-bold drop-shadow-lg"
+                style={{ 
+                  color: '#FF6600',
+                  textShadow: '0 0 20px #FF660040'
                 }}
               >
-                <CartesianGrid 
-                  strokeDasharray="3 3" 
-                  stroke="hsl(var(--border))" 
-                  opacity={0.3}
-                />
-                <XAxis
-                  dataKey="years"
-                  axisLine={false}
-                  tickLine={false}
-                  tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }}
-                  label={{ 
-                    value: "Años de Servicio", 
-                    position: "insideBottom", 
-                    offset: -5,
-                    style: { textAnchor: "middle", fill: "hsl(var(--muted-foreground))" }
-                  }}
-                />
-                <YAxis
-                  axisLine={false}
-                  tickLine={false}
-                  tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }}
-                  tickFormatter={(value) => `$${(value / 1000000).toFixed(1)}M`}
-                  label={{ 
-                    value: "Indemnización (CLP)", 
-                    angle: -90, 
-                    position: "insideLeft",
-                    style: { textAnchor: "middle", fill: "hsl(var(--muted-foreground))" }
-                  }}
-                />
-                <Tooltip content={<CustomTooltip />} />
-                <Bar
-                  dataKey="indemnization"
-                  fill="url(#barGradient)"
-                  radius={[4, 4, 0, 0]}
-                  style={{
-                    filter: "drop-shadow(0 4px 8px hsl(var(--primary) / 0.3))",
-                  }}
-                />
-                <defs>
-                  <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="hsl(var(--primary))" />
-                    <stop offset="100%" stopColor="hsl(var(--primary) / 0.6)" />
-                  </linearGradient>
-                </defs>
-              </BarChart>
-            ) : (
-              <LineChart
-                data={indemnizationData}
-                margin={{
-                  top: 20,
-                  right: 30,
-                  left: 20,
-                  bottom: 5,
+                Total: ${(selectedData.total / 1000000).toFixed(1)}M
+              </div>
+              <div className="text-gray-400 text-sm mt-1">
+                {selectedData.description}
+              </div>
+            </div>
+            
+            {/* Battery Icon with Glow */}
+            <div className="relative">
+              <Battery 
+                size={32} 
+                className="text-orange-400 drop-shadow-lg" 
+                style={{
+                  filter: 'drop-shadow(0 0 8px #FF660060)'
                 }}
+              />
+              <div 
+                className="absolute inset-0 opacity-60 blur-sm"
+                style={{
+                  background: 'radial-gradient(circle, #FF6600 0%, transparent 70%)'
+                }}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Breakdown Details */}
+      <div className="relative z-10 grid grid-cols-2 md:grid-cols-4 gap-4">
+        {segments.map((segment) => (
+          <div 
+            key={segment.name}
+            className="backdrop-blur-sm rounded-lg p-4 border border-white/10"
+            style={{
+              background: `linear-gradient(135deg, ${segment.color}15 0%, ${segment.color}05 100%)`,
+              boxShadow: `0 4px 12px ${segment.color}20`
+            }}
+          >
+            <div className="text-center">
+              <div 
+                className="text-lg font-bold mb-1"
+                style={{ color: segment.color }}
               >
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
-                <XAxis
-                  dataKey="years"
-                  axisLine={false}
-                  tickLine={false}
-                  tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }}
-                />
-                <YAxis
-                  axisLine={false}
-                  tickLine={false}
-                  tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }}
-                  tickFormatter={(value) => `$${(value / 1000000).toFixed(1)}M`}
-                />
-                <Tooltip content={<CustomTooltip />} />
-                <Line
-                  type="monotone"
-                  dataKey="indemnization"
-                  stroke="hsl(var(--primary))"
-                  strokeWidth={3}
-                  dot={{
-                    fill: "hsl(var(--primary))",
-                    strokeWidth: 2,
-                    r: 6,
-                  }}
-                  activeDot={{
-                    r: 8,
-                    fill: "hsl(var(--neon-green))",
-                    stroke: "hsl(var(--primary))",
-                    strokeWidth: 2,
-                  }}
-                />
-              </LineChart>
-            )}
-          </ResponsiveContainer>
-        </div>
-        
-        {/* Quick Info */}
-        <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="glass rounded-lg p-4 text-center">
-            <p className="text-2xl font-bold text-primary">
-              ${indemnizationData[2].indemnization.toLocaleString("es-CL")}
-            </p>
-            <p className="text-sm text-muted-foreground">3 años promedio</p>
+                ${segment.value.toLocaleString("es-CL")}
+              </div>
+              <div className="text-white text-sm font-medium mb-1">
+                {segment.name === "Tutela" && "Tutela de Derechos"}
+                {segment.name === "Nulidad" && "Nulidad del Despido"}
+                {segment.name === "Aviso" && "Falta de Aviso Previo"}
+                {segment.name === "Legal" && "Indemnización Legal"}
+              </div>
+              <div className="text-gray-400 text-xs">
+                {segment.percentage.toFixed(1)}%
+              </div>
+            </div>
           </div>
-          <div className="glass rounded-lg p-4 text-center">
-            <p className="text-2xl font-bold text-neon-green">11</p>
-            <p className="text-sm text-muted-foreground">Meses máximo</p>
-          </div>
-          <div className="glass rounded-lg p-4 text-center">
-            <p className="text-2xl font-bold text-cyan-electric">+</p>
-            <p className="text-sm text-muted-foreground">Años de servicio</p>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
+        ))}
+      </div>
+
+      {/* Ambient lighting effect */}
+      <div 
+        className="absolute top-0 left-1/2 transform -translate-x-1/2 w-full h-32 opacity-10 blur-2xl"
+        style={{
+          background: 'linear-gradient(180deg, #FF6600 0%, transparent 100%)'
+        }}
+      />
+    </div>
   );
 };
 
