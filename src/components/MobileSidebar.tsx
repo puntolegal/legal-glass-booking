@@ -47,8 +47,7 @@ export default function MobileSidebar({ open, onClose }: MobileSidebarProps) {
         aria-modal="true"
         ref={sidebarRef}
         className={`fixed top-0 left-0 h-full w-[80vw] max-w-[280px] z-[1000] flex flex-col p-6 pt-8
-          bg-gradient-to-br from-black/85 to-neutral-900/65
-          backdrop-blur-2xl border border-white/10 rounded-r-2xl shadow-2xl
+          bg-slate-800/90 backdrop-blur-2xl border border-white/10 rounded-r-2xl shadow-2xl
           transition-all duration-400 ease-[cubic-bezier(0.25,0.8,0.25,1)]
           ${open ? "translate-x-0 opacity-100" : "-translate-x-full opacity-0"}`}
       >

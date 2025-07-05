@@ -19,8 +19,23 @@ const HeroSection = ({ title, subtitle, showForm, setShowForm }: HeroSectionProp
   const defaultSubtitle = "en Derecho Laboral";
 
   return (
-    <section id="inicio" className="min-h-screen flex items-center justify-center pt-20 px-6">
-      <div className="container mx-auto">
+    <section id="inicio" className="min-h-screen flex items-center justify-center pt-20 px-6 relative overflow-hidden">
+      {/* 3D Elements Background */}
+      <div className="absolute inset-0 pointer-events-none">
+        <img 
+          src="/lovable-uploads/072374ab-546b-4f54-b7cd-16dee4333636.png" 
+          alt="Legal 3D Elements" 
+          className="absolute top-20 right-10 w-64 h-64 opacity-30 animate-float"
+        />
+        <img 
+          src="/lovable-uploads/ed23eaf2-7b8d-429b-9ecf-6cb0e062a5b7.png" 
+          alt="Briefcase 3D" 
+          className="absolute bottom-20 left-10 w-48 h-48 opacity-25 animate-float" 
+          style={{ animationDelay: '2s' }}
+        />
+      </div>
+      
+      <div className="container mx-auto relative z-10">
         <div className="text-center max-w-4xl mx-auto">
           <div className="animate-float">
             <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">

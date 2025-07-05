@@ -1,8 +1,16 @@
 const Footer = () => {
   return (
-    <footer id="contacto" className="py-16 px-6 border-t border-white/10 relative">
-      {/* Footer completo con fondo glass difuminado */}
-      <div className="glass backdrop-blur-lg bg-background/80 rounded-3xl shadow-2xl border border-white/10 p-8 md:p-16 mx-auto max-w-7xl">
+    <footer id="contacto" className="py-16 px-6 relative">
+      {/* Modern Footer with enhanced glass effect */}
+      <div className="glass-intense backdrop-blur-xl bg-gradient-to-br from-background/95 to-background/85 rounded-3xl shadow-2xl border border-primary/20 p-8 md:p-16 mx-auto max-w-7xl relative overflow-hidden">
+        {/* Subtle 3D accent */}
+        <div className="absolute top-4 right-4 opacity-10">
+          <img 
+            src="/lovable-uploads/072374ab-546b-4f54-b7cd-16dee4333636.png" 
+            alt="Legal Elements" 
+            className="w-24 h-24"
+          />
+        </div>
         <div className="container mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
             {/* Logo y descripción */}
@@ -130,8 +138,8 @@ const Footer = () => {
         </div>
       </div>
 
-      {/* Nueva barra glass/difusa para navegación y contacto */}
-      <div className="glass backdrop-blur-2xl bg-neutral-900/80 rounded-3xl shadow-2xl border border-white/10 p-8 md:p-12 mx-auto max-w-4xl my-12">
+      {/* Enhanced navigation bar with consistent styling */}
+      <div className="glass-intense backdrop-blur-xl bg-gradient-to-r from-background/90 to-background/95 rounded-3xl shadow-2xl border border-primary/20 p-8 md:p-12 mx-auto max-w-4xl my-12">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-8">
           {/* Logo y nombre */}
           <div className="flex items-center space-x-3">
