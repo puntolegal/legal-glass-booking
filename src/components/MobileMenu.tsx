@@ -61,22 +61,22 @@ const MobileMenu = ({ onAgendarClick }: MobileMenuProps) => {
         />
       )}
 
-      {/* Mobile Sidebar - Dark Tech 80% width */}
+      {/* Mobile Sidebar - Dark Tech responsive width */}
       <div
-        className={`fixed top-0 left-0 h-full w-[80vw] max-w-[280px] z-50 transform transition-all duration-400 ease-[cubic-bezier(0.25,0.8,0.25,1)] lg:hidden ${
+        className={`fixed top-0 left-0 h-full w-[85vw] max-w-[320px] min-w-[280px] z-50 transform transition-all duration-400 ease-[cubic-bezier(0.25,0.8,0.25,1)] lg:hidden ${
           isOpen ? "translate-x-0 opacity-100" : "-translate-x-full opacity-0"
         }`}
       >
-        <div className="h-full glass-intense backdrop-blur-xl bg-gradient-to-b from-background/90 to-background/95 border-r border-border/20 rounded-r-3xl shadow-2xl overflow-hidden">
+        <div className="h-full glass-intense backdrop-blur-xl bg-gradient-to-b from-background/90 to-background/95 border-r border-border/20 rounded-r-2xl shadow-2xl overflow-hidden flex flex-col">
           
           {/* Header with close button */}
-          <div className="p-6 border-b border-border/10">
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary via-primary to-primary/80 flex items-center justify-center shadow-lg shadow-primary/20">
-                  <span className="text-white font-bold text-lg">P</span>
+          <div className="p-4 sm:p-6 border-b border-border/10 flex-shrink-0">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2 sm:space-x-3">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-primary via-primary to-primary/80 flex items-center justify-center shadow-lg shadow-primary/20">
+                  <span className="text-white font-bold text-sm sm:text-lg">P</span>
                 </div>
-                <span className="text-lg font-medium text-foreground">Punto Legal</span>
+                <span className="text-base sm:text-lg font-medium text-foreground">Punto Legal</span>
               </div>
               
               <Button
@@ -92,16 +92,16 @@ const MobileMenu = ({ onAgendarClick }: MobileMenuProps) => {
           </div>
 
           {/* Navigation Items - Dark Tech Style */}
-          <nav className="p-6 flex-1">
-            <div className="space-y-2">
+          <nav className="p-4 sm:p-6 flex-1 overflow-y-auto">
+            <div className="space-y-1 sm:space-y-2">
               {menuItems.map((item, index) => (
                 <a
                   key={item.name}
                   href={item.href}
-                  className="group flex items-center space-x-4 px-4 py-3 rounded-xl text-secondary-foreground hover:text-primary hover:bg-primary/5 transition-all duration-200 relative"
+                  className="group flex items-center space-x-3 sm:space-x-4 px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl text-secondary-foreground hover:text-primary hover:bg-primary/5 transition-all duration-200 relative text-sm sm:text-base"
                   onClick={toggleMenu}
                 >
-                  <div className="w-2 h-2 rounded-full bg-primary/60 group-hover:bg-primary transition-colors" />
+                  <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-primary/60 group-hover:bg-primary transition-colors flex-shrink-0" />
                   <span className="font-medium">{item.name}</span>
                   
                   {/* Hover glow effect */}
@@ -111,13 +111,13 @@ const MobileMenu = ({ onAgendarClick }: MobileMenuProps) => {
             </div>
 
             {/* CTA Button - Neón Orange */}
-            <div className="mt-8">
+            <div className="mt-4 sm:mt-8">
               <Button
                 onClick={() => {
                   onAgendarClick?.();
                   toggleMenu();
                 }}
-                className="w-full bg-primary hover:bg-primary/90 text-white px-6 py-3 rounded-xl font-medium shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all duration-200 hover:scale-[1.02]"
+                className="w-full bg-primary hover:bg-primary/90 text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl font-medium shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all duration-200 hover:scale-[1.02] text-sm sm:text-base"
               >
                 Agendar Ahora - $15.000
               </Button>
@@ -125,36 +125,36 @@ const MobileMenu = ({ onAgendarClick }: MobileMenuProps) => {
           </nav>
 
           {/* Contact Links - Bottom section */}
-          <div className="p-6 border-t border-border/10 bg-background/30">
-            <div className="space-y-3">
+          <div className="p-4 sm:p-6 border-t border-border/10 bg-background/30 flex-shrink-0">
+            <div className="space-y-2 sm:space-y-3">
               <a
                 href="tel:+56962321883"
-                className="flex items-center space-x-3 text-sm text-muted-foreground hover:text-primary transition-colors group"
+                className="flex items-center space-x-2 sm:space-x-3 text-xs sm:text-sm text-muted-foreground hover:text-primary transition-colors group"
               >
-                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors flex-shrink-0">
                   <span className="text-xs">📞</span>
                 </div>
-                <span>+569 6232 1883</span>
+                <span className="truncate">+569 6232 1883</span>
               </a>
               <a
                 href="mailto:puntolegalelgolf@gmail.com"
-                className="flex items-center space-x-3 text-sm text-muted-foreground hover:text-primary transition-colors group"
+                className="flex items-center space-x-2 sm:space-x-3 text-xs sm:text-sm text-muted-foreground hover:text-primary transition-colors group"
               >
-                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors flex-shrink-0">
                   <span className="text-xs">✉️</span>
                 </div>
-                <span>Email</span>
+                <span className="truncate">Email</span>
               </a>
               <a
                 href="https://wa.me/56962321883"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center space-x-3 text-sm text-muted-foreground hover:text-primary transition-colors group"
+                className="flex items-center space-x-2 sm:space-x-3 text-xs sm:text-sm text-muted-foreground hover:text-primary transition-colors group"
               >
-                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors flex-shrink-0">
                   <span className="text-xs">💬</span>
                 </div>
-                <span>WhatsApp</span>
+                <span className="truncate">WhatsApp</span>
               </a>
             </div>
           </div>

@@ -38,15 +38,15 @@ const DarkModeToggle = () => {
       onClick={toggleDarkMode}
       className={`rounded-full transition-all duration-300 ${
         isDarkMode 
-          ? "glass-intense border border-orange-400/30 hover:bg-orange-500/20" 
-          : "bg-white border-2 border-orange-400 hover:bg-orange-50 text-orange-600"
+          ? "glass-intense border border-primary/30 hover:bg-primary/20" 
+          : "bg-card border-2 border-primary hover:bg-primary/5 text-primary"
       }`}
       aria-label="Toggle dark mode"
     >
       {isDarkMode ? (
-        <span className="text-orange-400 text-lg">☀️</span>
+        <span className="text-primary text-lg">☀️</span>
       ) : (
-        <span className="text-orange-600 text-lg">🌙</span>
+        <span className="text-primary text-lg">🌙</span>
       )}
     </Button>
   );
