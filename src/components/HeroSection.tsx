@@ -35,10 +35,10 @@ const HeroSection = ({ title, subtitle, showForm, setShowForm, servicePrice = "$
           }}
         />
         
-        {/* Legal Analytics Chart - Top Right */}
+        {/* Legal Tools - Bottom Center - Nueva imagen reemplazando la dorada */}
         <img 
-          src="/lovable-uploads/7898c61a-9e73-4112-97ad-5e1b16d84421.png" 
-          alt="Legal Analytics Chart" 
+          src="/lovable-uploads/ea96dfa2-e34b-4b38-8238-6e7dad6a9cc3.png" 
+          alt="Legal Tools 3D" 
           className="absolute top-8 sm:top-12 lg:top-16 right-4 sm:right-8 lg:right-16 w-20 sm:w-28 lg:w-40 xl:w-52 h-auto opacity-85 animate-float filter drop-shadow-2xl"
           style={{ 
             animationDelay: '1s',
@@ -50,7 +50,7 @@ const HeroSection = ({ title, subtitle, showForm, setShowForm, servicePrice = "$
         {/* Legal Tools - Bottom Center */}
         <img 
           src="/lovable-uploads/6e9bafb3-95e6-41ba-93e5-bf79b1a2064d.png" 
-          alt="Legal Tools 3D" 
+          alt="Legal Investigation Tools" 
           className="absolute bottom-4 sm:bottom-8 lg:bottom-16 left-1/2 transform -translate-x-1/2 w-32 sm:w-44 lg:w-60 xl:w-80 h-auto opacity-80 animate-float filter drop-shadow-2xl"
           style={{ 
             animationDelay: '2s',

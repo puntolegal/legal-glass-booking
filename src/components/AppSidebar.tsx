@@ -1,4 +1,4 @@
-import { Home, Briefcase, FileText, Phone, Calendar } from "lucide-react";
+import { Home, Briefcase, FileText, Phone, Calendar, Mail, MessageCircle } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -48,19 +48,19 @@ const contactItems = [
   {
     title: "Llamar",
     href: "tel:+56962321883",
-    icon: "📞",
+    icon: Phone,
     text: "+569 6232 1883"
   },
   {
     title: "Email",
     href: "mailto:puntolegalelgolf@gmail.com",
-    icon: "✉️",
+    icon: Mail,
     text: "Enviar correo"
   },
   {
     title: "WhatsApp",
     href: "https://wa.me/56962321883",
-    icon: "💬",
+    icon: MessageCircle,
     text: "Chat directo"
   },
   {
@@ -166,7 +166,11 @@ export function AppSidebar({ onAgendarClick }: AppSidebarProps) {
                   className="flex items-center space-x-3 px-3 py-2 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/5 transition-all duration-200 group"
                 >
                   <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                    <span className="text-sm">{contact.icon}</span>
+                    {typeof contact.icon === 'string' ? (
+                      <span className="text-sm">{contact.icon}</span>
+                    ) : (
+                      <contact.icon className="h-4 w-4 text-primary" />
+                    )}
                   </div>
                   <div className="flex flex-col">
                     <span className="text-xs font-medium">{contact.title}</span>

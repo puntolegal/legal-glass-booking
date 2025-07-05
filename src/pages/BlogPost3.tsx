@@ -143,8 +143,13 @@ const BlogPost3 = () => {
                   </div>
                 </div>
 
-                <div className="glass-intense rounded-xl p-6 bg-gradient-to-br from-cyan-electric/10 to-blue-500/5 mb-6">
-                  <h4 className="font-bold text-foreground mb-2">🏆 Ventajas de Nuestro Servicio</h4>
+                <div className="glass-intense rounded-xl p-6 bg-gradient-to-br from-primary/10 to-primary/5 mb-6">
+                  <h4 className="font-bold text-foreground mb-2 flex items-center">
+                    <svg className="w-5 h-5 mr-2 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Ventajas de Nuestro Servicio
+                  </h4>
                   <ul className="space-y-2 text-sm text-muted-foreground">
                     <li className="flex items-center gap-2">
                       <div className="w-2 h-2 rounded-full bg-cyan-electric"></div>

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Phone, Mail, MessageCircle } from "lucide-react";
 
 interface MobileMenuProps {
   onAgendarClick?: () => void;
@@ -132,7 +132,7 @@ const MobileMenu = ({ onAgendarClick }: MobileMenuProps) => {
                 className="flex items-center space-x-2 sm:space-x-3 text-xs sm:text-sm text-muted-foreground hover:text-primary transition-colors group"
               >
                 <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors flex-shrink-0">
-                  <span className="text-xs">📞</span>
+                  <Phone className="w-3 h-3 sm:w-4 sm:h-4 text-primary" />
                 </div>
                 <span className="truncate">+569 6232 1883</span>
               </a>
@@ -141,7 +141,7 @@ const MobileMenu = ({ onAgendarClick }: MobileMenuProps) => {
                 className="flex items-center space-x-2 sm:space-x-3 text-xs sm:text-sm text-muted-foreground hover:text-primary transition-colors group"
               >
                 <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors flex-shrink-0">
-                  <span className="text-xs">✉️</span>
+                  <Mail className="w-3 h-3 sm:w-4 sm:h-4 text-primary" />
                 </div>
                 <span className="truncate">Email</span>
               </a>
@@ -152,7 +152,7 @@ const MobileMenu = ({ onAgendarClick }: MobileMenuProps) => {
                 className="flex items-center space-x-2 sm:space-x-3 text-xs sm:text-sm text-muted-foreground hover:text-primary transition-colors group"
               >
                 <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors flex-shrink-0">
-                  <span className="text-xs">💬</span>
+                  <MessageCircle className="w-3 h-3 sm:w-4 sm:h-4 text-primary" />
                 </div>
                 <span className="truncate">WhatsApp</span>
               </a>

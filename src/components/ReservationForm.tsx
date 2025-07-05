@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Calendar, X, Phone, Mail, MessageCircle } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -152,24 +153,27 @@ const ReservationForm = ({ onClose, servicePrice = "$15.000 CLP", serviceName = 
                 <p className="text-sm font-medium text-foreground">Contacto rápido:</p>
                 <div className="flex flex-wrap gap-2">
                   <a
-                    href="tel:+56912345678"
-                    className="text-xs px-3 py-1 glass rounded-full hover:bg-primary/20 text-primary transition-colors"
+                    href="tel:+56962321883"
+                    className="text-xs px-3 py-1 glass rounded-full hover:bg-primary/20 text-primary transition-colors flex items-center"
                   >
-                    📞 Llamar
+                    <Phone className="w-3 h-3 mr-1" />
+                    Llamar
                   </a>
                   <a
-                    href="mailto:contacto@puntolegal.cl"
-                    className="text-xs px-3 py-1 glass rounded-full hover:bg-primary/20 text-primary transition-colors"
+                    href="mailto:puntolegalelgolf@gmail.com"
+                    className="text-xs px-3 py-1 glass rounded-full hover:bg-primary/20 text-primary transition-colors flex items-center"
                   >
-                    ✉️ Email
+                    <Mail className="w-3 h-3 mr-1" />
+                    Email
                   </a>
                   <a
-                    href="https://wa.me/56912345678"
+                    href="https://wa.me/56962321883"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-xs px-3 py-1 glass rounded-full hover:bg-green-500/20 text-green-400 transition-colors"
+                    className="text-xs px-3 py-1 glass rounded-full hover:bg-green-500/20 text-green-400 transition-colors flex items-center"
                   >
-                    💬 WhatsApp
+                    <MessageCircle className="w-3 h-3 mr-1" />
+                    WhatsApp
                   </a>
                 </div>
               </div>

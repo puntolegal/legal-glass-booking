@@ -1,4 +1,5 @@
 import { useRef, useEffect } from "react";
+import { Phone, Mail, MessageCircle } from "lucide-react";
 
 interface MobileSidebarProps {
   open: boolean;
@@ -78,9 +79,15 @@ export default function MobileSidebar({ open, onClose }: MobileSidebarProps) {
         </nav>
         {/* Contactos */}
         <div className="mt-10 flex flex-col gap-3 text-gray-300 text-base">
-          <a href="tel:+56912345678" className="flex items-center hover:text-accent transition-colors">📞 +56 9 1234 5678</a>
-          <a href="mailto:contacto@puntolegal.cl" className="flex items-center hover:text-accent transition-colors">✉️ contacto@puntolegal.cl</a>
-          <a href="https://wa.me/56912345678" target="_blank" rel="noopener noreferrer" className="flex items-center hover:text-accent transition-colors">💬 WhatsApp</a>
+          <a href="tel:+56962321883" className="flex items-center hover:text-accent transition-colors">
+            <Phone className="w-4 h-4 mr-2" /> +569 6232 1883
+          </a>
+          <a href="mailto:puntolegalelgolf@gmail.com" className="flex items-center hover:text-accent transition-colors">
+            <Mail className="w-4 h-4 mr-2" /> Email
+          </a>
+          <a href="https://wa.me/56962321883" target="_blank" rel="noopener noreferrer" className="flex items-center hover:text-accent transition-colors">
+            <MessageCircle className="w-4 h-4 mr-2" /> WhatsApp
+          </a>
         </div>
       </aside>
     </>
