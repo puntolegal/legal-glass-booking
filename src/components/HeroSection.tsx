@@ -22,26 +22,39 @@ const HeroSection = ({ title, subtitle, showForm, setShowForm, servicePrice = "$
 
   return (
     <section id="inicio" className="min-h-screen flex items-center justify-center pt-0 lg:pt-16 px-4 relative overflow-hidden">
-      {/* Dark Tech Background Elements - Centered and positioned below elements */}
+      {/* Premium 3D Legal Elements - Hero Background */}
       <div className="absolute inset-0 pointer-events-none z-10">
-        {/* Legal Elements - Positioned below CTA buttons, centered */}
+        {/* Legal Briefcase - Top Left */}
         <img 
-          src="/lovable-uploads/d57965c1-0748-4121-ab53-eeef49835b4c.png" 
-          alt="Legal 3D Elements" 
-          className="absolute top-1/2 left-1/2 transform -translate-x-1/2 translate-y-8 sm:translate-y-12 lg:translate-y-20 w-32 sm:w-40 lg:w-56 xl:w-72 h-32 sm:h-40 lg:h-56 xl:h-72 opacity-80 lg:opacity-90 animate-float filter drop-shadow-2xl"
+          src="/lovable-uploads/a0deea96-9ac7-49af-a07f-def89ae8abaa.png" 
+          alt="Legal Briefcase 3D" 
+          className="absolute top-8 sm:top-12 lg:top-16 left-4 sm:left-8 lg:left-16 w-24 sm:w-32 lg:w-48 xl:w-64 h-auto opacity-90 animate-float filter drop-shadow-2xl"
           style={{ 
-            filter: 'brightness(1.2) contrast(1.1) drop-shadow(0 0 20px rgba(255, 102, 0, 0.3))',
-            zIndex: 10
+            filter: 'drop-shadow(0 10px 30px rgba(255, 102, 0, 0.3))',
+            zIndex: 15
           }}
         />
-        {/* Briefcase - Positioned below feature cards, centered for mobile */}
+        
+        {/* Legal Analytics Chart - Top Right */}
         <img 
-          src="/lovable-uploads/5f1723b2-3e90-449b-a43c-8af1d2a8fc2a.png" 
-          alt="Legal Briefcase 3D" 
-          className="absolute bottom-12 sm:bottom-16 lg:bottom-24 left-1/2 transform -translate-x-1/2 translate-x-0 lg:translate-x-[-160px] w-28 sm:w-32 lg:w-40 xl:w-56 h-28 sm:h-32 lg:h-40 xl:h-56 opacity-75 lg:opacity-85 animate-float filter drop-shadow-2xl" 
+          src="/lovable-uploads/7898c61a-9e73-4112-97ad-5e1b16d84421.png" 
+          alt="Legal Analytics Chart" 
+          className="absolute top-8 sm:top-12 lg:top-16 right-4 sm:right-8 lg:right-16 w-20 sm:w-28 lg:w-40 xl:w-52 h-auto opacity-85 animate-float filter drop-shadow-2xl"
+          style={{ 
+            animationDelay: '1s',
+            filter: 'drop-shadow(0 8px 25px rgba(255, 102, 0, 0.25))',
+            zIndex: 15
+          }}
+        />
+
+        {/* Legal Tools - Bottom Center */}
+        <img 
+          src="/lovable-uploads/6e9bafb3-95e6-41ba-93e5-bf79b1a2064d.png" 
+          alt="Legal Tools 3D" 
+          className="absolute bottom-4 sm:bottom-8 lg:bottom-16 left-1/2 transform -translate-x-1/2 w-32 sm:w-44 lg:w-60 xl:w-80 h-auto opacity-80 animate-float filter drop-shadow-2xl"
           style={{ 
             animationDelay: '2s',
-            filter: 'brightness(1.3) contrast(1.2) drop-shadow(0 0 15px rgba(255, 102, 0, 0.4))',
+            filter: 'drop-shadow(0 12px 35px rgba(255, 102, 0, 0.4))',
             zIndex: 10
           }}
         />
