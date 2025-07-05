@@ -7,9 +7,11 @@ interface HeroSectionProps {
   subtitle?: string;
   showForm?: boolean;
   setShowForm?: (show: boolean) => void;
+  servicePrice?: string;
+  serviceName?: string;
 }
 
-const HeroSection = ({ title, subtitle, showForm, setShowForm }: HeroSectionProps) => {
+const HeroSection = ({ title, subtitle, showForm, setShowForm, servicePrice = "$15.000 CLP", serviceName = "Consulta Legal" }: HeroSectionProps) => {
   const [internalShowForm, internalSetShowForm] = useState(false);
   const isControlled = typeof showForm === 'boolean' && typeof setShowForm === 'function';
   const actualShowForm = isControlled ? showForm : internalShowForm;
@@ -52,7 +54,7 @@ const HeroSection = ({ title, subtitle, showForm, setShowForm }: HeroSectionProp
           <p className="text-lg md:text-xl text-secondary-foreground mb-10 leading-relaxed max-w-2xl mx-auto">
             Agenda y paga tu sesión de{" "}
             <span className="text-primary font-bold text-xl md:text-2xl px-2 py-1 rounded-lg bg-primary/10">
-              $15.000 CLP
+              {servicePrice}
             </span>
             <br className="hidden md:block" />
             Recibe asesoría legal profesional por Google Meet
@@ -122,7 +124,7 @@ const HeroSection = ({ title, subtitle, showForm, setShowForm }: HeroSectionProp
         </div>
       </div>
 
-      {actualShowForm && <ReservationForm onClose={() => actualSetShowForm(false)} />}
+      {actualShowForm && <ReservationForm onClose={() => actualSetShowForm(false)} servicePrice={servicePrice} serviceName={serviceName} />}
     </section>
   );
 };

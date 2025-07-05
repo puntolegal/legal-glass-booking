@@ -10,7 +10,7 @@ interface Service {
 interface ServicesSectionProps {
   title?: string;
   services?: Service[];
-  onAgendarClick?: () => void;
+  onAgendarClick?: (service: { title: string; promoPrice?: string; price?: string }) => void;
 }
 
 const ServicesSection = ({ title = "Elige el servicio legal que necesitas", services, onAgendarClick }: ServicesSectionProps) => {
@@ -312,7 +312,7 @@ const ServicesSection = ({ title = "Elige el servicio legal que necesitas", serv
                     </div>
                   </div>
                   <button 
-                    onClick={onAgendarClick}
+                    onClick={() => onAgendarClick?.(service)}
                     className="glass bg-gradient-to-r from-primary/80 to-primary/60 hover:from-primary hover:to-primary/80 text-white px-4 py-2 rounded-xl text-sm font-medium hover:scale-[1.02] transition-all duration-200 backdrop-blur-sm border border-primary/20 shadow-lg shadow-primary/20"
                   >
                     Agendar
@@ -395,7 +395,7 @@ const ServicesSection = ({ title = "Elige el servicio legal que necesitas", serv
                 {/* CTA Button */}
                 <div className="mt-auto">
                   <button 
-                    onClick={onAgendarClick}
+                    onClick={() => onAgendarClick?.(service)}
                     className="glass bg-gradient-to-r from-primary/80 to-primary/60 hover:from-primary hover:to-primary/80 text-white w-full px-4 py-3 rounded-xl text-sm font-medium hover:scale-[1.02] transition-all duration-200 backdrop-blur-sm border border-primary/20 shadow-lg shadow-primary/20"
                   >
                     Agendar {service.title.replace('Punto Legal ', '')}

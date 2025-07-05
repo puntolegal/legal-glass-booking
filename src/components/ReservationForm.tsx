@@ -9,9 +9,11 @@ import AvailabilityCalendar from "./AvailabilityCalendar";
 
 interface ReservationFormProps {
   onClose: () => void;
+  servicePrice?: string;
+  serviceName?: string;
 }
 
-const ReservationForm = ({ onClose }: ReservationFormProps) => {
+const ReservationForm = ({ onClose, servicePrice = "$15.000 CLP", serviceName = "Consulta Legal" }: ReservationFormProps) => {
   const [formData, setFormData] = useState({
     name: "",
     rut: "",
@@ -32,7 +34,7 @@ const ReservationForm = ({ onClose }: ReservationFormProps) => {
       return;
     }
     console.log("Form submitted:", { ...formData, appointment: selectedDateTime });
-    alert(`Formulario enviado correctamente. Cita agendada para ${selectedDateTime.date.toLocaleDateString()} a las ${selectedDateTime.time}. Redirigiendo al pago de $15.000...`);
+    alert(`Formulario enviado correctamente. Cita agendada para ${selectedDateTime.date.toLocaleDateString()} a las ${selectedDateTime.time}. Redirigiendo al pago de ${servicePrice}...`);
   };
 
   return (
@@ -63,7 +65,7 @@ const ReservationForm = ({ onClose }: ReservationFormProps) => {
             </div>
             <div className="flex items-center space-x-2">
               <Badge variant="secondary" className="bg-primary/20 text-primary border-primary/30">
-                $15.000 CLP
+                {servicePrice}
               </Badge>
               <Badge variant="outline" className="border-green-500/30 text-green-400">
                 45 minutos
@@ -178,7 +180,7 @@ const ReservationForm = ({ onClose }: ReservationFormProps) => {
                 size="lg"
                 disabled={!selectedDateTime}
               >
-                {selectedDateTime ? "Pagar y Reservar ($15.000)" : "Selecciona fecha y hora"}
+                {selectedDateTime ? `Pagar y Reservar (${servicePrice})` : "Selecciona fecha y hora"}
               </Button>
             </form>
           </CardContent>

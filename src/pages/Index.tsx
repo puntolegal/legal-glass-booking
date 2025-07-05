@@ -9,11 +9,27 @@ import { useState } from "react";
 
 const Index = () => {
   const [showForm, setShowForm] = useState(false);
+  const [selectedService, setSelectedService] = useState<{
+    title: string;
+    price: string;
+  } | null>(null);
+
+  const handleServiceSelect = (service: { title: string; promoPrice?: string; price?: string }) => {
+    const price = service.promoPrice || service.price || "$15.000 CLP";
+    setSelectedService({ title: service.title, price });
+    setShowForm(true);
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Header onAgendarClick={() => setShowForm(true)} />
-      <HeroSection showForm={showForm} setShowForm={setShowForm} />
-      <ServicesSection onAgendarClick={() => setShowForm(true)} />
+      <HeroSection 
+        showForm={showForm} 
+        setShowForm={setShowForm}
+        servicePrice={selectedService?.price}
+        serviceName={selectedService?.title}
+      />
+      <ServicesSection onAgendarClick={handleServiceSelect} />
       <TestimonialsSection />
       <BlogSection />
       <Footer />
