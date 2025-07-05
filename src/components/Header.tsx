@@ -1,8 +1,14 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Menu, X, User, LogOut } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 import MobileMenu from "./MobileMenu";
 import DarkModeToggle from "./DarkModeToggle";
 
 const Header = ({ onAgendarClick }: { onAgendarClick?: () => void }) => {
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
   return (
     <header className="fixed top-0 w-full z-50 glass border-b border-white/10">
       <div className="container mx-auto px-6 py-4">
@@ -41,14 +47,55 @@ const Header = ({ onAgendarClick }: { onAgendarClick?: () => void }) => {
               <a href="#contacto" className="text-muted-foreground hover:text-primary transition-colors">
                 Contacto
               </a>
-              <Button 
-                variant="primary" 
-                size="sm"
-                onClick={onAgendarClick}
-                className="btn-glow"
-              >
-                Agendar Ahora
-              </Button>
+              {user ? (
+                <>
+                  <Button 
+                    variant="primary" 
+                    size="sm"
+                    onClick={onAgendarClick}
+                    className="btn-glow"
+                  >
+                    Agendar Ahora
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    onClick={() => navigate("/admin")}
+                    className="glass border border-white/20 hover:bg-white/10"
+                  >
+                    <User className="w-4 h-4 mr-2" />
+                    Panel
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    onClick={signOut}
+                    className="glass border border-white/20 hover:bg-white/10"
+                  >
+                    <LogOut className="w-4 h-4 mr-2" />
+                    Salir
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    onClick={() => navigate("/auth")}
+                    className="glass border border-white/20 hover:bg-white/10"
+                  >
+                    Iniciar Sesión
+                  </Button>
+                  <Button 
+                    variant="primary" 
+                    size="sm"
+                    onClick={() => navigate("/auth")}
+                    className="btn-glow"
+                  >
+                    Registrarse
+                  </Button>
+                </>
+              )}
             </nav>
 
             <DarkModeToggle />
