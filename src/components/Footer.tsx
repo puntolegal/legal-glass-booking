@@ -1,16 +1,8 @@
 const Footer = () => {
   return (
-    <footer id="contacto" className="py-16 px-6 relative">
+    <footer id="contacto" className="py-16 px-6">
       {/* Modern Footer with enhanced glass effect */}
-      <div className="glass-intense backdrop-blur-xl bg-gradient-to-br from-background/95 to-background/85 rounded-3xl shadow-2xl border border-primary/20 p-8 md:p-16 mx-auto max-w-7xl relative overflow-hidden">
-        {/* Subtle 3D accent */}
-        <div className="absolute top-4 right-4 opacity-10">
-          <img 
-            src="/lovable-uploads/072374ab-546b-4f54-b7cd-16dee4333636.png" 
-            alt="Legal Elements" 
-            className="w-24 h-24"
-          />
-        </div>
+      <div className="glass-intense backdrop-blur-xl bg-gradient-to-br from-background/95 to-background/85 rounded-3xl shadow-2xl border border-primary/20 p-8 md:p-16 mx-auto max-w-7xl">
         <div className="container mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
             {/* Logo y descripción */}
