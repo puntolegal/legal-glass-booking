@@ -22,10 +22,10 @@ const HeroSection = ({ title, subtitle, showForm, setShowForm, servicePrice = "$
 
   return (
     <section id="inicio" className="min-h-screen flex items-center justify-center pt-16 px-4 relative overflow-hidden">
-      {/* Dark Tech Background Elements - Moved to foreground with better visibility */}
+      {/* Dark Tech Background Elements - High Quality Images */}
       <div className="absolute inset-0 pointer-events-none z-20">
         <img 
-          src="/lovable-uploads/072374ab-546b-4f54-b7cd-16dee4333636.png" 
+          src="/lovable-uploads/d57965c1-0748-4121-ab53-eeef49835b4c.png" 
           alt="Legal 3D Elements" 
           className="absolute top-20 right-10 w-48 md:w-64 h-48 md:h-64 opacity-90 animate-float filter drop-shadow-2xl"
           style={{ 
@@ -34,8 +34,8 @@ const HeroSection = ({ title, subtitle, showForm, setShowForm, servicePrice = "$
           }}
         />
         <img 
-          src="/lovable-uploads/ed23eaf2-7b8d-429b-9ecf-6cb0e062a5b7.png" 
-          alt="Briefcase 3D" 
+          src="/lovable-uploads/5f1723b2-3e90-449b-a43c-8af1d2a8fc2a.png" 
+          alt="Legal Briefcase 3D" 
           className="absolute bottom-20 left-10 w-32 md:w-48 h-32 md:h-48 opacity-85 animate-float filter drop-shadow-2xl" 
           style={{ 
             animationDelay: '2s',
