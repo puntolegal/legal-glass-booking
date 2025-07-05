@@ -9,6 +9,36 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      profiles: {
+        Row: {
+          created_at: string
+          email: string | null
+          id: string
+          nombre: string | null
+          telefono: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          nombre?: string | null
+          telefono?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          nombre?: string | null
+          telefono?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       reservas: {
         Row: {
           created_at: string | null
@@ -20,6 +50,7 @@ export type Database = {
           nombre: string
           rut: string
           telefono: string
+          user_id: string | null
         }
         Insert: {
           created_at?: string | null
@@ -31,6 +62,7 @@ export type Database = {
           nombre: string
           rut: string
           telefono: string
+          user_id?: string | null
         }
         Update: {
           created_at?: string | null
@@ -42,6 +74,7 @@ export type Database = {
           nombre?: string
           rut?: string
           telefono?: string
+          user_id?: string | null
         }
         Relationships: []
       }
