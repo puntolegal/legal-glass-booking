@@ -28,17 +28,17 @@ const HeroSection = ({ title, subtitle, showForm, setShowForm, servicePrice = "$
         <img 
           src="/lovable-uploads/d57965c1-0748-4121-ab53-eeef49835b4c.png" 
           alt="Legal 3D Elements" 
-          className="absolute top-1/2 left-1/2 transform -translate-x-1/2 translate-y-12 lg:translate-y-20 w-40 lg:w-56 xl:w-72 h-40 lg:h-56 xl:h-72 opacity-80 lg:opacity-90 animate-float filter drop-shadow-2xl"
+          className="absolute top-1/2 left-1/2 transform -translate-x-1/2 translate-y-8 sm:translate-y-12 lg:translate-y-20 w-32 sm:w-40 lg:w-56 xl:w-72 h-32 sm:h-40 lg:h-56 xl:h-72 opacity-80 lg:opacity-90 animate-float filter drop-shadow-2xl"
           style={{ 
             filter: 'brightness(1.2) contrast(1.1) drop-shadow(0 0 20px rgba(255, 102, 0, 0.3))',
             zIndex: 10
           }}
         />
-        {/* Briefcase - Positioned below feature cards, left-center */}
+        {/* Briefcase - Positioned below feature cards, centered for mobile */}
         <img 
           src="/lovable-uploads/5f1723b2-3e90-449b-a43c-8af1d2a8fc2a.png" 
           alt="Legal Briefcase 3D" 
-          className="absolute bottom-16 lg:bottom-24 left-1/2 transform -translate-x-1/2 translate-x-[-120px] lg:translate-x-[-160px] w-32 lg:w-40 xl:w-56 h-32 lg:h-40 xl:h-56 opacity-75 lg:opacity-85 animate-float filter drop-shadow-2xl" 
+          className="absolute bottom-12 sm:bottom-16 lg:bottom-24 left-1/2 transform -translate-x-1/2 translate-x-0 lg:translate-x-[-160px] w-28 sm:w-32 lg:w-40 xl:w-56 h-28 sm:h-32 lg:h-40 xl:h-56 opacity-75 lg:opacity-85 animate-float filter drop-shadow-2xl" 
           style={{ 
             animationDelay: '2s',
             filter: 'brightness(1.3) contrast(1.2) drop-shadow(0 0 15px rgba(255, 102, 0, 0.4))',
