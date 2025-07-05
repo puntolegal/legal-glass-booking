@@ -9,7 +9,7 @@ All colors MUST be HSL.
 @layer base {
   :root {
     /* Punto Legal Light Mode - Clean White Palette */
-    --background: 0 0% 98%;
+    --background: 0 0% 100%;
     --foreground: 220 15% 15%;
 
     --card: 0 0% 100%;
@@ -18,24 +18,24 @@ All colors MUST be HSL.
     --popover: 0 0% 100%;
     --popover-foreground: 220 15% 15%;
 
-    --primary: 24 100% 58%; /* Corporate Orange */
+    --primary: 24 100% 50%; /* Corporate Orange */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 220 10% 95%;
+    --secondary: 220 10% 96%;
     --secondary-foreground: 220 15% 15%;
 
-    --muted: 220 10% 92%;
+    --muted: 220 10% 94%;
     --muted-foreground: 220 15% 45%;
 
-    --accent: 24 95% 65%;
+    --accent: 24 95% 55%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 220 10% 88%;
+    --border: 220 10% 90%;
     --input: 0 0% 100%;
-    --ring: 24 100% 58%;
+    --ring: 24 100% 50%;
 
     /* New Color Variables from Expanded Palette */
     --slate-dark: 210 20% 18%;           /* #1A2730 */
@@ -46,24 +46,24 @@ All colors MUST be HSL.
     --orange-secondary: 16 90% 65%;      /* #E95D2C */
     
     /* Light Mode Glass morphism design tokens */
-    --glass-bg: 255 255 255 / 0.8;
+    --glass-bg: 0 0% 100% / 0.8;
     --glass-border: 220 15% 85%;
     --glass-blur: 20px;
-    --glass-intense: 255 255 255 / 0.9;
-    --glass-glow: 24 100% 58% / 0.1;
+    --glass-intense: 0 0% 100% / 0.9;
+    --glass-glow: 24 100% 50% / 0.1;
     
     /* Light Mode Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(24 100% 58%), hsl(24 95% 65%));
-    --gradient-glass: linear-gradient(135deg, hsl(255 255 255 / 0.8), hsl(24 100% 98% / 0.9));
-    --gradient-bg: linear-gradient(135deg, hsl(0 0% 98%), hsl(24 100% 99%));
-    --gradient-neon: linear-gradient(45deg, hsl(24 100% 58%), hsl(14 90% 55%));
-    --gradient-warm: linear-gradient(180deg, hsl(24 100% 58%), hsl(24 95% 65%));
+    --gradient-primary: linear-gradient(135deg, hsl(24 100% 50%), hsl(24 95% 55%));
+    --gradient-glass: linear-gradient(135deg, hsl(0 0% 100% / 0.8), hsl(0 0% 98% / 0.9));
+    --gradient-bg: linear-gradient(135deg, hsl(0 0% 100%), hsl(0 0% 98%));
+    --gradient-neon: linear-gradient(45deg, hsl(24 100% 50%), hsl(14 90% 55%));
+    --gradient-warm: linear-gradient(180deg, hsl(24 100% 50%), hsl(24 95% 55%));
     
     /* Light Mode Shadows */
     --shadow-glass: 0 8px 32px hsl(220 15% 15% / 0.1);
-    --shadow-primary: 0 4px 20px hsl(24 100% 58% / 0.2);
-    --shadow-neon: 0 0 30px hsl(24 100% 58% / 0.3);
-    --shadow-glow: 0 0 40px hsl(24 100% 58% / 0.4);
+    --shadow-primary: 0 4px 20px hsl(24 100% 50% / 0.2);
+    --shadow-neon: 0 0 30px hsl(24 100% 50% / 0.3);
+    --shadow-glow: 0 0 40px hsl(24 100% 50% / 0.4);
     
     /* Animations */
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
