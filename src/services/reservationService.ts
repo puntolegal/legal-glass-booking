@@ -10,6 +10,7 @@ export interface Reservation {
   descripcion: string;
   fecha: string;
   hora: string;
+  user_id?: string;
   created_at?: string;
 }
 
