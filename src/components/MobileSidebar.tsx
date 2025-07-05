@@ -7,10 +7,10 @@ interface MobileSidebarProps {
 }
 
 const menuItems = [
-  { name: "Inicio", href: "#inicio" },
-  { name: "Laboral", href: "#laboral" },
-  { name: "Familia", href: "#familia" },
-  { name: "Herencias", href: "#herencias" },
+  { name: "Inicio", href: "/" },
+  { name: "Laboral", href: "/laboral" },
+  { name: "Familia", href: "/familia" },
+  { name: "Herencias", href: "/herencias" },
   { name: "Blog", href: "#blog" },
   { name: "Contacto", href: "#contacto" },
 ];
@@ -69,6 +69,16 @@ export default function MobileSidebar({ open, onClose }: MobileSidebarProps) {
                   href={item.href}
                   ref={i === 0 ? firstLinkRef : undefined}
                   className="text-gray-200 text-lg pl-4 relative focus:outline-none focus:text-accent hover:text-accent transition-colors"
+                  onClick={(e) => {
+                    if (item.href.startsWith('#')) {
+                      e.preventDefault();
+                      const element = document.getElementById(item.href.slice(1));
+                      if (element) {
+                        element.scrollIntoView({ behavior: 'smooth' });
+                      }
+                    }
+                    onClose();
+                  }}
                 >
                   <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-orange-500 opacity-0 group-hover:opacity-100 group-focus:opacity-100 transition-opacity" />
                   {item.name}

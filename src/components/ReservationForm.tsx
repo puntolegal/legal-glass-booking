@@ -39,8 +39,8 @@ const ReservationForm = ({ onClose, servicePrice = "$15.000 CLP", serviceName = 
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
-      <div className="w-full max-w-6xl my-8">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-start sm:items-center justify-center p-2 sm:p-4 overflow-y-auto">
+      <div className="w-full max-w-6xl my-4 sm:my-8 mt-16 sm:mt-8">
         {/* Success Story Section */}
         {/* Se eliminó la sección de caso de éxito de Sebastián Soto y los montos relacionados */}
 
