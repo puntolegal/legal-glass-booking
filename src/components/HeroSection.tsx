@@ -22,18 +22,26 @@ const HeroSection = ({ title, subtitle, showForm, setShowForm, servicePrice = "$
 
   return (
     <section id="inicio" className="min-h-screen flex items-center justify-center pt-16 px-4 relative overflow-hidden">
-      {/* Dark Tech Background Elements */}
-      <div className="absolute inset-0 pointer-events-none">
+      {/* Dark Tech Background Elements - Moved to foreground with better visibility */}
+      <div className="absolute inset-0 pointer-events-none z-20">
         <img 
           src="/lovable-uploads/072374ab-546b-4f54-b7cd-16dee4333636.png" 
           alt="Legal 3D Elements" 
-          className="absolute top-20 right-10 w-48 md:w-64 h-48 md:h-64 opacity-20 animate-float"
+          className="absolute top-20 right-10 w-48 md:w-64 h-48 md:h-64 opacity-90 animate-float filter drop-shadow-2xl"
+          style={{ 
+            filter: 'brightness(1.2) contrast(1.1) drop-shadow(0 0 20px rgba(255, 102, 0, 0.3))',
+            zIndex: 20
+          }}
         />
         <img 
           src="/lovable-uploads/ed23eaf2-7b8d-429b-9ecf-6cb0e062a5b7.png" 
           alt="Briefcase 3D" 
-          className="absolute bottom-20 left-10 w-32 md:w-48 h-32 md:h-48 opacity-15 animate-float" 
-          style={{ animationDelay: '2s' }}
+          className="absolute bottom-20 left-10 w-32 md:w-48 h-32 md:h-48 opacity-85 animate-float filter drop-shadow-2xl" 
+          style={{ 
+            animationDelay: '2s',
+            filter: 'brightness(1.3) contrast(1.2) drop-shadow(0 0 15px rgba(255, 102, 0, 0.4))',
+            zIndex: 20
+          }}
         />
       </div>
       
