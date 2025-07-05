@@ -165,55 +165,90 @@ const ServicesSection = ({ title = "Nuestros Servicios", services }: ServicesSec
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {servicesList.map((service, index) => (
-            <div key={index} className="group relative">
-              {/* iPhone Widget-style card with advanced glassmorphism */}
-              <div className="relative group">
-                <div className="glass-intense rounded-[28px] p-6 hover:scale-[1.02] transition-all duration-500 border border-orange-500/20 hover:border-orange-400/40 bg-gradient-to-br from-orange-500/5 via-card/40 to-orange-400/5 backdrop-blur-2xl shadow-2xl hover:shadow-orange-500/20 overflow-hidden">
+        {/* Mobile-first horizontal scroll-snap cards */}
+        <div className="block md:hidden">
+          <div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide">
+            {servicesList.map((service, index) => (
+              <div key={index} className="flex-none w-80 snap-start">
+                <div className="glass rounded-3xl p-6 h-full border border-primary/10 hover:border-primary/20 bg-gradient-to-br from-primary/5 to-transparent backdrop-blur-xl transition-all duration-300 hover:scale-[1.02]">
                   
-                  {/* Background gradient orb */}
-                  <div className="absolute top-4 right-4 w-16 h-16 bg-gradient-to-br from-orange-500/20 to-red-500/10 rounded-full blur-xl opacity-60" />
-                  
-                  {/* Header with icon and price */}
-                  <div className="relative z-10 flex items-start justify-between mb-4">
-                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center shadow-lg shadow-orange-500/30">
-                      <div className="text-white scale-110">
-                        {service.icon}
+                  {/* Header - horizontal layout for mobile */}
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-lg shadow-primary/20">
+                        <div className="text-white scale-90">
+                          {service.icon}
+                        </div>
+                      </div>
+                      <div>
+                        <h3 className="text-lg font-bold text-foreground leading-tight">
+                          {service.title}
+                        </h3>
+                        {service.price && (
+                          <span className="text-primary font-bold text-sm">{service.price}</span>
+                        )}
                       </div>
                     </div>
-                    {service.price && (
-                      <div className="px-3 py-1 rounded-full bg-gradient-to-r from-orange-500/20 to-red-500/20 border border-orange-400/30 backdrop-blur-sm">
-                        <span className="text-orange-400 font-bold text-sm">{service.price}</span>
-                      </div>
-                    )}
                   </div>
                   
-                  {/* Title */}
-                  <h3 className="text-lg font-bold text-foreground mb-3 leading-tight">
-                    {service.title}
-                  </h3>
-                  
                   {/* Description */}
-                  <p className="text-muted-foreground mb-4 text-sm leading-relaxed line-clamp-3">
+                  <p className="text-secondary-foreground mb-4 text-sm leading-relaxed">
                     {service.description}
                   </p>
                   
-                  {/* Features with compact design */}
+                  {/* Features list */}
                   <div className="space-y-2">
                     {service.features.slice(0, 3).map((feature, featureIndex) => (
-                      <div key={featureIndex} className="flex items-center space-x-2 p-2 rounded-lg hover:bg-orange-500/5 transition-colors">
-                        <div className="w-4 h-4 rounded-full bg-gradient-to-br from-orange-500/30 to-red-500/20 flex items-center justify-center flex-shrink-0">
-                          <div className="w-2 h-2 rounded-full bg-orange-400" />
-                        </div>
-                        <span className="text-muted-foreground text-xs">{feature}</span>
+                      <div key={featureIndex} className="flex items-center space-x-2">
+                        <div className="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
+                        <span className="text-secondary-foreground text-xs">{feature}</span>
                       </div>
                     ))}
                   </div>
-                  
-                  {/* Hover effects */}
-                  <div className="absolute inset-0 rounded-[28px] opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-br from-orange-500/5 via-transparent to-red-500/5 pointer-events-none" />
-                  <div className="absolute inset-0 rounded-[28px] opacity-0 group-hover:opacity-100 transition-opacity duration-500 shadow-inner shadow-orange-500/10 pointer-events-none" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Desktop grid layout */}
+        <div className="hidden md:grid grid-cols-2 lg:grid-cols-3 gap-6">
+          {servicesList.map((service, index) => (
+            <div key={index} className="group">
+              <div className="glass rounded-3xl p-6 h-full border border-primary/10 hover:border-primary/20 bg-gradient-to-br from-primary/5 to-transparent backdrop-blur-xl transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-primary/5">
+                
+                {/* Header with icon and price */}
+                <div className="flex items-start justify-between mb-4">
+                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-lg shadow-primary/20">
+                    <div className="text-white">
+                      {service.icon}
+                    </div>
+                  </div>
+                  {service.price && (
+                    <div className="px-3 py-1 rounded-full bg-primary/10 border border-primary/20">
+                      <span className="text-primary font-bold text-sm">{service.price}</span>
+                    </div>
+                  )}
+                </div>
+                
+                {/* Title */}
+                <h3 className="text-xl font-bold text-foreground mb-3 leading-tight">
+                  {service.title}
+                </h3>
+                
+                {/* Description */}
+                <p className="text-secondary-foreground mb-4 text-sm leading-relaxed">
+                  {service.description}
+                </p>
+                
+                {/* Features */}
+                <div className="space-y-2">
+                  {service.features.slice(0, 3).map((feature, featureIndex) => (
+                    <div key={featureIndex} className="flex items-center space-x-2 p-2 rounded-lg hover:bg-primary/5 transition-colors">
+                      <div className="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
+                      <span className="text-secondary-foreground text-xs">{feature}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>

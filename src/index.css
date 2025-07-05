@@ -83,41 +83,41 @@ All colors MUST be HSL.
   }
 
   .dark {
-    /* Dark Mode - Orange Enhanced */
-    --background: 220 25% 8%;
-    --foreground: 0 0% 98%;
+    /* Dark Mode - Dark Tech Enhanced */
+    --background: 0 0% 7%; /* #121212 */
+    --foreground: 0 0% 100%; /* #FFFFFF */
 
-    --card: 220 20% 12%;
-    --card-foreground: 0 0% 98%;
+    --card: 0 0% 12%; /* #1E1E1E */
+    --card-foreground: 0 0% 100%;
 
-    --popover: 220 20% 12%;
-    --popover-foreground: 0 0% 98%;
+    --popover: 0 0% 12%;
+    --popover-foreground: 0 0% 100%;
 
-    --primary: 24 100% 58%;
-    --primary-foreground: 0 0% 98%;
+    --primary: 24 100% 50%; /* #FF6600 neón naranja */
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 220 15% 20%;
-    --secondary-foreground: 0 0% 98%;
+    --secondary: 0 0% 20%;
+    --secondary-foreground: 0 0% 88%; /* #E0E0E0 texto cuerpo */
 
-    --muted: 220 15% 15%;
-    --muted-foreground: 0 0% 70%;
+    --muted: 0 0% 15%;
+    --muted-foreground: 0 0% 60%; /* #999 enlaces pequeños */
 
-    --accent: 24 95% 65%;
-    --accent-foreground: 220 25% 8%;
+    --accent: 24 100% 50%;
+    --accent-foreground: 0 0% 7%;
 
     --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 220 15% 25%;
-    --input: 220 15% 18%;
-    --ring: 24 100% 58%;
+    --border: 0 0% 20%; /* #333 */
+    --input: 0 0% 7%; /* #121212 */
+    --ring: 24 100% 50%;
     
-    /* Dark Mode Glass morphism */
-    --glass-bg: 220 20% 12% / 0.15;
-    --glass-border: 0 0% 100% / 0.08;
-    --glass-blur: 24px;
-    --glass-intense: 220 20% 12% / 0.4;
-    --glass-glow: 24 100% 58% / 0.2;
+    /* Dark Tech Glass morphism */
+    --glass-bg: 0 0% 12% / 0.8; /* rgba(30,30,30,0.8) */
+    --glass-border: 0 0% 100% / 0.1;
+    --glass-blur: 12px;
+    --glass-intense: 0 0% 7% / 0.85; /* sidebar */
+    --glass-glow: 24 100% 50% / 0.3;
     
     /* Dark Mode Gradients */
     --gradient-primary: linear-gradient(135deg, hsl(24 100% 58%), hsl(190 100% 60%));
