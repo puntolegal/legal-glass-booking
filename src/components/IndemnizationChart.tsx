@@ -48,13 +48,13 @@ const IndemnizationChart = ({ selectedYears = 15 }: IndemnizationChartProps) => 
   ];
 
   return (
-    <div 
-      className="relative p-8 rounded-2xl backdrop-blur-xl border border-white/10 shadow-2xl overflow-hidden"
-      style={{
-        background: 'rgba(30, 30, 30, 0.8)',
-        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
-      }}
-    >
+    <div className="glass-strong rounded-3xl p-8 border border-primary/20 shadow-2xl overflow-hidden relative">
+      {/* Modern geometric background pattern */}
+      <div className="absolute inset-0 opacity-5">
+        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-primary/10 via-transparent to-accent/5"></div>
+        <div className="absolute top-8 right-8 w-32 h-32 border border-primary/10 rounded-full"></div>
+        <div className="absolute bottom-8 left-8 w-24 h-24 border border-primary/10 rounded-full"></div>
+      </div>
       {/* Warm glow effect */}
       <div 
         className="absolute inset-0 opacity-20 blur-xl"

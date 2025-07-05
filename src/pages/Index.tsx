@@ -13,7 +13,7 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       <Header onAgendarClick={() => setShowForm(true)} />
       <HeroSection showForm={showForm} setShowForm={setShowForm} />
-      <ServicesSection />
+      <ServicesSection onAgendarClick={() => setShowForm(true)} />
       <section className="py-20 px-6">
         <div className="container mx-auto">
           <IndemnizationChart />
