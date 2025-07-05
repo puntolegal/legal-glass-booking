@@ -21,13 +21,13 @@ const HeroSection = ({ title, subtitle, showForm, setShowForm, servicePrice = "$
   const defaultSubtitle = "en Derecho Laboral";
 
   return (
-    <section id="inicio" className="min-h-screen flex items-center justify-center pt-16 px-4 relative overflow-hidden">
-      {/* Dark Tech Background Elements - High Quality Images */}
+    <section id="inicio" className="min-h-screen flex items-center justify-center pt-0 lg:pt-16 px-4 relative overflow-hidden">
+      {/* Dark Tech Background Elements - Responsive positioning */}
       <div className="absolute inset-0 pointer-events-none z-20">
         <img 
           src="/lovable-uploads/d57965c1-0748-4121-ab53-eeef49835b4c.png" 
           alt="Legal 3D Elements" 
-          className="absolute top-20 right-10 w-48 md:w-64 h-48 md:h-64 opacity-90 animate-float filter drop-shadow-2xl"
+          className="absolute top-10 lg:top-20 right-4 lg:right-10 w-32 lg:w-48 xl:w-64 h-32 lg:h-48 xl:h-64 opacity-90 animate-float filter drop-shadow-2xl"
           style={{ 
             filter: 'brightness(1.2) contrast(1.1) drop-shadow(0 0 20px rgba(255, 102, 0, 0.3))',
             zIndex: 20
@@ -36,7 +36,7 @@ const HeroSection = ({ title, subtitle, showForm, setShowForm, servicePrice = "$
         <img 
           src="/lovable-uploads/5f1723b2-3e90-449b-a43c-8af1d2a8fc2a.png" 
           alt="Legal Briefcase 3D" 
-          className="absolute bottom-20 left-10 w-32 md:w-48 h-32 md:h-48 opacity-85 animate-float filter drop-shadow-2xl" 
+          className="absolute bottom-10 lg:bottom-20 left-4 lg:left-10 w-24 lg:w-32 xl:w-48 h-24 lg:h-32 xl:h-48 opacity-85 animate-float filter drop-shadow-2xl" 
           style={{ 
             animationDelay: '2s',
             filter: 'brightness(1.3) contrast(1.2) drop-shadow(0 0 15px rgba(255, 102, 0, 0.4))',
@@ -49,30 +49,30 @@ const HeroSection = ({ title, subtitle, showForm, setShowForm, servicePrice = "$
         <div className="text-center max-w-4xl mx-auto">
           {/* Hero Title - Dark Tech Typography */}
           <div className="mb-8">
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight tracking-tight">
+            <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold mb-4 lg:mb-6 leading-tight tracking-tight">
               <span className="bg-gradient-to-r from-primary via-primary to-primary/80 bg-clip-text text-transparent">
                 {title || defaultTitle}
               </span>
               <br />
-              <span className="text-foreground font-medium">{subtitle || defaultSubtitle}</span>
+              <span className="text-foreground font-medium text-2xl sm:text-3xl md:text-5xl lg:text-6xl">{subtitle || defaultSubtitle}</span>
             </h1>
           </div>
           
           {/* Subtitle with Pricing */}
-          <p className="text-lg md:text-xl text-secondary-foreground mb-10 leading-relaxed max-w-2xl mx-auto">
+          <p className="text-base sm:text-lg md:text-xl text-secondary-foreground mb-8 lg:mb-10 leading-relaxed max-w-2xl mx-auto px-4 sm:px-0">
             Agenda y paga tu sesión de{" "}
-            <span className="text-primary font-bold text-xl md:text-2xl px-2 py-1 rounded-lg bg-primary/10">
+            <span className="text-primary font-bold text-lg sm:text-xl md:text-2xl px-2 py-1 rounded-lg bg-primary/10 block sm:inline mt-2 sm:mt-0">
               {servicePrice}
             </span>
-            <br className="hidden md:block" />
-            Recibe asesoría legal profesional por Google Meet
+            <br className="hidden sm:block" />
+            <span className="block sm:inline mt-2 sm:mt-0">Recibe asesoría legal profesional por Google Meet</span>
           </p>
           
-          {/* CTA Buttons - Dark Tech Neón Style */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
+          {/* CTA Buttons - Responsive sizing */}
+          <div className="flex flex-col gap-3 sm:gap-4 justify-center items-center mb-12 lg:mb-16 px-4 sm:px-0">
             <Button 
               onClick={() => actualSetShowForm(true)}
-              className="w-full sm:w-auto px-8 py-4 bg-primary hover:bg-primary/90 text-white rounded-xl font-semibold text-lg shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all duration-200 hover:scale-[1.02] border border-primary/20"
+              className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 bg-primary hover:bg-primary/90 text-white rounded-xl font-semibold text-base sm:text-lg shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all duration-200 hover:scale-[1.02] border border-primary/20"
             >
               <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -82,7 +82,7 @@ const HeroSection = ({ title, subtitle, showForm, setShowForm, servicePrice = "$
             
             <Button 
               variant="outline"
-              className="w-full sm:w-auto px-6 py-4 glass border-border/50 text-secondary-foreground hover:text-primary hover:bg-primary/5 rounded-xl font-medium transition-all duration-200"
+              className="w-full sm:w-auto px-4 sm:px-6 py-3 sm:py-4 glass border-border/50 text-secondary-foreground hover:text-primary hover:bg-primary/5 rounded-xl font-medium transition-all duration-200 text-sm sm:text-base"
               onClick={() => {
                 const element = document.getElementById('casos-exito');
                 if (element) {

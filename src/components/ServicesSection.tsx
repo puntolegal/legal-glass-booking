@@ -247,7 +247,7 @@ const ServicesSection = ({ title = "Elige el servicio legal que necesitas", serv
   })) : defaultServices;
 
   return (
-    <section id="servicios" className="py-20 px-6 relative overflow-hidden">
+    <section id="servicios" className="py-12 lg:py-20 px-4 lg:px-6 relative overflow-hidden">
       {/* 3D Copper Ball Background */}
       <div className="absolute inset-0 pointer-events-none">
         <img 
@@ -272,8 +272,8 @@ const ServicesSection = ({ title = "Elige el servicio legal que necesitas", serv
         </div>
 
         {/* Mobile-first horizontal scroll-snap cards */}
-        <div className="block md:hidden">
-          <div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide">
+        <div className="block md:hidden px-4">
+          <div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide -mx-4 px-4">
             {servicesList.map((service, index) => (
               <div key={index} className="flex-none w-80 snap-start">
                 <div className="glass rounded-3xl p-6 h-full border border-primary/10 hover:border-primary/20 bg-gradient-to-br from-primary/5 to-transparent backdrop-blur-xl transition-all duration-300 hover:scale-[1.02]">

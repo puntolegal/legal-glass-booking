@@ -4,7 +4,7 @@ import ServicesSection from "@/components/ServicesSection";
 import BlogSection from "@/components/BlogSection";
 import TestimonialsSection from "@/components/TestimonialsSection";
 import Footer from "@/components/Footer";
-import { SidebarProvider } from "@/components/ui/sidebar";
+import { MobileLayout } from "@/components/MobileLayout";
 import { useState } from "react";
 
 const Index = () => {
@@ -20,11 +20,34 @@ const Index = () => {
     setShowForm(true);
   };
 
+  const content = (
+    <>
+      <Header onAgendarClick={() => setShowForm(true)} />
+      <div className="hidden lg:block lg:pt-20">
+        <HeroSection 
+          showForm={showForm} 
+          setShowForm={setShowForm}
+          servicePrice={selectedService?.price}
+          serviceName={selectedService?.title}
+        />
+        <ServicesSection onAgendarClick={handleServiceSelect} />
+        <TestimonialsSection />
+        <BlogSection />
+        <Footer />
+      </div>
+    </>
+  );
+
   return (
-    <SidebarProvider defaultOpen={false}>
-      <div className="min-h-screen bg-background flex w-full">
-        <div className="flex-1">
-          <Header onAgendarClick={() => setShowForm(true)} />
+    <div className="min-h-screen bg-background">
+      {/* Desktop Layout */}
+      <div className="hidden lg:block">
+        {content}
+      </div>
+
+      {/* Mobile Layout */}
+      <div className="lg:hidden">
+        <MobileLayout onAgendarClick={() => setShowForm(true)}>
           <HeroSection 
             showForm={showForm} 
             setShowForm={setShowForm}
@@ -35,9 +58,9 @@ const Index = () => {
           <TestimonialsSection />
           <BlogSection />
           <Footer />
-        </div>
+        </MobileLayout>
       </div>
-    </SidebarProvider>
+    </div>
   );
 };
 
