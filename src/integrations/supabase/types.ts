@@ -18,6 +18,8 @@ export type Database = {
           telefono: string | null
           updated_at: string
           user_id: string
+          role: 'admin' | 'abogado' | 'cliente'
+          is_active: boolean
         }
         Insert: {
           created_at?: string
@@ -27,6 +29,8 @@ export type Database = {
           telefono?: string | null
           updated_at?: string
           user_id: string
+          role?: 'admin' | 'abogado' | 'cliente'
+          is_active?: boolean
         }
         Update: {
           created_at?: string
@@ -36,6 +40,8 @@ export type Database = {
           telefono?: string | null
           updated_at?: string
           user_id?: string
+          role?: 'admin' | 'abogado' | 'cliente'
+          is_active?: boolean
         }
         Relationships: []
       }
@@ -51,6 +57,14 @@ export type Database = {
           rut: string
           telefono: string
           user_id: string | null
+          servicio: string | null
+          precio: string | null
+          categoria: string | null
+          tipo_reunion: string | null
+          estado: 'pendiente' | 'confirmada' | 'completada' | 'cancelada'
+          recordatorio_enviado: boolean
+          webhook_sent: boolean
+          updated_at: string | null
         }
         Insert: {
           created_at?: string | null
@@ -63,6 +77,14 @@ export type Database = {
           rut: string
           telefono: string
           user_id?: string | null
+          servicio?: string | null
+          precio?: string | null
+          categoria?: string | null
+          tipo_reunion?: string | null
+          estado?: 'pendiente' | 'confirmada' | 'completada' | 'cancelada'
+          recordatorio_enviado?: boolean
+          webhook_sent?: boolean
+          updated_at?: string | null
         }
         Update: {
           created_at?: string | null
@@ -75,8 +97,113 @@ export type Database = {
           rut?: string
           telefono?: string
           user_id?: string | null
+          servicio?: string | null
+          precio?: string | null
+          categoria?: string | null
+          tipo_reunion?: string | null
+          estado?: 'pendiente' | 'confirmada' | 'completada' | 'cancelada'
+          recordatorio_enviado?: boolean
+          webhook_sent?: boolean
+          updated_at?: string | null
         }
         Relationships: []
+      }
+      notificaciones: {
+        Row: {
+          id: string
+          reserva_id: string
+          tipo: 'nueva_reserva' | 'recordatorio' | 'comprobante'
+          estado: 'pendiente' | 'enviado' | 'fallido'
+          intentos: number
+          fecha_envio: string | null
+          ultimo_error: string | null
+          webhook_response: Json | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          reserva_id: string
+          tipo: 'nueva_reserva' | 'recordatorio' | 'comprobante'
+          estado?: 'pendiente' | 'enviado' | 'fallido'
+          intentos?: number
+          fecha_envio?: string | null
+          ultimo_error?: string | null
+          webhook_response?: Json | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          reserva_id?: string
+          tipo?: 'nueva_reserva' | 'recordatorio' | 'comprobante'
+          estado?: 'pendiente' | 'enviado' | 'fallido'
+          intentos?: number
+          fecha_envio?: string | null
+          ultimo_error?: string | null
+          webhook_response?: Json | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notificaciones_reserva_id_fkey"
+            columns: ["reserva_id"]
+            isOneToOne: false
+            referencedRelation: "reservas"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      pagos: {
+        Row: {
+          id: string
+          reserva_id: string
+          numero_comprobante: string
+          monto: number
+          metodo: string
+          numero_transaccion: string | null
+          estado: 'pendiente' | 'pagado' | 'fallido' | 'reembolsado'
+          fecha_pago: string | null
+          datos_pago: Json | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          reserva_id: string
+          numero_comprobante: string
+          monto: number
+          metodo: string
+          numero_transaccion?: string | null
+          estado?: 'pendiente' | 'pagado' | 'fallido' | 'reembolsado'
+          fecha_pago?: string | null
+          datos_pago?: Json | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          reserva_id?: string
+          numero_comprobante?: string
+          monto?: number
+          metodo?: string
+          numero_transaccion?: string | null
+          estado?: 'pendiente' | 'pagado' | 'fallido' | 'reembolsado'
+          fecha_pago?: string | null
+          datos_pago?: Json | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pagos_reserva_id_fkey"
+            columns: ["reserva_id"]
+            isOneToOne: false
+            referencedRelation: "reservas"
+            referencedColumns: ["id"]
+          }
+        ]
       }
     }
     Views: {

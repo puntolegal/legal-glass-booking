@@ -4,26 +4,46 @@ import ServicesSection from "@/components/ServicesSection";
 import BlogSection from "@/components/BlogSection";
 import TestimonialsSection from "@/components/TestimonialsSection";
 import Footer from "@/components/Footer";
+import { MobileLayout } from "@/components/MobileLayout";
+import { useState } from "react";
 
 const HerenciasPage = () => {
+  const [showForm, setShowForm] = useState(false);
+  const [selectedService, setSelectedService] = useState<{
+    title: string;
+    price: string;
+  } | null>(null);
+
+  const handleServiceSelect = (service: { title: string; promoPrice?: string; price?: string }) => {
+    const price = service.promoPrice || service.price || "$30.000 CLP";
+    setSelectedService({ title: service.title, price });
+    setShowForm(true);
+  };
+
   const herenciasData = {
-    heroTitle: "Asesoría en Herencias Online",
-    heroSubtitle: "Especialistas en Derecho Sucesorio",
+    heroTitle: "Asesoría Legal Especializada",
+    heroSubtitle: "en Herencias y Testamentos",
     services: [
       {
         title: "Sucesión Intestada",
         description: "Tramitación de herencias sin testamento, determinando herederos legales y distribución de bienes.",
-        icon: "scroll"
+        icon: "scroll",
+        price: "$40.000",
+        promoPrice: "$30.000"
       },
       {
         title: "Testamentos",
         description: "Redacción y validación de testamentos para asegurar el cumplimiento de tu voluntad.",
-        icon: "file-text"
+        icon: "file-text",
+        price: "$35.000",
+        promoPrice: "$25.000"
       },
       {
         title: "Aceptación y Repudio",
         description: "Asesoría para aceptar o repudiar herencias, evaluando beneficios y obligaciones.",
-        icon: "check-circle"
+        icon: "check-circle",
+        price: "$30.000",
+        promoPrice: "$22.000"
       }
     ],
     blogPosts: [
@@ -45,23 +65,64 @@ const HerenciasPage = () => {
     ]
   };
 
+  const content = (
+    <>
+      <Header onAgendarClick={() => setShowForm(true)} serviceName="Punto Legal Sucesorio" />
+      <div className="hidden lg:block lg:pt-20">
+        <HeroSection 
+          title={herenciasData.heroTitle}
+          subtitle={herenciasData.heroSubtitle}
+          showForm={showForm} 
+          setShowForm={setShowForm}
+          servicePrice={selectedService?.price || "$30.000 CLP"}
+          serviceName={selectedService?.title || "Consulta Sucesoria"}
+        />
+        <ServicesSection 
+          title="Servicios de Herencias"
+          services={herenciasData.services}
+          onAgendarClick={handleServiceSelect} 
+        />
+        <TestimonialsSection />
+        <BlogSection 
+          title="Blog de Herencias"
+          posts={herenciasData.blogPosts}
+        />
+        <Footer />
+      </div>
+    </>
+  );
+
   return (
     <div className="min-h-screen bg-background">
-      <Header />
-      <HeroSection 
-        title={herenciasData.heroTitle}
-        subtitle={herenciasData.heroSubtitle}
-      />
-      <ServicesSection 
-        title="Servicios de Herencias"
-        services={herenciasData.services}
-      />
-      <TestimonialsSection />
-      <BlogSection 
-        title="Blog de Herencias"
-        posts={herenciasData.blogPosts}
-      />
-      <Footer />
+      {/* Desktop Layout */}
+      <div className="hidden lg:block">
+        {content}
+      </div>
+
+      {/* Mobile Layout */}
+      <div className="lg:hidden">
+        <MobileLayout onAgendarClick={() => setShowForm(true)}>
+          <HeroSection 
+            title={herenciasData.heroTitle}
+            subtitle={herenciasData.heroSubtitle}
+            showForm={showForm} 
+            setShowForm={setShowForm}
+            servicePrice={selectedService?.price || "$30.000 CLP"}
+            serviceName={selectedService?.title || "Consulta Sucesoria"}
+          />
+          <ServicesSection 
+            title="Servicios de Herencias"
+            services={herenciasData.services}
+            onAgendarClick={handleServiceSelect} 
+          />
+          <TestimonialsSection />
+          <BlogSection 
+            title="Blog de Herencias"
+            posts={herenciasData.blogPosts}
+          />
+          <Footer />
+        </MobileLayout>
+      </div>
     </div>
   );
 };

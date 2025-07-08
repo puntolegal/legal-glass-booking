@@ -1,193 +1,213 @@
-import { PAYMENT_CONFIG, PAYMENT_URLS, PaymentMethod, PaymentResponse } from '@/config/payment';
+import { ServicePricing } from '@/config/pricing';
+
+export interface PaymentData {
+  service: ServicePricing;
+  customer: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone: string;
+    rut: string;
+  };
+  amount: number;
+  currency: string;
+}
+
+export interface PaymentResponse {
+  success: boolean;
+  transactionId?: string;
+  message: string;
+  redirectUrl?: string;
+}
+
+export type PaymentMethod = 'webpay' | 'transfer' | 'paypal';
 
 // Servicio para manejar pagos
 export class PaymentService {
+  private static instance: PaymentService;
   
-  // Iniciar pago con WebPay
-  static async initiateWebPayPayment(amount: number, orderId: string, description: string): Promise<PaymentResponse> {
-    try {
-      const totalAmount = Math.round(amount * (1 + PAYMENT_CONFIG.taxRate));
-      
-      // En producción, aquí harías la llamada real a la API de WebPay
-      const webpayData = {
-        amount: totalAmount,
-        commerce_code: PAYMENT_CONFIG.webpay.commerceCode,
-        buy_order: orderId,
-        session_id: `session_${Date.now()}`,
-        return_url: PAYMENT_CONFIG.webpay.returnUrl,
-        cancel_url: PAYMENT_CONFIG.webpay.cancelUrl,
-      };
+  public static getInstance(): PaymentService {
+    if (!PaymentService.instance) {
+      PaymentService.instance = new PaymentService();
+    }
+    return PaymentService.instance;
+  }
 
-      console.log('Iniciando pago WebPay:', webpayData);
+  // Procesar pago con WebPay (Transbank)
+  async processWebPayPayment(paymentData: PaymentData): Promise<PaymentResponse> {
+    try {
+      // Aquí iría la integración real con WebPay
+      console.log('Procesando pago con WebPay:', paymentData);
       
       // Simular respuesta de WebPay
-      const mockResponse = {
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      return {
         success: true,
-        transactionId: `webpay_${Date.now()}`,
-        amount: totalAmount,
-        currency: PAYMENT_CONFIG.currency,
-        method: 'webpay' as PaymentMethod,
-        timestamp: new Date(),
-        url: `${PAYMENT_URLS.webpay[PAYMENT_CONFIG.webpay.environment]}/webpay/init`,
-        token: `token_${Date.now()}`,
+        transactionId: `WEBPAY_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        message: 'Pago procesado exitosamente con WebPay',
+        redirectUrl: `/payment-success/${paymentData.service.id}`
       };
-
-      return mockResponse;
     } catch (error) {
-      console.error('Error iniciando pago WebPay:', error);
+      console.error('Error en WebPay:', error);
       return {
         success: false,
-        amount,
-        currency: PAYMENT_CONFIG.currency,
-        method: 'webpay',
-        timestamp: new Date(),
-        error: 'Error al iniciar el pago con WebPay',
+        message: 'Error al procesar el pago con WebPay'
       };
     }
   }
 
-  // Iniciar pago con PayPal
-  static async initiatePayPalPayment(amount: number, orderId: string, description: string): Promise<PaymentResponse> {
+  // Procesar pago con Transferencia Bancaria
+  async processBankTransferPayment(paymentData: PaymentData): Promise<PaymentResponse> {
     try {
-      const totalAmount = Math.round(amount * (1 + PAYMENT_CONFIG.taxRate));
+      console.log('Procesando pago por transferencia bancaria:', paymentData);
       
-      // En producción, aquí harías la llamada real a la API de PayPal
-      const paypalData = {
-        intent: 'CAPTURE',
-        purchase_units: [{
-          amount: {
-            currency_code: PAYMENT_CONFIG.currency,
-            value: (totalAmount / 100).toFixed(2), // PayPal espera el valor en formato decimal
-          },
-          description,
-          custom_id: orderId,
-        }],
-        application_context: {
-          return_url: `${window.location.origin}/payment/success`,
-          cancel_url: `${window.location.origin}/payment/cancel`,
-        },
-      };
-
-      console.log('Iniciando pago PayPal:', paypalData);
+      // Simular procesamiento
+      await new Promise(resolve => setTimeout(resolve, 1500));
       
-      // Simular respuesta de PayPal
-      const mockResponse = {
+      return {
         success: true,
-        transactionId: `paypal_${Date.now()}`,
-        amount: totalAmount,
-        currency: PAYMENT_CONFIG.currency,
-        method: 'paypal' as PaymentMethod,
-        timestamp: new Date(),
-        approvalUrl: `${PAYMENT_URLS.paypal[PAYMENT_CONFIG.paypal.environment]}/checkoutnow?token=EC_${Date.now()}`,
+        transactionId: `TRANSFER_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        message: 'Instrucciones de transferencia enviadas',
+        redirectUrl: `/payment-success/${paymentData.service.id}`
       };
-
-      return mockResponse;
     } catch (error) {
-      console.error('Error iniciando pago PayPal:', error);
+      console.error('Error en transferencia bancaria:', error);
       return {
         success: false,
-        amount,
-        currency: PAYMENT_CONFIG.currency,
-        method: 'paypal',
-        timestamp: new Date(),
-        error: 'Error al iniciar el pago con PayPal',
+        message: 'Error al procesar la transferencia bancaria'
       };
     }
   }
 
-  // Verificar estado de pago
-  static async verifyPayment(transactionId: string, method: PaymentMethod): Promise<PaymentResponse> {
+  // Procesar pago con PayPal
+  async processPayPalPayment(paymentData: PaymentData): Promise<PaymentResponse> {
     try {
-      console.log(`Verificando pago ${method}:`, transactionId);
+      console.log('Procesando pago con PayPal:', paymentData);
       
-      // Simular verificación
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Simular procesamiento
+      await new Promise(resolve => setTimeout(resolve, 2500));
       
       return {
         success: true,
-        transactionId,
-        amount: PAYMENT_CONFIG.baseAmount * (1 + PAYMENT_CONFIG.taxRate),
-        currency: PAYMENT_CONFIG.currency,
-        method,
-        timestamp: new Date(),
+        transactionId: `PAYPAL_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        message: 'Pago procesado exitosamente con PayPal',
+        redirectUrl: `/payment-success/${paymentData.service.id}`
       };
     } catch (error) {
-      console.error('Error verificando pago:', error);
+      console.error('Error en PayPal:', error);
       return {
         success: false,
-        amount: PAYMENT_CONFIG.baseAmount,
-        currency: PAYMENT_CONFIG.currency,
-        method,
-        timestamp: new Date(),
-        error: 'Error al verificar el pago',
+        message: 'Error al procesar el pago con PayPal'
       };
     }
   }
 
-  // Generar ID único para la orden
-  static generateOrderId(): string {
-    return `order_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-  }
-
-  // Validar datos de pago
-  static validatePaymentData(amount: number, description: string): boolean {
-    return amount > 0 && description.length > 0;
+  // Procesar pago según el método seleccionado
+  async processPayment(paymentData: PaymentData, method: PaymentMethod): Promise<PaymentResponse> {
+    switch (method) {
+      case 'webpay':
+        return this.processWebPayPayment(paymentData);
+      case 'transfer':
+        return this.processBankTransferPayment(paymentData);
+      case 'paypal':
+        return this.processPayPalPayment(paymentData);
+      default:
+        return {
+          success: false,
+          message: 'Método de pago no válido'
+        };
   }
 }
 
-// Hook personalizado para manejar pagos
-export const usePayment = () => {
-  const processPayment = async (
-    method: PaymentMethod,
-    amount: number,
-    description: string
-  ): Promise<PaymentResponse> => {
-    const orderId = PaymentService.generateOrderId();
+  // Validar datos del cliente
+  validateCustomerData(customer: PaymentData['customer']): { valid: boolean; errors: string[] } {
+    const errors: string[] = [];
+
+    if (!customer.firstName.trim()) errors.push('El nombre es requerido');
+    if (!customer.lastName.trim()) errors.push('El apellido es requerido');
+    if (!customer.email.trim()) errors.push('El email es requerido');
+    if (!this.isValidEmail(customer.email)) errors.push('El email no es válido');
+    if (!customer.phone.trim()) errors.push('El teléfono es requerido');
+    if (!customer.rut.trim()) errors.push('El RUT es requerido');
+    if (!this.isValidRUT(customer.rut)) errors.push('El RUT no es válido');
+
+    return {
+      valid: errors.length === 0,
+      errors
+    };
+  }
+
+  // Validar email
+  private isValidEmail(email: string): boolean {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  }
+
+  // Validar RUT chileno
+  private isValidRUT(rut: string): boolean {
+    // Eliminar puntos y guión
+    const cleanRut = rut.replace(/\./g, '').replace(/-/g, '');
     
-    if (!PaymentService.validatePaymentData(amount, description)) {
-      return {
-        success: false,
-        amount,
-        currency: PAYMENT_CONFIG.currency,
-        method,
-        timestamp: new Date(),
-        error: 'Datos de pago inválidos',
-      };
+    if (cleanRut.length < 2) return false;
+    
+    const body = cleanRut.slice(0, -1);
+    const dv = cleanRut.slice(-1).toUpperCase();
+    
+    // Validar que el cuerpo sea numérico
+    if (!/^\d+$/.test(body)) return false;
+    
+    // Calcular dígito verificador
+    let sum = 0;
+    let multiplier = 2;
+    
+    for (let i = body.length - 1; i >= 0; i--) {
+      sum += parseInt(body[i]) * multiplier;
+      multiplier = multiplier === 7 ? 2 : multiplier + 1;
     }
+    
+    const expectedDV = 11 - (sum % 11);
+    let calculatedDV: string;
+    
+    if (expectedDV === 11) calculatedDV = '0';
+    else if (expectedDV === 10) calculatedDV = 'K';
+    else calculatedDV = expectedDV.toString();
+    
+    return dv === calculatedDV;
+  }
 
-    try {
-      let response: PaymentResponse;
-      
-      if (method === 'webpay') {
-        response = await PaymentService.initiateWebPayPayment(amount, orderId, description);
-      } else {
-        response = await PaymentService.initiatePayPalPayment(amount, orderId, description);
+  // Obtener métodos de pago disponibles
+  getAvailablePaymentMethods(): Array<{
+    id: PaymentMethod;
+    name: string;
+    description: string;
+    icon: string;
+    processingTime: string;
+  }> {
+    return [
+      {
+        id: 'webpay',
+        name: 'WebPay',
+        description: 'Tarjeta de crédito/débito',
+        icon: '💳',
+        processingTime: 'Inmediato'
+      },
+      {
+        id: 'transfer',
+        name: 'Transferencia Bancaria',
+        description: 'Transferencia desde tu banco',
+        icon: '🏦',
+        processingTime: '1-2 días hábiles'
+      },
+      {
+        id: 'paypal',
+        name: 'PayPal',
+        description: 'Pago con PayPal',
+        icon: '🔵',
+        processingTime: 'Inmediato'
       }
-
-      if (response.success) {
-        // Redirigir al usuario a la pasarela de pago
-        if (method === 'webpay' && 'url' in response && typeof response.url === 'string') {
-          // Para WebPay, redirigir a la URL de pago
-          window.location.href = response.url;
-        } else if (method === 'paypal' && 'approvalUrl' in response && typeof response.approvalUrl === 'string') {
-          // Para PayPal, abrir en nueva ventana
-          window.open(response.approvalUrl, '_blank');
-        }
-      }
-
-      return response;
-    } catch (error) {
-      console.error('Error procesando pago:', error);
-      return {
-        success: false,
-        amount,
-        currency: PAYMENT_CONFIG.currency,
-        method,
-        timestamp: new Date(),
-        error: 'Error al procesar el pago',
-      };
+    ];
     }
-  };
+}
 
-  return { processPayment };
-}; 
+export default PaymentService.getInstance(); 

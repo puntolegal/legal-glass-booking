@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Clock, X } from "lucide-react";
 
 interface AvailabilityCalendarProps {
   onDateSelect?: (date: Date, time: string) => void;
@@ -19,6 +19,28 @@ const AvailabilityCalendar = ({ onDateSelect }: AvailabilityCalendarProps) => {
     "09:00", "09:30", "10:00", "10:30", "11:00", "11:30",
     "14:00", "14:30", "15:00", "15:30", "16:00", "16:30", "17:00"
   ];
+
+  // Generate unavailable hours for each day (consistent for the same day)
+  const unavailableHours = useMemo(() => {
+    const unavailable: Record<string, string> = {};
+    const today = new Date();
+    
+    for (let i = 1; i <= 30; i++) {
+      const date = new Date(today);
+      date.setDate(today.getDate() + i);
+      
+      // Skip weekends
+      if (date.getDay() !== 0 && date.getDay() !== 6) {
+        const dateKey = date.toDateString();
+        // Use the date as seed for consistent random generation
+        const seed = date.getTime();
+        const randomIndex = Math.floor((seed % 1000) / 1000 * timeSlots.length);
+        unavailable[dateKey] = timeSlots[randomIndex];
+      }
+    }
+    
+    return unavailable;
+  }, []);
 
   // Simulate available dates (next 30 days, excluding weekends)
   const getAvailableDates = () => {
@@ -44,6 +66,10 @@ const AvailabilityCalendar = ({ onDateSelect }: AvailabilityCalendarProps) => {
     );
   };
 
+  const getUnavailableHourForDate = (date: Date) => {
+    return unavailableHours[date.toDateString()];
+  };
+
   const handleDateSelect = (date: Date | undefined) => {
     setSelectedDate(date);
     setSelectedTime(undefined);
@@ -63,6 +89,10 @@ const AvailabilityCalendar = ({ onDateSelect }: AvailabilityCalendarProps) => {
       month: "long",
       day: "numeric",
     });
+  };
+
+  const isTimeUnavailable = (date: Date, time: string) => {
+    return getUnavailableHourForDate(date) === time;
   };
 
   return (
@@ -129,22 +159,46 @@ const AvailabilityCalendar = ({ onDateSelect }: AvailabilityCalendarProps) => {
               Horarios disponibles:
             </h3>
             <div className="grid grid-cols-3 gap-2">
-              {timeSlots.map((time) => (
-                <Button
-                  key={time}
-                  variant={selectedTime === time ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => handleTimeSelect(time)}
-                  className={`transition-all duration-300 ${
-                    selectedTime === time
-                      ? "btn-neon animate-pulse-neon"
-                      : "glass hover:bg-primary/20 hover:border-primary/50"
-                  }`}
-                >
-                  {time}
-                </Button>
-              ))}
+              {timeSlots.map((time) => {
+                const isUnavailable = isTimeUnavailable(selectedDate, time);
+                return (
+                  <Button
+                    key={time}
+                    variant={selectedTime === time ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => !isUnavailable && handleTimeSelect(time)}
+                    disabled={isUnavailable}
+                    className={`transition-all duration-300 ${
+                      isUnavailable
+                        ? "bg-red-500/20 text-red-400 border-red-500/30 cursor-not-allowed opacity-60"
+                        : selectedTime === time
+                        ? "btn-neon animate-pulse-neon"
+                        : "glass hover:bg-primary/20 hover:border-primary/50"
+                    }`}
+                  >
+                    <div className="flex items-center gap-1">
+                      {isUnavailable && <X className="w-3 h-3" />}
+                      {time}
+                    </div>
+                  </Button>
+                );
+              })}
             </div>
+            
+            {/* Unavailable time indicator */}
+            {selectedDate && (
+              <div className="mt-4 p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
+                <div className="flex items-center gap-2 text-red-400 text-sm">
+                  <Clock className="w-4 h-4" />
+                  <span>
+                    <strong>Hora no disponible:</strong> {getUnavailableHourForDate(selectedDate)}
+                  </span>
+                </div>
+                <p className="text-xs text-red-300 mt-1">
+                  Esta hora está reservada.
+                </p>
+              </div>
+            )}
           </div>
         )}
 
@@ -157,7 +211,7 @@ const AvailabilityCalendar = ({ onDateSelect }: AvailabilityCalendarProps) => {
                 <p className="font-semibold text-foreground">
                   {formatDate(selectedDate)} a las {selectedTime}
                 </p>
-                <p className="text-sm text-primary font-medium">Valor: $15.000 CLP</p>
+                <p className="text-sm text-primary font-medium">Valor: $35.000 CLP</p>
               </div>
               <div className="flex flex-col gap-2">
                 <Badge variant="secondary" className="bg-green-500/20 text-green-400 border-green-500/30">

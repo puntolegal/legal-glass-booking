@@ -1,6 +1,6 @@
 const Footer = () => {
   return (
-    <footer id="contacto" className="py-16 px-6">
+    <footer id="footer" className="py-16 px-6">
       {/* Modern Footer with enhanced glass effect */}
       <div className="glass-intense backdrop-blur-xl bg-gradient-to-br from-background/95 to-background/85 rounded-3xl shadow-2xl border border-primary/20 p-8 md:p-16 mx-auto max-w-7xl">
         <div className="container mx-auto">
@@ -108,10 +108,10 @@ const Footer = () => {
                 © 2024 Punto Legal. Todos los derechos reservados.
               </p>
               <div className="flex space-x-6 text-sm">
-                <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
+                <a href="/terms-of-service" className="text-muted-foreground hover:text-primary transition-colors">
                   Términos de Servicio
                 </a>
-                <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
+                <a href="/privacy-policy" className="text-muted-foreground hover:text-primary transition-colors">
                   Política de Privacidad
                 </a>
                 <a href="#" className="text-muted-foreground hover:text-primary transition-colors">

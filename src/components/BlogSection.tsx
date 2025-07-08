@@ -73,10 +73,10 @@ const BlogSection = ({ title = "Blog Legal", posts }: BlogSectionProps) => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {blogPostsList.map((post, index) => {
             const blogLinks = [
-              "/blog/calculo-indemnizacion",
-              "/blog/ley-karin", 
-              "/blog/pensiones-alimentos",
-              "/blog/calculo-indemnizacion"
+              "/blog/despido-injustificado",
+              "/blog/calculo-indemnizacion", 
+              "/blog/derechos-fundamentales",
+              "/blog/casos-exito"
             ];
             
             return (
@@ -126,8 +126,8 @@ const BlogSection = ({ title = "Blog Legal", posts }: BlogSectionProps) => {
           <button 
             className="glass-intense bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white px-8 py-3 rounded-xl font-semibold hover:scale-105 transition-all duration-300 border border-orange-400/20 backdrop-blur-xl shadow-lg"
             onClick={() => {
-              // Navigate to blog page or expand to show all articles
-              window.location.href = "#blog";
+              // Navigate to blog page with all articles
+              window.location.href = "/blog";
             }}
           >
             Ver Todos los Artículos

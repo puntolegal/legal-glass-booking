@@ -247,58 +247,58 @@ const ServicesSection = ({ title = "Elige el servicio legal que necesitas", serv
   })) : defaultServices;
 
   return (
-    <section id="servicios" className="py-12 lg:py-20 px-4 lg:px-6 relative overflow-hidden">
+    <section id="servicios" className="py-8 lg:py-16 px-4 relative overflow-hidden">
       {/* 3D Copper Ball Background */}
       <div className="absolute inset-0 pointer-events-none">
         <img 
           src="/lovable-uploads/208a984c-a991-439e-9065-377f14a69080.png" 
           alt="3D Copper Ball" 
-          className="absolute bottom-10 right-10 w-80 h-80 opacity-15 animate-float"
+          className="absolute bottom-10 right-10 w-60 h-60 lg:w-80 lg:h-80 opacity-15 animate-float"
           style={{ animationDelay: '0.5s' }}
         />
       </div>
       
       <div className="container mx-auto relative z-10">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold mb-6">
+        <div className="text-center mb-8 lg:mb-12">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 lg:mb-6">
             <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
               {title}
             </span>
           </h2>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+          <p className="text-sm sm:text-base md:text-lg lg:text-xl text-muted-foreground max-w-3xl mx-auto">
             Sesiones de 45 minutos con abogados especializados. Oferta de lanzamiento: 50% de descuento.
-            <span className="block text-sm mt-2 text-primary">Pago seguro y reunión inmediata por Google Meet</span>
+            <span className="block text-xs sm:text-sm mt-2 text-primary">Pago seguro y reunión inmediata por Google Meet</span>
           </p>
         </div>
 
-        {/* Mobile-first horizontal scroll-snap cards */}
-        <div className="block md:hidden px-4">
-          <div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide -mx-4 px-4">
+        {/* Mobile-first horizontal scroll-snap cards - Optimizado */}
+        <div className="block md:hidden">
+          <div className="flex gap-3 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide -mx-4 px-4">
             {servicesList.map((service, index) => (
-              <div key={index} className="flex-none w-80 snap-start">
-                <div className="glass rounded-3xl p-6 h-full border border-primary/10 hover:border-primary/20 bg-gradient-to-br from-primary/5 to-transparent backdrop-blur-xl transition-all duration-300 hover:scale-[1.02]">
+              <div key={index} className="flex-none w-72 snap-start">
+                <div className="glass rounded-2xl p-4 h-full border border-primary/10 hover:border-primary/20 bg-gradient-to-br from-primary/5 to-transparent backdrop-blur-xl transition-all duration-300 hover:scale-[1.02]">
                   
-                {/* Header with icon and title Mobile */}
-                <div className="flex items-center space-x-3 mb-4">
-                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-lg shadow-primary/20">
-                    <div className="text-white scale-90">
+                {/* Header with icon and title Mobile - Optimizado */}
+                <div className="flex items-center space-x-3 mb-3">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-lg shadow-primary/20">
+                    <div className="text-white scale-75">
                       {service.icon}
                     </div>
                   </div>
-                  <h3 className="text-lg font-bold text-foreground leading-tight">
+                  <h3 className="text-base font-bold text-foreground leading-tight">
                     {service.title}
                   </h3>
                 </div>
 
-                {/* Price and CTA Mobile */}
-                <div className="flex items-center justify-between mb-4">
+                {/* Price and CTA Mobile - Optimizado */}
+                <div className="flex items-center justify-between mb-3">
                   <div className="flex flex-col">
                     {service.regularPrice && service.promoPrice ? (
                       <>
                         <div className="text-xs text-muted-foreground line-through opacity-60">
                           {service.regularPrice}
                         </div>
-                        <div className="text-primary font-bold text-lg">
+                        <div className="text-primary font-bold text-base">
                           {service.promoPrice}
                         </div>
                       </>
@@ -313,22 +313,22 @@ const ServicesSection = ({ title = "Elige el servicio legal que necesitas", serv
                   </div>
                   <button 
                     onClick={() => onAgendarClick?.(service)}
-                    className="glass bg-gradient-to-r from-primary/80 to-primary/60 hover:from-primary hover:to-primary/80 text-white px-4 py-2 rounded-xl text-sm font-medium hover:scale-[1.02] transition-all duration-200 backdrop-blur-sm border border-primary/20 shadow-lg shadow-primary/20"
+                    className="glass bg-gradient-to-r from-primary/80 to-primary/60 hover:from-primary hover:to-primary/80 text-white px-3 py-2 rounded-lg text-xs font-medium hover:scale-[1.02] transition-all duration-200 backdrop-blur-sm border border-primary/20 shadow-lg shadow-primary/20"
                   >
                     Agendar
                   </button>
                 </div>
                   
-                  {/* Description */}
-                  <p className="text-secondary-foreground mb-4 text-sm leading-relaxed">
+                  {/* Description - Optimizado */}
+                  <p className="text-secondary-foreground mb-3 text-xs leading-relaxed">
                     {service.description}
                   </p>
                   
-                  {/* Features list */}
-                  <div className="space-y-2">
+                  {/* Features list - Optimizado */}
+                  <div className="space-y-1">
                     {service.features.slice(0, 3).map((feature, featureIndex) => (
                       <div key={featureIndex} className="flex items-center space-x-2">
-                        <div className="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
+                        <div className="w-1 h-1 rounded-full bg-primary flex-shrink-0" />
                         <span className="text-secondary-foreground text-xs">{feature}</span>
                       </div>
                     ))}
@@ -339,64 +339,64 @@ const ServicesSection = ({ title = "Elige el servicio legal que necesitas", serv
           </div>
         </div>
 
-        {/* Desktop grid layout */}
-        <div className="hidden md:grid grid-cols-2 lg:grid-cols-3 gap-6">
+        {/* Desktop grid layout - Optimizado */}
+        <div className="hidden md:grid grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
           {servicesList.map((service, index) => (
             <div key={index} className="group">
-              <div className="glass rounded-3xl p-6 h-full border border-primary/10 hover:border-primary/20 bg-gradient-to-br from-primary/5 to-transparent backdrop-blur-xl transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-primary/5">
+              <div className="glass rounded-2xl lg:rounded-3xl p-4 lg:p-6 h-full border border-primary/10 hover:border-primary/20 bg-gradient-to-br from-primary/5 to-transparent backdrop-blur-xl transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-primary/5">
                 
-                {/* Header with icon */}
-                <div className="flex items-center justify-between mb-4">
-                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-lg shadow-primary/20">
-                    <div className="text-white">
+                {/* Header with icon - Optimizado */}
+                <div className="flex items-center justify-between mb-3 lg:mb-4">
+                  <div className="w-12 h-12 lg:w-14 lg:h-14 rounded-xl lg:rounded-2xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-lg shadow-primary/20">
+                    <div className="text-white scale-90 lg:scale-100">
                       {service.icon}
                     </div>
                   </div>
                   
-                  {/* Price display */}
+                  {/* Price display - Optimizado */}
                   <div className="text-right">
                     {service.regularPrice && service.promoPrice ? (
                       <div className="flex flex-col items-end">
                         <div className="text-xs text-muted-foreground line-through opacity-60">
                           {service.regularPrice}
                         </div>
-                        <div className="text-primary font-bold text-lg">
+                        <div className="text-primary font-bold text-base lg:text-lg">
                           {service.promoPrice}
                         </div>
                       </div>
                     ) : service.price && (
-                      <div className="px-3 py-1 rounded-full bg-primary/10 border border-primary/20">
-                        <span className="text-primary font-bold text-sm">{service.price}</span>
+                      <div className="px-2 py-1 lg:px-3 lg:py-1 rounded-full bg-primary/10 border border-primary/20">
+                        <span className="text-primary font-bold text-xs lg:text-sm">{service.price}</span>
                       </div>
                     )}
                   </div>
                 </div>
                 
-                {/* Title */}
-                <h3 className="text-xl font-bold text-foreground mb-3 leading-tight">
+                {/* Title - Optimizado */}
+                <h3 className="text-lg lg:text-xl font-bold text-foreground mb-3 leading-tight">
                   {service.title}
                 </h3>
                 
-                {/* Description */}
-                <p className="text-secondary-foreground mb-4 text-sm leading-relaxed">
+                {/* Description - Optimizado */}
+                <p className="text-secondary-foreground mb-3 lg:mb-4 text-xs lg:text-sm leading-relaxed">
                   {service.description}
                 </p>
                 
-                {/* Features */}
-                <div className="space-y-2 mb-6">
+                {/* Features - Optimizado */}
+                <div className="space-y-1 lg:space-y-2 mb-4 lg:mb-6">
                   {service.features.slice(0, 3).map((feature, featureIndex) => (
-                    <div key={featureIndex} className="flex items-center space-x-2 p-2 rounded-lg hover:bg-primary/5 transition-colors">
-                      <div className="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
+                    <div key={featureIndex} className="flex items-center space-x-2 p-1 lg:p-2 rounded-lg hover:bg-primary/5 transition-colors">
+                      <div className="w-1 h-1 lg:w-1.5 lg:h-1.5 rounded-full bg-primary flex-shrink-0" />
                       <span className="text-secondary-foreground text-xs">{feature}</span>
                     </div>
                   ))}
                 </div>
 
-                {/* CTA Button */}
+                {/* CTA Button - Optimizado */}
                 <div className="mt-auto">
                   <button 
                     onClick={() => onAgendarClick?.(service)}
-                    className="glass bg-gradient-to-r from-primary/80 to-primary/60 hover:from-primary hover:to-primary/80 text-white w-full px-4 py-3 rounded-xl text-sm font-medium hover:scale-[1.02] transition-all duration-200 backdrop-blur-sm border border-primary/20 shadow-lg shadow-primary/20"
+                    className="glass bg-gradient-to-r from-primary/80 to-primary/60 hover:from-primary hover:to-primary/80 text-white w-full px-3 py-2 lg:px-4 lg:py-3 rounded-lg lg:rounded-xl text-xs lg:text-sm font-medium hover:scale-[1.02] transition-all duration-200 backdrop-blur-sm border border-primary/20 shadow-lg shadow-primary/20"
                   >
                     Agendar {service.title.replace('Punto Legal ', '')}
                   </button>

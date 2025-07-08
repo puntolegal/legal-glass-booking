@@ -288,6 +288,17 @@ const IndemnizationCalculator = () => {
                 <div className="mt-6 text-center">
                   <Button
                     className="glass-intense bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white px-8 py-3 rounded-xl font-semibold hover:scale-105 transition-all duration-300 border border-orange-400/20 backdrop-blur-xl shadow-lg hover:shadow-xl"
+                    onClick={() => {
+                      // Redirigir a /agendamiento
+                      window.location.href = '/agendamiento?plan=laboral';
+                      
+                      // Scroll al top automático en móvil
+                      setTimeout(() => {
+                        window.scrollTo({ top: 0, behavior: 'auto' });
+                        document.documentElement.scrollTop = 0;
+                        document.body.scrollTop = 0;
+                      }, 100);
+                    }}
                   >
                     Agendar ahora una reunión - $15.000
                   </Button>
