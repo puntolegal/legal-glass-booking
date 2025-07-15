@@ -28,7 +28,8 @@ import {
   DollarSign,
   Zap,
   ArrowLeft as ArrowLeftIcon,
-  ArrowRight as ArrowRightIcon
+  ArrowRight as ArrowRightIcon,
+  AlertTriangle
 } from 'lucide-react'
 
 interface MenuItem {
@@ -89,6 +90,19 @@ const menuItems: MenuItem[] = [
         label: 'Derecho Penal',
         icon: Shield,
         href: '/servicios/penal'
+      },
+      {
+        id: 'tax',
+        label: 'Derecho Tributario',
+        icon: Calculator,
+        href: '/servicios/tributario'
+      },
+      {
+        id: 'economic-criminal',
+        label: 'Derecho Penal Económico',
+        icon: AlertTriangle,
+        href: '/servicios/penal-economico',
+        badge: 'Especializado'
       },
       {
         id: 'digital',
@@ -618,86 +632,66 @@ export default function Sidebar() {
         `}>
           <div className="relative">
             {/* Premium Badge */}
-            <div className="absolute -top-2 -right-2 bg-gradient-to-r from-amber-300 via-yellow-400 to-amber-300 text-black text-xs font-bold px-3 py-1 rounded-full shadow-xl z-10 animate-pulse border border-amber-200">
+            <div className="absolute -top-2 -right-2 bg-gradient-to-r from-red-400 via-red-500 to-red-400 text-white text-xs font-bold px-3 py-1 rounded-full shadow-xl z-10 animate-pulse border border-red-300">
               ⚡ 50% OFF
             </div>
             
             <Link
               to="/agendamiento?plan=emergencia"
               onClick={() => isMobile && closeSidebar()}
-              className="w-full rounded-xl p-4 shadow-2xl hover:shadow-3xl transition-all duration-500 group relative overflow-hidden block transform hover:scale-[1.02]"
+              className="w-full rounded-xl p-5 shadow-lg hover:shadow-xl transition-all duration-500 group relative overflow-hidden block transform hover:scale-[1.01]"
               style={{
                 background: `linear-gradient(135deg, 
-                  #1a1a1a 0%, 
-                  #2d2d2d 25%, 
-                  #404040 50%, 
-                  #2d2d2d 75%, 
-                  #1a1a1a 100%
+                  rgba(239, 68, 68, 0.15) 0%,
+                  rgba(220, 38, 38, 0.20) 50%,
+                  rgba(239, 68, 68, 0.15) 100%
                 )`,
-                border: '1px solid rgba(255, 255, 255, 0.1)',
+                border: '1px solid rgba(239, 68, 68, 0.3)',
+                backdropFilter: 'blur(10px)',
                 boxShadow: `
-                  0 8px 32px rgba(0, 0, 0, 0.3),
-                  inset 0 1px 0 rgba(255, 255, 255, 0.1),
-                  inset 0 -1px 0 rgba(0, 0, 0, 0.2)
+                  0 4px 20px rgba(239, 68, 68, 0.15),
+                  inset 0 1px 0 rgba(255, 255, 255, 0.1)
                 `
               }}
             >
-              {/* Efectos metálicos */}
+              {/* Efecto de brillo suave */}
               <div 
-                className="absolute inset-0 opacity-30 group-hover:opacity-50 transition-opacity duration-500"
+                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700"
                 style={{
-                  background: `linear-gradient(45deg, 
-                    transparent 30%, 
-                    rgba(255, 255, 255, 0.1) 50%, 
+                  background: `radial-gradient(circle at 30% 50%, 
+                    rgba(255, 255, 255, 0.1) 0%, 
                     transparent 70%
                   )`
                 }}
               />
               
-              {/* Brillo metálico animado */}
-              <div 
-                className="absolute top-0 left-0 w-full h-1 opacity-60 group-hover:opacity-100 transition-opacity duration-500"
-                style={{
-                  background: 'linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent)'
-                }}
-              />
-              
               <div className="relative z-10">
-                <div className="flex items-center justify-between mb-3">
+                {/* Header de tarjeta */}
+                <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-3">
-                    <div className="p-2 bg-gradient-to-br from-amber-400/20 to-yellow-500/20 rounded-lg border border-amber-400/30 shadow-inner">
-                      <AlertCircle className="w-6 h-6 text-amber-300" />
+                    <div className="p-2.5 bg-red-500/20 rounded-lg border border-red-500/30 backdrop-blur-sm">
+                      <AlertCircle className="w-6 h-6 text-red-400" />
                     </div>
                     <div className="text-left">
-                      <p className="font-bold text-white tracking-wide">EMERGENCIA LEGAL</p>
-                      <p className="text-xs text-amber-200 font-medium">Respuesta inmediata 24/7</p>
+                      <p className="font-bold text-foreground tracking-wide">EMERGENCIA LEGAL</p>
+                      <p className="text-xs text-muted-foreground font-medium">Respuesta inmediata 24/7</p>
                     </div>
                   </div>
-                  <Phone className="w-5 h-5 text-amber-300 animate-pulse" />
+                  <div className="text-right">
+                    <Phone className="w-5 h-5 text-red-400 animate-pulse" />
+                    <p className="text-xs text-red-400/80 font-medium mt-1">URGENTE</p>
+                  </div>
                 </div>
                 
-                {/* Línea divisoria metálica */}
-                <div 
-                  className="w-full h-px mb-3"
-                  style={{
-                    background: 'linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent)'
-                  }}
-                />
+                {/* Línea divisoria */}
+                <div className="w-full h-px mb-4 bg-gradient-to-r from-transparent via-red-500/30 to-transparent" />
                 
-                {/* Pricing info premium */}
+                {/* Pricing info */}
                 <div className="text-center">
-                  <p className="text-xs text-gray-400 line-through font-light">$200.000</p>
-                  <p className="text-xl font-bold text-white tracking-wider">$100.000</p>
-                  <p className="text-xs text-amber-200 font-medium uppercase tracking-widest">Consulta Urgente</p>
+                  <p className="text-xs text-muted-foreground line-through">$200.000</p>
+                  <p className="text-2xl font-bold text-foreground">$100.000</p>
+                  <p className="text-xs text-red-400 font-medium uppercase tracking-wide">Consulta Urgente</p>
                 </div>
-                
-                {/* Chip de tarjeta */}
-                <div className="absolute bottom-2 left-4 w-6 h-5 rounded-sm opacity-30"
-                  style={{
-                    background: 'linear-gradient(135deg, #ffd700, #ffed4e, #ffd700)',
-                    border: '1px solid rgba(255, 215, 0, 0.3)'
-                  }}
-                />
               </div>
             </Link>
           </div>
@@ -755,5 +749,5 @@ export default function Sidebar() {
         </div>
       </motion.aside>
     </>
-  )
-} 
+      )
+  }  

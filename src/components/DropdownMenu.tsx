@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   Scale, ChevronDown, ChevronRight, Building2, Home as HomeIcon, Briefcase, Heart, 
-  FileText, Shield, Globe
+  FileText, Shield, Globe, Calculator, AlertTriangle
 } from "lucide-react";
 import { Link } from "react-router-dom";
 
@@ -48,6 +48,19 @@ const DropdownMenu: React.FC = () => {
       label: 'Derecho Penal',
       icon: Shield,
       href: '/servicios/penal'
+    },
+    {
+      id: 'tax',
+      label: 'Derecho Tributario',
+      icon: Calculator,
+      href: '/servicios/tributario'
+    },
+    {
+      id: 'economic-criminal',
+      label: 'Derecho Penal Económico',
+      icon: AlertTriangle,
+      href: '/servicios/penal-economico',
+      badge: 'Especializado'
     },
     {
       id: 'digital',

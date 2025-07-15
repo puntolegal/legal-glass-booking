@@ -10,6 +10,12 @@ export const NOTIFICATION_CONFIG = {
     direccion: 'El Golf, Las Condes, Santiago',
     website: 'https://punto-legal.cl'
   },
+  google: {
+    calendarId: 'primary', // o el ID específico del calendario
+    timeZone: 'America/Santiago',
+    meetingDuration: 60, // duración en minutos
+    autoCreateMeet: true
+  },
   recordatorio: {
     horasAntes: 24,
     asunto: '🔔 Recordatorio: Tu cita con Punto Legal es mañana'
@@ -17,6 +23,11 @@ export const NOTIFICATION_CONFIG = {
   comprobante: {
     asunto: '✅ Comprobante de pago - Punto Legal',
     envioAutomatico: true
+  },
+  abogado: {
+    email: 'puntolegalelgolf@gmail.com',
+    asunto: '📅 Nueva cita agendada - Punto Legal',
+    asuntoRecordatorio: '🔔 Recordatorio: Cita mañana - Punto Legal'
   }
 };
 
@@ -32,7 +43,9 @@ export const EMAIL_TEMPLATES = {
       'precio',
       'categoria',
       'telefono_cliente',
-      'email_cliente'
+      'email_cliente',
+      'google_meet_link',
+      'descripcion_consulta'
     ]
   },
   
@@ -46,7 +59,9 @@ export const EMAIL_TEMPLATES = {
       'direccion_oficina',
       'telefono_contacto',
       'enlace_reagendar',
-      'enlace_cancelar'
+      'enlace_cancelar',
+      'google_meet_link',
+      'descripcion_consulta'
     ]
   },
   
@@ -61,12 +76,43 @@ export const EMAIL_TEMPLATES = {
       'metodo_pago',
       'numero_transaccion'
     ]
+  },
+
+  notificacionAbogado: {
+    asunto: '📅 Nueva cita agendada - Punto Legal',
+    variables: [
+      'nombre_cliente',
+      'fecha_cita',
+      'hora_cita',
+      'servicio',
+      'precio',
+      'categoria',
+      'telefono_cliente',
+      'email_cliente',
+      'descripcion_consulta',
+      'google_meet_link',
+      'google_calendar_link'
+    ]
+  },
+
+  recordatorioAbogado: {
+    asunto: '🔔 Recordatorio: Cita mañana - Punto Legal',
+    variables: [
+      'nombre_cliente',
+      'fecha_cita',
+      'hora_cita',
+      'servicio',
+      'descripcion_consulta',
+      'google_meet_link',
+      'telefono_cliente',
+      'email_cliente'
+    ]
   }
 };
 
 // Estructura de datos para Make
 export interface MakeWebhookData {
-  tipo_evento: 'nueva_reserva' | 'recordatorio' | 'comprobante';
+  tipo_evento: 'nueva_reserva' | 'recordatorio' | 'comprobante' | 'notificacion_abogado' | 'recordatorio_abogado';
   timestamp: string;
   empresa: {
     nombre: string;
@@ -89,6 +135,12 @@ export interface MakeWebhookData {
     categoria?: string;
     tipo_reunion?: string;
     estado?: string;
+    descripcion?: string;
+  };
+  google?: {
+    meet_link?: string;
+    calendar_event_id?: string;
+    calendar_link?: string;
   };
   pago?: {
     numero_comprobante: string;
@@ -101,6 +153,9 @@ export interface MakeWebhookData {
   configuracion: {
     enviar_recordatorio: boolean;
     enviar_comprobante: boolean;
+    crear_calendar_event: boolean;
+    crear_meet_link: boolean;
+    notificar_abogado: boolean;
     idioma: 'es';
     zona_horaria: 'America/Santiago';
   };
@@ -109,8 +164,9 @@ export interface MakeWebhookData {
 // Función para generar el payload para Make
 export function generateMakePayload(
   reservation: any,
-  tipo: 'nueva_reserva' | 'recordatorio' | 'comprobante',
-  pagoData?: any
+  tipo: 'nueva_reserva' | 'recordatorio' | 'comprobante' | 'notificacion_abogado' | 'recordatorio_abogado',
+  pagoData?: any,
+  googleData?: any
 ): MakeWebhookData {
   return {
     tipo_evento: tipo,
@@ -127,8 +183,14 @@ export function generateMakePayload(
       precio: reservation.precio,
       categoria: reservation.categoria,
       tipo_reunion: reservation.tipo_reunion,
-      estado: reservation.estado
+      estado: reservation.estado,
+      descripcion: reservation.descripcion
     },
+    google: googleData ? {
+      meet_link: googleData.meet_link,
+      calendar_event_id: googleData.calendar_event_id,
+      calendar_link: googleData.calendar_link
+    } : undefined,
     pago: pagoData ? {
       numero_comprobante: pagoData.numero_comprobante,
       fecha_pago: pagoData.fecha_pago,
@@ -140,6 +202,9 @@ export function generateMakePayload(
     configuracion: {
       enviar_recordatorio: true,
       enviar_comprobante: true,
+      crear_calendar_event: true,
+      crear_meet_link: true,
+      notificar_abogado: true,
       idioma: 'es',
       zona_horaria: 'America/Santiago'
     }

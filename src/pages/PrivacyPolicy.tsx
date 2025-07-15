@@ -97,13 +97,7 @@ const PrivacyPolicy = () => {
                         <p className="text-sm">puntolegalelgolf@gmail.com</p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-3">
-                      <Phone className="w-5 h-5 text-primary" />
-                      <div>
-                        <p className="font-medium text-foreground">Teléfono</p>
-                        <p className="text-sm">+56 9 6232 1883</p>
-                      </div>
-                    </div>
+
                   </div>
                 </div>
 
@@ -415,11 +409,7 @@ const PrivacyPolicy = () => {
                   <h3 className="font-semibold text-foreground mb-2">Email</h3>
                   <p className="text-sm text-muted-foreground">puntolegalelgolf@gmail.com</p>
                 </div>
-                <div className="text-center p-6 glass rounded-lg border border-amber-500/20">
-                  <Phone className="w-8 h-8 mx-auto mb-4 text-amber-500" />
-                  <h3 className="font-semibold text-foreground mb-2">Teléfono</h3>
-                  <p className="text-sm text-muted-foreground">+56 9 6232 1883</p>
-                </div>
+
                 <div className="text-center p-6 glass rounded-lg border border-amber-500/20">
                   <FileText className="w-8 h-8 mx-auto mb-4 text-amber-500" />
                   <h3 className="font-semibold text-foreground mb-2">Sitio Web</h3>

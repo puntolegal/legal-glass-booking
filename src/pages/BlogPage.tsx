@@ -167,6 +167,167 @@ const blogPosts: BlogPost[] = [
     comments: 67,
     image: '/placeholder.svg',
     href: '/blog/casos-exito'
+  },
+
+  // Tributario
+  {
+    id: 'reforma-tributaria-2024',
+    title: 'Reforma Tributaria 2024: Lo que necesitas saber',
+    excerpt: 'Análisis completo de los cambios más importantes en la legislación tributaria chilena para el año 2024.',
+    category: 'Tributario',
+    categoryIcon: Scale,
+    date: '15 Enero 2024',
+    readTime: '8 min',
+    views: '3.8K',
+    comments: 42,
+    image: '/placeholder.svg',
+    href: '/blog/reforma-tributaria-2024',
+    featured: true
+  },
+  {
+    id: 'evasion-fiscal-chile',
+    title: 'Evasión Fiscal en Chile: Consecuencias y Prevención',
+    excerpt: 'Guía completa sobre las consecuencias legales de la evasión fiscal y cómo prevenir problemas con el SII.',
+    category: 'Tributario',
+    categoryIcon: Scale,
+    date: '12 Enero 2024',
+    readTime: '10 min',
+    views: '2.9K',
+    comments: 31,
+    image: '/placeholder.svg',
+    href: '/blog/evasion-fiscal-chile'
+  },
+  {
+    id: 'planificacion-tributaria-2024',
+    title: 'Planificación Tributaria 2024: Estrategias Legales',
+    excerpt: 'Estrategias de planificación tributaria legal para empresas y personas naturales en el nuevo marco normativo.',
+    category: 'Tributario',
+    categoryIcon: Scale,
+    date: '10 Enero 2024',
+    readTime: '12 min',
+    views: '2.6K',
+    comments: 28,
+    image: '/placeholder.svg',
+    href: '/blog/planificacion-tributaria-2024'
+  },
+
+  // Blog Posts Existentes
+  {
+    id: 'blog-post-1',
+    title: '¿Cuándo un despido es considerado injustificado?',
+    excerpt: 'Conoce las principales causales que determinan si tu despido fue sin causa justa y qué derechos tienes como trabajador.',
+    category: 'Laboral',
+    categoryIcon: Briefcase,
+    date: '20 Diciembre 2024',
+    readTime: '5 min',
+    views: '4.5K',
+    comments: 52,
+    image: '/placeholder.svg',
+    href: '/blog-post-1'
+  },
+  {
+    id: 'blog-post-2',
+    title: 'Guía Completa de Derecho de Familia en Chile',
+    excerpt: 'Todo lo que necesitas saber sobre matrimonio, divorcio, custodia y pensión alimenticia en Chile.',
+    category: 'Familia',
+    categoryIcon: Heart,
+    date: '18 Diciembre 2024',
+    readTime: '15 min',
+    views: '3.2K',
+    comments: 38,
+    image: '/placeholder.svg',
+    href: '/blog-post-2'
+  },
+  {
+    id: 'blog-post-3',
+    title: 'Contratos de Trabajo: Tipos y Obligaciones Legales',
+    excerpt: 'Análisis detallado de los diferentes tipos de contratos laborales y las obligaciones que generan para empleadores.',
+    category: 'Laboral',
+    categoryIcon: Briefcase,
+    date: '15 Diciembre 2024',
+    readTime: '12 min',
+    views: '3.8K',
+    comments: 41,
+    image: '/placeholder.svg',
+    href: '/blog-post-3'
+  },
+  {
+    id: 'blog-post-4',
+    title: 'Derecho Inmobiliario: Compraventa y Arrendamiento',
+    excerpt: 'Guía práctica sobre los aspectos legales de compraventa y arrendamiento de propiedades en Chile.',
+    category: 'Inmobiliario',
+    categoryIcon: Home,
+    date: '12 Diciembre 2024',
+    readTime: '14 min',
+    views: '2.9K',
+    comments: 33,
+    image: '/placeholder.svg',
+    href: '/blog-post-4'
+  },
+  {
+    id: 'blog-post-5',
+    title: 'Protección de Datos Personales en Chile',
+    excerpt: 'Análisis de la Ley de Protección de Datos Personales y sus implicancias para empresas y personas.',
+    category: 'Digital',
+    categoryIcon: Globe,
+    date: '10 Diciembre 2024',
+    readTime: '10 min',
+    views: '2.7K',
+    comments: 29,
+    image: '/placeholder.svg',
+    href: '/blog-post-5'
+  },
+  {
+    id: 'blog-post-6',
+    title: 'Derecho Penal Económico: Delitos Corporativos',
+    excerpt: 'Análisis de los principales delitos económicos y las consecuencias legales para empresas y ejecutivos.',
+    category: 'Penal',
+    categoryIcon: Shield,
+    date: '8 Diciembre 2024',
+    readTime: '16 min',
+    views: '3.1K',
+    comments: 35,
+    image: '/placeholder.svg',
+    href: '/blog-post-6'
+  },
+  {
+    id: 'blog-post-7',
+    title: 'Constitución de Sociedades: Guía Paso a Paso',
+    excerpt: 'Proceso detallado para constituir diferentes tipos de sociedades comerciales en Chile.',
+    category: 'Corporativo',
+    categoryIcon: Building2,
+    date: '5 Diciembre 2024',
+    readTime: '18 min',
+    views: '4.1K',
+    comments: 47,
+    image: '/placeholder.svg',
+    href: '/blog-post-7'
+  },
+  {
+    id: 'blog-post-8',
+    title: 'Derecho Civil: Responsabilidad Civil y Daños',
+    excerpt: 'Análisis de la responsabilidad civil extracontractual y contractual en el ordenamiento jurídico chileno.',
+    category: 'Civil',
+    categoryIcon: FileText,
+    date: '3 Diciembre 2024',
+    readTime: '13 min',
+    views: '2.8K',
+    comments: 31,
+    image: '/placeholder.svg',
+    href: '/blog-post-8'
+  },
+  {
+    id: 'blog-post-9',
+    title: 'Compliance Corporativo: Gestión de Riesgos Legales',
+    excerpt: 'Implementación de programas de cumplimiento normativo para prevenir riesgos legales en empresas.',
+    category: 'Corporativo',
+    categoryIcon: Building2,
+    date: '1 Diciembre 2024',
+    readTime: '20 min',
+    views: '3.5K',
+    comments: 39,
+    image: '/placeholder.svg',
+    href: '/blog-post-9'
   }
 ];
 
@@ -178,7 +339,8 @@ const categories = [
   { id: 'Inmobiliario', name: 'Inmobiliario', icon: Home, count: blogPosts.filter(p => p.category === 'Inmobiliario').length },
   { id: 'Civil', name: 'Civil', icon: FileText, count: blogPosts.filter(p => p.category === 'Civil').length },
   { id: 'Penal', name: 'Penal', icon: Shield, count: blogPosts.filter(p => p.category === 'Penal').length },
-  { id: 'Digital', name: 'Digital', icon: Globe, count: blogPosts.filter(p => p.category === 'Digital').length }
+  { id: 'Digital', name: 'Digital', icon: Globe, count: blogPosts.filter(p => p.category === 'Digital').length },
+  { id: 'Tributario', name: 'Tributario', icon: Scale, count: blogPosts.filter(p => p.category === 'Tributario').length }
 ];
 
 export default function BlogPage() {

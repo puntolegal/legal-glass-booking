@@ -1,22 +1,10 @@
-import { supabase } from '@/integrations/supabase/client';
-import { NOTIFICATION_CONFIG, generateMakePayload, type MakeWebhookData } from '@/config/notifications';
-
-export interface NotificationRecord {
-  id: string;
-  reserva_id: string;
-  tipo: 'nueva_reserva' | 'recordatorio' | 'comprobante';
-  estado: 'pendiente' | 'enviado' | 'fallido';
-  fecha_envio?: string;
-  intentos: number;
-  ultimo_error?: string;
-  webhook_response?: any;
-  created_at: string;
-}
+import { supabase } from '@/lib/supabaseClient';
+import { NOTIFICATION_CONFIG, generateMakePayload, MakeWebhookData } from '@/config/notifications';
 
 export class NotificationService {
   private static instance: NotificationService;
   
-  public static getInstance(): NotificationService {
+  static getInstance(): NotificationService {
     if (!NotificationService.instance) {
       NotificationService.instance = new NotificationService();
     }
@@ -82,14 +70,14 @@ export class NotificationService {
     return false;
   }
 
-  // Registrar notificación en base de datos
+  // Registrar notificación en la base de datos
   private async registrarNotificacion(
     reservaId: string,
     tipo: string,
-    estado: string,
+    estado: 'pendiente' | 'enviado' | 'fallido',
     intentos: number,
-    error?: string,
-    response?: any
+    error?: string | null,
+    respuesta?: any
   ): Promise<void> {
     try {
       await supabase
@@ -99,29 +87,75 @@ export class NotificationService {
           tipo,
           estado,
           intentos,
+          fecha_envio: estado === 'enviado' ? new Date().toISOString() : null,
           ultimo_error: error,
-          webhook_response: response,
-          fecha_envio: estado === 'enviado' ? new Date().toISOString() : null
+          webhook_response: respuesta
         }]);
-    } catch (dbError) {
-      console.error('Error registrando notificación:', dbError);
+    } catch (error) {
+      console.error('Error registrando notificación:', error);
     }
   }
 
-  // Enviar confirmación de nueva reserva
-  async enviarConfirmacionReserva(reserva: any): Promise<boolean> {
-    const payload = generateMakePayload(reserva, 'nueva_reserva');
-    return await this.sendWebhookToMake(payload);
+  // Verificar notificaciones pendientes
+  async verificarNotificacionesPendientes(): Promise<any[]> {
+    try {
+      const { data, error } = await supabase
+        .from('notificaciones')
+        .select('*')
+        .eq('estado', 'fallido')
+        .lt('intentos', 3)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      console.error('Error verificando notificaciones pendientes:', error);
+      return [];
+    }
   }
 
-  // Enviar recordatorio de cita
+  // Enviar confirmación de nueva reserva (incluye Google Calendar y notificación al abogado)
+  async enviarConfirmacionReserva(reserva: any): Promise<boolean> {
+    try {
+      // 1. Enviar confirmación al cliente
+      const payloadCliente = generateMakePayload(reserva, 'nueva_reserva');
+      const exitoCliente = await this.sendWebhookToMake(payloadCliente);
+      
+      // 2. Enviar notificación al abogado
+      const payloadAbogado = generateMakePayload(reserva, 'notificacion_abogado');
+      const exitoAbogado = await this.sendWebhookToMake(payloadAbogado);
+      
+      console.log(`Confirmación cliente: ${exitoCliente ? '✅' : '❌'}, Abogado: ${exitoAbogado ? '✅' : '❌'}`);
+      
+      return exitoCliente && exitoAbogado;
+    } catch (error) {
+      console.error('Error enviando confirmación de reserva:', error);
+      return false;
+    }
+  }
+
+  // Enviar recordatorio (incluye Google Meet)
   async enviarRecordatorio(reserva: any): Promise<boolean> {
-    const payload = generateMakePayload(reserva, 'recordatorio');
-    return await this.sendWebhookToMake(payload);
+    try {
+      // 1. Enviar recordatorio al cliente
+      const payloadCliente = generateMakePayload(reserva, 'recordatorio');
+      const exitoCliente = await this.sendWebhookToMake(payloadCliente);
+      
+      // 2. Enviar recordatorio al abogado
+      const payloadAbogado = generateMakePayload(reserva, 'recordatorio_abogado');
+      const exitoAbogado = await this.sendWebhookToMake(payloadAbogado);
+      
+      console.log(`Recordatorio cliente: ${exitoCliente ? '✅' : '❌'}, Abogado: ${exitoAbogado ? '✅' : '❌'}`);
+      
+      return exitoCliente && exitoAbogado;
+    } catch (error) {
+      console.error('Error enviando recordatorio:', error);
+      return false;
+    }
   }
 
   // Enviar comprobante de pago
-  async enviarComprobantePago(reserva: any, pagoData: any): Promise<boolean> {
+  async enviarComprobante(reserva: any, pagoData: any): Promise<boolean> {
     const payload = generateMakePayload(reserva, 'comprobante', pagoData);
     return await this.sendWebhookToMake(payload);
   }
@@ -200,24 +234,6 @@ export class NotificationService {
     }
   }
 
-  // Verificar estado de notificaciones pendientes
-  async verificarNotificacionesPendientes(): Promise<NotificationRecord[]> {
-    try {
-      const { data, error } = await supabase
-        .from('notificaciones')
-        .select('*')
-        .eq('estado', 'pendiente')
-        .lt('intentos', 3)
-        .order('created_at', { ascending: true });
-
-      if (error) throw error;
-      return data || [];
-    } catch (error) {
-      console.error('Error obteniendo notificaciones pendientes:', error);
-      return [];
-    }
-  }
-
   // Reenviar notificaciones fallidas
   async reenviarNotificacionesFallidas(): Promise<{procesadas: number, exitosas: number}> {
     const pendientes = await this.verificarNotificacionesPendientes();
@@ -247,6 +263,14 @@ export class NotificationService {
           case 'recordatorio':
             exito = await this.enviarRecordatorio(reserva);
             break;
+          case 'notificacion_abogado':
+            const payloadAbogado = generateMakePayload(reserva, 'notificacion_abogado');
+            exito = await this.sendWebhookToMake(payloadAbogado);
+            break;
+          case 'recordatorio_abogado':
+            const payloadRecordatorioAbogado = generateMakePayload(reserva, 'recordatorio_abogado');
+            exito = await this.sendWebhookToMake(payloadRecordatorioAbogado);
+            break;
           case 'comprobante':
             // Necesitaríamos datos de pago adicionales
             break;
@@ -266,33 +290,60 @@ export class NotificationService {
     return { procesadas, exitosas };
   }
 
-  // Obtener estadísticas de notificaciones
-  async obtenerEstadisticas(): Promise<{
-    total: number;
-    enviadas: number;
-    fallidas: number;
-    pendientes: number;
-    ultimaEjecucion?: string;
-  }> {
+  // Probar conexión con Make
+  async probarConexion(): Promise<{success: boolean, message: string}> {
     try {
-      const { data, error } = await supabase
-        .from('notificaciones')
-        .select('estado, created_at');
-
-      if (error) throw error;
-
-      const stats = {
-        total: data?.length || 0,
-        enviadas: data?.filter(n => n.estado === 'enviado').length || 0,
-        fallidas: data?.filter(n => n.estado === 'fallido').length || 0,
-        pendientes: data?.filter(n => n.estado === 'pendiente').length || 0,
-        ultimaEjecucion: data?.[0]?.created_at
+      const testPayload = {
+        tipo_evento: 'test',
+        timestamp: new Date().toISOString(),
+        empresa: NOTIFICATION_CONFIG.empresa,
+        reserva: {
+          id: 'test-' + Date.now(),
+          nombre: 'Test Usuario',
+          email: 'test@puntolegal.cl',
+          telefono: '+56912345678',
+          fecha: new Date().toISOString().split('T')[0],
+          hora: '15:00',
+          servicio: 'Test Service',
+          precio: '50000',
+          categoria: 'test'
+        },
+        configuracion: {
+          enviar_recordatorio: false,
+          enviar_comprobante: false,
+          crear_calendar_event: false,
+          crear_meet_link: false,
+          notificar_abogado: false,
+          idioma: 'es',
+          zona_horaria: 'America/Santiago'
+        }
       };
 
-      return stats;
+      const response = await fetch(NOTIFICATION_CONFIG.makeWebhookUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'User-Agent': 'PuntoLegal-WebhookSender/1.0'
+        },
+        body: JSON.stringify(testPayload)
+      });
+
+      if (response.ok) {
+        return {
+          success: true,
+          message: '✅ Conexión exitosa con Make.com'
+        };
+      } else {
+        return {
+          success: false,
+          message: `❌ Error HTTP ${response.status}: ${response.statusText}`
+        };
+      }
     } catch (error) {
-      console.error('Error obteniendo estadísticas:', error);
-      return { total: 0, enviadas: 0, fallidas: 0, pendientes: 0 };
+      return {
+        success: false,
+        message: `❌ Error de conexión: ${error.message}`
+      };
     }
   }
 }

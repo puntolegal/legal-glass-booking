@@ -27,8 +27,15 @@ const premiumServices = [
 ];
 
 const specializedServices = [
-  { title: "Derecho Laboral", href: "/laboral", icon: Briefcase, price: "$35.000" },
-  { title: "Derecho Familia", href: "/familia", icon: Heart, price: "$25.000" },
+  { title: "Derecho Laboral", href: "/servicios/laboral", icon: Briefcase, price: "$35.000" },
+  { title: "Derecho Corporativo", href: "/servicios/corporativo", icon: Building, price: "$45.000" },
+  { title: "Derecho Familia", href: "/servicios/familia", icon: Heart, price: "$25.000" },
+  { title: "Derecho Inmobiliario", href: "/servicios/inmobiliario", icon: Home, price: "$40.000" },
+  { title: "Derecho Civil", href: "/servicios/civil", icon: FileText, price: "$30.000" },
+  { title: "Derecho Penal", href: "/servicios/penal", icon: Shield, price: "$50.000" },
+  { title: "Derecho Tributario", href: "/servicios/tributario", icon: Scale, price: "$35.000" },
+  { title: "Derecho Penal Económico", href: "/servicios/penal-economico", icon: Shield, price: "$60.000" },
+  { title: "Derecho Digital", href: "/servicios/digital", icon: Lock, price: "$40.000" },
   { title: "Herencias & Sucesiones", href: "/herencias", icon: ScrollText, price: "$30.000" },
   { title: "Protección de Datos", href: "/proteccion-datos", icon: Lock, price: "$35.000" },
   { title: "E-Commerce", href: "/ecommerce-compliance", icon: ShoppingCart, price: "$40.000" },
@@ -42,12 +49,6 @@ const expressServices = [
 ];
 
 const contactItems = [
-  {
-    title: "Llamar",
-    href: "tel:+56962321883",
-    icon: Phone,
-    text: "+569 6232 1883"
-  },
   {
     title: "Email",
     href: "mailto:puntolegalelgolf@gmail.com",

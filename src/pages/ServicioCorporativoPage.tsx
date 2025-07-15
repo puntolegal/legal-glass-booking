@@ -105,7 +105,7 @@ export default function ServicioCorporativoPage() {
               
               <div className="flex flex-wrap gap-4 justify-center">
                 <Link
-                  to="/contacto"
+                  to="/agendamiento?plan=basico"
                   className="px-8 py-4 bg-primary text-white rounded-xl font-semibold hover:bg-primary/90 transition-all duration-300 shadow-lg hover:shadow-xl"
                 >
                   Consulta Gratuita
@@ -614,17 +614,12 @@ export default function ServicioCorporativoPage() {
                 
                 <div className="flex flex-wrap gap-4 justify-center">
                   <Link
-                    to="/contacto"
+                    to="/agendamiento?plan=premium"
                     className="px-8 py-4 bg-white text-primary rounded-xl font-semibold hover:bg-white/90 transition-all duration-300 shadow-lg hover:shadow-xl"
                   >
                     Agendar Consulta
                   </Link>
-                  <a
-                    href="tel:+56912345678"
-                    className="px-8 py-4 bg-white/20 backdrop-blur-sm text-white rounded-xl font-semibold hover:bg-white/30 transition-all duration-300 border border-white/30"
-                  >
-                    Llamar Ahora
-                  </a>
+
                 </div>
               </div>
             </motion.div>

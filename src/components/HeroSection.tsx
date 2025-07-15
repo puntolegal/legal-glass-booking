@@ -178,13 +178,8 @@ const HeroSection = ({ title, subtitle, showForm, setShowForm, servicePrice = "$
               {/* Botón principal optimizado */}
               <motion.button 
                 onClick={() => {
-                  if (isMobile) {
-                    // En móvil, redirigir a AgendamientoPage para mejor UX
-                    window.location.href = '/agendamiento?plan=premium';
-                  } else {
-                    // En desktop, mantener modal
-                    actualSetShowForm(true);
-                  }
+                  // Redirigir a asesoría laboral por $35.000
+                  window.location.href = '/agendamiento?plan=laboral';
                 }}
                 className={`group relative overflow-hidden bg-gradient-to-r from-primary to-primary/90 text-white rounded-2xl shadow-sm font-medium transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary/30 w-full sm:w-auto ${
                   isMobile 
@@ -428,8 +423,6 @@ const HeroSection = ({ title, subtitle, showForm, setShowForm, servicePrice = "$
           </motion.div>
         </div>
       </div>
-
-      {actualShowForm && <ReservationForm onClose={() => actualSetShowForm(false)} servicePrice={servicePrice} serviceName={serviceName} />}
     </section>
   );
 };

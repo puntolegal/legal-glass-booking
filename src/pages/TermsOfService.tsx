@@ -492,11 +492,7 @@ const TermsOfService = () => {
                   <h3 className="font-semibold text-foreground mb-2">Email Corporativo</h3>
                   <p className="text-sm text-muted-foreground">puntolegalelgolf@gmail.com</p>
                 </div>
-                <div className="text-center p-6 glass rounded-lg border border-cyan-500/20">
-                  <Users className="w-8 h-8 mx-auto mb-4 text-cyan-500" />
-                  <h3 className="font-semibold text-foreground mb-2">Línea Directa</h3>
-                  <p className="text-sm text-muted-foreground">+56 9 6232 1883<br />Atención: Lun-Vie 9:00-18:00</p>
-                </div>
+
               </div>
               
               <div className="mt-8 p-6 bg-gradient-to-r from-cyan-500/10 to-blue-500/10 rounded-xl border border-cyan-500/20">

@@ -353,12 +353,7 @@ export default function BlogPost7() {
                     >
                       Consulta Confidencial
                     </Link>
-                    <a
-                      href="tel:+56912345678"
-                      className="px-6 py-3 bg-white/20 backdrop-blur-sm rounded-xl font-semibold hover:bg-white/30 transition-all duration-300 border border-white/30"
-                    >
-                      Llamar Ahora
-                    </a>
+
                   </div>
                 </div>
 

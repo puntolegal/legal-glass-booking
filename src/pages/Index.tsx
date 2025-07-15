@@ -10,11 +10,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 
 const Index = () => {
-  const [showForm, setShowForm] = useState(false);
-  const [selectedService, setSelectedService] = useState<{
-    title: string;
-    price: string;
-  } | null>(null);
+  // Eliminar estados relacionados con modales ya que siempre redirigimos
   const [isMobile, setIsMobile] = useState(false);
 
   // Detectar móvil
@@ -30,28 +26,57 @@ const Index = () => {
   }, []);
 
   const handleServiceSelect = (service: { title: string; promoPrice?: string; price?: string }) => {
-    const price = service.promoPrice || service.price || "$35.000 CLP";
-    setSelectedService({ title: service.title, price });
-    setShowForm(true);
+    // Mapear servicios a planes específicos con nombres exactos
+    const serviceMap: { [key: string]: string } = {
+      'Punto Legal Laboral': 'laboral',
+      'Punto Legal Familia': 'familia', 
+      'Punto Legal Sucesorio': 'herencias',
+      'Punto Legal Inmobiliario': 'inmobiliario',
+      'Punto Legal Empresarial': 'empresarial',
+      'Punto Legal Contratos': 'contratos-express',
+      'Punto Legal Administración Pública': 'administracion-publica',
+      'Punto Legal Tributario': 'tributario',
+      'Punto Legal Compliance': 'compliance-riesgo',
+      'Punto Legal Migratorio': 'migratorio',
+      'Punto Legal Propiedad Intelectual': 'marcas-patentes',
+      'Punto Legal Consumidor': 'reclamos-sernac',
+      'Punto Legal Penal Económico': 'penal-economico',
+      // Fallbacks para variaciones de nombres
+      'Punto Legal Corporativo': 'premium',
+      'Punto Legal Express': 'contratos-express',
+      'Punto Legal Sociedades': 'sociedades-express',
+      'Punto Legal Protección de Datos': 'proteccion-datos',
+      'Punto Legal Digital': 'ecommerce'
+    };
+    const plan = serviceMap[service.title] || 'laboral'; // Cambio default a laboral
+    window.location.href = `/agendamiento?plan=${plan}`;
   };
 
   const handleAgendarClick = () => {
-    if (isMobile) {
-      // En móvil, redirigir a AgendamientoPage para mejor UX
-      window.location.href = '/agendamiento?plan=premium';
-    } else {
-      // En desktop, mantener modal
-      setShowForm(true);
-    }
+    // Redirigir a consulta general por $35.000
+    window.location.href = '/agendamiento?plan=general';
+  };
+
+  const handleAgendarGratis = () => {
+    window.location.href = '/agendamiento?plan=gratis';
   };
 
   const pageContent = (
     <>
+      {/* Botón de agendamiento gratis */}
+      <div className="w-full flex justify-center mt-32 mb-8 z-20 relative px-4">
+        <button
+          onClick={handleAgendarGratis}
+          className="px-6 py-3 md:px-8 md:py-4 rounded-2xl bg-gradient-to-r from-primary via-primary/90 to-accent text-white font-bold text-base md:text-lg shadow-lg shadow-primary/20 border border-primary/30 hover:scale-105 transition-all duration-300 backdrop-blur-xl w-full max-w-sm md:w-auto md:max-w-none"
+        >
+          🚀 Agendar Consulta Gratis
+        </button>
+      </div>
       <HeroSection 
-        showForm={showForm} 
-        setShowForm={setShowForm}
-        servicePrice={selectedService?.price}
-        serviceName={selectedService?.title}
+        showForm={false} 
+        setShowForm={() => {}}
+        servicePrice={null}
+        serviceName={null}
       />
       <ServicesSection onAgendarClick={handleServiceSelect} />
       <TestimonialsSection />
@@ -89,15 +114,13 @@ const Index = () => {
         )}
 
         {/* Desktop Layout */}
-        <div className="hidden lg:block relative z-10">
+        <div className="hidden lg:block">
           <Header onAgendarClick={handleAgendarClick} />
-          <div className="pt-20">
-            {pageContent}
-          </div>
+          {pageContent}
         </div>
 
-        {/* Mobile Layout Optimizado */}
-        <div className="lg:hidden relative z-10">
+        {/* Mobile Layout */}
+        <div className="lg:hidden">
           <MobileLayout onAgendarClick={handleAgendarClick}>
             {pageContent}
           </MobileLayout>

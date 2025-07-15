@@ -1,216 +1,212 @@
-// Script para configurar el primer usuario administrador
-// Uso: node scripts/setup-admin.js
+// Script para configurar usuario admin en Supabase
+// Ejecutar con: node scripts/setup-admin.js
 
 const { createClient } = require('@supabase/supabase-js');
+require('dotenv').config();
 
 // Configuración de Supabase
 const supabaseUrl = process.env.VITE_SUPABASE_URL || 'https://your-project.supabase.co';
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-if (!supabaseServiceKey) {
-  console.error('❌ Error: SUPABASE_SERVICE_ROLE_KEY no está configurado');
-  console.log('💡 Asegúrate de tener la variable de entorno SUPABASE_SERVICE_ROLE_KEY configurada');
-  process.exit(1);
-}
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || 'your-service-role-key';
 
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-async function setupAdmin() {
+async function setupAdminUser() {
   try {
-    console.log('🔧 Configurando usuario administrador...');
+    console.log('🚀 Iniciando configuración del usuario admin...');
     
-    // Solicitar datos del administrador
-    const readline = require('readline');
-    const rl = readline.createInterface({
-      input: process.stdin,
-      output: process.stdout
-    });
-
-    const question = (query) => new Promise((resolve) => rl.question(query, resolve));
-
-    const adminEmail = await question('📧 Email del administrador: ');
-    const adminPassword = await question('🔒 Contraseña del administrador: ');
-    const adminName = await question('👤 Nombre del administrador: ');
-
-    rl.close();
-
-    if (!adminEmail || !adminPassword || !adminName) {
-      console.error('❌ Error: Todos los campos son requeridos');
-      process.exit(1);
-    }
+    // Datos del usuario admin
+    const adminData = {
+      email: 'sozajimenez@puntolegal.cl',
+      password: 'puntolegalonline555',
+      user_metadata: {
+        full_name: 'Sofia Jimenez',
+        role: 'admin',
+        is_active: true
+      }
+    };
 
     // 1. Crear usuario en auth.users
-    console.log('👤 Creando usuario en autenticación...');
-    const { data: authData, error: authError } = await supabase.auth.admin.createUser({
-      email: adminEmail,
-      password: adminPassword,
+    console.log('📝 Creando usuario en auth.users...');
+    const { data: authUser, error: authError } = await supabase.auth.admin.createUser({
+      email: adminData.email,
+      password: adminData.password,
       email_confirm: true,
-      user_metadata: {
-        nombre: adminName
-      }
+      user_metadata: adminData.user_metadata
     });
 
     if (authError) {
-      console.error('❌ Error creando usuario:', authError.message);
-      process.exit(1);
+      console.error('❌ Error creando usuario en auth:', authError);
+      return;
     }
 
-    console.log('✅ Usuario creado exitosamente');
+    console.log('✅ Usuario creado en auth.users:', authUser.user.id);
 
-    // 2. Actualizar el perfil para asignar rol de administrador
-    console.log('👑 Asignando rol de administrador...');
-    const { error: profileError } = await supabase
+    // 2. Insertar en la tabla profiles
+    console.log('📝 Insertando en tabla profiles...');
+    const { data: profileData, error: profileError } = await supabase
       .from('profiles')
-      .update({ 
-        role: 'admin',
-        is_active: true,
-        nombre: adminName
-      })
-      .eq('user_id', authData.user.id);
+      .insert({
+        id: authUser.user.id,
+        email: adminData.email,
+        full_name: adminData.user_metadata.full_name,
+        role: adminData.user_metadata.role,
+        is_active: adminData.user_metadata.is_active,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      });
 
     if (profileError) {
-      console.error('❌ Error actualizando perfil:', profileError.message);
-      process.exit(1);
+      console.error('❌ Error insertando en profiles:', profileError);
+      return;
     }
 
-    console.log('✅ Rol de administrador asignado exitosamente');
+    console.log('✅ Perfil creado en tabla profiles');
 
-    // 3. Verificar que todo esté correcto
-    const { data: profile, error: verifyError } = await supabase
+    // 3. Verificar que el usuario existe
+    console.log('🔍 Verificando usuario creado...');
+    const { data: verifyUser, error: verifyError } = await supabase
       .from('profiles')
       .select('*')
-      .eq('user_id', authData.user.id)
+      .eq('email', adminData.email)
       .single();
 
     if (verifyError) {
-      console.error('❌ Error verificando perfil:', verifyError.message);
-      process.exit(1);
+      console.error('❌ Error verificando usuario:', verifyError);
+      return;
     }
 
-    console.log('\n🎉 ¡Usuario administrador configurado exitosamente!');
-    console.log('📋 Detalles del administrador:');
-    console.log(`   👤 Nombre: ${profile.nombre}`);
-    console.log(`   📧 Email: ${profile.email}`);
-    console.log(`   👑 Rol: ${profile.role}`);
-    console.log(`   ✅ Estado: ${profile.is_active ? 'Activo' : 'Inactivo'}`);
-    console.log(`   🆔 User ID: ${profile.user_id}`);
+    console.log('✅ Usuario verificado:', verifyUser);
+
+    // 4. Configurar políticas de seguridad (opcional)
+    console.log('🔒 Configurando políticas de seguridad...');
     
-    console.log('\n🔐 Ahora puedes iniciar sesión en la aplicación con:');
-    console.log(`   Email: ${adminEmail}`);
-    console.log(`   Contraseña: ${adminPassword}`);
+    // Ejemplo de política para que solo admins puedan ver todos los perfiles
+    const { error: policyError } = await supabase.rpc('create_admin_policy', {
+      table_name: 'profiles',
+      policy_name: 'admin_full_access',
+      definition: 'CREATE POLICY admin_full_access ON profiles FOR ALL TO authenticated USING (role = \'admin\')'
+    });
+
+    if (policyError) {
+      console.log('⚠️  No se pudo crear política automáticamente (puede que ya exista):', policyError.message);
+    } else {
+      console.log('✅ Política de seguridad creada');
+    }
+
+    console.log('\n🎉 ¡Configuración completada exitosamente!');
+    console.log('\n📋 Resumen:');
+    console.log(`   Email: ${adminData.email}`);
+    console.log(`   Contraseña: ${adminData.password}`);
+    console.log(`   Rol: ${adminData.user_metadata.role}`);
+    console.log(`   Estado: ${adminData.user_metadata.is_active ? 'Activo' : 'Inactivo'}`);
+    console.log(`   ID de Usuario: ${authUser.user.id}`);
     
-    console.log('\n🚀 Para acceder al panel de administración, ve a:');
-    console.log('   http://localhost:8081/admin');
+    console.log('\n🔐 Credenciales de acceso:');
+    console.log(`   Usuario: sozajimenez`);
+    console.log(`   Clave: puntolegalonline555`);
+    
+    console.log('\n⚠️  IMPORTANTE:');
+    console.log('   - Cambia la contraseña después del primer inicio de sesión');
+    console.log('   - Mantén estas credenciales seguras');
+    console.log('   - Considera usar autenticación de dos factores');
 
   } catch (error) {
-    console.error('❌ Error inesperado:', error);
-    process.exit(1);
+    console.error('❌ Error general:', error);
   }
 }
 
-// Función para listar usuarios existentes
-async function listUsers() {
+// Función para verificar si el usuario ya existe
+async function checkExistingUser() {
   try {
-    console.log('📋 Listando usuarios existentes...');
+    console.log('🔍 Verificando si el usuario admin ya existe...');
     
-    const { data: users, error } = await supabase
+    const { data: existingUser, error } = await supabase
       .from('profiles')
       .select('*')
-      .order('created_at', { ascending: false });
+      .eq('email', 'sozajimenez@puntolegal.cl')
+      .single();
 
-    if (error) {
-      console.error('❌ Error listando usuarios:', error.message);
-      return;
+    if (error && error.code === 'PGRST116') {
+      console.log('✅ Usuario admin no existe, procediendo con la creación...');
+      return false;
     }
 
-    if (users.length === 0) {
-      console.log('📭 No hay usuarios registrados');
-      return;
+    if (existingUser) {
+      console.log('⚠️  El usuario admin ya existe:');
+      console.log(`   ID: ${existingUser.id}`);
+      console.log(`   Email: ${existingUser.email}`);
+      console.log(`   Rol: ${existingUser.role}`);
+      console.log(`   Estado: ${existingUser.is_active ? 'Activo' : 'Inactivo'}`);
+      return true;
     }
 
-    console.log(`\n👥 Usuarios registrados (${users.length}):`);
-    users.forEach((user, index) => {
-      console.log(`\n${index + 1}. ${user.nombre || 'Sin nombre'}`);
-      console.log(`   📧 Email: ${user.email}`);
-      console.log(`   👑 Rol: ${user.role}`);
-      console.log(`   ✅ Estado: ${user.is_active ? 'Activo' : 'Inactivo'}`);
-      console.log(`   📅 Registro: ${new Date(user.created_at).toLocaleDateString('es-CL')}`);
-    });
-
+    return false;
   } catch (error) {
-    console.error('❌ Error inesperado:', error);
+    console.error('❌ Error verificando usuario existente:', error);
+    return false;
   }
 }
 
-// Función para cambiar rol de usuario existente
-async function changeUserRole() {
+// Función para actualizar usuario existente
+async function updateExistingUser() {
   try {
-    const readline = require('readline');
-    const rl = readline.createInterface({
-      input: process.stdin,
-      output: process.stdout
-    });
-
-    const question = (query) => new Promise((resolve) => rl.question(query, resolve));
-
-    const userEmail = await question('📧 Email del usuario: ');
-    const newRole = await question('👑 Nuevo rol (admin/abogado/cliente): ');
-
-    rl.close();
-
-    if (!['admin', 'abogado', 'cliente'].includes(newRole)) {
-      console.error('❌ Error: Rol debe ser admin, abogado o cliente');
-      return;
-    }
-
-    console.log('🔄 Cambiando rol de usuario...');
+    console.log('🔄 Actualizando usuario admin existente...');
     
-    const { error } = await supabase
+    const { data: updatedUser, error } = await supabase
       .from('profiles')
-      .update({ role: newRole })
-      .eq('email', userEmail);
+      .update({
+        role: 'admin',
+        is_active: true,
+        updated_at: new Date().toISOString()
+      })
+      .eq('email', 'sozajimenez@puntolegal.cl')
+      .select()
+      .single();
 
     if (error) {
-      console.error('❌ Error cambiando rol:', error.message);
+      console.error('❌ Error actualizando usuario:', error);
       return;
     }
 
-    console.log('✅ Rol cambiado exitosamente');
-
+    console.log('✅ Usuario actualizado:', updatedUser);
   } catch (error) {
-    console.error('❌ Error inesperado:', error);
+    console.error('❌ Error en actualización:', error);
   }
 }
 
 // Función principal
 async function main() {
-  const command = process.argv[2];
+  console.log('🏢 Configuración de Usuario Admin - Punto Legal');
+  console.log('==============================================\n');
 
-  switch (command) {
-    case 'setup':
-      await setupAdmin();
-      break;
-    case 'list':
-      await listUsers();
-      break;
-    case 'change-role':
-      await changeUserRole();
-      break;
-    default:
-      console.log('🔧 Script de administración de usuarios');
-      console.log('\n📖 Uso:');
-      console.log('   node scripts/setup-admin.js setup     - Crear nuevo administrador');
-      console.log('   node scripts/setup-admin.js list      - Listar usuarios existentes');
-      console.log('   node scripts/setup-admin.js change-role - Cambiar rol de usuario');
-      console.log('\n💡 Asegúrate de tener configuradas las variables de entorno:');
-      console.log('   - VITE_SUPABASE_URL');
-      console.log('   - SUPABASE_SERVICE_ROLE_KEY');
+  // Verificar variables de entorno
+  if (!supabaseUrl || supabaseUrl === 'https://your-project.supabase.co') {
+    console.error('❌ Error: VITE_SUPABASE_URL no está configurado');
+    console.log('   Asegúrate de tener un archivo .env con VITE_SUPABASE_URL');
+    return;
+  }
+
+  if (!supabaseServiceKey || supabaseServiceKey === 'your-service-role-key') {
+    console.error('❌ Error: SUPABASE_SERVICE_ROLE_KEY no está configurado');
+    console.log('   Asegúrate de tener un archivo .env con SUPABASE_SERVICE_ROLE_KEY');
+    return;
+  }
+
+  const userExists = await checkExistingUser();
+  
+  if (userExists) {
+    console.log('\n¿Deseas actualizar el usuario existente? (s/n)');
+    // En un entorno real, aquí podrías usar readline para input del usuario
+    // Por ahora, asumimos que sí
+    await updateExistingUser();
+  } else {
+    await setupAdminUser();
   }
 }
 
-main().then(() => {
-  process.exit(0);
-}).catch((error) => {
-  console.error('❌ Error:', error);
-  process.exit(1);
-}); 
+// Ejecutar si es llamado directamente
+if (require.main === module) {
+  main().catch(console.error);
+}
+
+module.exports = { setupAdminUser, checkExistingUser, updateExistingUser }; 

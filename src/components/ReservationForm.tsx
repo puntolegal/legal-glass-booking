@@ -184,13 +184,7 @@ const ReservationForm = ({
             <div className="glass rounded-lg p-4 space-y-2">
               <p className="text-sm font-semibold text-foreground">Contacto rápido:</p>
               <div className="flex flex-wrap gap-2">
-                <a
-                  href="tel:+56962321883"
-                  className="text-xs px-3 py-1 glass rounded-full hover:bg-primary/20 text-primary transition-colors flex items-center"
-                >
-                  <Phone className="w-3 h-3 mr-1" />
-                  Llamar
-                </a>
+
                 <a
                   href="mailto:puntolegalelgolf@gmail.com"
                   className="text-xs px-3 py-1 glass rounded-full hover:bg-primary/20 text-primary transition-colors flex items-center"

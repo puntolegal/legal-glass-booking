@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { Shield, Gavel, FileText, Users, CheckCircle, Star, Clock, Award, AlertCircle } from 'lucide-react'
+import { Shield, Gavel, FileText, Users, CheckCircle, Star, Clock, Award, AlertCircle, ArrowRight, Phone } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import SEO from '../components/SEO'
 
@@ -130,12 +130,7 @@ export default function ServicioPenalPage() {
                     Atendemos urgencias penales 24/7. Cada minuto cuenta en tu defensa.
                   </p>
                 </div>
-                <a
-                  href="tel:+56912345678"
-                  className="px-6 py-3 bg-red-500 text-white rounded-xl font-semibold hover:bg-red-600 transition-all duration-300 animate-pulse"
-                >
-                  Llamar Ahora
-                </a>
+
               </div>
             </motion.div>
           </div>
@@ -649,39 +644,264 @@ export default function ServicioPenalPage() {
           </div>
         </section>
 
-        {/* CTA Section */}
-        <section className="py-20">
+        {/* Sección de Actualidad */}
+        <section className="py-20 bg-gradient-to-b from-background/50 to-background">
           <div className="container mx-auto px-4">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-primary to-primary/80 p-12 text-center"
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-center mb-12"
             >
-              <div className="absolute inset-0 bg-grid-white/10" />
-              
-              <div className="relative z-10 max-w-3xl mx-auto">
-                <h2 className="text-4xl font-bold text-white mb-4">
-                  ¿Necesitas Defensa Penal Especializada?
-                </h2>
-                <p className="text-xl text-white/90 mb-8">
-                  No esperes. En materia penal, el tiempo es crucial para tu defensa
-                </p>
-                
-                <div className="flex flex-wrap gap-4 justify-center">
-                  <Link
-                    to="/contacto"
-                    className="px-8 py-4 bg-white text-primary rounded-xl font-semibold hover:bg-white/90 transition-all duration-300 shadow-lg hover:shadow-xl"
-                  >
-                    Consulta Inmediata
-                  </Link>
-                  <a
-                    href="tel:+56912345678"
-                    className="px-8 py-4 bg-white/20 backdrop-blur-sm text-white rounded-xl font-semibold hover:bg-white/30 transition-all duration-300 border border-white/30"
-                  >
-                    Llamar 24/7
-                  </a>
+              <h2 className="text-3xl lg:text-4xl font-bold mb-4">
+                Actualidad en Derecho Penal
+              </h2>
+              <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+                Mantente informado sobre las últimas reformas penales y jurisprudencia
+              </p>
+            </motion.div>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+              {/* Artículo 1 */}
+              <motion.article
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.1 }}
+                className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:border-primary/30 transition-all group"
+              >
+                <div className="flex items-center gap-2 mb-4">
+                  <span className="px-3 py-1 bg-red-500/20 text-red-400 rounded-full text-xs font-semibold">
+                    URGENTE
+                  </span>
+                  <span className="text-xs text-muted-foreground">Reforma</span>
                 </div>
+                <h3 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors">
+                  Nuevo Código Procesal Penal 2025
+                </h3>
+                <div className="flex items-center gap-4 text-sm text-muted-foreground mb-3">
+                  <span>24 Enero 2025</span>
+                  <span>• 10 min</span>
+                </div>
+                <p className="text-muted-foreground mb-4">
+                  Cambios fundamentales en el procedimiento penal y derechos del imputado...
+                </p>
+                <Link 
+                  to="/blog/nuevo-codigo-procesal-penal"
+                  className="text-primary hover:text-primary/80 font-medium flex items-center gap-2 group/link"
+                >
+                  Leer más 
+                  <ArrowRight className="w-4 h-4 group-hover/link:translate-x-1 transition-transform" />
+                </Link>
+              </motion.article>
+
+              {/* Artículo 2 */}
+              <motion.article
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.2 }}
+                className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:border-primary/30 transition-all group"
+              >
+                <div className="flex items-center gap-2 mb-4">
+                  <span className="px-3 py-1 bg-red-500/20 text-red-400 rounded-full text-xs font-semibold">
+                    URGENTE
+                  </span>
+                  <span className="text-xs text-muted-foreground">Delitos</span>
+                </div>
+                <h3 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors">
+                  Ciberdelitos: Nueva Tipificación
+                </h3>
+                <div className="flex items-center gap-4 text-sm text-muted-foreground mb-3">
+                  <span>22 Enero 2025</span>
+                  <span>• 8 min</span>
+                </div>
+                <p className="text-muted-foreground mb-4">
+                  Nuevos tipos penales para delitos informáticos y penas actualizadas...
+                </p>
+                <Link 
+                  to="/blog/ciberdelitos-nueva-tipificacion"
+                  className="text-primary hover:text-primary/80 font-medium flex items-center gap-2 group/link"
+                >
+                  Leer más 
+                  <ArrowRight className="w-4 h-4 group-hover/link:translate-x-1 transition-transform" />
+                </Link>
+              </motion.article>
+
+              {/* Artículo 3 */}
+              <motion.article
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.3 }}
+                className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:border-primary/30 transition-all group"
+              >
+                <div className="flex items-center gap-2 mb-4">
+                  <span className="text-xs text-muted-foreground">Penas</span>
+                </div>
+                <h3 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors">
+                  Penas Sustitutivas: Ampliación
+                </h3>
+                <div className="flex items-center gap-4 text-sm text-muted-foreground mb-3">
+                  <span>20 Enero 2025</span>
+                  <span>• 6 min</span>
+                </div>
+                <p className="text-muted-foreground mb-4">
+                  Nuevos criterios para acceder a penas alternativas a la privación de libertad...
+                </p>
+                <Link 
+                  to="/blog/penas-sustitutivas-ampliacion"
+                  className="text-primary hover:text-primary/80 font-medium flex items-center gap-2 group/link"
+                >
+                  Leer más 
+                  <ArrowRight className="w-4 h-4 group-hover/link:translate-x-1 transition-transform" />
+                </Link>
+              </motion.article>
+
+              {/* Artículo 4 */}
+              <motion.article
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.4 }}
+                className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:border-primary/30 transition-all group"
+              >
+                <div className="flex items-center gap-2 mb-4">
+                  <span className="px-3 py-1 bg-red-500/20 text-red-400 rounded-full text-xs font-semibold">
+                    URGENTE
+                  </span>
+                  <span className="text-xs text-muted-foreground">Violencia</span>
+                </div>
+                <h3 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors">
+                  Violencia Intrafamiliar: Endurecimiento
+                </h3>
+                <div className="flex items-center gap-4 text-sm text-muted-foreground mb-3">
+                  <span>18 Enero 2025</span>
+                  <span>• 9 min</span>
+                </div>
+                <p className="text-muted-foreground mb-4">
+                  Aumento de penas y nuevas medidas cautelares en casos de VIF...
+                </p>
+                <Link 
+                  to="/blog/vif-endurecimiento-penas"
+                  className="text-primary hover:text-primary/80 font-medium flex items-center gap-2 group/link"
+                >
+                  Leer más 
+                  <ArrowRight className="w-4 h-4 group-hover/link:translate-x-1 transition-transform" />
+                </Link>
+              </motion.article>
+
+              {/* Artículo 5 */}
+              <motion.article
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.5 }}
+                className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:border-primary/30 transition-all group"
+              >
+                <div className="flex items-center gap-2 mb-4">
+                  <span className="text-xs text-muted-foreground">Drogas</span>
+                </div>
+                <h3 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors">
+                  Ley de Drogas: Despenalización Parcial
+                </h3>
+                <div className="flex items-center gap-4 text-sm text-muted-foreground mb-3">
+                  <span>16 Enero 2025</span>
+                  <span>• 7 min</span>
+                </div>
+                <p className="text-muted-foreground mb-4">
+                  Cambios en el tratamiento penal del consumo personal y microtráfico...
+                </p>
+                  <Link
+                  to="/blog/ley-drogas-despenalizacion"
+                  className="text-primary hover:text-primary/80 font-medium flex items-center gap-2 group/link"
+                  >
+                  Leer más 
+                  <ArrowRight className="w-4 h-4 group-hover/link:translate-x-1 transition-transform" />
+                  </Link>
+              </motion.article>
+
+              {/* Artículo 6 */}
+              <motion.article
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.6 }}
+                className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:border-primary/30 transition-all group"
+              >
+                <div className="flex items-center gap-2 mb-4">
+                  <span className="text-xs text-muted-foreground">Defensa</span>
+                </div>
+                <h3 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors">
+                  Defensoría Penal: Nuevos Protocolos
+                </h3>
+                <div className="flex items-center gap-4 text-sm text-muted-foreground mb-3">
+                  <span>14 Enero 2025</span>
+                  <span>• 5 min</span>
+                </div>
+                <p className="text-muted-foreground mb-4">
+                  Mejoras en el sistema de defensa pública y asistencia jurídica gratuita...
+                </p>
+                <Link 
+                  to="/blog/defensoria-nuevos-protocolos"
+                  className="text-primary hover:text-primary/80 font-medium flex items-center gap-2 group/link"
+                >
+                  Leer más 
+                  <ArrowRight className="w-4 h-4 group-hover/link:translate-x-1 transition-transform" />
+                </Link>
+              </motion.article>
+            </div>
+
+            {/* Botón Ver Todos */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-center"
+            >
+              <Link
+                to="/blog/categoria/penal"
+                className="inline-flex items-center gap-2 bg-primary/10 hover:bg-primary/20 text-primary px-6 py-3 rounded-xl font-semibold transition-all"
+              >
+                Ver Todos los Artículos Penales
+                <ArrowRight className="w-5 h-5" />
+              </Link>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* CTA Final */}
+        <section className="py-20 bg-gradient-to-r from-red-500/10 to-red-600/10">
+          <div className="container mx-auto px-4">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              className="max-w-4xl mx-auto text-center"
+            >
+              <h2 className="text-3xl lg:text-4xl font-bold mb-6">
+                ¿Necesitas Defensa Penal Urgente?
+              </h2>
+              <p className="text-xl text-muted-foreground mb-8">
+                No enfrentes solo un proceso penal. Actúa rápido con defensa especializada
+              </p>
+              
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Link
+                  to="/agendamiento?plan=defensa-urgente"
+                  className="bg-red-500 text-white px-8 py-4 rounded-xl font-semibold hover:bg-red-600 transition-all inline-flex items-center gap-2 animate-pulse"
+                >
+                  <Shield className="w-5 h-5" />
+                  Defensa Urgente 24/7
+                </Link>
+                
+                <Link
+                  to="/consulta-gratuita-penal"
+                  className="bg-white/10 backdrop-blur-sm text-foreground px-8 py-4 rounded-xl font-semibold hover:bg-white/20 transition-all inline-flex items-center gap-2 border border-white/20"
+                >
+                  <Phone className="w-5 h-5" />
+                  Consulta Gratuita
+                </Link>
               </div>
             </motion.div>
           </div>

@@ -39,12 +39,18 @@ const MobileMenu = ({ onAgendarClick }: MobileMenuProps) => {
   ];
 
   const specializedServices = [
-    { name: "⚖️ Derecho Laboral", href: "/laboral" },
-    { name: "🏢 Derecho Corporativo", href: "/corporativo" },
-    { name: "👨‍👩‍👧‍👦 Derecho Familia", href: "/familia" },
+    { name: "⚖️ Derecho Laboral", href: "/servicios/laboral" },
+    { name: "🏢 Derecho Corporativo", href: "/servicios/corporativo" },
+    { name: "👨‍👩‍👧‍👦 Derecho Familia", href: "/servicios/familia" },
     { name: "📜 Herencias", href: "/herencias" },
+    { name: "🏠 Derecho Inmobiliario", href: "/servicios/inmobiliario" },
+    { name: "📄 Derecho Civil", href: "/servicios/civil" },
+    { name: "🛡️ Derecho Penal", href: "/servicios/penal" },
+    { name: "💰 Derecho Tributario", href: "/servicios/tributario" },
+    { name: "⚠️ Derecho Penal Económico", href: "/servicios/penal-economico" },
+    { name: "💻 Derecho Digital", href: "/servicios/digital" },
     { name: "🔒 Protección Datos", href: "/proteccion-datos" },
-    { name: "💻 E-Commerce", href: "/ecommerce-compliance" },
+    { name: "🛒 E-Commerce", href: "/ecommerce-compliance" },
   ];
 
   return (
@@ -107,7 +113,7 @@ const MobileMenu = ({ onAgendarClick }: MobileMenuProps) => {
           </div>
 
           {/* Navigation Items - Dark Tech Style */}
-          <nav className="p-4 sm:p-6 flex-1 overflow-y-auto">
+          <nav className="p-4 sm:p-6 flex-1 overflow-y-auto scrollbar-mobile">
             {/* Main Navigation */}
             <div className="space-y-1 sm:space-y-2 mb-6">
               {menuItems.map((item, index) => (
@@ -179,15 +185,7 @@ const MobileMenu = ({ onAgendarClick }: MobileMenuProps) => {
           {/* Contact Links - Bottom section */}
           <div className="p-4 sm:p-6 border-t border-gray-200/10 bg-background/30 flex-shrink-0">
             <div className="space-y-2 sm:space-y-3">
-              <a
-                href="tel:+56962321883"
-                className="flex items-center space-x-2 sm:space-x-3 text-xs sm:text-sm text-muted-foreground hover:text-primary transition-colors group"
-              >
-                <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors flex-shrink-0">
-                  <Phone className="w-3 h-3 sm:w-4 sm:h-4 text-primary" />
-                </div>
-                <span className="truncate">+569 6232 1883</span>
-              </a>
+
               <a
                 href="mailto:puntolegalelgolf@gmail.com"
                 className="flex items-center space-x-2 sm:space-x-3 text-xs sm:text-sm text-muted-foreground hover:text-primary transition-colors group"

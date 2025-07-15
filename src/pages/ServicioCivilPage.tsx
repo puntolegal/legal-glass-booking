@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { Scale, FileText, CreditCard, Users, CheckCircle, Star, Clock, Award } from 'lucide-react'
+import { Scale, FileText, CreditCard, Users, CheckCircle, Star, Clock, Award, ArrowRight, Calendar, Calculator } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import SEO from '../components/SEO'
 
@@ -567,169 +567,264 @@ export default function ServicioCivilPage() {
           </div>
         </section>
 
-        {/* Civil Law Updates */}
-        <section className="py-20 bg-gradient-to-b from-primary/5 to-transparent">
+        {/* Sección de Actualidad */}
+        <section className="py-20 bg-gradient-to-b from-background/50 to-background">
           <div className="container mx-auto px-4">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
               className="text-center mb-12"
             >
-              <h2 className="text-4xl font-bold mb-4">Actualidad en Derecho Civil</h2>
-              <p className="text-xl text-muted-foreground">Mantente informado sobre cambios en la legislación civil</p>
+              <h2 className="text-3xl lg:text-4xl font-bold mb-4">
+                Actualidad en Derecho Civil
+              </h2>
+              <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+                Mantente informado sobre las últimas reformas y jurisprudencia civil
+              </p>
             </motion.div>
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
-              {[
-                {
-                  title: "Nueva Ley de Responsabilidad Civil 2025",
-                  excerpt: "Importantes cambios en las normas de responsabilidad civil extracontractual...",
-                  date: "17 Enero 2025",
-                  readTime: "8 min",
-                  category: "Responsabilidad",
-                  urgent: true,
-                  link: "/blog/nueva-ley-responsabilidad-civil"
-                },
-                {
-                  title: "Cobranza Judicial: Nuevos Procedimientos",
-                  excerpt: "Modificaciones en el procedimiento de cobro de deudas y medidas precautorias...",
-                  date: "15 Enero 2025", 
-                  readTime: "6 min",
-                  category: "Cobranza",
-                  urgent: false,
-                  link: "/blog/cobranza-judicial-procedimientos"
-                },
-                {
-                  title: "Contratos Civiles: Nuevas Regulaciones",
-                  excerpt: "Cambios en la validez y efectos de los contratos civiles...",
-                  date: "13 Enero 2025",
-                  readTime: "7 min", 
-                  category: "Contratos",
-                  urgent: true,
-                  link: "/blog/contratos-civiles-regulaciones"
-                },
-                {
-                  title: "Daño Moral: Nuevos Criterios de Indemnización",
-                  excerpt: "Actualización en los criterios para determinar el monto del daño moral...",
-                  date: "11 Enero 2025",
-                  readTime: "5 min",
-                  category: "Daños",
-                  urgent: false,
-                  link: "/blog/dano-moral-criterios-indemnizacion"
-                },
-                {
-                  title: "Prescripción Civil: Cambios en los Plazos",
-                  excerpt: "Nuevas normativas sobre plazos de prescripción en acciones civiles...",
-                  date: "9 Enero 2025",
-                  readTime: "6 min",
-                  category: "Prescripción",
-                  urgent: true,
-                  link: "/blog/prescripcion-civil-plazos"
-                },
-                {
-                  title: "Mediación Civil: Obligatoriedad en Ciertos Casos",
-                  excerpt: "Nuevos casos donde la mediación previa es obligatoria...",
-                  date: "7 Enero 2025",
-                  readTime: "4 min",
-                  category: "Mediación",
-                  urgent: false,
-                  link: "/blog/mediacion-civil-obligatoria"
-                }
-              ].map((article, index) => (
-                <motion.div
-                  key={index}
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+              {/* Artículo 1 */}
+              <motion.article
                   initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: index * 0.1 }}
-                  className="group relative"
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.1 }}
+                className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:border-primary/30 transition-all group"
+              >
+                <div className="flex items-center gap-2 mb-4">
+                  <span className="px-3 py-1 bg-red-500/20 text-red-400 rounded-full text-xs font-semibold">
+                    URGENTE
+                  </span>
+                  <span className="text-xs text-muted-foreground">Contratos</span>
+                </div>
+                <h3 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors">
+                  Reforma al Código Civil: Contratos
+                </h3>
+                <div className="flex items-center gap-4 text-sm text-muted-foreground mb-3">
+                  <span>23 Enero 2025</span>
+                  <span>• 9 min</span>
+                </div>
+                <p className="text-muted-foreground mb-4">
+                  Modificaciones sustanciales en la teoría general de contratos y nuevas causales de nulidad...
+                </p>
+                <Link 
+                  to="/blog/reforma-codigo-civil-contratos"
+                  className="text-primary hover:text-primary/80 font-medium flex items-center gap-2 group/link"
                 >
-                  <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-primary/10 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                  
+                  Leer más 
+                  <ArrowRight className="w-4 h-4 group-hover/link:translate-x-1 transition-transform" />
+                </Link>
+              </motion.article>
+
+              {/* Artículo 2 */}
+              <motion.article
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.2 }}
+                className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:border-primary/30 transition-all group"
+              >
+                <div className="flex items-center gap-2 mb-4">
+                  <span className="px-3 py-1 bg-red-500/20 text-red-400 rounded-full text-xs font-semibold">
+                    URGENTE
+                  </span>
+                  <span className="text-xs text-muted-foreground">Responsabilidad</span>
+                </div>
+                <h3 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors">
+                  Daño Moral: Nuevos Montos 2025
+                </h3>
+                <div className="flex items-center gap-4 text-sm text-muted-foreground mb-3">
+                  <span>21 Enero 2025</span>
+                  <span>• 7 min</span>
+                </div>
+                <p className="text-muted-foreground mb-4">
+                  Corte Suprema actualiza criterios para indemnización por daño moral...
+                </p>
                   <Link 
-                    to={article.link}
-                    className="relative block bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:border-primary/30 transition-all duration-300"
-                  >
-                    {article.urgent && (
-                      <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
-                        URGENTE
+                  to="/blog/dano-moral-montos-2025"
+                  className="text-primary hover:text-primary/80 font-medium flex items-center gap-2 group/link"
+                >
+                  Leer más 
+                  <ArrowRight className="w-4 h-4 group-hover/link:translate-x-1 transition-transform" />
+                </Link>
+              </motion.article>
+
+              {/* Artículo 3 */}
+              <motion.article
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.3 }}
+                className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:border-primary/30 transition-all group"
+              >
+                <div className="flex items-center gap-2 mb-4">
+                  <span className="text-xs text-muted-foreground">Prescripción</span>
+                </div>
+                <h3 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors">
+                  Prescripción Civil: Cambios Clave
+                </h3>
+                <div className="flex items-center gap-4 text-sm text-muted-foreground mb-3">
+                  <span>19 Enero 2025</span>
+                  <span>• 6 min</span>
                       </div>
-                    )}
-                    
-                    <div className="flex items-center gap-2 mb-3">
-                      <span className="bg-primary/20 text-primary px-2 py-1 rounded-full text-xs font-semibold">
-                        {article.category}
+                <p className="text-muted-foreground mb-4">
+                  Nuevos plazos de prescripción para acciones civiles y comerciales...
+                </p>
+                <Link 
+                  to="/blog/prescripcion-civil-cambios"
+                  className="text-primary hover:text-primary/80 font-medium flex items-center gap-2 group/link"
+                >
+                  Leer más 
+                  <ArrowRight className="w-4 h-4 group-hover/link:translate-x-1 transition-transform" />
+                </Link>
+              </motion.article>
+
+              {/* Artículo 4 */}
+              <motion.article
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.4 }}
+                className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:border-primary/30 transition-all group"
+              >
+                <div className="flex items-center gap-2 mb-4">
+                  <span className="px-3 py-1 bg-red-500/20 text-red-400 rounded-full text-xs font-semibold">
+                    URGENTE
                       </span>
-                      <span className="text-xs text-muted-foreground">{article.date}</span>
-                      <span className="text-xs text-muted-foreground">• {article.readTime}</span>
+                  <span className="text-xs text-muted-foreground">Obligaciones</span>
+                </div>
+                <h3 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors">
+                  Teoría de la Imprevisión: Aplicación
+                </h3>
+                <div className="flex items-center gap-4 text-sm text-muted-foreground mb-3">
+                  <span>17 Enero 2025</span>
+                  <span>• 8 min</span>
                     </div>
-                    
-                    <h3 className="text-lg font-bold mb-3 group-hover:text-primary transition-colors">
-                      {article.title}
+                <p className="text-muted-foreground mb-4">
+                  Criterios actualizados para revisar contratos por cambios imprevistos...
+                </p>
+                <Link 
+                  to="/blog/teoria-imprevision-2025"
+                  className="text-primary hover:text-primary/80 font-medium flex items-center gap-2 group/link"
+                >
+                  Leer más 
+                  <ArrowRight className="w-4 h-4 group-hover/link:translate-x-1 transition-transform" />
+                </Link>
+              </motion.article>
+
+              {/* Artículo 5 */}
+              <motion.article
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.5 }}
+                className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:border-primary/30 transition-all group"
+              >
+                <div className="flex items-center gap-2 mb-4">
+                  <span className="text-xs text-muted-foreground">Garantías</span>
+                </div>
+                <h3 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors">
+                  Fianza y Aval: Nuevas Reglas
                     </h3>
-                    
-                    <p className="text-sm text-muted-foreground mb-4 line-clamp-3">
-                      {article.excerpt}
-                    </p>
-                    
-                    <div className="flex items-center gap-2 text-primary text-sm font-semibold">
-                      <span>Leer más</span>
-                      <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
+                <div className="flex items-center gap-4 text-sm text-muted-foreground mb-3">
+                  <span>15 Enero 2025</span>
+                  <span>• 5 min</span>
+                </div>
+                <p className="text-muted-foreground mb-4">
+                  Modificaciones en las garantías personales y su ejecución...
+                </p>
+                <Link 
+                  to="/blog/fianza-aval-nuevas-reglas"
+                  className="text-primary hover:text-primary/80 font-medium flex items-center gap-2 group/link"
+                >
+                  Leer más 
+                  <ArrowRight className="w-4 h-4 group-hover/link:translate-x-1 transition-transform" />
+                </Link>
+              </motion.article>
+
+              {/* Artículo 6 */}
+              <motion.article
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.6 }}
+                className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:border-primary/30 transition-all group"
+              >
+                <div className="flex items-center gap-2 mb-4">
+                  <span className="text-xs text-muted-foreground">Procedimiento</span>
+                </div>
+                <h3 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors">
+                  Juicio Ejecutivo: Agilización
+                </h3>
+                <div className="flex items-center gap-4 text-sm text-muted-foreground mb-3">
+                  <span>13 Enero 2025</span>
+                  <span>• 4 min</span>
                     </div>
+                <p className="text-muted-foreground mb-4">
+                  Nuevos procedimientos para acelerar la cobranza judicial...
+                </p>
+                <Link 
+                  to="/blog/juicio-ejecutivo-agilizacion"
+                  className="text-primary hover:text-primary/80 font-medium flex items-center gap-2 group/link"
+                >
+                  Leer más 
+                  <ArrowRight className="w-4 h-4 group-hover/link:translate-x-1 transition-transform" />
                   </Link>
-                </motion.div>
-              ))}
+              </motion.article>
             </div>
             
-            <div className="text-center mt-12">
+            {/* Botón Ver Todos */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-center"
+            >
               <Link
-                to="/blog?categoria=civil"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-primary/10 text-primary border border-primary/30 rounded-xl font-semibold hover:bg-primary/20 transition-all duration-300"
+                to="/blog/categoria/civil"
+                className="inline-flex items-center gap-2 bg-primary/10 hover:bg-primary/20 text-primary px-6 py-3 rounded-xl font-semibold transition-all"
               >
                 Ver Todos los Artículos Civiles
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                </svg>
+                <ArrowRight className="w-5 h-5" />
               </Link>
-            </div>
+            </motion.div>
           </div>
         </section>
 
-        {/* CTA Section */}
-        <section className="py-20">
+        {/* CTA Final */}
+        <section className="py-20 bg-gradient-to-r from-primary/10 to-primary/5">
           <div className="container mx-auto px-4">
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-primary to-primary/80 p-12 text-center"
+              initial={{ opacity: 0, scale: 0.95 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              className="max-w-4xl mx-auto text-center"
             >
-              <div className="absolute inset-0 bg-grid-white/10" />
+              <h2 className="text-3xl lg:text-4xl font-bold mb-6">
+                ¿Listo para Resolver tu Conflicto Civil?
+              </h2>
+              <p className="text-xl text-muted-foreground mb-8">
+                No dejes que los problemas legales se agraven. Actúa ahora con asesoría experta
+              </p>
               
-              <div className="relative z-10 max-w-3xl mx-auto">
-                <h2 className="text-4xl font-bold text-white mb-4">
-                  ¿Tienes una Deuda Impaga o un Conflicto Civil?
-                </h2>
-                <p className="text-xl text-white/90 mb-8">
-                  Evaluamos tu caso sin costo y te mostramos las mejores opciones
-                </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Link
+                  to="/agendamiento?plan=civil"
+                  className="bg-primary text-white px-8 py-4 rounded-xl font-semibold hover:bg-primary/90 transition-all inline-flex items-center gap-2"
+                >
+                  <Calendar className="w-5 h-5" />
+                  Consulta Civil
+                </Link>
                 
-                <div className="flex flex-wrap gap-4 justify-center">
                   <Link
-                    to="/contacto"
-                    className="px-8 py-4 bg-white text-primary rounded-xl font-semibold hover:bg-white/90 transition-all duration-300 shadow-lg hover:shadow-xl"
+                  to="/calculadora-indemnizacion"
+                  className="bg-white/10 backdrop-blur-sm text-foreground px-8 py-4 rounded-xl font-semibold hover:bg-white/20 transition-all inline-flex items-center gap-2 border border-white/20"
                   >
-                    Evaluación Gratuita
+                  <Calculator className="w-5 h-5" />
+                  Calculadora de Indemnización
                   </Link>
-                  <a
-                    href="tel:+56912345678"
-                    className="px-8 py-4 bg-white/20 backdrop-blur-sm text-white rounded-xl font-semibold hover:bg-white/30 transition-all duration-300 border border-white/30"
-                  >
-                    Llamar Ahora
-                  </a>
-                </div>
               </div>
             </motion.div>
           </div>

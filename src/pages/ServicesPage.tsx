@@ -404,22 +404,7 @@ const ExpressGrid: React.FC = () => {
 };
 
 const ServicesPage: React.FC = () => {
-  const [showForm, setShowForm] = useState(false);
-  const [selectedService, setSelectedService] = useState<ServiceCard | null>(null);
-  const [isMobile, setIsMobile] = useState(false);
-
-  // Detectar móvil
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 1024);
-    };
-    
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
-
+  // Eliminar estados de modal ya que siempre redirigimos
   const handleAgendarClick = (service: ServiceCard) => {
     // Siempre redirigir a AgendamientoPage para experiencia unificada
     const serviceMap: { [key: string]: string } = {
@@ -442,10 +427,19 @@ const ServicesPage: React.FC = () => {
     window.location.href = `/agendamiento?plan=${plan}`;
   };
 
-  const handleCloseForm = () => {
-    setShowForm(false);
-    setSelectedService(null);
-  };
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Detectar móvil
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 1024);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   return (
     <>

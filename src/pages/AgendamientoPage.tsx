@@ -14,13 +14,19 @@ import {
   Video,
   MessageSquare,
   MapPin,
-  X
+  X,
+  Info
 } from 'lucide-react';
 import SEO from '../components/SEO';
 import { MobileFloatingNav } from '../components/MobileFloatingNav';
+import WeeklyDatePicker from '../components/WeeklyDatePicker';
+import BankTransferCard3D from '../components/BankTransferCard3D';
 
 // Definición de servicios y precios
 const serviceCatalog = {
+  // Plan Gratis - Prueba de automatización
+  'gratis': { name: 'Consulta Gratis - Prueba', price: '0', category: 'Gratis', note: 'Solo para probar la automatización' },
+  
   // Corporativo
   'basico': { name: 'Corporativo Básico', price: '350.000', category: 'Corporativo' },
   'premium': { name: 'Corporativo Premium', price: '750.000', category: 'Corporativo' },
@@ -34,11 +40,13 @@ const serviceCatalog = {
   'comprador-seguro': { name: 'Comprador Seguro', price: '450.000', category: 'Inmobiliario' },
   'inversionista-pro': { name: 'Inversionista Pro', price: '850.000', category: 'Inmobiliario' },
   'desarrollador-elite': { name: 'Desarrollador Elite', price: '2.500.000', category: 'Inmobiliario' },
+  'inmobiliario': { name: 'Punto Legal Inmobiliario', price: '27.500', category: 'Inmobiliario', originalPrice: '55.000', discount: '50% OFF' },
   
   // Penal
   'defensa-esencial': { name: 'Defensa Esencial', price: '650.000', category: 'Penal' },
   'defensa-premium': { name: 'Defensa Premium', price: '1.200.000', category: 'Penal' },
   'defensa-elite': { name: 'Defensa Elite', price: '2.500.000', category: 'Penal' },
+  'penal-economico': { name: 'Punto Legal Penal Económico', price: '45.000', category: 'Penal Económico', originalPrice: '90.000', discount: '50% OFF' },
   
   // Civil
   'cobranza-express': { name: 'Cobranza Express', price: '280.000', category: 'Civil', note: '+ 15% del monto recuperado' },
@@ -51,20 +59,30 @@ const serviceCatalog = {
   'ecommerce': { name: 'E-Commerce', price: '40.000', category: 'Digital' },
   'tech-enterprise': { name: 'Tech Enterprise', price: '1.650.000', category: 'Digital' },
   
-  // Especializado
-  'laboral': { name: 'Derecho Laboral', price: '35.000', category: 'Laboral' },
-  'familia': { name: 'Derecho Familia', price: '25.000', category: 'Familia' },
-  'herencias': { name: 'Herencias & Sucesiones', price: '30.000', category: 'Sucesorio' },
+  // Especializado - Servicios de la página principal
+  'laboral': { name: 'Punto Legal Laboral', price: '35.000', category: 'Laboral', originalPrice: '70.000', discount: '50% OFF' },
+  'familia': { name: 'Punto Legal Familia', price: '30.000', category: 'Familia', originalPrice: '60.000', discount: '50% OFF' },
+  'herencias': { name: 'Punto Legal Sucesorio', price: '30.000', category: 'Sucesorio', originalPrice: '60.000', discount: '50% OFF' },
+  'empresarial': { name: 'Punto Legal Empresarial', price: '45.000', category: 'Empresarial', originalPrice: '90.000', discount: '50% OFF' },
+  'tributario': { name: 'Punto Legal Tributario', price: '30.000', category: 'Tributario', originalPrice: '60.000', discount: '50% OFF' },
+  'administracion-publica': { name: 'Punto Legal Administración Pública', price: '25.000', category: 'Administración Pública', originalPrice: '50.000', discount: '50% OFF' },
+  'migratorio': { name: 'Punto Legal Migratorio', price: '27.500', category: 'Migratorio', originalPrice: '55.000', discount: '50% OFF' },
+  'compliance-riesgo': { name: 'Punto Legal Compliance', price: '40.000', category: 'Compliance', originalPrice: '80.000', discount: '50% OFF' },
+  
+  // Protección y Propiedad
   'proteccion-datos': { name: 'Protección de Datos', price: '35.000', category: 'Digital' },
+  'marcas-patentes': { name: 'Punto Legal Propiedad Intelectual', price: '32.500', category: 'Propiedad Intelectual', originalPrice: '65.000', discount: '50% OFF' },
   
   // Express
-  'contratos-express': { name: 'Contratos Express', price: '20.000', category: 'Express' },
+  'contratos-express': { name: 'Punto Legal Contratos', price: '15.000', category: 'Express', originalPrice: '30.000', discount: '50% OFF' },
   'sociedades-express': { name: 'Sociedades Express', price: '30.000', category: 'Express' },
-  'marcas-patentes': { name: 'Marcas & Patentes', price: '40.000', category: 'Propiedad Intelectual' },
-  'reclamos-sernac': { name: 'Reclamos SERNAC', price: '18.000', category: 'Consumidor' },
+  'reclamos-sernac': { name: 'Punto Legal Consumidor', price: '22.500', category: 'Consumidor', originalPrice: '45.000', discount: '50% OFF' },
   
   // Emergencia
-  'emergencia': { name: 'Consulta de Emergencia', price: '100.000', category: 'Emergencia', originalPrice: '200.000', discount: '50% OFF' }
+  'emergencia': { name: 'Consulta de Emergencia', price: '100.000', category: 'Emergencia', originalPrice: '200.000', discount: '50% OFF' },
+  
+  // Consulta General
+  'general': { name: 'Consulta General', price: '35.000', category: 'General' }
 };
 
 const timeSlots = [
@@ -91,6 +109,7 @@ export default function AgendamientoPage() {
     descripcion: ''
   });
   const [step, setStep] = useState(1);
+  const [showBankTransfer, setShowBankTransfer] = useState(false);
 
   const plan = searchParams.get('plan') || 'premium';
   const service = serviceCatalog[plan] || serviceCatalog['premium'];
@@ -203,48 +222,11 @@ export default function AgendamientoPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (step < 3) {
+    if (step < 4) {
       setStep(step + 1);
     } else {
-      // Envío de datos a la base de datos con notificaciones automáticas
-      try {
-        // Crear objeto de reserva
-        const reservaData = {
-          nombre: formData.nombre,
-          rut: formData.rut || 'N/A',
-          email: formData.email,
-          telefono: formData.telefono,
-          fecha: selectedDate || '',
-          hora: selectedTime || '',
-          descripcion: formData.descripcion || `Reunión ${service.name}`,
-          servicio: service.name,
-          precio: service.price,
-          categoria: service.category,
-          tipo_reunion: meetingTypes.find(t => t.id === selectedMeetingType)?.name || 'presencial'
-        };
-
-        console.log('📝 Creando reserva:', reservaData);
-        
-        // Importar dinámicamente el servicio de reservas
-        const { createReservation } = await import('@/services/reservationService');
-        
-        // Crear la reserva (esto automáticamente envía notificación a Make)
-        const nuevaReserva = await createReservation(reservaData);
-        
-        console.log('✅ Reserva creada exitosamente:', nuevaReserva.id);
-        
-        // Mostrar confirmación detallada
-        alert(`🎉 ¡Cita agendada exitosamente!\n\n📋 Servicio: ${service.name}\n💰 Precio: $${service.price}\n📅 Fecha: ${formatDate(new Date(selectedDate))}\n⏰ Hora: ${selectedTime}\n🎯 Tipo: ${meetingTypes.find(t => t.id === selectedMeetingType)?.name}\n\n✅ ID de reserva: ${nuevaReserva.id}\n📧 Te enviaremos un email de confirmación\n🔔 Recibirás un recordatorio 24h antes\n💰 Comprobante de pago por email\n\n¡Gracias por confiar en Punto Legal!`);
-        
-        // Redirigir al inicio después de unos segundos
-        setTimeout(() => {
-          window.location.href = '/';
-        }, 3000);
-        
-      } catch (error) {
-        console.error('❌ Error al agendar cita:', error);
-        alert(`❌ Error al agendar la cita.\n\nError: ${error.message || 'Error desconocido'}\n\nPor favor, inténtalo nuevamente o contacta a soporte.`);
-      }
+      // Este flujo ya no se usará aquí, se manejará en PaymentPage
+      console.log('Flujo de pago completado');
     }
   };
 
@@ -264,11 +246,11 @@ export default function AgendamientoPage() {
           <div className="container mx-auto px-4">
             <div className="flex items-center gap-4 mb-8">
               <Link 
-                to="/servicios" 
+                to="/" 
                 className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors"
               >
                 <ArrowLeft className="w-5 h-5" />
-                Volver a servicios
+                Volver al inicio
               </Link>
             </div>
             
@@ -334,7 +316,7 @@ export default function AgendamientoPage() {
             <div className="max-w-4xl mx-auto">
               {/* Progress Steps */}
               <div className="flex items-center justify-center mb-12">
-                {[1, 2, 3].map((stepNumber) => (
+                {[1, 2, 3, 4].map((stepNumber) => (
                   <div key={stepNumber} className="flex items-center">
                     <div className={`
                       w-10 h-10 rounded-full flex items-center justify-center font-semibold
@@ -345,7 +327,7 @@ export default function AgendamientoPage() {
                     `}>
                       {step > stepNumber ? <CheckCircle className="w-6 h-6" /> : stepNumber}
                     </div>
-                    {stepNumber < 3 && (
+                    {stepNumber < 4 && (
                       <div className={`
                         w-16 h-1 mx-4
                         ${step > stepNumber ? 'bg-primary' : 'bg-white/10'}
@@ -453,48 +435,45 @@ export default function AgendamientoPage() {
                     <div className="mb-8">
                       <h3 className="text-lg font-semibold mb-4 text-foreground">Tipo de reunión</h3>
                       <div className="grid md:grid-cols-3 gap-4">
-                        {meetingTypes.map((type) => (
+                        {meetingTypes.map((type) => {
+                          const isDisabled = type.id === 'presencial';
+                          return (
                           <button
                             key={type.id}
                             type="button"
-                            onClick={() => setSelectedMeetingType(type.id)}
+                              onClick={() => !isDisabled && setSelectedMeetingType(type.id)}
+                              disabled={isDisabled}
                             className={`
-                              p-4 rounded-lg border transition-all
-                              ${selectedMeetingType === type.id
+                                p-4 rounded-lg border transition-all relative
+                                ${isDisabled 
+                                  ? 'border-white/10 bg-white/5 opacity-50 cursor-not-allowed' 
+                                  : selectedMeetingType === type.id
                                 ? 'border-primary bg-primary/10'
                                 : 'border-white/20 hover:border-white/40'
                               }
                             `}
                           >
-                            <type.icon className="w-6 h-6 mx-auto mb-2 text-primary" />
+                              <type.icon className={`w-6 h-6 mx-auto mb-2 ${isDisabled ? 'text-muted-foreground' : 'text-primary'}`} />
                             <div className="font-semibold">{type.name}</div>
                             <div className="text-sm text-muted-foreground">{type.description}</div>
+                              {isDisabled && (
+                                <div className="absolute top-2 right-2 text-xs font-semibold bg-orange-400/20 text-orange-400 px-2 py-1 rounded-full">
+                                  Próximamente
+                                </div>
+                              )}
                           </button>
-                        ))}
+                          );
+                        })}
                       </div>
                     </div>
                     
-                    {/* Selección de Fecha */}
+                    {/* Selección de Fecha con vista semanal */}
                     <div className="mb-6">
-                      <h3 className="text-lg font-semibold mb-4 text-foreground">Selecciona una fecha</h3>
-                      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                        {availableDates.map((date) => (
-                          <button
-                            key={date.toISOString()}
-                            type="button"
-                            onClick={() => setSelectedDate(date.toISOString())}
-                            className={`
-                              p-3 rounded-lg border text-sm transition-all
-                              ${selectedDate === date.toISOString()
-                                ? 'border-primary bg-primary/10'
-                                : 'border-white/20 hover:border-white/40'
-                              }
-                            `}
-                          >
-                            {formatDate(date)}
-                          </button>
-                        ))}
-                      </div>
+                      <WeeklyDatePicker
+                        selectedDate={selectedDate}
+                        onDateSelect={setSelectedDate}
+                        availableDates={availableDates}
+                      />
                     </div>
                     
                     {/* Selección de Hora */}
@@ -541,21 +520,46 @@ export default function AgendamientoPage() {
                           })}
                         </div>
                         
-                        {/* Información adicional */}
-                        <div className="mt-4 p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg">
-                          <div className="flex items-start gap-3">
-                            <Clock className="w-5 h-5 text-blue-400 mt-0.5 flex-shrink-0" />
-                            <div className="text-sm">
-                              <p className="text-blue-400 font-semibold mb-1">Información importante:</p>
-                              <ul className="text-blue-300 space-y-1 text-xs">
-                                <li>• Las citas deben agendarse con al menos 1 hora de anticipación</li>
-                                <li>• Duración de la consulta: 45 minutos</li>
-                                <li>• Recibirás confirmación por email y WhatsApp</li>
-                                <li>• Puedes reprogramar hasta 2 horas antes de la cita</li>
+                        {/* Información adicional - Estilo glassmorphism negro */}
+                        <motion.div 
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: 0.3 }}
+                          className="mt-6 relative overflow-hidden"
+                        >
+                          <div className="relative bg-black/40 backdrop-blur-xl border border-white/10 rounded-2xl p-6 shadow-2xl">
+                            {/* Efecto de brillo sutil */}
+                            <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-white/5 pointer-events-none" />
+                            
+                            <div className="relative z-10">
+                              <div className="flex items-center gap-3 mb-4">
+                                <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center">
+                                  <Info className="w-5 h-5 text-white" />
+                                </div>
+                                <h4 className="text-white font-semibold text-lg">Información importante</h4>
+                              </div>
+                              
+                              <ul className="space-y-3 text-white/90">
+                                <li className="flex items-start gap-2">
+                                  <span className="text-primary mt-1">•</span>
+                                  <span>Las citas deben agendarse con al menos 1 hora de anticipación</span>
+                                </li>
+                                <li className="flex items-start gap-2">
+                                  <span className="text-primary mt-1">•</span>
+                                  <span>Duración de la consulta: 45 minutos</span>
+                                </li>
+                                <li className="flex items-start gap-2">
+                                  <span className="text-primary mt-1">•</span>
+                                  <span>Recibirás confirmación por email y WhatsApp</span>
+                                </li>
+                                <li className="flex items-start gap-2">
+                                  <span className="text-primary mt-1">•</span>
+                                  <span>Puedes reprogramar hasta 2 horas antes de la cita</span>
+                                </li>
                               </ul>
                             </div>
                           </div>
-                        </div>
+                        </motion.div>
                       </div>
                     )}
                     
@@ -668,9 +672,240 @@ export default function AgendamientoPage() {
                       </button>
                       <button
                         type="submit"
-                        className="flex-1 bg-gradient-to-r from-primary to-primary/80 text-white py-3 px-6 rounded-lg font-semibold hover:from-primary/90 hover:to-primary/70 transition-all"
+                        onClick={() => {
+                          // Guardar datos en localStorage para la página de pago
+                          const paymentData = {
+                            service: service.name,
+                            category: service.category,
+                            price: service.price,
+                            fecha: selectedDate,
+                            hora: selectedTime,
+                            tipo_reunion: selectedMeetingType,
+                            cliente: {
+                              nombre: formData.nombre,
+                              email: formData.email,
+                              telefono: formData.telefono,
+                              empresa: formData.empresa
+                            },
+                            descripcion: formData.descripcion,
+                            id: Date.now().toString()
+                          };
+                          localStorage.setItem('paymentData', JSON.stringify(paymentData));
+                          window.location.href = '/pago';
+                        }}
+                        className="flex-1 bg-gradient-to-r from-primary to-primary/80 text-white py-3 px-6 rounded-lg font-semibold hover:from-primary/90 hover:to-primary/70 transition-all flex items-center justify-center gap-2"
                       >
-                        Confirmar Agendamiento
+                        <CreditCard className="w-5 h-5" />
+                        Proceder al Pago
+                      </button>
+                    </div>
+                  </motion.div>
+                )}
+
+                {/* Paso 4: Pago */}
+                {step === 4 && (
+                  <motion.div
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    className="bg-white/5 backdrop-blur-sm rounded-2xl p-8 border border-white/10"
+                  >
+                    <h2 className="text-2xl font-bold mb-6 flex items-center gap-3 text-foreground">
+                      <CreditCard className="w-6 h-6 text-primary" />
+                      Método de Pago
+                    </h2>
+                    
+                    {/* Resumen del Servicio */}
+                    <div className="bg-gradient-to-r from-primary/10 to-primary/5 border border-primary/30 rounded-xl p-6 mb-8">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h3 className="text-xl font-bold text-primary">{service.name}</h3>
+                          <p className="text-sm text-muted-foreground">{service.category}</p>
+                          <div className="text-2xl font-bold text-foreground mt-2">
+                            ${service.price}
+                            {service.originalPrice && (
+                              <span className="text-lg text-muted-foreground line-through ml-2">
+                                ${service.originalPrice}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        {service.discount && (
+                          <div className="bg-gradient-to-r from-yellow-400 to-orange-500 text-black text-xs font-bold px-3 py-1 rounded-full">
+                            {service.discount}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Opciones de Pago */}
+                    <div className="space-y-4 mb-8">
+                      <h3 className="text-lg font-semibold text-foreground mb-4">Selecciona tu método de pago</h3>
+                      
+                      {/* Transferencia Electrónica - Tarjeta Premium */}
+                      <motion.div
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={() => setShowBankTransfer(true)}
+                        className="relative bg-gradient-to-br from-amber-500/10 via-amber-600/5 to-amber-700/10 border border-amber-500/30 rounded-xl p-6 cursor-pointer group overflow-hidden"
+                      >
+                        {/* Efecto de brillo premium */}
+                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-amber-400/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 transform -skew-x-12 group-hover:translate-x-full" />
+                        
+                        <div className="relative z-10 flex items-center gap-4">
+                          <div className="w-12 h-12 bg-gradient-to-br from-amber-400 to-amber-600 rounded-xl flex items-center justify-center shadow-lg shadow-amber-500/30">
+                            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                            </svg>
+                          </div>
+                          <div className="flex-1">
+                            <h4 className="font-semibold text-foreground group-hover:text-amber-400 transition-colors">Transferencia Electrónica</h4>
+                            <p className="text-sm text-muted-foreground">Pago directo desde tu banco • Inmediato</p>
+                          </div>
+                          <motion.div
+                            animate={{ scale: [1, 1.1, 1] }}
+                            transition={{ duration: 2, repeat: Infinity }}
+                            className="bg-gradient-to-r from-green-400 to-green-500 text-white text-sm font-bold px-3 py-1 rounded-full shadow-lg shadow-green-500/30"
+                          >
+                            Recomendado
+                          </motion.div>
+                        </div>
+                      </motion.div>
+
+                      {/* Transbank */}
+                      <div className="bg-white/5 border border-white/20 rounded-xl p-6 opacity-60 cursor-not-allowed group">
+                        <div className="flex items-center gap-4">
+                          <div className="w-12 h-12 bg-red-500/20 rounded-xl flex items-center justify-center">
+                            <svg className="w-6 h-6 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                            </svg>
+                          </div>
+                          <div className="flex-1">
+                            <h4 className="font-semibold text-foreground">Transbank</h4>
+                            <p className="text-sm text-muted-foreground">Tarjetas de crédito y débito • Seguro</p>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <img src="/visa.svg" alt="Visa" className="h-6" />
+                            <img src="/mastercard.svg" alt="Mastercard" className="h-6" />
+                          </div>
+                          <div className="text-orange-400 text-xs font-semibold bg-orange-400/20 px-2 py-1 rounded-full">
+                            Próximamente
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* MercadoPago */}
+                      <div className="bg-white/5 border border-white/20 rounded-xl p-6 hover:border-primary/50 transition-all cursor-pointer group">
+                        <div className="flex items-center gap-4">
+                          <div className="w-12 h-12 bg-blue-400/20 rounded-xl flex items-center justify-center">
+                            <svg className="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                            </svg>
+                          </div>
+                          <div className="flex-1">
+                            <h4 className="font-semibold text-foreground group-hover:text-primary transition-colors">MercadoPago</h4>
+                            <p className="text-sm text-muted-foreground">Pago en cuotas disponible • Flexible</p>
+                          </div>
+                          <div className="text-blue-400 text-xs font-semibold bg-blue-400/20 px-2 py-1 rounded-full">
+                            Hasta 12 cuotas
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Bitcoin */}
+                      <div className="bg-white/5 border border-white/20 rounded-xl p-6 hover:border-primary/50 transition-all cursor-pointer group opacity-60">
+                        <div className="flex items-center gap-4">
+                          <div className="w-12 h-12 bg-orange-500/20 rounded-xl flex items-center justify-center">
+                            <svg className="w-6 h-6 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                            </svg>
+                          </div>
+                          <div className="flex-1">
+                            <h4 className="font-semibold text-foreground">Bitcoin</h4>
+                            <p className="text-sm text-muted-foreground">Pago con criptomonedas</p>
+                          </div>
+                          <div className="text-orange-400 text-xs font-semibold bg-orange-400/20 px-2 py-1 rounded-full">
+                            Próximamente
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Modal de Transferencia Bancaria 3D */}
+                    {showBankTransfer && (
+                      <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+                        onClick={() => setShowBankTransfer(false)}
+                      >
+                        <motion.div
+                          initial={{ scale: 0.9, opacity: 0 }}
+                          animate={{ scale: 1, opacity: 1 }}
+                          exit={{ scale: 0.9, opacity: 0 }}
+                          onClick={(e) => e.stopPropagation()}
+                          className="relative max-w-4xl w-full"
+                        >
+                          <button
+                            onClick={() => setShowBankTransfer(false)}
+                            className="absolute top-4 right-4 z-10 p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+                          >
+                            <X className="w-6 h-6 text-white" />
+                          </button>
+                          <BankTransferCard3D
+                            onTransferComplete={() => {
+                              setShowBankTransfer(false);
+                              // Aquí puedes agregar lógica adicional para el pago
+                              window.location.href = '/pago';
+                            }}
+                          />
+                        </motion.div>
+                      </motion.div>
+                    )}
+
+                    <div className="flex gap-4">
+                      <button
+                        type="button"
+                        onClick={() => setStep(3)}
+                        className="flex-1 bg-white/10 text-white py-3 px-6 rounded-lg font-semibold hover:bg-white/20 transition-colors"
+                      >
+                        Anterior
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const paymentData = {
+                            ...formData,
+                            service: service.name,
+                            price: service.price,
+                            category: service.category,
+                            fecha: selectedDate,
+                            hora: selectedTime,
+                            tipo_reunion: selectedMeetingType,
+                            descripcion: formData.descripcion,
+                            id: Date.now().toString()
+                          };
+                          
+                          // Si el precio es 0, guardar directamente sin pago
+                          if (service.price === '0') {
+                            // Guardar en localStorage para simular el flujo
+                            localStorage.setItem('paymentData', JSON.stringify({
+                              ...paymentData,
+                              paymentMethod: 'gratis',
+                              paymentStatus: 'completed'
+                            }));
+                            // Ir directamente a la página de éxito
+                            window.location.href = '/payment-success';
+                          } else {
+                            // Flujo normal de pago
+                          localStorage.setItem('paymentData', JSON.stringify(paymentData));
+                          window.location.href = '/pago';
+                          }
+                        }}
+                        className="flex-1 bg-gradient-to-r from-primary to-primary/80 text-white py-3 px-6 rounded-lg font-semibold hover:from-primary/90 hover:to-primary/70 transition-all flex items-center justify-center gap-2"
+                      >
+                        <CreditCard className="w-5 h-5" />
+                        {service.price === '0' ? 'Confirmar Reserva Gratis' : 'Proceder al Pago'}
                       </button>
                     </div>
                   </motion.div>

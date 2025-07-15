@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { HomeIcon, FileText, Shield, TrendingUp, CheckCircle, Star, Clock, Award, AlertTriangle } from 'lucide-react'
+import { HomeIcon, FileText, Shield, TrendingUp, CheckCircle, Star, Clock, Award, AlertTriangle, ArrowRight, Calendar } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import SEO from '../components/SEO'
 
@@ -614,39 +614,264 @@ export default function ServicioInmobiliarioPage() {
           </div>
         </section>
 
-        {/* CTA Section */}
-        <section className="py-20">
+        {/* Sección de Actualidad */}
+        <section className="py-20 bg-gradient-to-b from-background/50 to-background">
           <div className="container mx-auto px-4">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-primary to-primary/80 p-12 text-center"
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-center mb-12"
             >
-              <div className="absolute inset-0 bg-grid-white/10" />
-              
-              <div className="relative z-10 max-w-3xl mx-auto">
-                <h2 className="text-4xl font-bold text-white mb-4">
-                  ¿Vas a Comprar o Vender una Propiedad?
-                </h2>
-                <p className="text-xl text-white/90 mb-8">
-                  No arriesgues tu patrimonio. Solicita un estudio de títulos profesional
-                </p>
-                
-                <div className="flex flex-wrap gap-4 justify-center">
-                  <Link
-                    to="/contacto"
-                    className="px-8 py-4 bg-white text-primary rounded-xl font-semibold hover:bg-white/90 transition-all duration-300 shadow-lg hover:shadow-xl"
-                  >
-                    Solicitar Estudio
-                  </Link>
-                  <a
-                    href="tel:+56912345678"
-                    className="px-8 py-4 bg-white/20 backdrop-blur-sm text-white rounded-xl font-semibold hover:bg-white/30 transition-all duration-300 border border-white/30"
-                  >
-                    Llamar Ahora
-                  </a>
+              <h2 className="text-3xl lg:text-4xl font-bold mb-4">
+                Actualidad en Derecho Inmobiliario
+              </h2>
+              <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+                Mantente al día con las últimas regulaciones del mercado inmobiliario
+              </p>
+            </motion.div>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+              {/* Artículo 1 */}
+              <motion.article
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.1 }}
+                className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:border-primary/30 transition-all group"
+              >
+                <div className="flex items-center gap-2 mb-4">
+                  <span className="px-3 py-1 bg-red-500/20 text-red-400 rounded-full text-xs font-semibold">
+                    URGENTE
+                  </span>
+                  <span className="text-xs text-muted-foreground">Arriendos</span>
                 </div>
+                <h3 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors">
+                  Nueva Ley de Arriendos 2025
+                </h3>
+                <div className="flex items-center gap-4 text-sm text-muted-foreground mb-3">
+                  <span>24 Enero 2025</span>
+                  <span>• 8 min</span>
+                </div>
+                <p className="text-muted-foreground mb-4">
+                  Cambios significativos en los contratos de arriendo y nuevos derechos para arrendatarios...
+                </p>
+                <Link 
+                  to="/blog/nueva-ley-arriendos-2025"
+                  className="text-primary hover:text-primary/80 font-medium flex items-center gap-2 group/link"
+                >
+                  Leer más 
+                  <ArrowRight className="w-4 h-4 group-hover/link:translate-x-1 transition-transform" />
+                </Link>
+              </motion.article>
+
+              {/* Artículo 2 */}
+              <motion.article
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.2 }}
+                className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:border-primary/30 transition-all group"
+              >
+                <div className="flex items-center gap-2 mb-4">
+                  <span className="px-3 py-1 bg-red-500/20 text-red-400 rounded-full text-xs font-semibold">
+                    URGENTE
+                  </span>
+                  <span className="text-xs text-muted-foreground">Compraventa</span>
+                </div>
+                <h3 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors">
+                  IVA en Viviendas: Cambios Tributarios
+                </h3>
+                <div className="flex items-center gap-4 text-sm text-muted-foreground mb-3">
+                  <span>22 Enero 2025</span>
+                  <span>• 6 min</span>
+                </div>
+                <p className="text-muted-foreground mb-4">
+                  Modificaciones al IVA en la venta de propiedades nuevas y su impacto en el mercado...
+                </p>
+                <Link 
+                  to="/blog/iva-viviendas-2025"
+                  className="text-primary hover:text-primary/80 font-medium flex items-center gap-2 group/link"
+                >
+                  Leer más 
+                  <ArrowRight className="w-4 h-4 group-hover/link:translate-x-1 transition-transform" />
+                </Link>
+              </motion.article>
+
+              {/* Artículo 3 */}
+              <motion.article
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.3 }}
+                className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:border-primary/30 transition-all group"
+              >
+                <div className="flex items-center gap-2 mb-4">
+                  <span className="text-xs text-muted-foreground">Hipotecas</span>
+                </div>
+                <h3 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors">
+                  Tasas Hipotecarias: Nuevos Límites
+                </h3>
+                <div className="flex items-center gap-4 text-sm text-muted-foreground mb-3">
+                  <span>20 Enero 2025</span>
+                  <span>• 5 min</span>
+                </div>
+                <p className="text-muted-foreground mb-4">
+                  Banco Central establece nuevos límites para tasas de interés en créditos hipotecarios...
+                </p>
+                <Link 
+                  to="/blog/tasas-hipotecarias-2025"
+                  className="text-primary hover:text-primary/80 font-medium flex items-center gap-2 group/link"
+                >
+                  Leer más 
+                  <ArrowRight className="w-4 h-4 group-hover/link:translate-x-1 transition-transform" />
+                </Link>
+              </motion.article>
+
+              {/* Artículo 4 */}
+              <motion.article
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.4 }}
+                className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:border-primary/30 transition-all group"
+              >
+                <div className="flex items-center gap-2 mb-4">
+                  <span className="px-3 py-1 bg-red-500/20 text-red-400 rounded-full text-xs font-semibold">
+                    URGENTE
+                  </span>
+                  <span className="text-xs text-muted-foreground">Condominios</span>
+                </div>
+                <h3 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors">
+                  Ley de Copropiedad: Reforma Total
+                </h3>
+                <div className="flex items-center gap-4 text-sm text-muted-foreground mb-3">
+                  <span>18 Enero 2025</span>
+                  <span>• 10 min</span>
+                </div>
+                <p className="text-muted-foreground mb-4">
+                  Cambios profundos en la administración de edificios y condominios...
+                </p>
+                <Link 
+                  to="/blog/reforma-copropiedad-2025"
+                  className="text-primary hover:text-primary/80 font-medium flex items-center gap-2 group/link"
+                >
+                  Leer más 
+                  <ArrowRight className="w-4 h-4 group-hover/link:translate-x-1 transition-transform" />
+                </Link>
+              </motion.article>
+
+              {/* Artículo 5 */}
+              <motion.article
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.5 }}
+                className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:border-primary/30 transition-all group"
+              >
+                <div className="flex items-center gap-2 mb-4">
+                  <span className="text-xs text-muted-foreground">Inversiones</span>
+                </div>
+                <h3 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors">
+                  REITs en Chile: Marco Regulatorio
+                </h3>
+                <div className="flex items-center gap-4 text-sm text-muted-foreground mb-3">
+                  <span>16 Enero 2025</span>
+                  <span>• 7 min</span>
+                </div>
+                <p className="text-muted-foreground mb-4">
+                  Nueva normativa para fondos de inversión inmobiliaria y su tributación...
+                </p>
+                  <Link
+                  to="/blog/reits-chile-2025"
+                  className="text-primary hover:text-primary/80 font-medium flex items-center gap-2 group/link"
+                  >
+                  Leer más 
+                  <ArrowRight className="w-4 h-4 group-hover/link:translate-x-1 transition-transform" />
+                  </Link>
+              </motion.article>
+
+              {/* Artículo 6 */}
+              <motion.article
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.6 }}
+                className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:border-primary/30 transition-all group"
+              >
+                <div className="flex items-center gap-2 mb-4">
+                  <span className="text-xs text-muted-foreground">Urbanismo</span>
+                </div>
+                <h3 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors">
+                  Planos Reguladores: Actualizaciones
+                </h3>
+                <div className="flex items-center gap-4 text-sm text-muted-foreground mb-3">
+                  <span>14 Enero 2025</span>
+                  <span>• 4 min</span>
+                </div>
+                <p className="text-muted-foreground mb-4">
+                  Cambios en normativas de construcción y uso de suelo en principales ciudades...
+                </p>
+                <Link 
+                  to="/blog/planos-reguladores-2025"
+                  className="text-primary hover:text-primary/80 font-medium flex items-center gap-2 group/link"
+                >
+                  Leer más 
+                  <ArrowRight className="w-4 h-4 group-hover/link:translate-x-1 transition-transform" />
+                </Link>
+              </motion.article>
+            </div>
+
+            {/* Botón Ver Todos */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-center"
+            >
+              <Link
+                to="/blog/categoria/inmobiliario"
+                className="inline-flex items-center gap-2 bg-primary/10 hover:bg-primary/20 text-primary px-6 py-3 rounded-xl font-semibold transition-all"
+              >
+                Ver Todos los Artículos Inmobiliarios
+                <ArrowRight className="w-5 h-5" />
+              </Link>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* CTA Final */}
+        <section className="py-20 bg-gradient-to-r from-primary/10 to-primary/5">
+          <div className="container mx-auto px-4">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              className="max-w-4xl mx-auto text-center"
+            >
+              <h2 className="text-3xl lg:text-4xl font-bold mb-6">
+                ¿Listo para Proteger tu Inversión Inmobiliaria?
+              </h2>
+              <p className="text-xl text-muted-foreground mb-8">
+                No dejes que problemas legales afecten tu patrimonio inmobiliario
+              </p>
+              
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Link
+                  to="/agendamiento?plan=inmobiliario"
+                  className="bg-primary text-white px-8 py-4 rounded-xl font-semibold hover:bg-primary/90 transition-all inline-flex items-center gap-2"
+                >
+                  <Calendar className="w-5 h-5" />
+                  Consulta Inmobiliaria
+                </Link>
+                
+                <Link
+                  to="/generador-contratos-inmobiliarios"
+                  className="bg-white/10 backdrop-blur-sm text-foreground px-8 py-4 rounded-xl font-semibold hover:bg-white/20 transition-all inline-flex items-center gap-2 border border-white/20"
+                >
+                  <FileText className="w-5 h-5" />
+                  Generador Automático
+                </Link>
               </div>
             </motion.div>
           </div>

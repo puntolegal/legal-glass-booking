@@ -1,285 +1,843 @@
-import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Calendar, Clock, CheckCircle, ArrowLeft, CreditCard, Shield, Zap } from 'lucide-react';
-import { getServicePricing, formatPrice, type ServicePricing } from '@/config/pricing';
-import { MobileLayout } from '@/components/MobileLayout';
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Link } from 'react-router-dom';
+import { 
+  CreditCard, 
+  ArrowLeft, 
+  CheckCircle, 
+  Shield,
+  Copy,
+  Clock,
+  AlertCircle,
+  Info,
+  ExternalLink,
+  Sparkles,
+  Crown,
+  Lock,
+  Banknote,
+  Smartphone,
+  Monitor,
+  Phone,
+  User,
+  MessageCircle
+} from 'lucide-react';
+import SEO from '../components/SEO';
+import { MobileFloatingNav } from '../components/MobileFloatingNav';
 
 export default function PaymentPage() {
-  const { serviceId } = useParams<{ serviceId: string }>();
-  const navigate = useNavigate();
-  const [service, setService] = useState<ServicePricing | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    phone: '',
-    rut: '',
-    acceptTerms: false,
-    acceptPrivacy: false
-  });
+  const [paymentData, setPaymentData] = useState<any>(null);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>('');
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [copiedText, setCopiedText] = useState<string>('');
 
   useEffect(() => {
-    if (serviceId) {
-      const serviceData = getServicePricing(serviceId);
-      if (serviceData) {
-        setService(serviceData);
+    // Recuperar datos del localStorage
+    const data = localStorage.getItem('paymentData');
+    if (data) {
+      setPaymentData(JSON.parse(data));
       } else {
-        navigate('/');
+      // Si no hay datos, redirigir al agendamiento
+      window.location.href = '/agendamiento';
+    }
+  }, []);
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('es-CL', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  };
+
+  const handlePaymentMethod = async (method: string) => {
+    setSelectedPaymentMethod(method);
+    setIsProcessing(true);
+
+    // Simular procesamiento
+    setTimeout(async () => {
+      if (method === 'transfer') {
+        // Mostrar datos de transferencia
+        setIsProcessing(false);
+      } else if (method === 'transbank') {
+        // Preparar datos para Transbank
+        const transbankData = {
+          amount: paymentData.price.replace(/\./g, ''),
+          orderId: `PL-${Date.now()}`,
+          sessionId: paymentData.id || Date.now().toString(),
+          returnUrl: `${window.location.origin}/payment-success?method=transbank`,
+          cancelUrl: `${window.location.origin}/pago`
+        };
+        
+        // Guardar datos en localStorage para recuperar después
+        localStorage.setItem('transbankPayment', JSON.stringify({
+          ...paymentData,
+          transbankData
+        }));
+        
+        // En producción, aquí se haría la integración real con Transbank
+        // Por ahora simulamos el flujo
+        setIsProcessing(false);
+        
+        // Mostrar modal de Transbank simulado
+        setSelectedPaymentMethod('transbank-process');
       }
-    }
-  }, [serviceId, navigate]);
-
-  const handleInputChange = (field: string, value: string | boolean) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
-    }));
+    }, 1500);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!formData.acceptTerms || !formData.acceptPrivacy) {
-      alert('Debes aceptar los términos y condiciones y la política de privacidad');
-      return;
-    }
-
-    setLoading(true);
-    
-    try {
-      // Aquí iría la integración con la pasarela de pago
-      console.log('Procesando pago:', {
-        service,
-        customer: formData
-      });
-      
-      // Simular procesamiento de pago
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Redirigir a página de confirmación
-      navigate(`/payment-success/${serviceId}`);
-    } catch (error) {
-      console.error('Error en el pago:', error);
-      alert('Error al procesar el pago. Por favor, intenta nuevamente.');
-    } finally {
-      setLoading(false);
-    }
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    setCopiedText(text);
+    // Limpiar el estado después de 2 segundos
+    setTimeout(() => setCopiedText(''), 2000);
   };
 
-  if (!service) {
+  if (!paymentData) {
     return (
-      <MobileLayout>
-        <div className="min-h-screen flex items-center justify-center">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-            <p className="text-muted-foreground">Cargando servicio...</p>
-          </div>
+      <div className="min-h-screen bg-gradient-to-b from-background to-background/50 flex items-center justify-center relative overflow-hidden">
+        {/* Partículas de fondo */}
+        <div className="absolute inset-0 overflow-hidden">
+          {[...Array(6)].map((_, i) => (
+            <motion.div
+              key={i}
+              className="absolute w-2 h-2 bg-primary/20 rounded-full"
+              animate={{
+                x: [0, 100, 0],
+                y: [0, -100, 0],
+                opacity: [0, 0.8, 0],
+                scale: [0, 1, 0],
+              }}
+              transition={{
+                duration: 8 + i * 2,
+                repeat: Infinity,
+                delay: i * 1.5,
+                ease: "easeInOut"
+              }}
+              style={{
+                left: `${20 + i * 15}%`,
+                top: `${30 + i * 10}%`,
+              }}
+            />
+          ))}
         </div>
-      </MobileLayout>
+        
+        <motion.div 
+          className="text-center relative z-10"
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.8 }}
+        >
+          <div className="relative">
+            <motion.div 
+              className="w-24 h-24 border-4 border-primary/30 rounded-full mx-auto mb-6 relative"
+              animate={{ rotate: 360 }}
+              transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+            >
+              <div className="absolute inset-2 bg-gradient-to-br from-primary/20 to-primary/10 rounded-full backdrop-blur-sm" />
+              <div className="absolute inset-0 rounded-full border border-primary/50" />
+            </motion.div>
+            <motion.div
+              className="absolute inset-0 rounded-full"
+              animate={{ 
+                boxShadow: [
+                  "0 0 20px rgba(255, 107, 53, 0.3)",
+                  "0 0 40px rgba(255, 107, 53, 0.6)",
+                  "0 0 20px rgba(255, 107, 53, 0.3)"
+                ]
+              }}
+              transition={{ duration: 2, repeat: Infinity }}
+            />
+          </div>
+          <p className="text-muted-foreground text-lg">Cargando información de pago...</p>
+        </motion.div>
+        </div>
     );
   }
 
   return (
-    <MobileLayout>
-      <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
-        {/* Header */}
-        <div className="container mx-auto px-4 py-8">
-          <Button
-            variant="ghost"
-            onClick={() => navigate(-1)}
-            className="mb-6 group hover:bg-primary/10"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
-            Volver
-          </Button>
+    <>
+      <SEO 
+        title={`Pago - ${paymentData.service} - Punto Legal`}
+        description={`Completa el pago para tu consulta de ${paymentData.service}. Múltiples métodos de pago disponibles.`}
+      />
+      
+      <MobileFloatingNav />
+      
+      <div className="min-h-screen bg-gradient-to-b from-background to-background/50 pt-20 relative overflow-hidden">
+        {/* Partículas de fondo elegantes */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          {[...Array(8)].map((_, i) => (
+            <motion.div
+              key={i}
+              className="absolute w-1 h-1 bg-primary/10 rounded-full"
+              animate={{
+                x: [0, 200, 0],
+                y: [0, -200, 0],
+                opacity: [0, 0.6, 0],
+                scale: [0, 1, 0],
+              }}
+              transition={{
+                duration: 12 + i * 3,
+                repeat: Infinity,
+                delay: i * 2,
+                ease: "easeInOut"
+              }}
+              style={{
+                left: `${10 + i * 12}%`,
+                top: `${20 + i * 8}%`,
+              }}
+            />
+          ))}
+        </div>
 
-          <div className="max-w-4xl mx-auto">
-            <div className="grid lg:grid-cols-2 gap-8">
-              {/* Resumen del Servicio */}
-              <div className="space-y-6">
-                <Card className="glass-card border-primary/20">
-                  <CardHeader>
-                    <div className="flex items-center space-x-3">
-                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center">
-                        <Zap className="w-6 h-6 text-white" />
-                      </div>
-                      <div>
-                        <CardTitle className="text-xl">{service.title}</CardTitle>
-                        <CardDescription>{service.description}</CardDescription>
+        {/* Header Premium */}
+        <section className="py-16 border-b border-white/10 relative">
+          <div className="container mx-auto px-4">
+            <motion.div 
+              className="flex items-center gap-4 mb-8"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6 }}
+            >
+              <Link 
+                to="/agendamiento" 
+                className="group flex items-center gap-2 text-muted-foreground hover:text-primary transition-all duration-300"
+              >
+                <motion.div
+                  whileHover={{ x: -3 }}
+                  transition={{ type: "spring", stiffness: 400 }}
+                >
+                  <ArrowLeft className="w-5 h-5" />
+                </motion.div>
+                <span className="group-hover:translate-x-1 transition-transform duration-300">
+                  Volver al agendamiento
+                </span>
+              </Link>
+            </motion.div>
+            
+            <div className="max-w-4xl mx-auto text-center">
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.2 }}
+                className="relative"
+              >
+
+
+                {/* Efecto de brillo premium */}
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/5 to-transparent blur-3xl" />
+                
+                <h1 className="text-5xl lg:text-7xl font-bold mb-6 relative">
+                  <span className="bg-gradient-to-r from-primary via-amber-400 to-primary bg-clip-text text-transparent animate-gradient-x">
+                  Finalizar Pago
+                  </span>
+                </h1>
+                
+                <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto leading-relaxed">
+                  Completa tu pago para confirmar la consulta legal con nuestros expertos
+                </p>
+
+                {/* Indicadores de seguridad mejorados */}
+                <div className="flex flex-wrap items-center justify-center gap-4">
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 0.6 }}
+                    className="inline-flex items-center gap-2 bg-gradient-to-r from-green-500/10 to-emerald-500/10 text-green-400 px-6 py-3 rounded-full border border-green-500/20 backdrop-blur-xl shadow-lg shadow-green-500/10"
+                >
+                    <Shield className="w-5 h-5" />
+                    <span className="text-sm font-semibold">Pago 100% Seguro</span>
+                  </motion.div>
+                  
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: 0.7 }}
+                    className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-500/10 to-indigo-500/10 text-blue-400 px-6 py-3 rounded-full border border-blue-500/20 backdrop-blur-xl shadow-lg shadow-blue-500/10"
+                  >
+                    <Lock className="w-5 h-5" />
+                    <span className="text-sm font-semibold">SSL Encriptado</span>
+                  </motion.div>
+                  
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: 0.8 }}
+                    className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-500/10 to-pink-500/10 text-purple-400 px-6 py-3 rounded-full border border-purple-500/20 backdrop-blur-xl shadow-lg shadow-purple-500/10"
+                  >
+                    <Crown className="w-5 h-5" />
+                    <span className="text-sm font-semibold">Garantía Legal</span>
+                </motion.div>
+                </div>
+              </motion.div>
                       </div>
                     </div>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="flex items-center justify-between p-4 rounded-lg bg-primary/5 border border-primary/10">
-                      <div className="flex items-center space-x-2">
-                        <Clock className="w-4 h-4 text-primary" />
-                        <span className="text-sm text-muted-foreground">Duración</span>
+        </section>
+
+        {/* Contenido Principal */}
+        <section className="py-20">
+          <div className="container mx-auto px-4">
+            <div className="max-w-7xl mx-auto">
+              <div className="grid lg:grid-cols-3 gap-8">
+                
+                {/* Panel Izquierdo - Resumen Premium */}
+                <div className="lg:col-span-1">
+                  <motion.div
+                    initial={{ opacity: 0, x: -30 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.8, delay: 0.3 }}
+                    className="relative"
+                  >
+                    <div className="bg-white/5 backdrop-blur-xl rounded-3xl p-8 border border-white/10 sticky top-24 shadow-2xl">
+                      {/* Efecto de brillo */}
+                      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/10 rounded-3xl" />
+                      <div className="relative z-10">
+                        <div className="flex items-center gap-3 mb-8">
+                          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center">
+                            <Sparkles className="w-5 h-5 text-primary" />
                       </div>
-                      <span className="font-semibold">{service.duration}</span>
+                          <h3 className="text-2xl font-bold text-foreground">Resumen de tu consulta</h3>
                     </div>
 
-                    <div className="space-y-3">
-                      <h4 className="font-semibold text-primary">Incluye:</h4>
-                      {service.features?.map((feature, index) => (
-                        <div key={index} className="flex items-center space-x-3">
-                          <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
-                          <span className="text-sm">{feature}</span>
+                        {/* Servicio Premium */}
+                        <div className="bg-gradient-to-r from-primary/15 to-primary/5 border border-primary/30 rounded-2xl p-6 mb-8 relative overflow-hidden">
+                          <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-transparent opacity-50" />
+                          <div className="relative z-10">
+                            <h4 className="font-bold text-primary text-lg mb-2">{paymentData.service}</h4>
+                            <p className="text-sm text-muted-foreground mb-4">{paymentData.category}</p>
+                            <div className="text-3xl font-bold text-foreground">
+                              ${paymentData.price}
+                            </div>
+                          </div>
                         </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
 
-                {/* Información de Seguridad */}
-                <Card className="glass-card border-green-500/20">
-                  <CardHeader>
-                    <div className="flex items-center space-x-2">
-                      <Shield className="w-5 h-5 text-green-500" />
-                      <CardTitle className="text-lg">Pago Seguro</CardTitle>
+                        {/* Detalles de la cita */}
+                        <div className="space-y-6 mb-8">
+                          <div>
+                            <h5 className="font-semibold text-foreground mb-4 flex items-center gap-2">
+                              <Clock className="w-4 h-4 text-primary" />
+                              Detalles de la cita
+                            </h5>
+                            <div className="space-y-3 text-sm">
+                              <div className="flex justify-between items-center py-2 border-b border-white/5">
+                                <span className="text-muted-foreground">Fecha:</span>
+                                <span className="text-foreground font-medium">{formatDate(paymentData.fecha)}</span>
+                              </div>
+                              <div className="flex justify-between items-center py-2 border-b border-white/5">
+                                <span className="text-muted-foreground">Hora:</span>
+                                <span className="text-foreground font-medium">{paymentData.hora}</span>
                     </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-2 text-sm text-muted-foreground">
-                      <p>• Transacción encriptada SSL</p>
-                      <p>• Datos protegidos por ley</p>
-                      <p>• Sin almacenamiento de datos bancarios</p>
-                      <p>• Garantía de satisfacción</p>
+                              <div className="flex justify-between items-center py-2">
+                                <span className="text-muted-foreground">Modalidad:</span>
+                                <span className="text-foreground font-medium flex items-center gap-1">
+                                  {paymentData.tipo_reunion === 'presencial' ? (
+                                    <>
+                                      <Monitor className="w-3 h-3" />
+                                      Presencial
+                                    </>
+                                  ) : paymentData.tipo_reunion === 'videollamada' ? (
+                                    <>
+                                      <Smartphone className="w-3 h-3" />
+                                      Videollamada
+                                    </>
+                                  ) : (
+                                    <>
+                                      <Phone className="w-3 h-3" />
+                                      Telefónica
+                                    </>
+                                  )}
+                                </span>
                     </div>
-                  </CardContent>
-                </Card>
+                    </div>
               </div>
 
-              {/* Formulario de Pago */}
-              <div className="space-y-6">
-                <Card className="glass-card">
-                  <CardHeader>
-                    <div className="flex items-center space-x-2">
-                      <CreditCard className="w-5 h-5 text-primary" />
-                      <CardTitle>Información de Pago</CardTitle>
+                          <div>
+                            <h5 className="font-semibold text-foreground mb-4 flex items-center gap-2">
+                              <User className="w-4 h-4 text-primary" />
+                              Cliente
+                            </h5>
+                            <div className="space-y-2 text-sm">
+                              <div className="text-muted-foreground">{paymentData.cliente.nombre}</div>
+                              <div className="text-muted-foreground">{paymentData.cliente.email}</div>
+                              <div className="text-muted-foreground">{paymentData.cliente.telefono}</div>
+                            </div>
                     </div>
-                    <CardDescription>
-                      Completa tus datos para procesar el pago de {formatPrice(service.price)}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <form onSubmit={handleSubmit} className="space-y-4">
-                      {/* Datos Personales */}
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="firstName">Nombre *</Label>
-                          <Input
-                            id="firstName"
-                            value={formData.firstName}
-                            onChange={(e) => handleInputChange('firstName', e.target.value)}
-                            required
-                            className="glass"
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="lastName">Apellido *</Label>
-                          <Input
-                            id="lastName"
-                            value={formData.lastName}
-                            onChange={(e) => handleInputChange('lastName', e.target.value)}
-                            required
-                            className="glass"
-                          />
-                        </div>
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label htmlFor="email">Email *</Label>
-                        <Input
-                          id="email"
-                          type="email"
-                          value={formData.email}
-                          onChange={(e) => handleInputChange('email', e.target.value)}
-                          required
-                          className="glass"
-                        />
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label htmlFor="phone">Teléfono *</Label>
-                        <Input
-                          id="phone"
-                          type="tel"
-                          value={formData.phone}
-                          onChange={(e) => handleInputChange('phone', e.target.value)}
-                          required
-                          className="glass"
-                        />
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label htmlFor="rut">RUT *</Label>
-                        <Input
-                          id="rut"
-                          value={formData.rut}
-                          onChange={(e) => handleInputChange('rut', e.target.value)}
-                          placeholder="12.345.678-9"
-                          required
-                          className="glass"
-                        />
-                      </div>
-
-                      {/* Checkboxes */}
-                      <div className="space-y-3 pt-4">
-                        <div className="flex items-center space-x-2">
-                          <Checkbox
-                            id="acceptTerms"
-                            checked={formData.acceptTerms}
-                            onCheckedChange={(checked) => handleInputChange('acceptTerms', checked as boolean)}
-                          />
-                          <Label htmlFor="acceptTerms" className="text-sm">
-                            Acepto los <a href="#" className="text-primary hover:underline">términos y condiciones</a> *
-                          </Label>
                         </div>
 
-                        <div className="flex items-center space-x-2">
-                          <Checkbox
-                            id="acceptPrivacy"
-                            checked={formData.acceptPrivacy}
-                            onCheckedChange={(checked) => handleInputChange('acceptPrivacy', checked as boolean)}
-                          />
-                          <Label htmlFor="acceptPrivacy" className="text-sm">
-                            Acepto la <a href="#" className="text-primary hover:underline">política de privacidad</a> *
-                          </Label>
-                        </div>
-                      </div>
-
-                      {/* Botón de Pago */}
-                      <Button
-                        type="submit"
-                        disabled={loading}
-                        className="w-full cta-button-premium text-white py-4 text-lg font-semibold"
-                      >
-                        {loading ? (
-                          <div className="flex items-center space-x-2">
-                            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                            <span>Procesando pago...</span>
+                        {/* Información adicional */}
+                        <div className="bg-blue-500/10 border border-blue-500/20 rounded-2xl p-6">
+                          <div className="flex items-start gap-3">
+                            <Info className="w-5 h-5 text-blue-400 mt-0.5 flex-shrink-0" />
+                            <div className="text-sm">
+                              <p className="text-blue-300 font-medium mb-1">Información importante</p>
+                              <p className="text-blue-200/80">
+                                Tu consulta será confirmada una vez completado el pago. Recibirás un email con los detalles de la cita.
+                              </p>
+                            </div>
                           </div>
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+                </div>
+
+                {/* Panel Derecho - Métodos de Pago */}
+                <div className="lg:col-span-2">
+                  <motion.div
+                    initial={{ opacity: 0, x: 30 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.8, delay: 0.4 }}
+                    className="relative"
+                  >
+                    <div className="bg-white/5 backdrop-blur-xl rounded-3xl p-8 border border-white/10 shadow-2xl">
+                      {/* Efecto de brillo */}
+                      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/10 rounded-3xl" />
+                      <div className="relative z-10">
+                        <div className="flex items-center gap-3 mb-8">
+                          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center">
+                            <CreditCard className="w-6 h-6 text-primary" />
+                          </div>
+                          <h3 className="text-3xl font-bold text-foreground">Métodos de Pago</h3>
+                        </div>
+
+                        {/* Transferencia Electrónica */}
+                        {selectedPaymentMethod === 'transfer' && !isProcessing ? (
+                          <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.6 }}
+                            className="space-y-8"
+                          >
+                            {/* Header de Transferencia */}
+                            <div className="bg-gradient-to-r from-green-500/15 to-emerald-500/10 border border-green-500/30 rounded-2xl p-6 relative overflow-hidden">
+                              <div className="absolute inset-0 bg-gradient-to-r from-green-500/10 to-transparent opacity-50" />
+                              <div className="relative z-10">
+                                <div className="flex items-center gap-3 mb-4">
+                                  <div className="w-10 h-10 rounded-xl bg-green-500/20 flex items-center justify-center">
+                                    <Banknote className="w-5 h-5 text-green-400" />
+                                  </div>
+                                  <div>
+                                    <h4 className="text-xl font-bold text-green-400">Transferencia Electrónica</h4>
+                                    <p className="text-green-300/80 text-sm">Método recomendado - Sin comisiones</p>
+                                  </div>
+                                </div>
+                        </div>
+                      </div>
+
+                            <div className="grid lg:grid-cols-2 gap-8">
+                              {/* Datos bancarios */}
+                              <div className="space-y-6">
+                                <div className="flex items-center gap-3 mb-4">
+                                  <div className="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center">
+                                    <Lock className="w-4 h-4 text-blue-400" />
+                                  </div>
+                                  <h5 className="text-lg font-semibold text-foreground">Datos bancarios</h5>
+                      </div>
+
+                                <div className="space-y-4">
+                                  <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-4 border border-white/10 hover:border-primary/30 transition-all duration-300">
+                                    <div className="flex justify-between items-center">
+                                      <span className="text-sm text-muted-foreground">Titular:</span>
+                                      <div className="flex items-center gap-3">
+                                        <span className="font-semibold text-foreground">Benjamin Soza</span>
+                                        <motion.button 
+                                          onClick={() => copyToClipboard('Benjamin Soza')}
+                                          className={`p-2 rounded-lg transition-all duration-300 ${
+                                            copiedText === 'Benjamin Soza' 
+                                              ? 'bg-green-500/20 text-green-400' 
+                                              : 'bg-primary/10 text-primary hover:bg-primary/20'
+                                          }`}
+                                          whileHover={{ scale: 1.05 }}
+                                          whileTap={{ scale: 0.95 }}
+                                          title={copiedText === 'Benjamin Soza' ? '¡Copiado!' : 'Copiar titular'}
+                                        >
+                                          {copiedText === 'Benjamin Soza' ? 
+                                            <CheckCircle className="w-4 h-4" /> : 
+                                            <Copy className="w-4 h-4" />
+                                          }
+                                        </motion.button>
+                                      </div>
+                                    </div>
+                                  </div>
+
+                                  <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-4 border border-white/10 hover:border-primary/30 transition-all duration-300">
+                                    <div className="flex justify-between items-center">
+                                      <span className="text-sm text-muted-foreground">RUT:</span>
+                                      <div className="flex items-center gap-3">
+                                        <span className="font-semibold text-foreground">20.162.555-6</span>
+                                        <motion.button 
+                                          onClick={() => copyToClipboard('20.162.555-6')}
+                                          className={`p-2 rounded-lg transition-all duration-300 ${
+                                            copiedText === '20.162.555-6' 
+                                              ? 'bg-green-500/20 text-green-400' 
+                                              : 'bg-primary/10 text-primary hover:bg-primary/20'
+                                          }`}
+                                          whileHover={{ scale: 1.05 }}
+                                          whileTap={{ scale: 0.95 }}
+                                        >
+                                          {copiedText === '20.162.555-6' ? 
+                                            <CheckCircle className="w-4 h-4" /> : 
+                                            <Copy className="w-4 h-4" />
+                                          }
+                                        </motion.button>
+                                      </div>
+                                    </div>
+                                  </div>
+
+                                  <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-4 border border-white/10 hover:border-primary/30 transition-all duration-300">
+                                    <div className="flex justify-between items-center">
+                                      <span className="text-sm text-muted-foreground">Banco:</span>
+                                      <div className="flex items-center gap-3">
+                                        <span className="font-semibold text-foreground">Banco de Chile</span>
+                                        <motion.button 
+                                          onClick={() => copyToClipboard('Banco de Chile')}
+                                          className={`p-2 rounded-lg transition-all duration-300 ${
+                                            copiedText === 'Banco de Chile' 
+                                              ? 'bg-green-500/20 text-green-400' 
+                                              : 'bg-primary/10 text-primary hover:bg-primary/20'
+                                          }`}
+                                          whileHover={{ scale: 1.05 }}
+                                          whileTap={{ scale: 0.95 }}
+                                        >
+                                          {copiedText === 'Banco de Chile' ? 
+                                            <CheckCircle className="w-4 h-4" /> : 
+                                            <Copy className="w-4 h-4" />
+                                          }
+                                        </motion.button>
+                                      </div>
+                                    </div>
+                                  </div>
+
+                                  <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-4 border border-white/10 hover:border-primary/30 transition-all duration-300">
+                                    <div className="flex justify-between items-center">
+                                      <span className="text-sm text-muted-foreground">Cuenta:</span>
+                                      <div className="flex items-center gap-3">
+                                        <span className="font-semibold text-foreground">07-154-00711-07</span>
+                                        <motion.button 
+                                          onClick={() => copyToClipboard('07-154-00711-07')}
+                                          className={`p-2 rounded-lg transition-all duration-300 ${
+                                            copiedText === '07-154-00711-07' 
+                                              ? 'bg-green-500/20 text-green-400' 
+                                              : 'bg-primary/10 text-primary hover:bg-primary/20'
+                                          }`}
+                                          whileHover={{ scale: 1.05 }}
+                                          whileTap={{ scale: 0.95 }}
+                                        >
+                                          {copiedText === '07-154-00711-07' ? 
+                                            <CheckCircle className="w-4 h-4" /> : 
+                                            <Copy className="w-4 h-4" />
+                                          }
+                                        </motion.button>
+                                      </div>
+                                    </div>
+                                  </div>
+
+                                  <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-4 border border-white/10 hover:border-primary/30 transition-all duration-300">
+                                    <div className="flex justify-between items-center">
+                                      <span className="text-sm text-muted-foreground">Email:</span>
+                                      <div className="flex items-center gap-3">
+                                        <span className="font-semibold text-foreground">benja.soza@gmail.com</span>
+                                        <motion.button 
+                                          onClick={() => copyToClipboard('benja.soza@gmail.com')}
+                                          className={`p-2 rounded-lg transition-all duration-300 ${
+                                            copiedText === 'benja.soza@gmail.com' 
+                                              ? 'bg-green-500/20 text-green-400' 
+                                              : 'bg-primary/10 text-primary hover:bg-primary/20'
+                                          }`}
+                                          whileHover={{ scale: 1.05 }}
+                                          whileTap={{ scale: 0.95 }}
+                                        >
+                                          {copiedText === 'benja.soza@gmail.com' ? 
+                                            <CheckCircle className="w-4 h-4" /> : 
+                                            <Copy className="w-4 h-4" />
+                                          }
+                                        </motion.button>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+
+                                {/* Botón copiar todo */}
+                                <motion.button
+                                  onClick={() => {
+                                    const allData = `Titular: Benjamin Soza\nRUT: 20.162.555-6\nBanco: Banco de Chile\nCuenta: 07-154-00711-07\nEmail: benja.soza@gmail.com`;
+                                    copyToClipboard(allData);
+                                  }}
+                                  className={`w-full py-4 px-6 rounded-2xl font-semibold transition-all duration-300 flex items-center justify-center gap-3 ${
+                                    copiedText.includes('Titular: Benjamin Soza') 
+                                      ? 'bg-green-500/20 text-green-400 border border-green-500/30' 
+                                      : 'bg-primary/20 text-primary hover:bg-primary/30 border border-primary/30'
+                                  }`}
+                                  whileHover={{ scale: 1.02 }}
+                                  whileTap={{ scale: 0.98 }}
+                                >
+                                  {copiedText.includes('Titular: Benjamin Soza') ? 
+                                    <CheckCircle className="w-5 h-5" /> : 
+                                    <Copy className="w-5 h-5" />
+                                  }
+                                  {copiedText.includes('Titular: Benjamin Soza') ? '¡Datos copiados!' : 'Copiar todos los datos'}
+                                </motion.button>
+                              </div>
+
+                              {/* Instrucciones */}
+                              <div className="space-y-6">
+                                <div className="flex items-center gap-3 mb-4">
+                                  <div className="w-8 h-8 rounded-lg bg-amber-500/20 flex items-center justify-center">
+                                    <Info className="w-4 h-4 text-amber-400" />
+                                  </div>
+                                  <h5 className="text-lg font-semibold text-foreground">Instrucciones</h5>
+                      </div>
+
+                                <div className="space-y-4">
+                                  <div className="bg-amber-500/10 border border-amber-500/20 rounded-2xl p-4">
+                                    <div className="flex items-start gap-3">
+                                      <div className="w-6 h-6 rounded-full bg-amber-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                        <span className="text-amber-400 text-xs font-bold">1</span>
+                                      </div>
+                                      <div>
+                                        <p className="text-amber-300 font-medium mb-1">Realiza la transferencia</p>
+                                        <p className="text-amber-200/80 text-sm">
+                                          Usa los datos bancarios proporcionados para realizar la transferencia por el monto exacto.
+                                        </p>
+                                      </div>
+                                    </div>
+                      </div>
+
+                                  <div className="bg-blue-500/10 border border-blue-500/20 rounded-2xl p-4">
+                                    <div className="flex items-start gap-3">
+                                      <div className="w-6 h-6 rounded-full bg-blue-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                        <span className="text-blue-400 text-xs font-bold">2</span>
+                                      </div>
+                                      <div>
+                                        <p className="text-blue-300 font-medium mb-1">Envía el comprobante</p>
+                                        <p className="text-blue-200/80 text-sm">
+                                          Envía el comprobante de transferencia por WhatsApp para confirmar tu pago.
+                                        </p>
+                                      </div>
+                                    </div>
+                        </div>
+
+                                  <div className="bg-green-500/10 border border-green-500/20 rounded-2xl p-4">
+                                    <div className="flex items-start gap-3">
+                                      <div className="w-6 h-6 rounded-full bg-green-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                        <span className="text-green-400 text-xs font-bold">3</span>
+                                      </div>
+                                      <div>
+                                        <p className="text-green-300 font-medium mb-1">Confirma tu cita</p>
+                                        <p className="text-green-200/80 text-sm">
+                                          Recibirás confirmación inmediata y los detalles de tu consulta por email.
+                                        </p>
+                                      </div>
+                                    </div>
+                        </div>
+                      </div>
+
+                                {/* WhatsApp Button */}
+                                <motion.a
+                                  href={`https://wa.me/56962321883?text=${encodeURIComponent(
+                                    `Hola, acabo de realizar la transferencia por ${paymentData.service} - $${paymentData.price}. Adjunto comprobante.`
+                                  )}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="w-full py-4 px-6 bg-green-500 hover:bg-green-600 text-white rounded-2xl font-semibold transition-all duration-300 flex items-center justify-center gap-3 shadow-lg hover:shadow-xl"
+                                  whileHover={{ scale: 1.02 }}
+                                  whileTap={{ scale: 0.98 }}
+                                >
+                                  <MessageCircle className="w-5 h-5" />
+                                  Enviar comprobante por WhatsApp
+                                </motion.a>
+                              </div>
+                          </div>
+                          </motion.div>
                         ) : (
-                          <div className="flex items-center justify-center space-x-2">
-                            <CreditCard className="w-5 h-5" />
-                            <span>Pagar {formatPrice(service.price)}</span>
+                          <div className="space-y-6">
+                            {/* Transferencia Electrónica */}
+                            <motion.div 
+                              className={`bg-white/5 backdrop-blur-sm border rounded-2xl p-6 hover:border-primary/50 transition-all cursor-pointer group ${
+                                selectedPaymentMethod === 'transfer' ? 'border-primary/50 bg-primary/10' : 'border-white/20'
+                              }`}
+                              onClick={() => handlePaymentMethod('transfer')}
+                              whileHover={{ scale: 1.02 }}
+                              whileTap={{ scale: 0.98 }}
+                            >
+                              <div className="flex items-center gap-4">
+                                <div className="w-12 h-12 bg-gradient-to-br from-green-500/20 to-emerald-500/20 rounded-2xl flex items-center justify-center">
+                                  <Banknote className="w-6 h-6 text-green-400" />
+                                </div>
+                                <div className="flex-1">
+                                  <h4 className="font-semibold text-foreground group-hover:text-primary transition-colors">
+                                    Transferencia Electrónica
+                                  </h4>
+                                  <p className="text-sm text-muted-foreground">
+                                    Pago directo desde tu banco • Sin comisiones • Inmediato
+                                  </p>
+                                </div>
+                                <div className="flex items-center gap-3">
+                                  <div className="text-green-400 text-xs font-semibold bg-green-400/20 px-3 py-1 rounded-full">
+                                    Recomendado
+                                  </div>
+                                  <svg className="w-5 h-5 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                  </svg>
+                                </div>
+                              </div>
+                            </motion.div>
+
+                            {/* Transbank */}
+                            <motion.div 
+                              className={`bg-white/5 backdrop-blur-sm border rounded-2xl p-6 hover:border-primary/50 transition-all cursor-pointer group ${
+                                selectedPaymentMethod === 'transbank' ? 'border-primary/50 bg-primary/10' : 'border-white/20'
+                              }`}
+                              onClick={() => handlePaymentMethod('transbank')}
+                              whileHover={{ scale: 1.02 }}
+                              whileTap={{ scale: 0.98 }}
+                            >
+                              <div className="flex items-center gap-4">
+                                <div className="w-12 h-12 bg-gradient-to-br from-red-500/20 to-pink-500/20 rounded-2xl flex items-center justify-center">
+                                  <CreditCard className="w-6 h-6 text-red-400" />
+                                </div>
+                                <div className="flex-1">
+                                  <h4 className="font-semibold text-foreground group-hover:text-primary transition-colors">
+                                    Transbank
+                                  </h4>
+                                  <p className="text-sm text-muted-foreground">
+                                    Tarjetas de crédito y débito • Pago seguro • Instantáneo
+                                  </p>
+                                </div>
+                                <div className="flex items-center gap-3">
+                                  <div className="flex items-center gap-1">
+                                    <div className="w-8 h-5 bg-blue-600 rounded text-white text-xs flex items-center justify-center font-bold">
+                                      VISA
+                                    </div>
+                                    <div className="w-8 h-5 bg-red-500 rounded text-white text-xs flex items-center justify-center font-bold">
+                                      MC
+                                    </div>
+                                  </div>
+                                  <svg className="w-5 h-5 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                  </svg>
+                                </div>
+                              </div>
+                            </motion.div>
+
+                            {/* MercadoPago - Próximamente */}
+                            <div className="bg-white/5 border border-white/20 rounded-2xl p-6 opacity-60 cursor-not-allowed">
+                              <div className="flex items-center gap-4">
+                                <div className="w-12 h-12 bg-blue-400/20 rounded-2xl flex items-center justify-center">
+                                  <svg className="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                                  </svg>
+                                </div>
+                                <div className="flex-1">
+                                  <h4 className="font-semibold text-foreground">MercadoPago</h4>
+                                  <p className="text-sm text-muted-foreground">
+                                    Pago en cuotas sin interés • Múltiples opciones • Flexible
+                                  </p>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <div className="text-orange-400 text-xs font-semibold bg-orange-400/20 px-2 py-1 rounded-full">
+                                    Próximamente
+                                  </div>
+                                  <div className="text-blue-400 text-xs font-semibold bg-blue-400/20 px-2 py-1 rounded-full opacity-50">
+                                    Hasta 12 cuotas
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Bitcoin - Próximamente */}
+                            <div className="bg-white/5 border border-white/20 rounded-2xl p-6 opacity-60 cursor-not-allowed">
+                              <div className="flex items-center gap-4">
+                                <div className="w-12 h-12 bg-orange-500/20 rounded-2xl flex items-center justify-center">
+                                  <svg className="w-6 h-6 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                                  </svg>
+                                </div>
+                                <div className="flex-1">
+                                  <h4 className="font-semibold text-foreground">Bitcoin</h4>
+                                  <p className="text-sm text-muted-foreground">
+                                    Pago con criptomonedas • Sin intermediarios
+                                  </p>
+                                </div>
+                                <div className="text-orange-400 text-xs font-semibold bg-orange-400/20 px-2 py-1 rounded-full">
+                                  Próximamente
+                                </div>
+                              </div>
+                            </div>
                           </div>
                         )}
-                      </Button>
-                    </form>
-                  </CardContent>
-                </Card>
+
+                        {/* Loading State */}
+                        {isProcessing && (
+                          <div className="flex items-center justify-center py-12">
+                            <div className="text-center">
+                              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+                              <p className="text-muted-foreground">Procesando método de pago...</p>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Security Info */}
+                        <div className="mt-8 bg-green-500/10 border border-green-500/20 rounded-2xl p-6">
+                          <div className="flex items-start gap-3">
+                            <Shield className="w-5 h-5 text-green-400 mt-0.5 flex-shrink-0" />
+                            <div className="text-sm">
+                              <p className="text-green-400 font-semibold mb-1">Pago 100% Seguro</p>
+                              <p className="text-green-300 text-xs">
+                                Todos los métodos de pago cuentan con certificación SSL y encriptación de extremo a extremo. 
+                                Tu información financiera está completamente protegida.
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* FAQ Section */}
+                        <div className="mt-8 bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10">
+                          <h4 className="text-lg font-bold mb-4 text-foreground">Preguntas Frecuentes</h4>
+                          
+                          <div className="space-y-4">
+                            <div>
+                              <h5 className="font-semibold text-foreground mb-2">¿Cuánto tiempo tengo para realizar el pago?</h5>
+                              <p className="text-sm text-muted-foreground">
+                                Tu reserva se mantiene por 2 horas. Después de este tiempo, la cita se libera automáticamente.
+                              </p>
+                            </div>
+                            
+                            <div>
+                              <h5 className="font-semibold text-foreground mb-2">¿Puedo cancelar o reprogramar mi cita?</h5>
+                              <p className="text-sm text-muted-foreground">
+                                Sí, puedes cancelar o reprogramar hasta 4 horas antes de la cita sin costo adicional. 
+                                Contáctanos por WhatsApp para hacer cambios.
+                              </p>
+                            </div>
+                            
+                            <div>
+                              <h5 className="font-semibold text-foreground mb-2">¿Qué pasa si no puedo asistir a la cita?</h5>
+                              <p className="text-sm text-muted-foreground">
+                                Si no puedes asistir, puedes reprogramar sin costo hasta 4 horas antes. 
+                                Las inasistencias sin aviso no son reembolsables.
+                              </p>
+                            </div>
+                            
+                            <div>
+                              <h5 className="font-semibold text-foreground mb-2">¿Necesito tener documentos preparados?</h5>
+                              <p className="text-sm text-muted-foreground">
+                                Sí, te recomendamos tener todos los documentos relacionados con tu caso listos en formato digital. 
+                                Te enviaremos una lista específica según tu tipo de consulta.
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        </section>
       </div>
-    </MobileLayout>
+    </>
   );
 } 

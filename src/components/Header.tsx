@@ -9,11 +9,13 @@ import { useSidebar } from "@/contexts/SidebarContext";
 import { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 
+
 const Header = ({ onAgendarClick, serviceName }: { onAgendarClick?: () => void; serviceName?: string }) => {
   const { title, subtitle } = usePageTitle();
   const { isOpen, toggleSidebar } = useSidebar();
   const [isScrolled, setIsScrolled] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
+
   const { scrollY } = useScroll();
   const navigate = useNavigate();
   const location = useLocation();
@@ -45,7 +47,7 @@ const Header = ({ onAgendarClick, serviceName }: { onAgendarClick?: () => void; 
     { icon: Home, label: "Inicio", href: "/", color: "blue" },
     { icon: Scale, label: "Servicios", href: "/servicios", color: "purple", hasDropdown: true },
     { icon: FileText, label: "Blog", href: "/blog", color: "green" },
-    { icon: Phone, label: "Contacto", href: "/contacto", color: "orange" },
+    { icon: Phone, label: "¡Ayuda Legal Urgente!", href: "/urgente", color: "orange" },
   ];
 
   return (
@@ -167,9 +169,10 @@ const Header = ({ onAgendarClick, serviceName }: { onAgendarClick?: () => void; 
                       onClick={item.label === "Inicio" ? handleHomeClick : undefined}
                       className={`
                         relative flex items-center gap-2 px-3 py-2 rounded-xl transition-all duration-300
-                        text-foreground/70 hover:text-foreground
-                        hover:bg-white/10
-                        border border-transparent hover:border-white/20
+                        ${item.label === "¡Ayuda Legal Urgente!" 
+                          ? 'bg-gradient-to-r from-red-600 to-orange-500 text-white hover:from-red-700 hover:to-orange-600 border border-red-400/50 hover:border-red-300/70 shadow-lg shadow-red-500/40 hover:shadow-red-500/60 animate-pulse' 
+                          : 'text-foreground/70 hover:text-foreground hover:bg-white/10 border border-transparent hover:border-white/20'
+                        }
                         backdrop-blur-sm group cursor-pointer
                       `}
                     >
@@ -184,15 +187,30 @@ const Header = ({ onAgendarClick, serviceName }: { onAgendarClick?: () => void; 
                         whileTap={{ scale: 0.95 }}
                         transition={{ type: "spring", stiffness: 400, damping: 17 }}
                       >
-                        <item.icon className={`w-4 h-4 relative z-10 group-hover:text-primary transition-colors duration-300`} />
+                        <item.icon className={`w-4 h-4 relative z-10 ${item.label === "¡Ayuda Legal Urgente!" ? 'text-white' : 'group-hover:text-primary'} transition-colors duration-300`} />
                       </motion.div>
+                      
+                      {item.label === "¡Ayuda Legal Urgente!" && (
+                        <motion.div
+                          className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"
+                          animate={{ scale: [1, 1.5, 1], opacity: [1, 0.5, 1] }}
+                          transition={{ duration: 1, repeat: Infinity }}
+                        />
+                      )}
                      
                       <span className="text-xs font-medium relative z-10 hidden sm:inline">
                         {item.label}
                       </span>
                       
-                      {item.label !== "Inicio" && (
+                      {item.label !== "Inicio" && item.label !== "¡Ayuda Legal Urgente!" && (
                         <Link to={item.href} className="absolute inset-0" />
+                      )}
+                      {item.label === "¡Ayuda Legal Urgente!" && (
+                        <button 
+                          onClick={() => navigate('/agendamiento?plan=emergencia')}
+                          className="absolute inset-0"
+                          aria-label="Ir a agendamiento de emergencia legal"
+                        />
                       )}
                     </div>
                   </motion.div>
@@ -255,7 +273,8 @@ const Header = ({ onAgendarClick, serviceName }: { onAgendarClick?: () => void; 
                   if (onAgendarClick) {
                     onAgendarClick();
                   } else {
-                    navigate('/agendamiento');
+                    // Redirigir a consulta general por $35.000
+                    navigate('/agendamiento?plan=general');
                   }
                 }}
                 className="group relative overflow-hidden rounded-2xl bg-gradient-to-r from-primary via-primary/90 to-primary/80 px-4 py-2 text-white font-semibold text-sm shadow-lg hover:shadow-xl transition-all duration-300 border border-white/20"
@@ -363,6 +382,8 @@ const Header = ({ onAgendarClick, serviceName }: { onAgendarClick?: () => void; 
         }}
         transition={{ duration: 0.3 }}
       />
+
+
     </motion.header>
   );
 };

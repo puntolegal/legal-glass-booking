@@ -30,7 +30,7 @@ export const HORARIOS_DISPONIBLES = [
 ];
 
 // URL del webhook de Make (configurable)
-const MAKE_WEBHOOK_URL = process.env.VITE_MAKE_WEBHOOK_URL || 'https://hook.eu2.make.com/YOUR_WEBHOOK_ID';
+const MAKE_WEBHOOK_URL = process.env.VITE_MAKE_WEBHOOK_URL || 'https://hook.us2.make.com/qahisda8n5e6bh9my4f9fm6dkgdg71sq';
 
 // Función para crear una nueva reserva con integración Make
 export async function createReservation(reservationData: Omit<Reservation, 'id' | 'created_at'>): Promise<Reservation> {
@@ -64,29 +64,22 @@ export async function createReservation(reservationData: Omit<Reservation, 'id' 
 // Función para enviar datos a Make webhook
 export async function sendToMakeWebhook(reservation: Reservation, tipo: 'nueva_reserva' | 'recordatorio' | 'comprobante'): Promise<boolean> {
   try {
+    // Formato que espera Make.com según las instrucciones
     const webhookData = {
-      tipo_evento: tipo,
-      reserva: {
-        id: reservation.id,
+      cliente: {
         nombre: reservation.nombre,
         email: reservation.email,
-        telefono: reservation.telefono,
+        telefono: reservation.telefono
+      },
+      servicio: {
+        nombre: reservation.servicio || 'Consulta Legal',
+        precio: reservation.precio ? parseInt(reservation.precio) : 0,
+        duracion: 60 // duración en minutos
+      },
+      cita: {
         fecha: reservation.fecha,
         hora: reservation.hora,
-        servicio: reservation.servicio,
-        precio: reservation.precio,
-        categoria: reservation.categoria,
-        tipo_reunion: reservation.tipo_reunion,
-        estado: reservation.estado
-      },
-      timestamp: new Date().toISOString(),
-      // Datos adicionales para personalización
-      empresa: 'Punto Legal',
-      logo_url: 'https://tu-dominio.com/logo.png',
-      contacto: {
-        telefono: '+56962321883',
-        email: 'puntolegalelgolf@gmail.com',
-        whatsapp: 'https://wa.me/56962321883'
+        notas: reservation.descripcion || ''
       }
     };
 

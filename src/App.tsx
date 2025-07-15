@@ -21,6 +21,10 @@ import FamiliaPage from "./pages/FamiliaPage";
 import HerenciasPage from "./pages/HerenciasPage";
 import CorporativoPage from "./pages/CorporativoPage";
 import ContratosExpressPage from "./pages/ContratosExpressPage";
+import TributarioPage from "./pages/TributarioPage";
+import BlogTributario1 from "./pages/BlogTributario1";
+import BlogTributario2 from "./pages/BlogTributario2";
+import BlogTributario3 from "./pages/BlogTributario3";
 import MarcasPatentesPage from "./pages/MarcasPatentesPage";
 import SociedadesExpressPage from "./pages/SociedadesExpressPage";
 import ProteccionDatosPage from "./pages/ProteccionDatosPage";
@@ -42,11 +46,17 @@ import AgendamientoPage from "./pages/AgendamientoPage";
 // Nuevas páginas de servicios
 import ServicioCorporativoPage from "./pages/ServicioCorporativoPage";
 import ServicioDigitalPage from "./pages/ServicioDigitalPage";
+import ServicioInmobiliarioPage from "./pages/ServicioInmobiliarioPage";
+import ServicioCivilPage from "./pages/ServicioCivilPage";
+import ServicioPenalPage from "./pages/ServicioPenalPage";
+import ServicioTributarioPage from "./pages/ServicioTributarioPage";
+import ServicioPenalEconomicoPage from "./pages/ServicioPenalEconomicoPage";
 
 // Nuevas páginas de blog
 import BlogPost6 from "./pages/BlogPost6";
 import BlogPost7 from "./pages/BlogPost7";
 import BlogPost8 from "./pages/BlogPost8";
+import BlogPost9 from "./pages/BlogPost9";
 import BlogPage from "./pages/BlogPage";
 
 // Páginas legales
@@ -84,13 +94,24 @@ const App = () => (
           <Route path="/proteccion-datos" element={<ProteccionDatosPage />} />
           <Route path="/ecommerce-compliance" element={<ECommerceCompliancePage />} />
           <Route path="/reclamos-sernac" element={<ReclamosSernacPage />} />
+          <Route path="/tributario" element={<TributarioPage />} />
+          <Route path="/blog/reforma-tributaria-2024" element={<BlogTributario1 />} />
+          <Route path="/blog/beneficios-pyme" element={<BlogTributario2 />} />
+          <Route path="/blog/fiscalizacion-sii" element={<BlogTributario3 />} />
           
           {/* Nuevas rutas de servicios */}
           <Route path="/servicios/corporativo" element={<ServicioCorporativoPage />} />
           <Route path="/servicios/laboral" element={<LaboralPage />} />
           <Route path="/servicios/familia" element={<FamiliaPage />} />
           <Route path="/servicios/digital" element={<ServicioDigitalPage />} />
+          <Route path="/servicios/inmobiliario" element={<ServicioInmobiliarioPage />} />
+          <Route path="/servicios/civil" element={<ServicioCivilPage />} />
+          <Route path="/servicios/penal" element={<ServicioPenalPage />} />
+          <Route path="/servicios/tributario" element={<ServicioTributarioPage />} />
+          <Route path="/servicios/penal-economico" element={<ServicioPenalEconomicoPage />} />
+                          <Route path="/pago" element={<PaymentPage />} />
                           <Route path="/payment/:serviceId" element={<PaymentPage />} />
+                          <Route path="/payment-success" element={<PaymentSuccessPage />} />
                           <Route path="/payment-success/:serviceId" element={<PaymentSuccessPage />} />
                           <Route 
                             path="/admin" 
@@ -111,6 +132,14 @@ const App = () => (
                           <Route path="/blog/constituir-empresa-chile-2025" element={<BlogPost6 />} />
                           <Route path="/blog/divorcio-chile-2025" element={<BlogPost7 />} />
                           <Route path="/blog/compraventa-propiedades-guia" element={<BlogPost8 />} />
+                          <Route path="/blog/contratos-digitales-firma-electronica" element={<BlogPost9 />} />
+                          <Route path="/blog/evasion-fiscal-chile" element={<BlogTributario2 />} />
+                          <Route path="/blog/planificacion-tributaria-2024" element={<BlogTributario3 />} />
+                          <Route path="/blog-post-1" element={<BlogPost1 />} />
+                          <Route path="/blog-post-2" element={<BlogPost2 />} />
+                          <Route path="/blog-post-3" element={<BlogPost3 />} />
+                          <Route path="/blog-post-4" element={<BlogPost4 />} />
+                          <Route path="/blog-post-5" element={<BlogPost5 />} />
                           <Route path="/test" element={<TestPage />} />
                           <Route path="/agendamiento" element={<AgendamientoPage />} />
                           

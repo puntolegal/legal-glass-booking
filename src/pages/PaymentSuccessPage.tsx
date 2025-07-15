@@ -132,13 +132,7 @@ export default function PaymentSuccessPage() {
                     <span className="text-blue-700 group-hover:text-blue-800">puntolegalelgolf@gmail.com</span>
                   </a>
                   
-                  <a
-                    href="tel:+56962321883"
-                    className="flex items-center justify-center space-x-2 p-3 rounded-lg bg-green-500/10 hover:bg-green-500/20 border border-green-500/20 transition-all duration-200 group"
-                  >
-                    <Phone className="w-4 h-4 text-green-600" />
-                    <span className="text-green-700 group-hover:text-green-800">+569 6232 1883</span>
-                  </a>
+
                 </div>
               </CardContent>
             </Card>

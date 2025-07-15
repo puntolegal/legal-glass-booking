@@ -46,12 +46,6 @@ const navigationItems = [
 
 const contactItems = [
   {
-    title: "Llamar",
-    href: "tel:+56962321883",
-    icon: Phone,
-    text: "+569 6232 1883"
-  },
-  {
     title: "Email",
     href: "mailto:puntolegalelgolf@gmail.com",
     icon: Mail,
