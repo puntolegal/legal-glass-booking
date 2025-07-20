@@ -749,5 +749,5 @@ export default function Sidebar() {
         </div>
       </motion.aside>
     </>
-      )
-  }  
+  )
+} 

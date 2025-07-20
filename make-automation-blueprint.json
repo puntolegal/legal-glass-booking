@@ -1,184 +1,158 @@
 {
-  "name": "Punto Legal - Sistema de Notificaciones Completo",
-  "description": "Automatización completa para agendamiento de citas con notificaciones automáticas",
-  "version": "1.0.0",
-  "created": "2025-01-07T00:00:00.000Z",
-  "updated": "2025-01-07T00:00:00.000Z",
-  "scenario": {
-    "id": "punto-legal-automation",
-    "name": "Sistema de Notificaciones Completo",
-    "description": "Automatización para procesar citas y enviar notificaciones",
-    "modules": [
-      {
-        "id": "webhook-1",
-        "name": "Nueva Cita Recibida",
-        "type": "webhook",
-        "position": {
-          "x": 100,
-          "y": 200
+    "name": "Punto Legal - Sistema de Notificaciones Completo",
+    "flow": [
+        {
+            "id": "webhook_trigger",
+            "module": "webhook:webhook",
+            "metadata": {
+                "designer": {
+                    "x": 100,
+                    "y": 100
+                },
+                "webhook": {
+                    "url": "https://hook.eu2.make.com/YOUR_WEBHOOK_ID",
+                    "method": "POST",
+                    "headers": {
+                        "Content-Type": "application/json"
+                    }
+                }
+            }
         },
-        "config": {
-          "url": "{{webhook_url}}",
-          "method": "POST",
-          "response": "JSON",
-          "headers": {
-            "Content-Type": "application/json"
-          }
+        {
+            "id": "parse_data",
+            "module": "json:json",
+            "metadata": {
+                "designer": {
+                    "x": 300,
+                    "y": 100
+                },
+                "operation": "parse",
+                "source": "{{webhook_trigger.body}}"
+            }
         },
-        "data": {
-          "cliente": {
-            "nombre": "string",
-            "email": "string",
-            "telefono": "string"
-          },
-          "servicio": {
-            "nombre": "string",
-            "precio": "number",
-            "duracion": "number"
-          },
-          "cita": {
-            "fecha": "string",
-            "hora": "string",
-            "notas": "string"
-          }
+        {
+            "id": "validate_data",
+            "module": "filter:filter",
+            "metadata": {
+                "designer": {
+                    "x": 500,
+                    "y": 100
+                },
+                "conditions": [
+                    {
+                        "field": "{{parse_data.name}}",
+                        "operator": "isNotEmpty",
+                        "value": ""
+                    },
+                    {
+                        "field": "{{parse_data.email}}",
+                        "operator": "isNotEmpty",
+                        "value": ""
+                    },
+                    {
+                        "field": "{{parse_data.phone}}",
+                        "operator": "isNotEmpty",
+                        "value": ""
+                    }
+                ]
+            }
+        },
+        {
+            "id": "create_notification",
+            "module": "database:database",
+            "metadata": {
+                "designer": {
+                    "x": 700,
+                    "y": 100
+                },
+                "operation": "insert",
+                "table": "notifications",
+                "data": {
+                    "user_id": "{{parse_data.user_id}}",
+                    "type": "consultation_request",
+                    "title": "Nueva solicitud de consulta",
+                    "message": "Cliente {{parse_data.name}} solicitó una consulta para {{parse_data.service}}",
+                    "data": "{{parse_data}}",
+                    "status": "pending",
+                    "created_at": "{{now}}"
+                }
+            }
+        },
+        {
+            "id": "send_email_notification",
+            "module": "email:email",
+            "metadata": {
+                "designer": {
+                    "x": 900,
+                    "y": 100
+                },
+                "operation": "send",
+                "to": "admin@puntolegal.cl",
+                "subject": "Nueva solicitud de consulta - {{parse_data.name}}",
+                "body": "Se ha recibido una nueva solicitud de consulta:\n\nNombre: {{parse_data.name}}\nEmail: {{parse_data.email}}\nTeléfono: {{parse_data.phone}}\nServicio: {{parse_data.service}}\nFecha: {{parse_data.date}}\nHora: {{parse_data.time}}\nMensaje: {{parse_data.message}}\n\nResponder a: {{parse_data.email}}"
+            }
+        },
+        {
+            "id": "send_confirmation_email",
+            "module": "email:email",
+            "metadata": {
+                "designer": {
+                    "x": 900,
+                    "y": 300
+                },
+                "operation": "send",
+                "to": "{{parse_data.email}}",
+                "subject": "Confirmación de solicitud - Punto Legal",
+                "body": "Hola {{parse_data.name}},\n\nHemos recibido tu solicitud de consulta para {{parse_data.service}}.\n\nFecha solicitada: {{parse_data.date}}\nHora: {{parse_data.time}}\n\nNos pondremos en contacto contigo pronto para confirmar los detalles.\n\nSaludos,\nEquipo Punto Legal"
+            }
+        },
+        {
+            "id": "update_notification_status",
+            "module": "database:database",
+            "metadata": {
+                "designer": {
+                    "x": 1100,
+                    "y": 100
+                },
+                "operation": "update",
+                "table": "notifications",
+                "where": {
+                    "id": "{{create_notification.id}}"
+                },
+                "data": {
+                    "status": "processed",
+                    "processed_at": "{{now}}"
+                }
+            }
         }
-      },
-      {
-        "id": "google-calendar-1",
-        "name": "Crear Evento en Calendar",
-        "type": "google-calendar",
-        "position": {
-          "x": 400,
-          "y": 200
-        },
-        "config": {
-          "action": "createAnEvent",
-          "calendar": "primary",
-          "summary": "Consulta Legal - {{cliente.nombre}}",
-          "description": "Cliente: {{cliente.nombre}}\nEmail: {{cliente.email}}\nTeléfono: {{cliente.telefono}}\nServicio: {{servicio.nombre}}\nNotas: {{cita.notas}}",
-          "start": "{{cita.fecha}}T{{cita.hora}}:00",
-          "end": "{{cita.fecha}}T{{cita.hora}}:00",
-          "location": "Google Meet - Enlace será enviado por email",
-          "attendees": ["{{cliente.email}}"]
-        }
-      },
-      {
-        "id": "gmail-1",
-        "name": "Email Confirmación Cliente",
-        "type": "gmail",
-        "position": {
-          "x": 700,
-          "y": 200
-        },
-        "config": {
-          "action": "SendEmail",
-          "to": "{{cliente.email}}",
-          "subject": "Confirmación de Cita - Punto Legal",
-          "body": "{{email_template_confirmacion}}",
-          "isHtml": true
-        }
-      },
-      {
-        "id": "gmail-2",
-        "name": "Email Notificación Abogado",
-        "type": "gmail",
-        "position": {
-          "x": 700,
-          "y": 400
-        },
-        "config": {
-          "action": "SendEmail",
-          "to": "abogado@puntolegal.cl",
-          "subject": "Nueva Cita Programada - {{cliente.nombre}}",
-          "body": "{{email_template_abogado}}",
-          "isHtml": true
-        }
-      },
-      {
-        "id": "supabase-1",
-        "name": "Guardar en Base de Datos",
-        "type": "supabase",
-        "position": {
-          "x": 400,
-          "y": 400
-        },
-        "config": {
-          "action": "insertRecord",
-          "table": "reservations",
-          "data": {
-            "cliente_nombre": "{{cliente.nombre}}",
-            "cliente_email": "{{cliente.email}}",
-            "cliente_telefono": "{{cliente.telefono}}",
-            "servicio_nombre": "{{servicio.nombre}}",
-            "servicio_precio": "{{servicio.precio}}",
-            "cita_fecha": "{{cita.fecha}}",
-            "cita_hora": "{{cita.hora}}",
-            "cita_notas": "{{cita.notas}}",
-            "estado": "confirmada",
-            "created_at": "{{now}}"
-          }
-        }
-      }
     ],
-    "connections": [
-      {
-        "from": "webhook-1",
-        "to": "google-calendar-1",
-        "type": "success",
-        "label": "Nueva Reserva"
-      },
-      {
-        "from": "google-calendar-1",
-        "to": "gmail-1",
-        "type": "success",
-        "label": "Evento Creado"
-      },
-      {
-        "from": "gmail-1",
-        "to": "gmail-2",
-        "type": "success",
-        "label": "Notificación Abogado"
-      },
-      {
-        "from": "webhook-1",
-        "to": "supabase-1",
-        "type": "success",
-        "label": "Guardar Datos"
-      }
-    ],
-    "variables": {
-      "webhook_url": "https://hook.eu1.make.com/YOUR_WEBHOOK_ID",
-      "email_template_confirmacion": "<!DOCTYPE html><html><head><title>Confirmación de Cita</title></head><body><h1>¡Hola {{cliente.nombre}}!</h1><p>Tu cita ha sido confirmada para el {{cita.fecha}} a las {{cita.hora}}.</p><p>Servicio: {{servicio.nombre}}</p><p>Gracias por confiar en Punto Legal.</p></body></html>",
-      "email_template_abogado": "<!DOCTYPE html><html><head><title>Nueva Cita</title></head><body><h1>Nueva Cita Programada</h1><p><strong>Cliente:</strong> {{cliente.nombre}}</p><p><strong>Email:</strong> {{cliente.email}}</p><p><strong>Teléfono:</strong> {{cliente.telefono}}</p><p><strong>Servicio:</strong> {{servicio.nombre}}</p><p><strong>Fecha:</strong> {{cita.fecha}} {{cita.hora}}</p><p><strong>Notas:</strong> {{cita.notas}}</p></body></html>"
+    "metadata": {
+        "instant": false,
+        "version": 1,
+        "scenario": {
+            "roundtrips": 1,
+            "maxErrors": 3,
+            "autoCommit": true,
+            "autoCommitTriggerLast": true,
+            "sequential": false,
+            "slots": null,
+            "confidential": false,
+            "dataloss": false,
+            "dlq": false,
+            "freshVariables": false
+        },
+        "designer": {
+            "orphans": []
+        },
+        "zone": "us2.make.com",
+        "notes": [
+            "Este escenario procesa las solicitudes de consulta del webhook",
+            "1. Recibe datos del webhook",
+            "2. Valida que los campos requeridos estén presentes",
+            "3. Crea una notificación en la base de datos",
+            "4. Envía email al administrador",
+            "5. Envía email de confirmación al cliente",
+            "6. Actualiza el estado de la notificación"
+        ]
     }
-  },
-  "settings": {
-    "execution": {
-      "mode": "immediate",
-      "retry": {
-        "enabled": true,
-        "maxAttempts": 3,
-        "delay": 300
-      }
-    },
-    "notifications": {
-      "email": {
-        "enabled": true,
-        "address": "admin@puntolegal.cl"
-      },
-      "webhook": {
-        "enabled": false
-      }
-    }
-  },
-  "metadata": {
-    "author": "Punto Legal",
-    "version": "1.0.0",
-    "tags": ["legal", "appointments", "automation"],
-    "requirements": {
-      "google-calendar": "API access required",
-      "gmail": "SMTP access required",
-      "supabase": "Database connection required"
-    }
-  }
-} 
+}

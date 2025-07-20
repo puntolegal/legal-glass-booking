@@ -658,7 +658,7 @@ export default function ServicioCivilPage() {
                 viewport={{ once: true }}
                 transition={{ delay: 0.3 }}
                 className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:border-primary/30 transition-all group"
-              >
+                  >
                 <div className="flex items-center gap-2 mb-4">
                   <span className="text-xs text-muted-foreground">Prescripción</span>
                 </div>
@@ -804,11 +804,11 @@ export default function ServicioCivilPage() {
             >
               <h2 className="text-3xl lg:text-4xl font-bold mb-6">
                 ¿Listo para Resolver tu Conflicto Civil?
-              </h2>
+                </h2>
               <p className="text-xl text-muted-foreground mb-8">
                 No dejes que los problemas legales se agraven. Actúa ahora con asesoría experta
-              </p>
-              
+                </p>
+                
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link
                   to="/agendamiento?plan=civil"
