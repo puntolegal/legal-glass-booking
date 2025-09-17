@@ -401,23 +401,23 @@ const Footer: React.FC = () => {
               <h2 className="text-2xl font-bold">Punto Legal</h2>
             </div>
             <p className="text-gray-300 mb-6 leading-relaxed">
-              Soluciones jurídicas especializadas con más de 10 años de experiencia. 
-              Comprometidos con la excelencia y la satisfacción de nuestros clientes.
+              Startup legal chilena que democratiza el acceso a la justicia con tecnología. 
+              Creamos soluciones jurídicas modernas, accesibles y de alta calidad.
             </p>
             
-            {/* Estadísticas */}
+            {/* Valores Auténticos - Startup Chilena */}
             <div className="grid grid-cols-3 gap-4">
               <div className="text-center p-3 bg-white/5 rounded-lg">
-                <div className="text-2xl font-bold text-orange-400">1,247</div>
-                <div className="text-xs text-gray-400">Casos ganados</div>
+                <div className="text-2xl font-bold text-blue-400">🇨🇱</div>
+                <div className="text-xs text-gray-400">Hecho en Chile</div>
               </div>
               <div className="text-center p-3 bg-white/5 rounded-lg">
-                <div className="text-2xl font-bold text-amber-400">$2.3M</div>
-                <div className="text-xs text-gray-400">Recuperados</div>
+                <div className="text-2xl font-bold text-emerald-400">2025</div>
+                <div className="text-xs text-gray-400">Startup Legal</div>
               </div>
               <div className="text-center p-3 bg-white/5 rounded-lg">
-                <div className="text-2xl font-bold text-orange-400">98%</div>
-                <div className="text-xs text-gray-400">Éxito</div>
+                <div className="text-2xl font-bold text-purple-400">✨</div>
+                <div className="text-xs text-gray-400">Innovación</div>
               </div>
             </div>
           </motion.div>
@@ -502,8 +502,12 @@ const Footer: React.FC = () => {
             <p className="text-gray-400 text-sm mb-4 md:mb-0">
               © 2025 Punto Legal. Todos los derechos reservados.
             </p>
-            <p className="text-gray-400 text-sm">
-              Desarrollado con ❤️ para la justicia en Chile
+            <p className="text-gray-400 text-sm flex items-center gap-2">
+              <span>Hecho con</span>
+              <span className="text-red-500">❤️</span>
+              <span>en Chile</span>
+              <span className="text-blue-500">🇨🇱</span>
+              <span>• Startup Legal</span>
             </p>
           </div>
         </div>

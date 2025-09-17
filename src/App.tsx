@@ -13,7 +13,6 @@ import ErrorBoundary from '@/components/ErrorBoundary';
 import PageTransition from '@/components/PageTransition';
 import AccessibilityPanel from '@/components/AccessibilityPanel';
 import { MobileLayout } from '@/components/MobileLayout';
-import { MobileFloatingNav } from '@/components/MobileFloatingNav';
 import { useLocation } from 'react-router-dom';
 
 // Pages

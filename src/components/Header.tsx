@@ -64,7 +64,7 @@ const Header = ({ onAgendarClick, serviceName }: { onAgendarClick?: () => void; 
 
   return (
     <motion.header 
-      className={`fixed top-0 right-0 z-50 transition-all duration-700 ease-out ${
+      className={`hidden lg:block fixed top-0 right-0 z-50 transition-all duration-700 ease-out ${
         isOpen ? 'left-80' : 'left-0'
       }`}
       initial={{ y: -100, opacity: 0 }}

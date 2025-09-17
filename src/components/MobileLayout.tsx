@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import Header from './Header';
-import MobileMenu from './MobileMenu';
-import { MobileFloatingNav } from './MobileFloatingNav';
+import PremiumMobileHeader from './PremiumMobileHeader';
+import PremiumMobileDock from './PremiumMobileDock';
 import ApuntesHeader from './ApuntesHeader';
 
 interface MobileLayoutProps {
@@ -52,23 +51,8 @@ export const MobileLayout: React.FC<MobileLayoutProps> = ({ children, onAgendarC
         // Header específico para Apuntes
         <ApuntesHeader />
       ) : (
-        // Header normal para el resto del sitio
-        <motion.div
-          animate={{
-            y: isHeaderVisible ? 0 : -100,
-            opacity: isHeaderVisible ? 1 : 0
-          }}
-          transition={{
-            duration: 0.3,
-            type: "tween",
-            ease: "easeInOut"
-          }}
-          className="fixed top-0 left-0 right-0 z-50"
-        >
-          <Header 
-            onAgendarClick={onAgendarClick}
-          />
-        </motion.div>
+        // Header móvil premium para el resto del sitio
+        <PremiumMobileHeader />
       )}
 
       {/* Main content with dynamic padding */}
@@ -83,15 +67,8 @@ export const MobileLayout: React.FC<MobileLayoutProps> = ({ children, onAgendarC
         {children}
       </main>
 
-      {/* Mobile Menu - Solo para sección principal */}
-      {!isApuntesSection && (
-        <MobileMenu 
-          onAgendarClick={onAgendarClick}
-        />
-      )}
-
-      {/* Floating Navigation - Solo para sección principal */}
-      {!isApuntesSection && <MobileFloatingNav />}
+      {/* Premium Mobile Dock - Unificado y optimizado */}
+      <PremiumMobileDock />
     </div>
   );
 };
