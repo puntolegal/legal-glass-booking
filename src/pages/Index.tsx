@@ -5,6 +5,7 @@ import ServicesSection from "@/components/ServicesSection";
 import BlogSection from "@/components/BlogSection";
 import TestimonialsSection from "@/components/TestimonialsSection";
 import { MobileLayout } from "@/components/MobileLayout";
+import PremiumMobileHero from "@/components/PremiumMobileHero";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 
@@ -128,64 +129,13 @@ const Index = () => {
           {pageContent}
         </div>
 
-        {/* Mobile Layout */}
+        {/* Mobile Layout - Hero Premium Definitivo */}
         <div className="lg:hidden">
           <MobileLayout onAgendarClick={handleAgendarClick}>
-            {pageContent}
+            <PremiumMobileHero />
           </MobileLayout>
         </div>
 
-        {/* CTA Sticky Móvil Optimizado - Reposicionado */}
-        <motion.div 
-          className="fixed bottom-4 right-4 z-50 lg:hidden"
-          initial={{ y: 100, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.5, duration: 0.6, type: "spring", stiffness: 100 }}
-        >
-          <motion.button 
-            onClick={handleAgendarClick}
-            className="w-14 h-14 bg-gradient-to-r from-primary via-primary/95 to-primary/90 text-white rounded-2xl font-bold shadow-lg shadow-primary/20 border border-primary/30 backdrop-blur-sm transition-all duration-300 group relative overflow-hidden flex items-center justify-center"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            title="Agendar consulta"
-          >
-            {/* Efecto de brillo sutil */}
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 transform -skew-x-12 group-hover:translate-x-full" />
-            
-            {/* Icono del botón */}
-            <div className="relative flex items-center justify-center">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
-            </div>
-          </motion.button>
-        </motion.div>
-
-        {/* Indicador de scroll en móvil */}
-        {isMobile && (
-          <motion.div
-            className="fixed bottom-24 right-6 z-40 w-1 h-12 bg-primary/20 rounded-full overflow-hidden"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1 }}
-          >
-            <motion.div
-              className="w-full bg-gradient-to-t from-primary to-primary/60 rounded-full"
-              style={{
-                height: "30%",
-                transformOrigin: "bottom"
-              }}
-              animate={{
-                height: ["30%", "70%", "30%"]
-              }}
-              transition={{
-                duration: 2,
-                repeat: Infinity,
-                ease: "easeInOut"
-              }}
-            />
-          </motion.div>
-        )}
       </div>
     </>
   );
