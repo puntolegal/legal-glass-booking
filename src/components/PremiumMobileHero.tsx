@@ -1,75 +1,93 @@
 import React from 'react';
-import { motion } from 'framer-motion';
-import { Sparkles, Shield, Zap, Star } from 'lucide-react';
+import { motion, useScroll, useTransform } from 'framer-motion';
+import { Sparkles, Shield, Zap, Star, ArrowDown, CheckCircle } from 'lucide-react';
 import PremiumServiceSelector from './PremiumServiceSelector';
 
 export const PremiumMobileHero: React.FC = () => {
-  return (
-    <div className="relative min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-700 overflow-hidden">
-      {/* Background Elements */}
-      <div className="absolute inset-0 overflow-hidden">
-        {/* Animated Gradient Orbs */}
-        <motion.div
-          animate={{
-            scale: [1, 1.2, 1],
-            rotate: [0, 180, 360],
-          }}
-          transition={{
-            duration: 20,
-            repeat: Infinity,
-            ease: "linear"
-          }}
-          className="absolute -top-32 -right-32 w-64 h-64 bg-gradient-to-br from-blue-400/20 to-purple-500/20 rounded-full blur-3xl"
-        />
-        
-        <motion.div
-          animate={{
-            scale: [1.2, 1, 1.2],
-            rotate: [360, 180, 0],
-          }}
-          transition={{
-            duration: 25,
-            repeat: Infinity,
-            ease: "linear"
-          }}
-          className="absolute -bottom-32 -left-32 w-64 h-64 bg-gradient-to-br from-rose-400/20 to-orange-500/20 rounded-full blur-3xl"
-        />
+  const { scrollY } = useScroll();
+  const backgroundY = useTransform(scrollY, [0, 500], [0, 150]);
+  const opacity = useTransform(scrollY, [0, 300], [1, 0]);
 
-        {/* Floating Particles */}
-        {[...Array(20)].map((_, i) => (
+  return (
+    <div className="relative min-h-screen bg-background overflow-hidden">
+      {/* Premium Background - Consistent with web style */}
+      <div className="absolute inset-0">
+        {/* Base gradient */}
+        <div className="absolute inset-0 bg-gradient-to-br from-orange-50/30 via-background to-amber-50/30 dark:from-orange-950/10 dark:via-background dark:to-amber-950/10" />
+        
+        {/* Animated Gradient Orbs - Orange theme */}
+        <motion.div
+          style={{ y: backgroundY }}
+          className="absolute inset-0"
+        >
           <motion.div
-            key={i}
-            className="absolute w-1 h-1 bg-white/40 rounded-full"
             animate={{
-              y: [0, -100, 0],
-              x: [0, Math.random() * 50 - 25, 0],
-              opacity: [0, 1, 0],
-              scale: [0, 1, 0],
+              scale: [1, 1.3, 1],
+              rotate: [0, 90, 0],
             }}
             transition={{
-              duration: 8 + Math.random() * 4,
+              duration: 20,
               repeat: Infinity,
-              delay: Math.random() * 8,
+              ease: "easeInOut"
+            }}
+            className="absolute -top-20 -right-20 w-60 h-60 bg-gradient-to-br from-primary/20 to-accent/20 rounded-full blur-3xl"
+          />
+          
+          <motion.div
+            animate={{
+              scale: [1.3, 1, 1.3],
+              rotate: [180, 0, 180],
+            }}
+            transition={{
+              duration: 25,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+            className="absolute -bottom-20 -left-20 w-60 h-60 bg-gradient-to-br from-accent/20 to-primary/20 rounded-full blur-3xl"
+          />
+        </motion.div>
+
+        {/* Premium Glass Overlay */}
+        <div className="absolute inset-0 backdrop-blur-[1px]" />
+
+        {/* Floating Glass Elements */}
+        {[...Array(10)].map((_, i) => (
+          <motion.div
+            key={i}
+            className="absolute w-20 h-20 bg-white/5 dark:bg-white/5 rounded-2xl backdrop-blur-xl border border-white/10"
+            animate={{
+              y: [0, -30, 0],
+              rotate: [0, 180, 360],
+              opacity: [0.3, 0.6, 0.3]
+            }}
+            transition={{
+              duration: 15 + Math.random() * 10,
+              repeat: Infinity,
+              delay: Math.random() * 10,
               ease: "easeInOut"
             }}
             style={{
               left: `${Math.random() * 100}%`,
               top: `${Math.random() * 100}%`,
+              transform: `scale(${0.5 + Math.random() * 0.5})`
             }}
           />
         ))}
       </div>
 
       {/* Main Content */}
-      <div className="relative z-10 flex flex-col items-center justify-center min-h-screen px-4 py-8">
-        {/* Header Section */}
+      <motion.div 
+        className="relative z-10 flex flex-col items-center justify-center min-h-screen px-4 py-12"
+        style={{ opacity }}
+      >
+        {/* Header Section - Premium Style */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
-          className="text-center mb-8"
+          className="text-center mb-6"
         >
-          {/* Logo */}
+          {/* Logo - Orange gradient consistent with brand */}
           <motion.div
             initial={{ scale: 0, rotate: -180 }}
             animate={{ scale: 1, rotate: 0 }}
@@ -79,19 +97,35 @@ export const PremiumMobileHero: React.FC = () => {
               damping: 15,
               delay: 0.1 
             }}
-            className="w-16 h-16 mx-auto mb-6 bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl flex items-center justify-center shadow-xl shadow-orange-500/30"
+            className="relative mx-auto mb-6"
           >
-            <span className="text-white font-bold text-2xl">P</span>
+            <div className="w-20 h-20 bg-gradient-to-br from-primary to-accent rounded-[1.75rem] flex items-center justify-center shadow-2xl shadow-primary/30 relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-t from-white/0 to-white/20" />
+              <span className="text-white font-bold text-3xl relative z-10">P</span>
+            </div>
+            <motion.div
+              className="absolute inset-0 rounded-[1.75rem]"
+              animate={{
+                boxShadow: [
+                  '0 0 20px rgba(255, 107, 53, 0.3)',
+                  '0 0 40px rgba(255, 107, 53, 0.5)',
+                  '0 0 20px rgba(255, 107, 53, 0.3)'
+                ]
+              }}
+              transition={{ duration: 2, repeat: Infinity }}
+            />
           </motion.div>
 
-          {/* Title */}
+          {/* Title with gradient */}
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
-            className="text-3xl font-bold text-gray-900 dark:text-white mb-3"
+            className="text-4xl font-bold mb-3"
           >
-            Punto Legal
+            <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+              Punto Legal
+            </span>
           </motion.h1>
 
           {/* Subtitle */}
@@ -99,27 +133,27 @@ export const PremiumMobileHero: React.FC = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.6 }}
-            className="text-gray-600 dark:text-gray-300 mb-2"
+            className="text-muted-foreground mb-4 text-lg"
           >
-            Tu socio legal estratégico
+            Tu socio legal de confianza
           </motion.p>
 
-          {/* Badge Premium */}
+          {/* Premium Badge */}
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5, delay: 0.8 }}
-            className="inline-flex items-center gap-2 bg-gradient-to-r from-orange-100 to-amber-100 dark:from-orange-900/30 dark:to-amber-900/30 border border-orange-200/50 dark:border-orange-700/30 rounded-full px-4 py-2"
+            className="inline-flex items-center gap-2 bg-gradient-to-r from-primary/10 to-accent/10 backdrop-blur-xl border border-primary/20 rounded-full px-5 py-2.5 shadow-lg"
           >
-            <Sparkles className="w-4 h-4 text-orange-500" />
-            <span className="text-orange-700 dark:text-orange-400 text-sm font-medium">
-              Startup Legal Chilena
+            <CheckCircle className="w-4 h-4 text-primary" />
+            <span className="text-primary font-semibold text-sm">
+              Más de 10 años de experiencia
             </span>
-            <span className="text-blue-500">🇨🇱</span>
+            <span>🇨🇱</span>
           </motion.div>
         </motion.div>
 
-        {/* Service Selector */}
+        {/* Service Selector - Main Focus */}
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
@@ -129,50 +163,86 @@ export const PremiumMobileHero: React.FC = () => {
           <PremiumServiceSelector />
         </motion.div>
 
-        {/* Features */}
+        {/* Trust Indicators - Premium Glass Cards */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 1.2 }}
-          className="grid grid-cols-3 gap-4 w-full max-w-sm"
+          className="grid grid-cols-3 gap-3 w-full max-w-sm"
         >
           {[
-            { icon: Shield, text: 'Seguro', color: 'text-blue-500' },
-            { icon: Zap, text: 'Rápido', color: 'text-orange-500' },
-            { icon: Star, text: 'Premium', color: 'text-purple-500' }
+            { 
+              icon: Shield, 
+              text: '100% Seguro', 
+              subtext: 'Protegido',
+              gradient: 'from-blue-500 to-cyan-600' 
+            },
+            { 
+              icon: Zap, 
+              text: 'Respuesta 24h', 
+              subtext: 'Garantizada',
+              gradient: 'from-primary to-accent' 
+            },
+            { 
+              icon: Star, 
+              text: '5.0 Rating', 
+              subtext: 'Excelencia',
+              gradient: 'from-purple-500 to-pink-600' 
+            }
           ].map((feature, index) => (
             <motion.div
               key={feature.text}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 1.4 + index * 0.1 }}
-              className="text-center"
+              whileHover={{ scale: 1.05, y: -5 }}
+              className="relative group"
             >
-              <div className="w-12 h-12 mx-auto mb-2 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl border border-white/30 dark:border-gray-700/30 flex items-center justify-center shadow-lg">
-                <feature.icon className={`w-5 h-5 ${feature.color}`} />
+              <div className="absolute inset-0 bg-gradient-to-br from-white/50 to-white/30 dark:from-gray-800/50 dark:to-gray-700/30 rounded-xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <div className="relative bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl rounded-xl p-3 border border-white/50 dark:border-gray-700/50 shadow-lg">
+                <div className={`w-10 h-10 mx-auto mb-2 bg-gradient-to-br ${feature.gradient} rounded-xl flex items-center justify-center shadow-lg`}>
+                  <feature.icon className="w-5 h-5 text-white" />
+                </div>
+                <p className="text-xs font-bold text-foreground">
+                  {feature.text}
+                </p>
+                <p className="text-[10px] text-muted-foreground">
+                  {feature.subtext}
+                </p>
               </div>
-              <p className="text-xs font-medium text-gray-600 dark:text-gray-400">
-                {feature.text}
-              </p>
             </motion.div>
           ))}
         </motion.div>
 
-        {/* Bottom Info */}
+        {/* Scroll Indicator */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.6, delay: 1.6 }}
-          className="mt-8 text-center"
+          transition={{ duration: 0.6, delay: 1.8 }}
+          className="absolute bottom-8 left-1/2 -translate-x-1/2"
         >
-          <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
-            ✨ Democratizamos el acceso a la justicia con tecnología
-          </p>
-          <div className="flex items-center justify-center gap-2 text-xs text-gray-400 dark:text-gray-500">
-            <span>Hecho con</span>
-            <span className="text-red-500">❤️</span>
-            <span>en Chile</span>
-            <span className="text-blue-500">🇨🇱</span>
+          <motion.div
+            animate={{ y: [0, 8, 0] }}
+            transition={{ duration: 1.5, repeat: Infinity }}
+            className="flex flex-col items-center gap-2 text-muted-foreground"
+          >
+            <span className="text-xs font-medium">Explora más</span>
+            <ArrowDown className="w-4 h-4" />
+          </motion.div>
+        </motion.div>
+
+        {/* Bottom Branding */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6, delay: 2 }}
+          className="absolute bottom-4 left-0 right-0 text-center"
+        >
+          <div className="inline-flex items-center gap-2 text-xs text-muted-foreground bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm rounded-full px-4 py-2 border border-white/30 dark:border-gray-700/30">
+            <Sparkles className="w-3 h-3" />
+            <span>Innovación legal chilena</span>
+            <span>•</span>
+            <span>Hecho con ❤️ en 🇨🇱</span>
           </div>
         </motion.div>
       </div>
