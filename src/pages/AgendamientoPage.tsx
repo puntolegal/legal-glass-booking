@@ -259,112 +259,127 @@ export default function AgendamientoPage() {
       {/* Navegación Flotante Móvil */}
       <MobileFloatingNav />
       
-      <div className="min-h-screen bg-gradient-to-b from-background to-background/50 pt-20">
-        {/* Header */}
-        <section className="py-12 border-b border-white/10">
-          <div className="container mx-auto px-4">
-            <div className="flex items-center gap-4 mb-8">
+      <div className="min-h-screen bg-gradient-to-b from-background to-background/50">
+        {/* Header Móvil Optimizado */}
+        <section className="pt-6 pb-8 px-4">
+          <div className="max-w-md mx-auto">
+            {/* Breadcrumb Móvil */}
+            <div className="flex items-center gap-2 mb-6">
               <Link 
                 to="/" 
-                className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors"
+                className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors text-sm"
               >
-                <ArrowLeft className="w-5 h-5" />
-                Volver al inicio
+                <ArrowLeft className="w-4 h-4" />
+                Inicio
               </Link>
+              <span className="text-muted-foreground">•</span>
+              <span className="text-sm font-medium">Agendamiento</span>
             </div>
             
-            <div className="max-w-4xl mx-auto text-center">
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6 }}
-              >
-                {isEmergency && (
-                  <div className="inline-flex items-center gap-2 bg-red-500/20 text-red-400 px-4 py-2 rounded-full mb-4">
-                    <Shield className="w-5 h-5" />
-                    <span className="font-semibold">CONSULTA DE EMERGENCIA 24/7</span>
-                  </div>
-                )}
-                
-                <h1 className="text-4xl lg:text-5xl font-bold mb-4">
-                  Agendar {service.name}
-                </h1>
-                
-                {/* Indicador de estado de Supabase */}
-                <div className="flex justify-center mb-4">
-                  <SupabaseStatusIndicator showDetails={true} className="bg-white/10 backdrop-blur-sm px-4 py-2 rounded-lg border border-white/20" />
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="text-center"
+            >
+              {/* Badge de Emergencia */}
+              {isEmergency && (
+                <div className="inline-flex items-center gap-2 bg-red-500/20 text-red-400 px-3 py-2 rounded-full mb-4 text-sm">
+                  <Shield className="w-4 h-4" />
+                  <span className="font-semibold">EMERGENCIA 24/7</span>
+                </div>
+              )}
+              
+              {/* Título Móvil */}
+              <h1 className="text-2xl font-bold mb-3 text-foreground">
+                {service.name}
+              </h1>
+              
+              {/* Precio y Categoría - Layout Móvil */}
+              <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm rounded-2xl p-4 border border-white/20 mb-4">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm text-muted-foreground">Precio</span>
+                  <span className="text-sm text-muted-foreground">{service.category}</span>
                 </div>
                 
-                <div className="flex items-center justify-center gap-8 mb-6">
-                  <div className="text-center">
-                    <div className="text-3xl font-bold text-primary">
+                <div className="flex items-center justify-between">
+                  <div className="text-left">
+                    <div className="text-2xl font-bold text-primary">
                       ${precioFinal}
                       {isConvenioValido && (
-                        <span className="text-lg text-muted-foreground line-through ml-2">
+                        <span className="text-sm text-muted-foreground line-through ml-2">
                           ${service.price}
                         </span>
                       )}
                       {!isConvenioValido && service.originalPrice && (
-                        <span className="text-lg text-muted-foreground line-through ml-2">
+                        <span className="text-sm text-muted-foreground line-through ml-2">
                           ${service.originalPrice}
                         </span>
                       )}
                     </div>
                     {service.note && !isConvenioValido && (
-                      <p className="text-sm text-muted-foreground">{service.note}</p>
+                      <p className="text-xs text-muted-foreground">{service.note}</p>
                     )}
+                  </div>
+                  
+                  <div className="text-right">
                     {isConvenioValido && (
-                      <span className="inline-block bg-gradient-to-r from-green-400 to-emerald-500 text-white text-xs font-bold px-3 py-1 rounded-full mt-1">
-                        80% OFF - CONVENIO
+                      <span className="inline-block bg-gradient-to-r from-green-400 to-emerald-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+                        80% OFF
                       </span>
                     )}
                     {!isConvenioValido && service.discount && (
-                      <span className="inline-block bg-gradient-to-r from-yellow-400 to-orange-500 text-black text-xs font-bold px-2 py-1 rounded-full mt-1">
+                      <span className="inline-block bg-gradient-to-r from-yellow-400 to-orange-500 text-black text-xs font-bold px-2 py-1 rounded-full">
                         {service.discount}
                       </span>
                     )}
                   </div>
-                  
-                  <div className="w-px h-16 bg-white/20" />
-                  
-                  <div className="text-center">
-                    <div className="text-lg font-semibold">{service.category}</div>
-                    <p className="text-sm text-muted-foreground">Área de especialización</p>
-                  </div>
                 </div>
-                
-                {isEmergency && (
-                  <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-4 max-w-md mx-auto">
-                    <p className="text-red-400 font-semibold">⚡ Respuesta inmediata</p>
-                    <p className="text-sm text-muted-foreground">Te contactaremos en menos de 1 hora</p>
-                  </div>
-                )}
-              </motion.div>
-            </div>
+              </div>
+              
+              {/* Indicador de Supabase - Móvil */}
+              <div className="flex justify-center mb-4">
+                <SupabaseStatusIndicator 
+                  showDetails={false} 
+                  className="bg-white/60 backdrop-blur-sm px-3 py-1 rounded-full border border-white/20 text-xs" 
+                />
+              </div>
+              
+              {/* Alerta de Emergencia */}
+              {isEmergency && (
+                <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-3 text-sm">
+                  <p className="text-red-400 font-semibold">⚡ Respuesta inmediata</p>
+                  <p className="text-xs text-muted-foreground">Te contactaremos en menos de 1 hora</p>
+                </div>
+              )}
+            </motion.div>
           </div>
         </section>
 
-        {/* Formulario de Agendamiento */}
-        <section className="py-20">
-          <div className="container mx-auto px-4">
-            <div className="max-w-4xl mx-auto">
-              {/* Progress Steps */}
-              <div className="flex items-center justify-center mb-12">
+        {/* Formulario de Agendamiento - Optimizado Móvil */}
+        <section className="pb-24 px-4">
+          <div className="max-w-md mx-auto lg:max-w-4xl lg:mx-auto">
+            <div className="lg:max-w-4xl lg:mx-auto">
+              {/* Progress Steps - Móvil Optimizado */}
+              <div className="flex items-center justify-center mb-8">
                 {[1, 2, 3, 4].map((stepNumber) => (
                   <div key={stepNumber} className="flex items-center">
                     <div className={`
-                      w-10 h-10 rounded-full flex items-center justify-center font-semibold
+                      w-8 h-8 lg:w-10 lg:h-10 rounded-full flex items-center justify-center font-semibold text-sm lg:text-base
                       ${step >= stepNumber 
-                        ? 'bg-primary text-white' 
-                        : 'bg-white/10 text-muted-foreground'
+                        ? 'bg-gradient-to-br from-orange-500 to-orange-600 text-white shadow-lg shadow-orange-500/30' 
+                        : 'bg-white/20 text-muted-foreground'
                       }
                     `}>
-                      {step > stepNumber ? <CheckCircle className="w-6 h-6" /> : stepNumber}
+                      {step > stepNumber ? <CheckCircle className="w-4 h-4 lg:w-6 lg:h-6" /> : stepNumber}
                     </div>
                     {stepNumber < 4 && (
                       <div className={`
-                        w-16 h-1 mx-4
-                        ${step > stepNumber ? 'bg-primary' : 'bg-white/10'}
+                        w-8 lg:w-16 h-1 mx-2 lg:mx-4 rounded-full
+                        ${step > stepNumber 
+                          ? 'bg-gradient-to-r from-orange-500 to-orange-600' 
+                          : 'bg-white/20'
+                        }
                       `} />
                     )}
                   </div>
@@ -377,14 +392,14 @@ export default function AgendamientoPage() {
                   <motion.div
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
-                    className="bg-white/5 backdrop-blur-sm rounded-2xl p-8 border border-white/10"
+                    className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm rounded-2xl p-4 lg:p-8 border border-white/20 shadow-lg"
                   >
-                    <h2 className="text-2xl font-bold mb-6 flex items-center gap-3 text-foreground">
-                      <User className="w-6 h-6 text-primary" />
+                    <h2 className="text-xl lg:text-2xl font-bold mb-4 lg:mb-6 flex items-center gap-3 text-foreground">
+                      <User className="w-5 h-5 lg:w-6 lg:h-6 text-orange-500" />
                       Información Personal
                     </h2>
                     
-                    <div className="grid md:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
                       <div>
                         <label className="block text-sm font-semibold mb-2 text-foreground">Nombre Completo *</label>
                         <input
@@ -392,7 +407,7 @@ export default function AgendamientoPage() {
                           required
                           value={formData.nombre}
                           onChange={(e) => setFormData({...formData, nombre: e.target.value})}
-                          className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-lg focus:border-primary outline-none transition-colors"
+                          className="w-full px-4 py-3 lg:py-3 bg-white/90 dark:bg-gray-800/90 border border-gray-200/50 dark:border-gray-700/50 rounded-xl focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none transition-all text-base"
                           placeholder="Juan Pérez"
                         />
                       </div>
@@ -404,7 +419,7 @@ export default function AgendamientoPage() {
                           required
                           value={formData.telefono}
                           onChange={(e) => setFormData({...formData, telefono: e.target.value})}
-                          className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-lg focus:border-primary outline-none transition-colors"
+                          className="w-full px-4 py-3 lg:py-3 bg-white/90 dark:bg-gray-800/90 border border-gray-200/50 dark:border-gray-700/50 rounded-xl focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none transition-all text-base"
                           placeholder="+56 9 1234 5678"
                         />
                       </div>
@@ -416,7 +431,7 @@ export default function AgendamientoPage() {
                           required
                           value={formData.email}
                           onChange={(e) => setFormData({...formData, email: e.target.value})}
-                          className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-lg focus:border-primary outline-none transition-colors"
+                          className="w-full px-4 py-3 lg:py-3 bg-white/90 dark:bg-gray-800/90 border border-gray-200/50 dark:border-gray-700/50 rounded-xl focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none transition-all text-base"
                           placeholder="juan@empresa.com"
                         />
                       </div>
@@ -427,7 +442,7 @@ export default function AgendamientoPage() {
                           type="text"
                           value={formData.empresa}
                           onChange={(e) => setFormData({...formData, empresa: e.target.value})}
-                          className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-lg focus:border-primary outline-none transition-colors"
+                          className="w-full px-4 py-3 lg:py-3 bg-white/90 dark:bg-gray-800/90 border border-gray-200/50 dark:border-gray-700/50 rounded-xl focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none transition-all text-base"
                           placeholder="Mi Empresa SpA"
                         />
                       </div>
@@ -625,14 +640,14 @@ export default function AgendamientoPage() {
                       <button
                         type="button"
                         onClick={() => setStep(1)}
-                        className="flex-1 bg-white/10 text-white py-3 px-6 rounded-lg font-semibold hover:bg-white/20 transition-colors"
+                        className="flex-1 bg-white/20 dark:bg-gray-800/20 text-foreground py-3 lg:py-3 px-6 rounded-xl font-semibold hover:bg-white/30 dark:hover:bg-gray-800/30 transition-all border border-white/20 text-base"
                       >
                         Anterior
                       </button>
                       <button
                         type="submit"
                         disabled={!selectedDate || !selectedTime}
-                        className="flex-1 bg-primary text-white py-3 px-6 rounded-lg font-semibold hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="flex-1 bg-gradient-to-r from-orange-500 to-orange-600 text-white py-3 lg:py-3 px-6 rounded-xl font-semibold hover:from-orange-600 hover:to-orange-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-orange-500/20 text-base"
                       >
                         Continuar
                       </button>
@@ -750,7 +765,7 @@ export default function AgendamientoPage() {
                       <button
                         type="button"
                         onClick={() => setStep(2)}
-                        className="flex-1 bg-white/10 text-white py-3 px-6 rounded-lg font-semibold hover:bg-white/20 transition-colors"
+                        className="flex-1 bg-white/20 dark:bg-gray-800/20 text-foreground py-3 lg:py-3 px-6 rounded-xl font-semibold hover:bg-white/30 dark:hover:bg-gray-800/30 transition-all border border-white/20 text-base"
                       >
                         Anterior
                       </button>
@@ -787,7 +802,7 @@ export default function AgendamientoPage() {
                           localStorage.setItem('paymentData', JSON.stringify(paymentData));
                           window.location.href = '/mercadopago';
                         }}
-                        className="flex-1 bg-gradient-to-r from-primary to-primary/80 text-white py-3 px-6 rounded-lg font-semibold hover:from-primary/90 hover:to-primary/70 transition-all flex items-center justify-center gap-2"
+                        className="flex-1 bg-gradient-to-r from-orange-500 to-orange-600 text-white py-4 lg:py-3 px-6 rounded-xl font-semibold hover:from-orange-600 hover:to-orange-700 transition-all flex items-center justify-center gap-2 shadow-lg shadow-orange-500/20 text-base"
                       >
                         <CreditCard className="w-5 h-5" />
                         Pagar con MercadoPago
@@ -961,7 +976,7 @@ export default function AgendamientoPage() {
                       <button
                         type="button"
                         onClick={() => setStep(3)}
-                        className="flex-1 bg-white/10 text-white py-3 px-6 rounded-lg font-semibold hover:bg-white/20 transition-colors"
+                        className="flex-1 bg-white/20 dark:bg-gray-800/20 text-foreground py-3 lg:py-3 px-6 rounded-xl font-semibold hover:bg-white/30 dark:hover:bg-gray-800/30 transition-all border border-white/20 text-base"
                       >
                         Anterior
                       </button>
@@ -1098,10 +1113,10 @@ export default function AgendamientoPage() {
                             window.location.href = '/mercadopago';
                           }
                         }}
-                        className="flex-1 bg-gradient-to-r from-primary to-primary/80 text-white py-3 px-6 rounded-lg font-semibold hover:from-primary/90 hover:to-primary/70 transition-all flex items-center justify-center gap-2"
+                        className="flex-1 bg-gradient-to-r from-orange-500 to-orange-600 text-white py-4 lg:py-3 px-6 rounded-xl font-semibold hover:from-orange-600 hover:to-orange-700 transition-all flex items-center justify-center gap-2 shadow-lg shadow-orange-500/20 text-base"
                       >
                         <CreditCard className="w-5 h-5" />
-{precioFinal === '0' || precioConConvenio === 0 ? 'Confirmar Reserva Gratis' : 'Pagar con MercadoPago'}
+                        {precioFinal === '0' || precioConConvenio === 0 ? 'Confirmar Reserva Gratis' : 'Pagar con MercadoPago'}
                       </button>
                     </div>
                   </motion.div>
