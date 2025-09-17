@@ -21,6 +21,11 @@ import SEO from '../components/SEO';
 import { MobileFloatingNav } from '../components/MobileFloatingNav';
 import WeeklyDatePicker from '../components/WeeklyDatePicker';
 import BankTransferCard3D from '../components/BankTransferCard3D';
+import { createBookingWithEmails, type BookingData } from '@/services/supabaseBooking';
+import { createOfflineBookingWithEmail, type OfflineBookingData } from '@/services/offlineBooking';
+import { sendRealBookingEmails, type BookingEmailData } from '@/services/realEmailService';
+import { checkSupabaseConnection } from '@/integrations/supabase/client';
+import SupabaseStatusIndicator from '@/components/SupabaseStatusIndicator';
 
 // Definición de servicios y precios
 const serviceCatalog = {
@@ -29,9 +34,9 @@ const serviceCatalog = {
   
   // Corporativo
   'basico': { name: 'Corporativo Básico', price: '350.000', category: 'Corporativo' },
-  'premium': { name: 'Corporativo Premium', price: '750.000', category: 'Corporativo' },
+  'premium': { name: 'Corporativo Premium', price: '800.000', category: 'Corporativo' },
   'enterprise': { name: 'Corporativo Enterprise', price: '1.500.000', category: 'Corporativo' },
-  'corporativo': { name: 'Escudo Legal Mensual', price: '800.000', category: 'Corporativo', note: 'Mensual' },
+  'corporativo': { name: 'Asesoría Corporativa', price: '35.000', category: 'Corporativo', note: 'Consulta especializada' },
   'ma-express': { name: 'M&A Express', price: '2.500.000', category: 'Corporativo' },
   'compliance': { name: 'Compliance & Protección Datos', price: '1.500.000', category: 'Corporativo' },
   'fiscalizacion': { name: 'Defensa Fiscalizaciones & DT', price: '900.000', category: 'Corporativo' },
@@ -42,6 +47,12 @@ const serviceCatalog = {
   'desarrollador-elite': { name: 'Desarrollador Elite', price: '2.500.000', category: 'Inmobiliario' },
   'inmobiliario': { name: 'Punto Legal Inmobiliario', price: '27.500', category: 'Inmobiliario', originalPrice: '55.000', discount: '50% OFF' },
   
+  // Familia
+  'familia-basico': { name: 'Familiar Básico', price: '180.000', category: 'Familia' },
+  'familia-completo': { name: 'Familiar Completo', price: '450.000', category: 'Familia' },
+  'familia-premium': { name: 'Familiar Premium', price: '750.000', category: 'Familia' },
+  'familia': { name: 'Asesoría Familiar', price: '35.000', category: 'Familia', originalPrice: '70.000', discount: '50% OFF', note: 'Consulta especializada' },
+
   // Penal
   'defensa-esencial': { name: 'Defensa Esencial', price: '650.000', category: 'Penal' },
   'defensa-premium': { name: 'Defensa Premium', price: '1.200.000', category: 'Penal' },
@@ -61,7 +72,6 @@ const serviceCatalog = {
   
   // Especializado - Servicios de la página principal
   'laboral': { name: 'Punto Legal Laboral', price: '35.000', category: 'Laboral', originalPrice: '70.000', discount: '50% OFF' },
-  'familia': { name: 'Punto Legal Familia', price: '30.000', category: 'Familia', originalPrice: '60.000', discount: '50% OFF' },
   'herencias': { name: 'Punto Legal Sucesorio', price: '30.000', category: 'Sucesorio', originalPrice: '60.000', discount: '50% OFF' },
   'empresarial': { name: 'Punto Legal Empresarial', price: '45.000', category: 'Empresarial', originalPrice: '90.000', discount: '50% OFF' },
   'tributario': { name: 'Punto Legal Tributario', price: '30.000', category: 'Tributario', originalPrice: '60.000', discount: '50% OFF' },
@@ -106,7 +116,8 @@ export default function AgendamientoPage() {
     telefono: '',
     email: '',
     empresa: '',
-    descripcion: ''
+    descripcion: '',
+    codigoConvenio: ''
   });
   const [step, setStep] = useState(1);
   const [showBankTransfer, setShowBankTransfer] = useState(false);
@@ -115,6 +126,16 @@ export default function AgendamientoPage() {
   const service = serviceCatalog[plan] || serviceCatalog['premium'];
   const isEmergency = plan === 'emergencia';
 
+  // Lógica del código de convenio
+  const CODIGO_CONVENIO_VALIDO = 'PUNTOLEGAL!';
+  const isConvenioValido = formData.codigoConvenio === CODIGO_CONVENIO_VALIDO;
+  const descuentoConvenio = 0.8; // 80% de descuento
+  
+  // Calcular precio con descuento de convenio
+  const precioOriginal = parseFloat(service.price.replace(/\./g, ''));
+  const precioConConvenio = isConvenioValido ? Math.round(precioOriginal * (1 - descuentoConvenio)) : precioOriginal;
+  const precioFinal = precioConConvenio.toLocaleString('es-CL');
+
   // Scroll automático al top cuando se carga la página
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'auto' });
@@ -122,7 +143,7 @@ export default function AgendamientoPage() {
     document.body.scrollTop = 0;
   }, []);
 
-  // Generar fechas disponibles (próximos 14 días, excluyendo fines de semana)
+  // Generar fechas disponibles (próximos 21 días, INCLUYENDO sábados y domingos)
   const getAvailableDates = () => {
     const dates = [];
     const today = new Date();
@@ -131,10 +152,8 @@ export default function AgendamientoPage() {
       const date = new Date(today);
       date.setDate(today.getDate() + i);
       
-      // Excluir fines de semana
-      if (date.getDay() !== 0 && date.getDay() !== 6) {
-        dates.push(date);
-      }
+      // INCLUIR TODOS LOS DÍAS (lunes a domingo)
+      dates.push(date);
     }
     return dates;
   };
@@ -271,20 +290,35 @@ export default function AgendamientoPage() {
                   Agendar {service.name}
                 </h1>
                 
+                {/* Indicador de estado de Supabase */}
+                <div className="flex justify-center mb-4">
+                  <SupabaseStatusIndicator showDetails={true} className="bg-white/10 backdrop-blur-sm px-4 py-2 rounded-lg border border-white/20" />
+                </div>
+                
                 <div className="flex items-center justify-center gap-8 mb-6">
                   <div className="text-center">
                     <div className="text-3xl font-bold text-primary">
-                      ${service.price}
-                      {service.originalPrice && (
+                      ${precioFinal}
+                      {isConvenioValido && (
+                        <span className="text-lg text-muted-foreground line-through ml-2">
+                          ${service.price}
+                        </span>
+                      )}
+                      {!isConvenioValido && service.originalPrice && (
                         <span className="text-lg text-muted-foreground line-through ml-2">
                           ${service.originalPrice}
                         </span>
                       )}
                     </div>
-                    {service.note && (
+                    {service.note && !isConvenioValido && (
                       <p className="text-sm text-muted-foreground">{service.note}</p>
                     )}
-                    {service.discount && (
+                    {isConvenioValido && (
+                      <span className="inline-block bg-gradient-to-r from-green-400 to-emerald-500 text-white text-xs font-bold px-3 py-1 rounded-full mt-1">
+                        80% OFF - CONVENIO
+                      </span>
+                    )}
+                    {!isConvenioValido && service.discount && (
                       <span className="inline-block bg-gradient-to-r from-yellow-400 to-orange-500 text-black text-xs font-bold px-2 py-1 rounded-full mt-1">
                         {service.discount}
                       </span>
@@ -396,6 +430,30 @@ export default function AgendamientoPage() {
                           className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-lg focus:border-primary outline-none transition-colors"
                           placeholder="Mi Empresa SpA"
                         />
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-semibold mb-2 text-foreground flex items-center gap-2">
+                          <span className="text-amber-600">🏷️</span>
+                          Código de Convenio (opcional)
+                        </label>
+                        <input
+                          type="text"
+                          value={formData.codigoConvenio}
+                          onChange={(e) => setFormData({...formData, codigoConvenio: e.target.value})}
+                          className={`w-full px-4 py-3 bg-white/5 border rounded-lg focus:border-primary outline-none transition-colors ${
+                            isConvenioValido 
+                              ? 'border-green-400 bg-green-50/10' 
+                              : 'border-white/20'
+                          }`}
+                          placeholder="Código especial"
+                        />
+                        {isConvenioValido && (
+                          <div className="mt-2 text-sm text-green-400 flex items-center gap-2">
+                            <span>✅</span>
+                            <span>Código válido - Descuento del 80% aplicado</span>
+                          </div>
+                        )}
                       </div>
                     </div>
                     
@@ -610,19 +668,34 @@ export default function AgendamientoPage() {
                         <div className="flex items-center justify-between">
                           <div>
                             <div className="text-2xl font-bold text-foreground">
-                              ${service.price}
-                              {service.originalPrice && (
+                              ${precioFinal}
+                              {isConvenioValido && (
+                                <span className="text-lg text-muted-foreground line-through ml-2">
+                                  ${service.price}
+                                </span>
+                              )}
+                              {!isConvenioValido && service.originalPrice && (
                                 <span className="text-lg text-muted-foreground line-through ml-2">
                                   ${service.originalPrice}
                                 </span>
                               )}
                             </div>
-                            {service.note && (
+                            {isConvenioValido && (
+                              <p className="text-sm text-green-600 mt-1 font-medium">
+                                🏷️ Descuento de convenio aplicado (80% OFF)
+                              </p>
+                            )}
+                            {!isConvenioValido && service.note && (
                               <p className="text-sm text-muted-foreground mt-1">{service.note}</p>
                             )}
                           </div>
                           
-                          {service.discount && (
+                          {isConvenioValido && (
+                            <div className="bg-gradient-to-r from-green-400 to-emerald-500 text-white text-xs font-bold px-3 py-1 rounded-full">
+                              80% OFF - CONVENIO
+                            </div>
+                          )}
+                          {!isConvenioValido && service.discount && (
                             <div className="bg-gradient-to-r from-yellow-400 to-orange-500 text-black text-xs font-bold px-3 py-1 rounded-full">
                               {service.discount}
                             </div>
@@ -648,6 +721,17 @@ export default function AgendamientoPage() {
                             <div><strong>Email:</strong> {formData.email}</div>
                             <div><strong>Teléfono:</strong> {formData.telefono}</div>
                             {formData.empresa && <div><strong>Empresa:</strong> {formData.empresa}</div>}
+                            {formData.codigoConvenio && (
+                              <div className="flex items-center gap-2">
+                                <strong>Código de Convenio:</strong> 
+                                <span className="text-green-600 font-medium">{formData.codigoConvenio}</span>
+                                {isConvenioValido && (
+                                  <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">
+                                    ✅ Válido
+                                  </span>
+                                )}
+                              </div>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -677,7 +761,8 @@ export default function AgendamientoPage() {
                           const paymentData = {
                             service: service.name,
                             category: service.category,
-                            price: service.price,
+                            price: precioFinal,
+                            originalPrice: service.price,
                             fecha: selectedDate,
                             hora: selectedTime,
                             tipo_reunion: selectedMeetingType,
@@ -688,15 +773,24 @@ export default function AgendamientoPage() {
                               empresa: formData.empresa
                             },
                             descripcion: formData.descripcion,
+                            codigoConvenio: formData.codigoConvenio,
+                            descuentoConvenio: isConvenioValido,
+                            porcentajeDescuento: isConvenioValido ? '80%' : null,
                             id: Date.now().toString()
                           };
+                          console.log('💳 [STEP 3] Guardando datos de pago desde confirmación:', paymentData);
+                          console.log('🏷️ [STEP 3] Código de convenio:', formData.codigoConvenio);
+                          console.log('✅ [STEP 3] Convenio válido:', isConvenioValido);
+                          console.log('💰 [STEP 3] Precio original:', service.price);
+                          console.log('💸 [STEP 3] Precio final:', precioFinal);
+                          
                           localStorage.setItem('paymentData', JSON.stringify(paymentData));
-                          window.location.href = '/pago';
+                          window.location.href = '/mercadopago';
                         }}
                         className="flex-1 bg-gradient-to-r from-primary to-primary/80 text-white py-3 px-6 rounded-lg font-semibold hover:from-primary/90 hover:to-primary/70 transition-all flex items-center justify-center gap-2"
                       >
                         <CreditCard className="w-5 h-5" />
-                        Proceder al Pago
+                        Pagar con MercadoPago
                       </button>
                     </div>
                   </motion.div>
@@ -873,39 +967,141 @@ export default function AgendamientoPage() {
                       </button>
                       <button
                         type="button"
-                        onClick={() => {
+                        onClick={async () => {
                           const paymentData = {
                             ...formData,
                             service: service.name,
-                            price: service.price,
+                            price: precioFinal,
+                            originalPrice: service.price,
                             category: service.category,
                             fecha: selectedDate,
                             hora: selectedTime,
                             tipo_reunion: selectedMeetingType,
                             descripcion: formData.descripcion,
+                            codigoConvenio: formData.codigoConvenio,
+                            descuentoConvenio: isConvenioValido,
+                            porcentajeDescuento: isConvenioValido ? '80%' : null,
                             id: Date.now().toString()
                           };
                           
-                          // Si el precio es 0, guardar directamente sin pago
-                          if (service.price === '0') {
-                            // Guardar en localStorage para simular el flujo
-                            localStorage.setItem('paymentData', JSON.stringify({
-                              ...paymentData,
-                              paymentMethod: 'gratis',
-                              paymentStatus: 'completed'
-                            }));
-                            // Ir directamente a la página de éxito
-                            window.location.href = '/payment-success';
+                          // Si el precio final es 0, crear reserva directamente con Supabase
+                          if (precioFinal === '0' || precioConConvenio === 0) {
+                            try {
+                              console.log('📧 Creando consulta gratuita con Supabase...');
+                              
+                              const bookingData: BookingData = {
+                                cliente: {
+                                  nombre: formData.nombre,
+                                  email: formData.email,
+                                  telefono: formData.telefono
+                                },
+                                servicio: {
+                                  tipo: service.name,
+                                  precio: precioFinal,
+                                  descripcion: `${service.category}${isConvenioValido ? ' - CONVENIO 80% OFF' : ''}`,
+                                  fecha: selectedDate,
+                                  hora: selectedTime
+                                },
+                                pago: {
+                                  metodo: 'gratis',
+                                  estado: 'approved'
+                                },
+                                motivoConsulta: formData.descripcion,
+                                notas: `Tipo de reunión: ${selectedMeetingType}${isConvenioValido ? ` | Código de convenio aplicado: ${formData.codigoConvenio} (80% descuento)` : ''}`
+                              };
+                              
+                              // Verificar si Supabase está disponible
+                              const isSupabaseAvailable = await checkSupabaseConnection();
+                              
+                              if (isSupabaseAvailable) {
+                                // Usar Supabase si está disponible
+                                console.log('🌐 Usando Supabase para crear reserva...');
+                                const result = await createBookingWithEmails(bookingData);
+                                
+                                if (result.success) {
+                                  console.log('✅ Consulta gratuita creada y emails enviados');
+                                  localStorage.setItem('paymentData', JSON.stringify({
+                                    ...paymentData,
+                                    paymentMethod: 'gratis',
+                                    paymentStatus: 'completed',
+                                    reservaId: result.reserva?.id
+                                  }));
+                                  window.location.href = '/payment-success';
+                                } else {
+                                  console.error('❌ Error creando consulta:', result.error);
+                                  alert('Error al crear la consulta. Por favor intenta nuevamente.');
+                                }
+                              } else {
+                                // Usar sistema offline si Supabase no está disponible
+                                console.log('💾 Supabase no disponible, usando sistema offline...');
+                                
+                                const offlineBookingData: Omit<OfflineBookingData, 'id' | 'created_at' | 'updated_at'> = {
+                                  cliente_nombre: formData.nombre,
+                                  cliente_email: formData.email,
+                                  cliente_telefono: formData.telefono,
+                                  cliente_empresa: formData.empresa,
+                                  servicio_tipo: service.name,
+                                  servicio_precio: precioFinal,
+                                  servicio_categoria: `${service.category}${isConvenioValido ? ' - CONVENIO 80% OFF' : ''}`,
+                                  fecha: selectedDate,
+                                  hora: selectedTime,
+                                  tipo_reunion: selectedMeetingType,
+                                  descripcion: `${formData.descripcion}${isConvenioValido ? ` | Código de convenio: ${formData.codigoConvenio} (80% descuento)` : ''}`,
+                                  estado: 'pendiente'
+                                };
+                                
+                                const offlineResult = await createOfflineBookingWithEmail(offlineBookingData);
+                                
+                                // Enviar emails reales incluso en modo offline
+                                const emailData: BookingEmailData = {
+                                  id: offlineResult.id,
+                                  cliente_nombre: offlineResult.cliente_nombre,
+                                  cliente_email: offlineResult.cliente_email,
+                                  cliente_telefono: offlineResult.cliente_telefono,
+                                  cliente_empresa: offlineResult.cliente_empresa,
+                                  servicio_tipo: offlineResult.servicio_tipo,
+                                  servicio_precio: offlineResult.servicio_precio,
+                                  fecha: offlineResult.fecha,
+                                  hora: offlineResult.hora,
+                                  tipo_reunion: offlineResult.tipo_reunion,
+                                  descripcion: offlineResult.descripcion,
+                                  created_at: offlineResult.created_at
+                                };
+                                
+                                const emailResult = await sendRealBookingEmails(emailData);
+                                console.log('📧 Resultado emails:', emailResult.success ? 'Enviados' : 'Error');
+                                
+                                console.log('✅ Consulta gratuita guardada offline y emails enviados');
+                                localStorage.setItem('paymentData', JSON.stringify({
+                                  ...paymentData,
+                                  paymentMethod: 'gratis',
+                                  paymentStatus: 'completed',
+                                  reservaId: offlineResult.id,
+                                  isOffline: true
+                                }));
+                                window.location.href = '/payment-success';
+                              }
+                            } catch (error) {
+                              console.error('❌ Error:', error);
+                              alert('Error al procesar la consulta. Por favor intenta nuevamente.');
+                            }
                           } else {
-                            // Flujo normal de pago
-                          localStorage.setItem('paymentData', JSON.stringify(paymentData));
-                          window.location.href = '/pago';
+                            // Flujo directo a MercadoPago
+                            console.log('💳 Guardando datos de pago con convenio:', paymentData);
+                            console.log('🏷️ Código de convenio:', formData.codigoConvenio);
+                            console.log('✅ Convenio válido:', isConvenioValido);
+                            console.log('💰 Precio original:', service.price);
+                            console.log('💸 Precio final:', precioFinal);
+                            console.log('📊 Descuento aplicado:', isConvenioValido ? '80%' : 'Ninguno');
+                            
+                            localStorage.setItem('paymentData', JSON.stringify(paymentData));
+                            window.location.href = '/mercadopago';
                           }
                         }}
                         className="flex-1 bg-gradient-to-r from-primary to-primary/80 text-white py-3 px-6 rounded-lg font-semibold hover:from-primary/90 hover:to-primary/70 transition-all flex items-center justify-center gap-2"
                       >
                         <CreditCard className="w-5 h-5" />
-                        {service.price === '0' ? 'Confirmar Reserva Gratis' : 'Proceder al Pago'}
+{precioFinal === '0' || precioConConvenio === 0 ? 'Confirmar Reserva Gratis' : 'Pagar con MercadoPago'}
                       </button>
                     </div>
                   </motion.div>

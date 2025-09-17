@@ -401,34 +401,148 @@ export default function PaymentPage() {
                           <h3 className="text-3xl font-bold text-foreground">Métodos de Pago</h3>
                         </div>
 
-                        {/* Transferencia Electrónica */}
-                        {selectedPaymentMethod === 'transfer' && !isProcessing ? (
+                        {/* Transbank Webpay - Método Principal */}
+                        {selectedPaymentMethod === 'transbank' && !isProcessing ? (
                           <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.6 }}
                             className="space-y-8"
                           >
-                            {/* Header de Transferencia */}
-                            <div className="bg-gradient-to-r from-green-500/15 to-emerald-500/10 border border-green-500/30 rounded-2xl p-6 relative overflow-hidden">
-                              <div className="absolute inset-0 bg-gradient-to-r from-green-500/10 to-transparent opacity-50" />
+                            {/* Header de Transbank */}
+                            <div className="bg-gradient-to-r from-red-500/15 to-red-600/10 border border-red-500/30 rounded-2xl p-6 relative overflow-hidden">
+                              <div className="absolute inset-0 bg-gradient-to-r from-red-500/10 to-transparent opacity-50" />
                               <div className="relative z-10">
                                 <div className="flex items-center gap-3 mb-4">
-                                  <div className="w-10 h-10 rounded-xl bg-green-500/20 flex items-center justify-center">
-                                    <Banknote className="w-5 h-5 text-green-400" />
+                                  <div className="w-10 h-10 rounded-xl bg-red-500/20 flex items-center justify-center">
+                                    <CreditCard className="w-5 h-5 text-red-400" />
                                   </div>
                                   <div>
-                                    <h4 className="text-xl font-bold text-green-400">Transferencia Electrónica</h4>
-                                    <p className="text-green-300/80 text-sm">Método recomendado - Sin comisiones</p>
+                                    <h4 className="text-xl font-bold text-red-400">Transbank Webpay</h4>
+                                    <p className="text-red-300/80 text-sm">Método seguro y confiable - Tarjetas chilenas</p>
                                   </div>
                                 </div>
-                        </div>
-                      </div>
+                              </div>
+                            </div>
 
-                            <div className="grid lg:grid-cols-2 gap-8">
-                              {/* Datos bancarios */}
-                              <div className="space-y-6">
-                                <div className="flex items-center gap-3 mb-4">
+                            {/* Información de Transbank */}
+                            <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-8 border border-white/10">
+                              <div className="text-center mb-8">
+                                <div className="w-20 h-20 bg-gradient-to-r from-red-500 to-red-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                                  <CreditCard className="w-10 h-10 text-white" />
+                                </div>
+                                <h3 className="text-2xl font-bold text-foreground mb-2">Pago con Transbank</h3>
+                                <p className="text-muted-foreground">Usa tu tarjeta de crédito o débito chilena de forma segura</p>
+                              </div>
+
+                              {/* Tarjetas aceptadas */}
+                              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                                <div className="bg-white/10 rounded-xl p-4 text-center">
+                                  <div className="text-2xl font-bold text-blue-400 mb-1">VISA</div>
+                                  <p className="text-xs text-muted-foreground">Crédito/Débito</p>
+                                </div>
+                                <div className="bg-white/10 rounded-xl p-4 text-center">
+                                  <div className="text-2xl font-bold text-orange-400 mb-1">MC</div>
+                                  <p className="text-xs text-muted-foreground">Mastercard</p>
+                                </div>
+                                <div className="bg-white/10 rounded-xl p-4 text-center">
+                                  <div className="text-2xl font-bold text-green-400 mb-1">MAGNA</div>
+                                  <p className="text-xs text-muted-foreground">Redbanc</p>
+                                </div>
+                                <div className="bg-white/10 rounded-xl p-4 text-center">
+                                  <div className="text-2xl font-bold text-purple-400 mb-1">DINERS</div>
+                                  <p className="text-xs text-muted-foreground">Club</p>
+                                </div>
+                              </div>
+
+                              {/* Proceso simplificado */}
+                              <div className="space-y-4 mb-8">
+                                <h4 className="font-semibold text-foreground mb-4">Proceso rápido y seguro:</h4>
+                                
+                                <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-blue-500/10 to-transparent rounded-xl border border-blue-500/20">
+                                  <div className="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-bold">1</div>
+                                  <div>
+                                    <p className="font-medium text-foreground">Serás redirigido a Transbank</p>
+                                    <p className="text-sm text-muted-foreground">Ingresa los datos de tu tarjeta de forma segura</p>
+                                  </div>
+                                </div>
+
+                                <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-green-500/10 to-transparent rounded-xl border border-green-500/20">
+                                  <div className="w-8 h-8 bg-green-500 text-white rounded-full flex items-center justify-center text-sm font-bold">2</div>
+                                  <div>
+                                    <p className="font-medium text-foreground">Confirmación inmediata</p>
+                                    <p className="text-sm text-muted-foreground">Recibes confirmación al instante</p>
+                                  </div>
+                                </div>
+
+                                <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-purple-500/10 to-transparent rounded-xl border border-purple-500/20">
+                                  <div className="w-8 h-8 bg-purple-500 text-white rounded-full flex items-center justify-center text-sm font-bold">3</div>
+                                  <div>
+                                    <p className="font-medium text-foreground">Cita confirmada automáticamente</p>
+                                    <p className="text-sm text-muted-foreground">Te enviaremos los detalles por email</p>
+                                  </div>
+                                </div>
+                              </div>
+
+                              {/* Botón de pago principal */}
+                              <motion.button
+                                onClick={() => {
+                                  // Proceder con Transbank
+                                  const transbankData = {
+                                    amount: paymentData.price.replace(/\./g, ''),
+                                    orderId: `PL-${Date.now()}`,
+                                    description: paymentData.service,
+                                    returnUrl: `${window.location.origin}/payment-success?method=transbank`
+                                  };
+                                  localStorage.setItem('transbankData', JSON.stringify(transbankData));
+                                  // En producción, redirigir a Transbank
+                                  window.location.href = '/payment-success?method=transbank';
+                                }}
+                                className="w-full bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white py-4 px-6 rounded-2xl font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-3"
+                                whileHover={{ scale: 1.02 }}
+                                whileTap={{ scale: 0.98 }}
+                              >
+                                <Lock className="w-5 h-5" />
+                                Pagar con Transbank - ${paymentData.price}
+                              </motion.button>
+
+                              {/* Indicadores de seguridad */}
+                              <div className="flex items-center justify-center gap-6 mt-6 text-sm text-muted-foreground">
+                                <div className="flex items-center gap-2">
+                                  <Shield className="w-4 h-4 text-green-500" />
+                                  <span>Protegido por Transbank</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <Lock className="w-4 h-4 text-blue-500" />
+                                  <span>Encriptación SSL</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <CheckCircle className="w-4 h-4 text-purple-500" />
+                                  <span>Certificado PCI</span>
+                                </div>
+                              </div>
+                            </div>
+                          </motion.div>
+                        ) : selectedPaymentMethod === 'mercadopago' && !isProcessing ? (
+                          <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.6 }}
+                            className="space-y-8"
+                          >
+                            {/* Redirigir a página específica de MercadoPago */}
+                            <div className="text-center">
+                              <p className="text-muted-foreground mb-4">Serás redirigido a MercadoPago para completar tu pago</p>
+                              <motion.button
+                                onClick={() => window.location.href = '/mercadopago'}
+                                className="bg-gradient-to-r from-blue-500 to-blue-600 text-white py-3 px-6 rounded-xl font-semibold"
+                                whileHover={{ scale: 1.05 }}
+                              >
+                                Continuar con MercadoPago
+                              </motion.button>
+                            </div>
+                          </motion.div>
+                        ) : (
                                   <div className="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center">
                                     <Lock className="w-4 h-4 text-blue-400" />
                                   </div>
@@ -721,8 +835,16 @@ export default function PaymentPage() {
                               </div>
                             </motion.div>
 
-                            {/* MercadoPago - Próximamente */}
-                            <div className="bg-white/5 border border-white/20 rounded-2xl p-6 opacity-60 cursor-not-allowed">
+                            {/* MercadoPago - Disponible */}
+                            <motion.div 
+                              className="bg-white/5 border border-white/20 rounded-2xl p-6 hover:border-blue-400/50 hover:bg-white/10 cursor-pointer transition-all duration-300"
+                              onClick={() => {
+                                // Redirigir a página específica de MercadoPago
+                                window.location.href = '/mercadopago';
+                              }}
+                              whileHover={{ scale: 1.02 }}
+                              whileTap={{ scale: 0.98 }}
+                            >
                               <div className="flex items-center gap-4">
                                 <div className="w-12 h-12 bg-blue-400/20 rounded-2xl flex items-center justify-center">
                                   <svg className="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -730,21 +852,21 @@ export default function PaymentPage() {
                                   </svg>
                                 </div>
                                 <div className="flex-1">
-                                  <h4 className="font-semibold text-foreground">MercadoPago</h4>
+                                  <h4 className="font-semibold text-foreground group-hover:text-primary transition-colors">MercadoPago</h4>
                                   <p className="text-sm text-muted-foreground">
-                                    Pago en cuotas sin interés • Múltiples opciones • Flexible
+                                    Pago en cuotas disponible • Seguro y flexible
                                   </p>
                                 </div>
                                 <div className="flex items-center gap-2">
-                                  <div className="text-orange-400 text-xs font-semibold bg-orange-400/20 px-2 py-1 rounded-full">
-                                    Próximamente
+                                  <div className="text-green-400 text-xs font-semibold bg-green-400/20 px-2 py-1 rounded-full">
+                                    Disponible
                                   </div>
-                                  <div className="text-blue-400 text-xs font-semibold bg-blue-400/20 px-2 py-1 rounded-full opacity-50">
+                                  <div className="text-blue-400 text-xs font-semibold bg-blue-400/20 px-2 py-1 rounded-full">
                                     Hasta 12 cuotas
                                   </div>
                                 </div>
                               </div>
-                            </div>
+                            </motion.div>
 
                             {/* Bitcoin - Próximamente */}
                             <div className="bg-white/5 border border-white/20 rounded-2xl p-6 opacity-60 cursor-not-allowed">

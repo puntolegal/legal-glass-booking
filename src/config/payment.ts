@@ -2,18 +2,18 @@
 export const PAYMENT_CONFIG = {
   // WebPay (Transbank) - Pasarela principal en Chile
   webpay: {
-    commerceCode: process.env.VITE_WEBPAY_COMMERCE_CODE || '597055555532',
-    apiKey: process.env.VITE_WEBPAY_API_KEY || '',
-    environment: process.env.VITE_WEBPAY_ENVIRONMENT || 'integration', // 'integration' | 'production'
-    returnUrl: process.env.VITE_WEBPAY_RETURN_URL || 'http://localhost:8080/payment/success',
-    cancelUrl: process.env.VITE_WEBPAY_CANCEL_URL || 'http://localhost:8080/payment/cancel',
+    commerceCode: import.meta.env.VITE_WEBPAY_COMMERCE_CODE || '597055555532',
+    apiKey: import.meta.env.VITE_WEBPAY_API_KEY || '',
+    environment: import.meta.env.VITE_WEBPAY_ENVIRONMENT || 'integration', // 'integration' | 'production'
+    returnUrl: import.meta.env.VITE_WEBPAY_RETURN_URL || 'http://localhost:8080/payment/success',
+    cancelUrl: import.meta.env.VITE_WEBPAY_CANCEL_URL || 'http://localhost:8080/payment/cancel',
   },
   
   // PayPal - Pasarela internacional
   paypal: {
-    clientId: process.env.VITE_PAYPAL_CLIENT_ID || '',
-    clientSecret: process.env.VITE_PAYPAL_CLIENT_SECRET || '',
-    environment: process.env.VITE_PAYPAL_ENVIRONMENT || 'sandbox', // 'sandbox' | 'production'
+    clientId: import.meta.env.VITE_PAYPAL_CLIENT_ID || '',
+    clientSecret: import.meta.env.VITE_PAYPAL_CLIENT_SECRET || '',
+    environment: import.meta.env.VITE_PAYPAL_ENVIRONMENT || 'sandbox', // 'sandbox' | 'production'
     currency: 'CLP',
   },
   

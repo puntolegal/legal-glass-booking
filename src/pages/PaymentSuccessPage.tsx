@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { CheckCircle, Home, Mail, Phone, Calendar, ArrowRight } from 'lucide-react';
@@ -8,15 +8,38 @@ import { MobileLayout } from '@/components/MobileLayout';
 
 export default function PaymentSuccessPage() {
   const { serviceId } = useParams<{ serviceId: string }>();
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const [service, setService] = useState<any>(null);
+  const [paymentData, setPaymentData] = useState<any>(null);
+
+  // Parámetros de MercadoPago en URL de retorno
+  const paymentId = searchParams.get('payment_id');
+  const status = searchParams.get('status');
+  const externalReference = searchParams.get('external_reference');
+  const merchantOrderId = searchParams.get('merchant_order_id');
+  const preferenceId = searchParams.get('preference_id');
+  const source = searchParams.get('source');
 
   useEffect(() => {
+    // Recuperar datos del pago desde localStorage
+    const storedPaymentData = localStorage.getItem('paymentData') || localStorage.getItem('paymentSuccess');
+    if (storedPaymentData) {
+      setPaymentData(JSON.parse(storedPaymentData));
+    }
+    
     if (serviceId) {
       const serviceData = getServicePricing(serviceId);
       setService(serviceData);
     }
-  }, [serviceId]);
+    
+    // Log de parámetros de MercadoPago
+    if (source === 'mercadopago') {
+      console.log('✅ Pago exitoso desde MercadoPago:', {
+        paymentId, status, externalReference, merchantOrderId, preferenceId
+      });
+    }
+  }, [serviceId, paymentId, status, externalReference, merchantOrderId, preferenceId, source]);
 
   if (!service) {
     return (

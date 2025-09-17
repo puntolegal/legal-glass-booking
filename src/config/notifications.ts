@@ -39,6 +39,69 @@ export const NOTIFICATION_CONFIG = {
     email: 'puntolegalelgolf@gmail.com',
     asunto: '📅 Nueva cita agendada - Punto Legal',
     asuntoRecordatorio: '🔔 Recordatorio: Cita mañana - Punto Legal'
+  },
+
+  // Configuración corporativa
+  corporativo: {
+    email: 'empresas@puntolegal.cl',
+    asunto: '🏢 Nueva solicitud corporativa - Punto Legal',
+    asuntoRecordatorio: '🔔 Recordatorio: Audiencia corporativa mañana',
+    dashboardUrl: '/servicios/corporativo',
+    planSuscripcion: {
+      basico: {
+        precio: 350000,
+        moneda: 'CLP',
+        periodo: 'unico',
+        caracteristicas: [
+          'Constitución SpA o EIRL',
+          'Estatutos estándar',
+          'Inscripción CBR',
+          'RUT empresa',
+          '1 mes soporte básico'
+        ]
+      },
+      premium: {
+        precio: 750000,
+        moneda: 'CLP',
+        periodo: 'unico',
+        caracteristicas: [
+          'Todo lo del plan Básico',
+          'Estatutos personalizados',
+          '3 contratos comerciales',
+          'Políticas internas básicas',
+          '6 meses soporte legal',
+          'Asesoría tributaria inicial'
+        ]
+      },
+      enterprise: {
+        precio: 1500000,
+        moneda: 'CLP',
+        periodo: 'unico',
+        caracteristicas: [
+          'Todo lo del plan Premium',
+          'Due diligence completo',
+          'Estructuración M&A',
+          'Compliance corporativo',
+          '12 meses soporte premium',
+          'Abogado dedicado'
+        ]
+      },
+      suscripcion: {
+        precio: 800000,
+        moneda: 'CLP',
+        periodo: 'mensual',
+        caracteristicas: [
+          'Panel de control empresarial',
+          'Seguimiento completo de causas',
+          'Comparendos ante Inspección del Trabajo',
+          'Redacción de contratos y amonestaciones',
+          'Gestión de despidos y otros procesos',
+          'Proyecciones de resultados en juicio',
+          'Notificaciones automáticas',
+          'Soporte prioritario 24/7'
+        ]
+      }
+    }
   }
 };
 
@@ -118,6 +181,78 @@ export const EMAIL_TEMPLATES = {
       'telefono_cliente',
       'email_cliente'
     ]
+  },
+
+  // Templates corporativos
+  nuevaCausa: {
+    asunto: '⚖️ Nueva causa registrada - Punto Legal',
+    variables: [
+      'nombre_empresa',
+      'titulo_causa',
+      'tipo_causa',
+      'tribunal',
+      'numero_causa',
+      'fecha_inicio',
+      'abogado_asignado',
+      'costo_estimado',
+      'resultado_proyectado'
+    ]
+  },
+
+  audienciaProxima: {
+    asunto: '📅 Audiencia programada - Punto Legal',
+    variables: [
+      'nombre_empresa',
+      'titulo_causa',
+      'tipo_audiencia',
+      'fecha_audiencia',
+      'hora_audiencia',
+      'lugar_audiencia',
+      'tribunal',
+      'documentos_requeridos',
+      'abogado_asignado'
+    ]
+  },
+
+  documentoVencido: {
+    asunto: '⚠️ Documento por vencer - Punto Legal',
+    variables: [
+      'nombre_empresa',
+      'titulo_documento',
+      'tipo_documento',
+      'fecha_vencimiento',
+      'causa_relacionada',
+      'dias_restantes',
+      'accion_requerida'
+    ]
+  },
+
+  actualizacionCausa: {
+    asunto: '📊 Actualización de causa - Punto Legal',
+    variables: [
+      'nombre_empresa',
+      'titulo_causa',
+      'estado_anterior',
+      'estado_nuevo',
+      'fecha_actualizacion',
+      'descripcion_cambios',
+      'proximos_pasos',
+      'abogado_asignado'
+    ]
+  },
+
+  proyeccionResultado: {
+    asunto: '📈 Proyección de resultado - Punto Legal',
+    variables: [
+      'nombre_empresa',
+      'titulo_causa',
+      'tipo_proyeccion',
+      'valor_proyectado',
+      'confianza_porcentaje',
+      'fundamento',
+      'fecha_proyeccion',
+      'abogado_asignado'
+    ]
   }
 };
 
@@ -158,6 +293,92 @@ export interface MakeWebhookData {
     metodo: string;
     estado: 'pendiente' | 'pagado' | 'fallido';
   };
+
+  // Datos corporativos (opcional)
+  corporativo?: {
+    razon_social: string;
+    rut_empresa: string;
+    tipo_empresa: string;
+    plan_suscripcion: string;
+    industria: string;
+    tamano_empresa: string;
+  };
+}
+
+// Estructura de datos para causas corporativas
+export interface CausaData {
+  id?: string;
+  user_id: string;
+  empresa_id: string;
+  titulo: string;
+  tipo: 'laboral' | 'comercial' | 'tributario' | 'dt' | 'civil' | 'penal';
+  estado: 'pendiente' | 'en_proceso' | 'resuelto' | 'apelacion' | 'archivado';
+  prioridad: 'baja' | 'media' | 'alta' | 'urgente';
+  descripcion?: string;
+  fecha_inicio: string;
+  fecha_proxima_audiencia?: string;
+  hora_proxima_audiencia?: string;
+  tribunal?: string;
+  numero_causa?: string;
+  abogado_asignado?: string;
+  costo_estimado?: number;
+  resultado_proyectado?: string;
+  probabilidad_exito?: number;
+  documentos?: any;
+  notas?: string;
+}
+
+// Estructura de datos para comparendos
+export interface ComparendoData {
+  id?: string;
+  causa_id: string;
+  tipo: 'audiencia' | 'comparendo' | 'mediacion' | 'conciliacion';
+  fecha: string;
+  hora: string;
+  lugar?: string;
+  descripcion?: string;
+  estado: 'programada' | 'realizada' | 'cancelada' | 'pospuesta';
+  resultado?: string;
+  documentos_requeridos?: string[];
+}
+
+// Estructura de datos para documentos legales
+export interface DocumentoLegalData {
+  id?: string;
+  causa_id: string;
+  tipo: 'contrato' | 'amonestacion' | 'despido' | 'demanda' | 'respuesta' | 'recurso' | 'otro';
+  titulo: string;
+  descripcion?: string;
+  contenido?: string;
+  archivo_url?: string;
+  estado: 'borrador' | 'revisado' | 'aprobado' | 'enviado';
+  fecha_creacion?: string;
+  fecha_vencimiento?: string;
+}
+
+// Estructura de datos para proyecciones
+export interface ProyeccionData {
+  id?: string;
+  causa_id: string;
+  tipo_proyeccion: 'resultado_juicio' | 'tiempo_resolucion' | 'costo_total' | 'probabilidad_exito';
+  valor_proyectado: string;
+  confianza: number;
+  fundamento?: string;
+  fecha_proyeccion?: string;
+  fecha_actualizacion?: string;
+}
+
+// Estructura de datos para notificaciones empresariales
+export interface NotificacionEmpresarialData {
+  id?: string;
+  empresa_id: string;
+  tipo: 'audiencia_proxima' | 'documento_vencido' | 'causa_actualizada' | 'pago_pendiente' | 'sistema';
+  titulo: string;
+  mensaje: string;
+  leida?: boolean;
+  fecha_envio?: string;
+  fecha_lectura?: string;
+  datos_adicionales?: any;
 }
 
 // Función para generar el payload para Make.com
@@ -165,7 +386,8 @@ export function generateMakePayload(
   reservation: any,
   source: 'website' | 'mobile' | 'api' = 'website',
   googleData?: any,
-  pagoData?: any
+  pagoData?: any,
+  corporativoData?: any
 ): MakeWebhookData {
   return {
     // Datos básicos de la solicitud
@@ -202,6 +424,88 @@ export function generateMakePayload(
       monto: pagoData.monto,
       metodo: pagoData.metodo,
       estado: pagoData.estado
+    } : undefined,
+
+    // Datos corporativos (opcional)
+    corporativo: corporativoData ? {
+      razon_social: corporativoData.razon_social,
+      rut_empresa: corporativoData.rut_empresa,
+      tipo_empresa: corporativoData.tipo_empresa,
+      plan_suscripcion: corporativoData.plan_suscripcion,
+      industria: corporativoData.industria,
+      tamano_empresa: corporativoData.tamano_empresa
     } : undefined
+  };
+}
+
+// Función para generar payload de causa corporativa
+export function generateCausaPayload(
+  causa: CausaData,
+  empresa: any
+): any {
+  return {
+    // Datos de la causa
+    titulo: causa.titulo,
+    tipo: causa.tipo,
+    estado: causa.estado,
+    prioridad: causa.prioridad,
+    descripcion: causa.descripcion,
+    fecha_inicio: causa.fecha_inicio,
+    fecha_proxima_audiencia: causa.fecha_proxima_audiencia,
+    tribunal: causa.tribunal,
+    numero_causa: causa.numero_causa,
+    costo_estimado: causa.costo_estimado,
+    resultado_proyectado: causa.resultado_proyectado,
+    probabilidad_exito: causa.probabilidad_exito,
+
+    // Datos de la empresa
+    empresa: {
+      nombre: empresa.razon_social || empresa.nombre,
+      rut: empresa.rut_empresa,
+      email: empresa.email,
+      telefono: empresa.telefono_empresa,
+      plan_suscripcion: empresa.plan_suscripcion
+    },
+
+    // Datos del sistema
+    created_at: new Date().toISOString(),
+    source: 'dashboard_corporativo'
+  };
+}
+
+// Función para generar payload de comparendo
+export function generateComparendoPayload(
+  comparendo: ComparendoData,
+  causa: CausaData,
+  empresa: any
+): any {
+  return {
+    // Datos del comparendo
+    tipo: comparendo.tipo,
+    fecha: comparendo.fecha,
+    hora: comparendo.hora,
+    lugar: comparendo.lugar,
+    descripcion: comparendo.descripcion,
+    estado: comparendo.estado,
+    documentos_requeridos: comparendo.documentos_requeridos,
+
+    // Datos de la causa relacionada
+    causa: {
+      titulo: causa.titulo,
+      tipo: causa.tipo,
+      numero_causa: causa.numero_causa,
+      tribunal: causa.tribunal
+    },
+
+    // Datos de la empresa
+    empresa: {
+      nombre: empresa.razon_social || empresa.nombre,
+      rut: empresa.rut_empresa,
+      email: empresa.email
+    },
+
+    // Datos del sistema
+    created_at: new Date().toISOString(),
+    source: 'dashboard_corporativo'
   };
 } 

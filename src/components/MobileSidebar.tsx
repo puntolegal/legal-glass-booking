@@ -61,17 +61,29 @@ export default function MobileSidebar({ open, onClose }: MobileSidebarProps) {
       >
         {/* Header fijo */}
         <div className="flex-shrink-0 p-6 pt-8 border-b border-white/10">
-          <button
-            aria-label="Cerrar menú"
-            onClick={onClose}
-            className="self-end text-gray-200 text-2xl bg-transparent border-0 hover:text-accent focus:outline-none"
-          >
-            ✕
-          </button>
+          <div className="flex items-center justify-between">
+            {/* Logo P naranja */}
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl flex items-center justify-center shadow-lg shadow-orange-500/30">
+                <span className="text-white font-bold text-xl">P</span>
+              </div>
+              <span className="text-white font-bold text-lg">Punto Legal</span>
+            </div>
+            <button
+              aria-label="Cerrar menú"
+              onClick={onClose}
+              className="text-gray-200 text-2xl bg-transparent border-0 hover:text-accent focus:outline-none"
+            >
+              ✕
+            </button>
+          </div>
         </div>
 
         {/* Contenido scrolleable con scrollbar móvil personalizado */}
-        <div className="flex-1 overflow-y-auto scrollbar-mobile">
+        <div className="flex-1 overflow-y-auto scrollbar-mobile" style={{ 
+          scrollbarWidth: 'thin',
+          scrollbarColor: 'rgba(255, 255, 255, 0.3) transparent'
+        }}>
           <div className="p-6">
             {/* Navegación */}
             <nav className="mb-8">

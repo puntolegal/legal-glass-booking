@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import DarkModeToggle from "./DarkModeToggle";
 import NavigationButton from "@/components/ui/navigation-button";
 import DropdownMenu from "./DropdownMenu";
-import { Menu, Home, FileText, Phone, Scale, Sparkles, Calendar, User, Bell, Search } from "lucide-react";
+import { Menu, Home, FileText, Phone, Scale, Sparkles, Calendar, User, Bell, Search, BookOpen } from "lucide-react";
 import { usePageTitle } from "@/hooks/usePageTitle";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useSidebar } from "@/contexts/SidebarContext";
@@ -15,6 +15,8 @@ const Header = ({ onAgendarClick, serviceName }: { onAgendarClick?: () => void; 
   const { isOpen, toggleSidebar } = useSidebar();
   const [isScrolled, setIsScrolled] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
+  const [isHeaderVisible, setIsHeaderVisible] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
 
   const { scrollY } = useScroll();
   const navigate = useNavigate();
@@ -24,82 +26,95 @@ const Header = ({ onAgendarClick, serviceName }: { onAgendarClick?: () => void; 
   const handleHomeClick = (e: React.MouseEvent) => {
     e.preventDefault();
     if (location.pathname === '/') {
-      // Si ya estamos en inicio, scroll al top
       window.scrollTo({
         top: 0,
         behavior: 'smooth'
       });
     } else {
-      // Si no estamos en inicio, navegar allí
       navigate('/');
     }
   };
   
-  // Efecto de scroll para glassmorfismo dinámico
+  // Efecto de scroll para transparencia dinámica y visibilidad del header
   useEffect(() => {
     const unsubscribe = scrollY.onChange((latest) => {
-      setIsScrolled(latest > 20);
+      setIsScrolled(latest > 50);
+      
+      // Lógica para mostrar/ocultar header con suavidad
+      if (latest < 100) {
+        setIsHeaderVisible(true);
+      } else if (latest < lastScrollY) {
+        setIsHeaderVisible(true);
+      } else if (latest > lastScrollY && latest > 200) {
+        setIsHeaderVisible(false);
+      }
+      
+      setLastScrollY(latest);
     });
     return unsubscribe;
-  }, [scrollY]);
+  }, [scrollY, lastScrollY]);
 
   const navItems = [
     { icon: Home, label: "Inicio", href: "/", color: "blue" },
     { icon: Scale, label: "Servicios", href: "/servicios", color: "purple", hasDropdown: true },
     { icon: FileText, label: "Blog", href: "/blog", color: "green" },
-    { icon: Phone, label: "¡Ayuda Legal Urgente!", href: "/urgente", color: "orange" },
+    { icon: BookOpen, label: "Apuntes", href: "/apuntes/home", color: "indigo" },
+    { icon: Phone, label: "¡Ayuda Legal Urgente!", href: "/urgente", color: "red" },
   ];
 
   return (
     <motion.header 
-      className={`fixed top-0 right-0 z-40 transition-all duration-500 ${
+      className={`fixed top-0 right-0 z-50 transition-all duration-700 ease-out ${
         isOpen ? 'left-80' : 'left-0'
       }`}
       initial={{ y: -100, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.8, type: "spring", stiffness: 100 }}
+      animate={{ 
+        y: isHeaderVisible ? 0 : -100, 
+        opacity: isHeaderVisible ? 1 : 0 
+      }}
+      transition={{ duration: 0.4, type: "spring", damping: 25 }}
     >
-      {/* Dock Container */}
+      {/* 🌟 DOCK COMPACTO ORIGINAL CON TRANSPARENCIA PREMIUM */}
       <div className="flex justify-center pt-4 px-4">
         <motion.div
           className={`
             relative flex items-center gap-2 px-6 py-3 rounded-2xl border transition-all duration-500
             ${isScrolled 
-              ? 'bg-black/30 backdrop-blur-2xl border-white/20 shadow-2xl' 
-              : 'bg-black/20 backdrop-blur-xl border-white/20 shadow-xl'
+              ? 'bg-black/30 dark:bg-black/40 backdrop-blur-2xl border-white/20 dark:border-white/15 shadow-2xl' 
+              : 'bg-black/20 dark:bg-black/30 backdrop-blur-xl border-white/20 dark:border-white/15 shadow-xl'
             }
           `}
           whileHover={{ scale: 1.02, y: -2 }}
           transition={{ type: "spring", stiffness: 300, damping: 20 }}
         >
-                     {/* Efectos de fondo animados - estilo sidebar */}
-           <div className="absolute inset-0 rounded-2xl overflow-hidden">
-             {/* Partículas flotantes sutiles */}
-             {[...Array(4)].map((_, i) => (
-               <motion.div
-                 key={i}
-                 className="absolute w-1.5 h-1.5 bg-primary/15 rounded-full"
-                 animate={{
-                   x: [0, 60, 0],
-                   y: [0, -60, 0],
-                   opacity: [0, 0.6, 0],
-                 }}
-                 transition={{
-                   duration: 12 + i * 3,
-                   repeat: Infinity,
-                   delay: i * 2,
-                   ease: "easeInOut"
-                 }}
-                 style={{
-                   left: `${25 + i * 20}%`,
-                   top: `${40 + i * 15}%`,
-                 }}
-               />
-             ))}
-           </div>
+          {/* Efectos de fondo animados - estilo sidebar */}
+          <div className="absolute inset-0 rounded-2xl overflow-hidden">
+            {/* Partículas flotantes sutiles */}
+            {[...Array(4)].map((_, i) => (
+              <motion.div
+                key={i}
+                className="absolute w-1.5 h-1.5 bg-primary/15 rounded-full"
+                animate={{
+                  x: [0, 60, 0],
+                  y: [0, -60, 0],
+                  opacity: [0, 0.6, 0],
+                }}
+                transition={{
+                  duration: 12 + i * 3,
+                  repeat: Infinity,
+                  delay: i * 2,
+                  ease: "easeInOut"
+                }}
+                style={{
+                  left: `${25 + i * 20}%`,
+                  top: `${40 + i * 15}%`,
+                }}
+              />
+            ))}
+          </div>
 
-           {/* Gradient overlay estilo sidebar */}
-           <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-primary/10 pointer-events-none rounded-2xl" />
+          {/* Gradient overlay estilo sidebar */}
+          <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-primary/10 pointer-events-none rounded-2xl" />
 
           {/* Botón de menú + Logo compacto */}
           <div className="flex items-center gap-3 mr-4">
@@ -122,18 +137,18 @@ const Header = ({ onAgendarClick, serviceName }: { onAgendarClick?: () => void; 
               transition={{ type: "spring", stiffness: 400 }}
             >
               <div className="relative group">
-                               <motion.div 
-                   className="w-8 h-8 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center backdrop-blur-xl shadow-lg border border-white/10"
-                   whileHover={{ 
-                     scale: 1.1, 
-                     rotate: 10,
-                     boxShadow: "0 0 20px rgba(255, 107, 53, 0.3)"
-                   }}
-                   whileTap={{ scale: 0.95 }}
-                   transition={{ type: "spring", stiffness: 400, damping: 17 }}
-                 >
-                   <Scale className="w-4 h-4 text-primary" />
-                 </motion.div>
+                <motion.div 
+                  className="w-8 h-8 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center backdrop-blur-xl shadow-lg border border-white/10"
+                  whileHover={{ 
+                    scale: 1.1, 
+                    rotate: 10,
+                    boxShadow: "0 0 20px rgba(255, 107, 53, 0.3)"
+                  }}
+                  whileTap={{ scale: 0.95 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                >
+                  <Scale className="w-4 h-4 text-primary" />
+                </motion.div>
               </div>
               <div className="hidden sm:block">
                 <span className="text-sm font-bold text-foreground/90">Punto Legal</span>
@@ -262,67 +277,69 @@ const Header = ({ onAgendarClick, serviceName }: { onAgendarClick?: () => void; 
             {/* Dark mode toggle */}
             <DarkModeToggle />
 
-            {/* CTA Button estilo iOS */}
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="ml-2"
-            >
-              <Button 
-                onClick={() => {
-                  if (onAgendarClick) {
-                    onAgendarClick();
-                  } else {
-                    // Redirigir a consulta general por $35.000
-                    navigate('/agendamiento?plan=general');
-                  }
-                }}
-                className="group relative overflow-hidden rounded-2xl bg-gradient-to-r from-primary via-primary/90 to-primary/80 px-4 py-2 text-white font-semibold text-sm shadow-lg hover:shadow-xl transition-all duration-300 border border-white/20"
+            {/* CTA Button estilo iOS - Solo en páginas relevantes */}
+            {(location.pathname === '/' || location.pathname.includes('/servicios') || location.pathname === '/blog') && (
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="ml-2"
               >
-                {/* Efecto de brillo iOS */}
-                <motion.div 
-                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 transform -skew-x-12"
-                  initial={{ x: "-100%" }}
-                  whileHover={{ x: "100%" }}
-                  transition={{ duration: 0.6 }}
-                />
-                
-                {/* Micro-interacciones */}
-                <div className="relative flex items-center gap-2">
-                  <Calendar className="w-4 h-4" />
-                  <span className="hidden sm:inline">Agendar</span>
-                  
-                  {/* Partícula flotante */}
-                  <motion.div
-                    className="absolute -top-1 -right-1 w-1 h-1 bg-white/60 rounded-full"
-                    animate={{
-                      scale: [0, 1, 0],
-                      opacity: [0, 1, 0],
-                    }}
-                    transition={{
-                      duration: 2,
-                      repeat: Infinity,
-                      delay: 1,
-                    }}
+                <Button 
+                  onClick={() => {
+                    if (onAgendarClick) {
+                      onAgendarClick();
+                    } else {
+                      // Redirigir a consulta general por $35.000
+                      navigate('/agendamiento?plan=general');
+                    }
+                  }}
+                  className="group relative overflow-hidden rounded-2xl bg-gradient-to-r from-orange-500 via-amber-500 to-yellow-500 hover:from-orange-600 hover:via-amber-600 hover:to-yellow-600 px-4 py-2 text-white font-semibold text-sm shadow-lg hover:shadow-xl hover:shadow-orange-500/25 transition-all duration-300 border border-orange-500/20"
+                >
+                  {/* Efecto de brillo iOS */}
+                  <motion.div 
+                    className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 transform -skew-x-12"
+                    initial={{ x: "-100%" }}
+                    whileHover={{ x: "100%" }}
+                    transition={{ duration: 0.6 }}
                   />
-                </div>
-              </Button>
-            </motion.div>
+                  
+                  {/* Micro-interacciones */}
+                  <div className="relative flex items-center gap-2">
+                    <Calendar className="w-4 h-4" />
+                    <span className="hidden sm:inline">Agendar</span>
+                    
+                    {/* Partícula flotante */}
+                    <motion.div
+                      className="absolute -top-1 -right-1 w-1 h-1 bg-white/60 rounded-full"
+                      animate={{
+                        scale: [0, 1, 0],
+                        opacity: [0, 1, 0],
+                      }}
+                      transition={{
+                        duration: 2,
+                        repeat: Infinity,
+                        delay: 1,
+                      }}
+                    />
+                  </div>
+                </Button>
+              </motion.div>
+            )}
           </div>
 
-                     {/* Indicador de conexión estilo sidebar */}
-           <motion.div
-             className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-8 h-1 bg-gradient-to-r from-primary to-primary/60 rounded-full opacity-60"
-             animate={{
-               width: [32, 40, 32],
-               opacity: [0.6, 0.8, 0.6],
-             }}
-             transition={{
-               duration: 3,
-               repeat: Infinity,
-               ease: "easeInOut"
-             }}
-           />
+          {/* Indicador de conexión estilo sidebar */}
+          <motion.div
+            className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-8 h-1 bg-gradient-to-r from-primary to-primary/60 rounded-full opacity-60"
+            animate={{
+              width: [32, 40, 32],
+              opacity: [0.6, 0.8, 0.6],
+            }}
+            transition={{
+              duration: 3,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+          />
         </motion.div>
       </div>
 
@@ -382,8 +399,6 @@ const Header = ({ onAgendarClick, serviceName }: { onAgendarClick?: () => void; 
         }}
         transition={{ duration: 0.3 }}
       />
-
-
     </motion.header>
   );
 };

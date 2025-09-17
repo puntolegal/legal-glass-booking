@@ -61,7 +61,7 @@ const TestimonialsSection = () => {
               Casos de Éxito
             </span>
           </h2>
-          <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+          <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed text-center md:text-left">
             Testimonios reales de clientes que obtuvieron resultados favorables 
             con nuestra asesoría legal especializada
           </p>
@@ -96,8 +96,8 @@ const TestimonialsSection = () => {
                 ))}
               </div>
 
-              {/* Testimonio */}
-              <blockquote className="text-muted-foreground mb-6 italic leading-relaxed text-sm lg:text-base">
+              {/* Testimonio - Justificado y ajustado */}
+              <blockquote className="text-muted-foreground mb-6 italic leading-relaxed text-sm lg:text-base text-justify">
                 "{testimonial.testimonial}"
               </blockquote>
 

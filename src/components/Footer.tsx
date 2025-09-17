@@ -1,283 +1,515 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { 
-  Scale, 
-  Mail, 
-  MapPin, 
+  BookOpen, 
+  GraduationCap, 
+  Brain, 
+  Target, 
+  Award,
+  Mail,
   Phone,
-  Facebook,
-  Instagram,
-  Linkedin,
-  Twitter,
+  MapPin,
+  ExternalLink,
   Heart,
   Sparkles,
-  ArrowRight
+  Zap,
+  Trophy,
+  Users,
+  TrendingUp
 } from 'lucide-react';
 
-export default function Footer() {
-  const currentYear = new Date().getFullYear();
+const Footer: React.FC = () => {
+  const location = useLocation();
+  const isApuntesSection = location.pathname.startsWith('/apuntes');
 
+  // Configuración específica para Punto Legal Apuntes
+  if (isApuntesSection) {
+    const apuntesServices = [
+      { name: 'Derecho Civil', href: '/apuntes?category=derecho-civil' },
+      { name: 'Derecho Penal', href: '/apuntes?category=derecho-penal' },
+      { name: 'Derecho Constitucional', href: '/apuntes?category=derecho-constitucional' },
+      { name: 'Derecho Procesal', href: '/apuntes?category=derecho-procesal' },
+      { name: 'Derecho Comercial', href: '/apuntes?category=derecho-comercial' },
+      { name: 'Derecho Tributario', href: '/apuntes?category=derecho-tributario' }
+    ];
+
+    const studyTools = [
+      { name: 'Sistema de Gamificación', href: '/apuntes' },
+      { name: 'Conceptos Interactivos', href: '/apuntes' },
+      { name: 'Seguimiento de Progreso', href: '/apuntes' },
+      { name: 'Estadísticas de Estudio', href: '/apuntes' }
+    ];
+
+    const legal = [
+      { name: 'Términos de Uso', href: '/terms-of-service' },
+      { name: 'Política de Privacidad', href: '/privacy-policy' },
+      { name: 'Aviso Legal', href: '/terms-of-service' }
+    ];
+
+    const socialLinks = [
+      { name: 'Instagram', href: 'https://instagram.com/puntolegalapuntes', icon: '📸' },
+      { name: 'LinkedIn', href: 'https://linkedin.com/company/puntolegalapuntes', icon: '💼' },
+      { name: 'YouTube', href: 'https://youtube.com/@puntolegalapuntes', icon: '🎥' },
+      { name: 'TikTok', href: 'https://tiktok.com/@puntolegalapuntes', icon: '🎵' }
+    ];
+
+    return (
+      <footer className="relative bg-gradient-to-br from-blue-900 via-indigo-900 to-purple-900 text-white overflow-hidden">
+        {/* Efectos de fondo animados */}
+        <div className="absolute inset-0 overflow-hidden">
+          {/* Círculos decorativos */}
+          <div className="absolute -top-24 -left-24 w-48 h-48 bg-blue-500/10 rounded-full animate-pulse" />
+          <div className="absolute top-32 -right-32 w-64 h-64 bg-purple-500/10 rounded-full animate-pulse delay-1000" />
+          <div className="absolute -bottom-16 left-1/2 w-32 h-32 bg-indigo-500/10 rounded-full animate-pulse delay-500" />
+          
+          {/* Partículas flotantes */}
+          {[...Array(15)].map((_, i) => (
+            <motion.div
+              key={i}
+              className="absolute w-1 h-1 bg-blue-400/30 rounded-full"
+              animate={{
+                y: [0, -100, 0],
+                x: [0, Math.random() * 50 - 25, 0],
+                opacity: [0, 1, 0],
+              }}
+              transition={{
+                duration: 8 + i * 0.5,
+                repeat: Infinity,
+                delay: i * 0.8,
+                ease: "easeInOut"
+              }}
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+              }}
+            />
+          ))}
+        </div>
+
+        <div className="relative z-10 container mx-auto px-4 py-16">
+          {/* Header del footer */}
+          <div className="text-center mb-12">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="flex items-center justify-center space-x-4 mb-6"
+            >
+              <div className="p-3 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl shadow-xl">
+                <GraduationCap className="w-8 h-8 text-white" />
+              </div>
+              <div>
+                <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-300 to-purple-300 bg-clip-text text-transparent">
+                  Punto Legal Apuntes
+                </h2>
+                <p className="text-blue-200 text-lg">
+                  La plataforma más avanzada para estudiar Derecho en Chile
+                </p>
+              </div>
+            </motion.div>
+
+            {/* Estadísticas */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="flex items-center justify-center space-x-8 mb-8"
+            >
+              <div className="text-center">
+                <div className="flex items-center justify-center space-x-2 mb-1">
+                  <BookOpen className="w-5 h-5 text-blue-400" />
+                  <span className="text-2xl font-bold text-white">500+</span>
+                </div>
+                <p className="text-blue-200 text-sm">Apuntes</p>
+              </div>
+              <div className="text-center">
+                <div className="flex items-center justify-center space-x-2 mb-1">
+                  <Users className="w-5 h-5 text-purple-400" />
+                  <span className="text-2xl font-bold text-white">1000+</span>
+                </div>
+                <p className="text-purple-200 text-sm">Estudiantes</p>
+              </div>
+              <div className="text-center">
+                <div className="flex items-center justify-center space-x-2 mb-1">
+                  <Trophy className="w-5 h-5 text-indigo-400" />
+                  <span className="text-2xl font-bold text-white">50+</span>
+                </div>
+                <p className="text-indigo-200 text-sm">Medallas</p>
+              </div>
+              <div className="text-center">
+                <div className="flex items-center justify-center space-x-2 mb-1">
+                  <TrendingUp className="w-5 h-5 text-blue-400" />
+                  <span className="text-2xl font-bold text-white">95%</span>
+                </div>
+                <p className="text-blue-200 text-sm">Satisfacción</p>
+              </div>
+            </motion.div>
+
+            <p className="text-blue-200 text-lg max-w-2xl mx-auto leading-relaxed">
+              Sistema gamificado, contenido actualizado y seguimiento de progreso personalizado.
+            </p>
+          </div>
+
+          {/* Contenido principal */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+            
+            {/* Categorías de Apuntes */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+            >
+              <h3 className="text-xl font-semibold mb-4 flex items-center space-x-2">
+                <BookOpen className="w-5 h-5 text-blue-400" />
+                <span>Categorías de Apuntes</span>
+              </h3>
+              <ul className="space-y-2">
+                {apuntesServices.map((service) => (
+                  <li key={service.name}>
+                    <Link
+                      to={service.href}
+                      className="text-blue-200 hover:text-white transition-colors duration-200 flex items-center space-x-2 hover:translate-x-1 transition-transform"
+                    >
+                      <span className="w-1 h-1 bg-blue-400 rounded-full"></span>
+                      <span>{service.name}</span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </motion.div>
+
+            {/* Herramientas de Estudio */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+            >
+              <h3 className="text-xl font-semibold mb-4 flex items-center space-x-2">
+                <Brain className="w-5 h-5 text-purple-400" />
+                <span>Herramientas de Estudio</span>
+              </h3>
+              <ul className="space-y-2">
+                {studyTools.map((tool) => (
+                  <li key={tool.name}>
+                    <Link
+                      to={tool.href}
+                      className="text-purple-200 hover:text-white transition-colors duration-200 flex items-center space-x-2 hover:translate-x-1 transition-transform"
+                    >
+                      <span className="w-1 h-1 bg-purple-400 rounded-full"></span>
+                      <span>{tool.name}</span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </motion.div>
+
+            {/* Legal */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+            >
+              <h3 className="text-xl font-semibold mb-4 flex items-center space-x-2">
+                <Target className="w-5 h-5 text-indigo-400" />
+                <span>Legal</span>
+              </h3>
+              <ul className="space-y-2">
+                {legal.map((item) => (
+                  <li key={item.name}>
+                    <Link
+                      to={item.href}
+                      className="text-indigo-200 hover:text-white transition-colors duration-200 flex items-center space-x-2 hover:translate-x-1 transition-transform"
+                    >
+                      <span className="w-1 h-1 bg-indigo-400 rounded-full"></span>
+                      <span>{item.name}</span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </motion.div>
+
+            {/* Contacto */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+            >
+              <h3 className="text-xl font-semibold mb-4 flex items-center space-x-2">
+                <Mail className="w-5 h-5 text-blue-400" />
+                <span>Contacto</span>
+              </h3>
+              <div className="space-y-3">
+                <div className="flex items-center space-x-2 text-blue-200">
+                  <Mail className="w-4 h-4" />
+                  <span className="text-sm">apuntes@puntolegal.online</span>
+                </div>
+                <div className="flex items-center space-x-2 text-blue-200">
+                  <Phone className="w-4 h-4" />
+                  <span className="text-sm">+56 9 6232 1883</span>
+                </div>
+                <div className="flex items-center space-x-2 text-blue-200">
+                  <MapPin className="w-4 h-4" />
+                  <span className="text-sm">Santiago, Chile</span>
+                </div>
+              </div>
+
+              {/* Redes sociales */}
+              <div className="mt-4">
+                <h4 className="text-lg font-medium mb-2 text-white">Síguenos</h4>
+                <div className="flex space-x-2">
+                  {socialLinks.map((social) => (
+                    <a
+                      key={social.name}
+                      href={social.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-10 h-10 bg-white/10 hover:bg-white/20 rounded-lg flex items-center justify-center transition-all duration-300 hover:scale-110"
+                    >
+                      <span className="text-lg">{social.icon}</span>
+                    </a>
+                  ))}
+                </div>
+              </div>
+            </motion.div>
+          </div>
+
+          {/* Call to Action */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.5 }}
+            className="text-center mb-12"
+          >
+            <div className="bg-gradient-to-r from-blue-600/20 to-purple-600/20 rounded-2xl p-8 backdrop-blur-sm border border-blue-500/20">
+              <h3 className="text-2xl font-bold mb-4 flex items-center justify-center space-x-2">
+                <Sparkles className="w-6 h-6 text-yellow-400" />
+                <span>¡Empieza a Estudiar Hoy!</span>
+                <Sparkles className="w-6 h-6 text-yellow-400" />
+              </h3>
+              <p className="text-blue-200 mb-6 max-w-lg mx-auto">
+                Accede a cientos de apuntes organizados y un sistema gamificado único.
+              </p>
+              <Link
+                to="/apuntes"
+                className="inline-flex items-center space-x-2 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 px-8 py-3 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
+              >
+                <Zap className="w-5 h-5" />
+                <span>Comenzar Gratis</span>
+                <ExternalLink className="w-4 h-4" />
+              </Link>
+            </div>
+          </motion.div>
+
+          {/* Footer inferior */}
+          <div className="border-t border-blue-500/20 pt-8">
+            <div className="flex flex-col md:flex-row items-center justify-between">
+              <motion.p
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                transition={{ duration: 0.6 }}
+                className="text-blue-200 text-sm mb-4 md:mb-0"
+              >
+                © 2025 Punto Legal Apuntes. Todos los derechos reservados.
+              </motion.p>
+              
+              <motion.p
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+                className="text-blue-200 text-sm flex items-center space-x-1"
+              >
+                <span>Hecho con</span>
+                <Heart className="w-4 h-4 text-red-400 animate-pulse" />
+                <span>para estudiantes de Derecho en Chile</span>
+              </motion.p>
+            </div>
+          </div>
+        </div>
+
+        {/* Efecto de brillo inferior */}
+        <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-blue-400/50 to-transparent"></div>
+      </footer>
+    );
+  }
+
+  // Footer original para el sitio principal de Punto Legal (mantener esquema naranjo)
   const services = [
-    { name: 'Derecho Laboral', href: '/laboral' },
-    { name: 'Derecho de Familia', href: '/familia' },
-    { name: 'Herencias y Testamentos', href: '/herencias' },
-    { name: 'Derecho Tributario', href: '/tributario' },
-    { name: 'Derecho Corporativo', href: '/corporativo' },
-    { name: 'Derecho Inmobiliario', href: '/inmobiliario' }
+    { name: 'Derecho Corporativo', href: '/servicios/corporativo' },
+    { name: 'Derecho Inmobiliario', href: '/servicios/inmobiliario' },
+    { name: 'Derecho Laboral', href: '/servicios/laboral' },
+    { name: 'Derecho de Familia', href: '/servicios/familia' },
+    { name: 'Derecho Civil', href: '/servicios/civil' },
+    { name: 'Derecho Penal', href: '/servicios/penal' }
   ];
 
-  const legal = [
-    { name: 'Términos de Servicio', href: '/terminos' },
-    { name: 'Política de Privacidad', href: '/privacidad' },
-    { name: 'Aviso Legal', href: '/aviso-legal' }
+  const legalMain = [
+    { name: 'Términos de Servicio', href: '/terms-of-service' },
+    { name: 'Política de Privacidad', href: '/privacy-policy' },
+    { name: 'Aviso Legal', href: '/terms-of-service' }
   ];
 
-  const socialLinks = [
-    { icon: Facebook, href: 'https://facebook.com', label: 'Facebook' },
-    { icon: Instagram, href: 'https://instagram.com', label: 'Instagram' },
-    { icon: Linkedin, href: 'https://linkedin.com', label: 'LinkedIn' },
-    { icon: Twitter, href: 'https://twitter.com', label: 'Twitter' }
+  const socialLinksMain = [
+    { name: 'Instagram', href: 'https://instagram.com/puntolegal', icon: '📸' },
+    { name: 'LinkedIn', href: 'https://linkedin.com/company/puntolegal', icon: '💼' },
+    { name: 'WhatsApp', href: 'https://wa.me/56962321883', icon: '💬' }
   ];
 
   return (
-    <footer className="relative mt-20 overflow-hidden">
-      {/* Fondo con gradiente premium */}
-      <div className="absolute inset-0 bg-gradient-to-b from-background via-background/95 to-black/20" />
-      
-      {/* Partículas flotantes de fondo */}
-      <div className="absolute inset-0">
-        {[...Array(20)].map((_, i) => (
+    <footer className="relative bg-gradient-to-br from-gray-900 via-slate-900 to-gray-800 text-white overflow-hidden">
+      {/* Efectos de fondo */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-24 -left-24 w-48 h-48 bg-orange-500/10 rounded-full animate-pulse" />
+        <div className="absolute top-32 -right-32 w-64 h-64 bg-amber-500/10 rounded-full animate-pulse delay-1000" />
+        
+        {[...Array(12)].map((_, i) => (
           <motion.div
             key={i}
-            className="absolute w-1 h-1 bg-primary/20 rounded-full"
+            className="absolute w-1 h-1 bg-orange-400/30 rounded-full"
             animate={{
-              y: [0, -100],
+              y: [0, -80, 0],
+              x: [0, Math.random() * 40 - 20, 0],
               opacity: [0, 1, 0],
             }}
             transition={{
-              duration: 10 + Math.random() * 10,
+              duration: 6 + i * 0.5,
               repeat: Infinity,
-              delay: Math.random() * 10,
-              ease: "linear"
+              delay: i * 0.6,
+              ease: "easeInOut"
             }}
             style={{
               left: `${Math.random() * 100}%`,
-              bottom: `${Math.random() * 50}%`,
+              top: `${Math.random() * 100}%`,
             }}
           />
         ))}
-                </div>
+      </div>
 
-      {/* Contenido principal */}
-      <div className="relative z-10">
-        {/* Sección superior con glassmorphism */}
-        <div className="bg-white/5 backdrop-blur-xl border-t border-white/10">
-          <div className="container mx-auto px-4 py-16">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
-              
-              {/* Columna 1: Logo y descripción */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                className="space-y-6"
-              >
-                <div className="flex items-center gap-3">
-                  <motion.div
-                    whileHover={{ rotate: 360 }}
-                    transition={{ duration: 0.5 }}
-                    className="w-12 h-12 bg-gradient-to-br from-primary/20 to-primary/10 rounded-2xl flex items-center justify-center backdrop-blur-xl border border-primary/20"
-                  >
-                    <Scale className="w-6 h-6 text-primary" />
-                  </motion.div>
-                  <h3 className="text-2xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-                    Punto Legal
-                  </h3>
-                </div>
-                
-                <p className="text-muted-foreground leading-relaxed">
-                  Especialistas en derecho laboral con más de 10 años de experiencia defendiendo 
-                  los derechos de los trabajadores en Chile.
-                </p>
-
-                {/* Social Links */}
-                <div className="flex gap-3">
-                  {socialLinks.map((social, index) => (
-                    <motion.a
-                      key={index}
-                      href={social.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                      whileHover={{ scale: 1.1, y: -2 }}
-                      whileTap={{ scale: 0.9 }}
-                      className="w-10 h-10 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl flex items-center justify-center hover:bg-primary/20 hover:border-primary/30 transition-all group"
-                      aria-label={social.label}
-                    >
-                      <social.icon className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
-                    </motion.a>
-                  ))}
+      <div className="relative z-10 container mx-auto px-4 py-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+          {/* Logo y descripción */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="lg:col-span-2"
+          >
+            <div className="flex items-center space-x-3 mb-6">
+              <div className="p-2 bg-gradient-to-br from-orange-500 to-amber-600 rounded-xl">
+                <Award className="w-6 h-6 text-white" />
               </div>
-              </motion.div>
-
-              {/* Columna 2: Servicios */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.1 }}
-                className="space-y-6"
-              >
-                <h4 className="text-lg font-semibold flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 text-primary" />
-                  Servicios
-                </h4>
-              <ul className="space-y-3">
-                  {services.map((service, index) => (
-                    <motion.li
-                      key={index}
-                      whileHover={{ x: 5 }}
-                      transition={{ type: "spring", stiffness: 300 }}
-                    >
-                      <Link
-                        to={service.href}
-                        className="text-muted-foreground hover:text-primary transition-colors flex items-center gap-2 group"
-                      >
-                        <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-                        {service.name}
-                      </Link>
-                    </motion.li>
-                  ))}
-              </ul>
-              </motion.div>
-
-              {/* Columna 3: Contacto */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.2 }}
-                className="space-y-6"
-              >
-                <h4 className="text-lg font-semibold flex items-center gap-2">
-                  <Phone className="w-4 h-4 text-primary" />
-                  Contacto
-                </h4>
-                <ul className="space-y-4">
-                  <li>
-                  <a 
-                    href="mailto:puntolegalelgolf@gmail.com"
-                      className="text-muted-foreground hover:text-primary transition-colors flex items-start gap-3 group"
-                  >
-                      <Mail className="w-5 h-5 mt-0.5 text-primary/60 group-hover:text-primary transition-colors" />
-                      <span>puntolegalelgolf@gmail.com</span>
-                  </a>
-                </li>
-                  <li>
-                  <a 
-                      href="tel:+56912345678"
-                      className="text-muted-foreground hover:text-primary transition-colors flex items-start gap-3 group"
-                  >
-                      <Phone className="w-5 h-5 mt-0.5 text-primary/60 group-hover:text-primary transition-colors" />
-                      <span>+56 9 1234 5678</span>
-                  </a>
-                </li>
-                  <li className="flex items-start gap-3">
-                    <MapPin className="w-5 h-5 mt-0.5 text-primary/60 flex-shrink-0" />
-                    <span className="text-muted-foreground">
-                      Metro El Golf,<br />
-                      Las Condes, Santiago, Chile
-                    </span>
-                  </li>
-                </ul>
-              </motion.div>
-
-              {/* Columna 4: Newsletter */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.3 }}
-                className="space-y-6"
-              >
-                <h4 className="text-lg font-semibold">Newsletter Legal</h4>
-                <p className="text-muted-foreground text-sm">
-                  Recibe actualizaciones sobre cambios legales y consejos profesionales.
-                </p>
-                <form className="space-y-3" onSubmit={(e) => e.preventDefault()}>
-                  <div className="relative">
-                    <input
-                      type="email"
-                      placeholder="Tu email"
-                      className="w-full px-4 py-3 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl focus:border-primary/50 outline-none transition-all text-sm"
-                    />
-                  </div>
-                  <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    type="submit"
-                    className="w-full bg-gradient-to-r from-primary to-primary/80 text-white py-3 px-4 rounded-xl font-medium text-sm hover:shadow-lg hover:shadow-primary/20 transition-all flex items-center justify-center gap-2"
-                  >
-                    Suscribirse
-                    <ArrowRight className="w-4 h-4" />
-                  </motion.button>
-                </form>
-              </motion.div>
+              <h2 className="text-2xl font-bold">Punto Legal</h2>
             </div>
-          </div>
+            <p className="text-gray-300 mb-6 leading-relaxed">
+              Soluciones jurídicas especializadas con más de 10 años de experiencia. 
+              Comprometidos con la excelencia y la satisfacción de nuestros clientes.
+            </p>
+            
+            {/* Estadísticas */}
+            <div className="grid grid-cols-3 gap-4">
+              <div className="text-center p-3 bg-white/5 rounded-lg">
+                <div className="text-2xl font-bold text-orange-400">1,247</div>
+                <div className="text-xs text-gray-400">Casos ganados</div>
+              </div>
+              <div className="text-center p-3 bg-white/5 rounded-lg">
+                <div className="text-2xl font-bold text-amber-400">$2.3M</div>
+                <div className="text-xs text-gray-400">Recuperados</div>
+              </div>
+              <div className="text-center p-3 bg-white/5 rounded-lg">
+                <div className="text-2xl font-bold text-orange-400">98%</div>
+                <div className="text-xs text-gray-400">Éxito</div>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Servicios */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+          >
+            <h3 className="text-xl font-semibold mb-4">Servicios Legales</h3>
+            <ul className="space-y-2">
+              {services.map((service) => (
+                <li key={service.name}>
+                  <Link
+                    to={service.href}
+                    className="text-gray-300 hover:text-orange-400 transition-colors duration-200"
+                  >
+                    {service.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </motion.div>
+
+          {/* Contacto y Legal */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+          >
+            <h3 className="text-xl font-semibold mb-4">Contacto</h3>
+            <div className="space-y-3 mb-6">
+              <div className="flex items-center space-x-2 text-gray-300">
+                <Mail className="w-4 h-4" />
+                <span className="text-sm">puntolegalelgolf@gmail.com</span>
+              </div>
+              <div className="flex items-center space-x-2 text-gray-300">
+                <Phone className="w-4 h-4" />
+                <span className="text-sm">+56 9 6232 1883</span>
+              </div>
+            </div>
+
+            {/* Legal */}
+            <h4 className="text-lg font-medium mb-2">Legal</h4>
+            <ul className="space-y-1">
+              {legalMain.map((item) => (
+                <li key={item.name}>
+                  <Link
+                    to={item.href}
+                    className="text-gray-300 hover:text-orange-400 transition-colors duration-200 text-sm"
+                  >
+                    {item.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+
+            {/* Redes sociales */}
+            <div className="mt-6">
+              <h4 className="text-lg font-medium mb-3">Síguenos</h4>
+              <div className="flex space-x-3">
+                {socialLinksMain.map((social) => (
+                  <a
+                    key={social.name}
+                    href={social.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-10 h-10 bg-white/10 hover:bg-orange-500/20 rounded-lg flex items-center justify-center transition-all duration-300"
+                  >
+                    <span>{social.icon}</span>
+                  </a>
+                ))}
+              </div>
+            </div>
+          </motion.div>
         </div>
 
-        {/* Sección inferior */}
-        <div className="bg-black/20 backdrop-blur-xl border-t border-white/5">
-          <div className="container mx-auto px-4 py-6">
-            <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-              {/* Copyright */}
-              <motion.div
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 1 }}
-                viewport={{ once: true }}
-                className="text-sm text-muted-foreground flex items-center gap-2"
-              >
-                © {currentYear} Punto Legal. Todos los derechos reservados.
-                <Heart className="w-3 h-3 text-red-500 animate-pulse" />
-              </motion.div>
-
-              {/* Links legales */}
-              <motion.div
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 1 }}
-                viewport={{ once: true }}
-                className="flex flex-wrap items-center gap-4 text-sm"
-              >
-                {legal.map((item, index) => (
-                  <React.Fragment key={index}>
-                    <Link
-                      to={item.href}
-                      className="text-muted-foreground hover:text-primary transition-colors"
-                    >
-                      {item.name}
-                    </Link>
-                    {index < legal.length - 1 && (
-                      <span className="text-muted-foreground/30">•</span>
-                    )}
-                  </React.Fragment>
-                ))}
-                <span className="text-muted-foreground/30">•</span>
-                <Link
-                  to="/admin"
-                  className="text-muted-foreground hover:text-primary transition-colors flex items-center gap-1"
-                >
-                  <Scale className="w-3 h-3" />
-                  Admin
-                </Link>
-              </motion.div>
-            </div>
+        {/* Footer inferior */}
+        <div className="border-t border-gray-700 pt-8">
+          <div className="flex flex-col md:flex-row items-center justify-between">
+            <p className="text-gray-400 text-sm mb-4 md:mb-0">
+              © 2025 Punto Legal. Todos los derechos reservados.
+            </p>
+            <p className="text-gray-400 text-sm">
+              Desarrollado con ❤️ para la justicia en Chile
+            </p>
           </div>
         </div>
       </div>
-
-      {/* Efecto de brillo superior */}
-      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
     </footer>
   );
-}
+};
+
+export default Footer;

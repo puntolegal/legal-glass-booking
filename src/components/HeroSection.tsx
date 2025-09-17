@@ -181,10 +181,10 @@ const HeroSection = ({ title, subtitle, showForm, setShowForm, servicePrice = "$
                   // Redirigir a asesoría laboral por $35.000
                   window.location.href = '/agendamiento?plan=laboral';
                 }}
-                className={`group relative overflow-hidden bg-gradient-to-r from-primary to-primary/90 text-white rounded-2xl shadow-sm font-medium transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary/30 w-full sm:w-auto ${
+                className={`group relative overflow-hidden bg-gradient-to-r from-orange-500 via-amber-500 to-yellow-500 hover:from-orange-600 hover:via-amber-600 hover:to-yellow-600 text-white rounded-xl shadow-lg hover:shadow-xl hover:shadow-orange-500/25 font-semibold transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-orange-500/30 backdrop-blur-sm border border-orange-500/20 hover:border-orange-400/30 w-full sm:w-auto ${
                   isMobile 
                     ? 'px-6 py-3 text-base' 
-                    : 'px-8 py-4 text-lg hover:scale-[1.02] hover:shadow-md hover:shadow-primary/10'
+                    : 'px-8 py-4 text-lg hover:scale-[1.02]'
                 }`}
                 whileHover={!isMobile ? { scale: 1.02 } : {}}
                 whileTap={{ scale: 0.98 }}
@@ -195,7 +195,7 @@ const HeroSection = ({ title, subtitle, showForm, setShowForm, servicePrice = "$
                 Agendar Ahora
                 {!isMobile && (
                   <span className="absolute left-0 top-0 w-full h-full pointer-events-none">
-                    <span className="block w-1/3 h-full bg-white/20 blur-lg animate-shimmer-premium opacity-50"></span>
+                    <span className="block w-1/3 h-full bg-white/20 blur-lg animate-shimmer opacity-50"></span>
                   </span>
                 )}
               </motion.button>

@@ -3,7 +3,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { Slider } from '@/components/ui/slider';
 import { 
   Accessibility, 
   Eye, 
@@ -13,20 +12,13 @@ import {
   X,
   Settings
 } from 'lucide-react';
-import { useAccessibility } from './AccessibilityProvider';
 
 const AccessibilityPanel: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const {
-    highContrast,
-    toggleHighContrast,
-    fontSize,
-    setFontSize,
-    reducedMotion,
-    toggleReducedMotion,
-    focusVisible,
-    setFocusVisible,
-  } = useAccessibility();
+  const [highContrast, setHighContrast] = useState(false);
+  const [fontSize, setFontSize] = useState<'small' | 'medium' | 'large'>('medium');
+  const [reducedMotion, setReducedMotion] = useState(false);
+  const [focusVisible, setFocusVisible] = useState(false);
 
   const fontSizeOptions = [
     { value: 'small', label: 'Pequeña' },
@@ -34,11 +26,48 @@ const AccessibilityPanel: React.FC = () => {
     { value: 'large', label: 'Grande' },
   ] as const;
 
+  const toggleHighContrast = () => {
+    setHighContrast(!highContrast);
+    const root = document.documentElement;
+    if (!highContrast) {
+      root.classList.add('high-contrast');
+    } else {
+      root.classList.remove('high-contrast');
+    }
+  };
+
+  const handleFontSizeChange = (size: 'small' | 'medium' | 'large') => {
+    setFontSize(size);
+    const root = document.documentElement;
+    root.classList.remove('font-size-small', 'font-size-medium', 'font-size-large');
+    root.classList.add(`font-size-${size}`);
+  };
+
+  const toggleReducedMotion = () => {
+    setReducedMotion(!reducedMotion);
+    const root = document.documentElement;
+    if (!reducedMotion) {
+      root.classList.add('reduced-motion');
+    } else {
+      root.classList.remove('reduced-motion');
+    }
+  };
+
+  const toggleFocusVisible = () => {
+    setFocusVisible(!focusVisible);
+    const root = document.documentElement;
+    if (!focusVisible) {
+      root.classList.add('focus-visible');
+    } else {
+      root.classList.remove('focus-visible');
+    }
+  };
+
   if (!isOpen) {
     return (
       <Button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 left-6 z-50 w-12 h-12 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 text-white shadow-lg shadow-amber-500/30 hover:shadow-amber-500/50 transition-all duration-300 hover:scale-110"
+        className="fixed bottom-6 right-6 z-50 w-12 h-12 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 text-white shadow-lg shadow-amber-500/30 hover:shadow-amber-500/50 transition-all duration-300 hover:scale-110"
         size="icon"
         aria-label="Abrir panel de accesibilidad"
       >
@@ -48,7 +77,7 @@ const AccessibilityPanel: React.FC = () => {
   }
 
   return (
-    <div className="fixed bottom-6 left-6 z-50 w-80">
+    <div className="fixed bottom-6 right-6 z-50 w-80 max-w-[calc(100vw-3rem)]">
       <Card className="shadow-2xl border-amber-200 dark:border-amber-800">
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
@@ -97,7 +126,7 @@ const AccessibilityPanel: React.FC = () => {
                   key={option.value}
                   variant={fontSize === option.value ? 'default' : 'outline'}
                   size="sm"
-                  onClick={() => setFontSize(option.value)}
+                  onClick={() => handleFontSizeChange(option.value)}
                   className={`text-xs ${
                     fontSize === option.value
                       ? 'bg-amber-500 text-white border-amber-500'
@@ -137,17 +166,28 @@ const AccessibilityPanel: React.FC = () => {
             <Switch
               id="focus-visible"
               checked={focusVisible}
-              onCheckedChange={setFocusVisible}
+              onCheckedChange={toggleFocusVisible}
               aria-label="Activar focus visible"
             />
           </div>
 
-          {/* Información adicional */}
-          <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
-            <p className="text-xs text-gray-600 dark:text-gray-400">
-              Estas configuraciones se guardan automáticamente y se aplican a toda la aplicación.
-            </p>
-          </div>
+          {/* Botón de Reset */}
+          <Button
+            onClick={() => {
+              setHighContrast(false);
+              setFontSize('medium');
+              setReducedMotion(false);
+              setFocusVisible(false);
+              const root = document.documentElement;
+              root.classList.remove('high-contrast', 'reduced-motion', 'focus-visible', 'font-size-small', 'font-size-medium', 'font-size-large');
+              root.classList.add('font-size-medium');
+            }}
+            variant="outline"
+            className="w-full border-amber-300 text-amber-600 hover:bg-amber-50"
+          >
+            <Settings className="w-4 h-4 mr-2" />
+            Restablecer Valores
+          </Button>
         </CardContent>
       </Card>
     </div>

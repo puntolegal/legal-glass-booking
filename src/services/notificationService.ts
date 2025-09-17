@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabaseClient';
+import { supabase } from '@/integrations/supabase/client';
 import { NOTIFICATION_CONFIG, generateMakePayload, MakeWebhookData } from '@/config/notifications';
 
 export class NotificationService {
