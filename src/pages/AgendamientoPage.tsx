@@ -15,7 +15,8 @@ import {
   MessageSquare,
   MapPin,
   X,
-  Info
+  Info,
+  FileText
 } from 'lucide-react';
 import SEO from '../components/SEO';
 import { MobileFloatingNav } from '../components/MobileFloatingNav';
@@ -655,111 +656,177 @@ export default function AgendamientoPage() {
                   </motion.div>
                 )}
 
-                {/* Paso 3: Confirmación */}
+                {/* Paso 3: Confirmación Premium */}
                 {step === 3 && (
                   <motion.div
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    className="bg-white/5 backdrop-blur-sm rounded-2xl p-8 border border-white/10"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="space-y-6"
                   >
-                    <h2 className="text-2xl font-bold mb-6 flex items-center gap-3 text-foreground">
-                      <CheckCircle className="w-6 h-6 text-primary" />
-                      Confirmar Agendamiento
-                    </h2>
-                    
-                    <div className="space-y-6">
-                      {/* Resumen del Servicio */}
-                      <div className="bg-gradient-to-r from-primary/10 to-primary/5 border border-primary/30 rounded-xl p-6">
-                        <div className="flex items-center gap-4 mb-4">
-                          <div className="w-12 h-12 bg-primary/20 rounded-xl flex items-center justify-center">
-                            <Calendar className="w-6 h-6 text-primary" />
-                          </div>
-                          <div>
-                            <h3 className="text-xl font-bold text-primary">{service.name}</h3>
-                            <p className="text-sm text-muted-foreground">{service.category}</p>
-                          </div>
+                    {/* Título de Confirmación */}
+                    <div className="text-center mb-8">
+                      <motion.div
+                        initial={{ scale: 0.8, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        transition={{ delay: 0.1 }}
+                        className="inline-flex items-center gap-3 bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-500/20 rounded-2xl px-6 py-3 mb-4"
+                      >
+                        <CheckCircle className="w-6 h-6 text-green-500" />
+                        <span className="text-lg font-bold text-green-700 dark:text-green-400">Confirmar Agendamiento</span>
+                      </motion.div>
+                    </div>
+
+                    {/* Card Principal del Servicio */}
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.2 }}
+                      className="bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl rounded-3xl p-6 border border-white/30 shadow-2xl shadow-black/5"
+                    >
+                      {/* Header del Servicio */}
+                      <div className="flex items-center gap-4 mb-6">
+                        <div className="w-14 h-14 bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl flex items-center justify-center shadow-lg shadow-orange-500/30">
+                          <Calendar className="w-7 h-7 text-white" />
                         </div>
-                        
+                        <div className="flex-1">
+                          <h3 className="text-xl lg:text-2xl font-bold text-gray-900 dark:text-white">{service.name}</h3>
+                          <p className="text-orange-600 font-medium">{service.category}</p>
+                        </div>
+                      </div>
+
+                      {/* Precio Premium */}
+                      <div className="bg-gradient-to-r from-orange-50 to-amber-50 dark:from-orange-900/20 dark:to-amber-900/20 border border-orange-200/50 dark:border-orange-700/30 rounded-2xl p-5 mb-6">
                         <div className="flex items-center justify-between">
                           <div>
-                            <div className="text-2xl font-bold text-foreground">
-                              ${precioFinal}
+                            <div className="flex items-baseline gap-3">
+                              <span className="text-3xl lg:text-4xl font-bold text-orange-600">
+                                ${precioFinal}
+                              </span>
                               {isConvenioValido && (
-                                <span className="text-lg text-muted-foreground line-through ml-2">
+                                <span className="text-lg text-gray-500 line-through">
                                   ${service.price}
                                 </span>
                               )}
                               {!isConvenioValido && service.originalPrice && (
-                                <span className="text-lg text-muted-foreground line-through ml-2">
+                                <span className="text-lg text-gray-500 line-through">
                                   ${service.originalPrice}
                                 </span>
                               )}
                             </div>
                             {isConvenioValido && (
-                              <p className="text-sm text-green-600 mt-1 font-medium">
-                                🏷️ Descuento de convenio aplicado (80% OFF)
+                              <p className="text-sm text-green-600 mt-2 font-medium flex items-center gap-2">
+                                <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+                                Descuento de convenio aplicado (80% OFF)
                               </p>
                             )}
                             {!isConvenioValido && service.note && (
-                              <p className="text-sm text-muted-foreground mt-1">{service.note}</p>
+                              <p className="text-sm text-gray-600 mt-2">{service.note}</p>
                             )}
                           </div>
                           
                           {isConvenioValido && (
-                            <div className="bg-gradient-to-r from-green-400 to-emerald-500 text-white text-xs font-bold px-3 py-1 rounded-full">
-                              80% OFF - CONVENIO
+                            <div className="bg-gradient-to-r from-green-500 to-emerald-600 text-white text-sm font-bold px-4 py-2 rounded-xl shadow-lg shadow-green-500/20">
+                              80% OFF
                             </div>
                           )}
                           {!isConvenioValido && service.discount && (
-                            <div className="bg-gradient-to-r from-yellow-400 to-orange-500 text-black text-xs font-bold px-3 py-1 rounded-full">
+                            <div className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-sm font-bold px-4 py-2 rounded-xl shadow-lg">
                               {service.discount}
                             </div>
                           )}
                         </div>
                       </div>
-                      
-                      {/* Resumen de la Cita */}
-                      <div className="grid md:grid-cols-2 gap-6">
-                        <div>
-                          <h4 className="font-semibold mb-3">Detalles de la cita</h4>
-                          <div className="space-y-2 text-sm">
-                            <div><strong>Fecha:</strong> {selectedDate && formatDate(new Date(selectedDate))}</div>
-                            <div><strong>Hora:</strong> {selectedTime}</div>
-                            <div><strong>Tipo:</strong> {meetingTypes.find(t => t.id === selectedMeetingType)?.name}</div>
+
+                      {/* Información de la Cita */}
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        {/* Detalles de la Cita */}
+                        <div className="bg-blue-50/50 dark:bg-blue-900/10 border border-blue-200/30 dark:border-blue-700/20 rounded-2xl p-4">
+                          <h4 className="font-bold text-blue-700 dark:text-blue-400 mb-3 flex items-center gap-2">
+                            <Calendar className="w-4 h-4" />
+                            Detalles de la cita
+                          </h4>
+                          <div className="space-y-3">
+                            <div className="flex items-center justify-between">
+                              <span className="text-gray-600 dark:text-gray-400">Fecha:</span>
+                              <span className="font-semibold text-gray-900 dark:text-white">
+                                {selectedDate && formatDate(new Date(selectedDate))}
+                              </span>
+                            </div>
+                            <div className="flex items-center justify-between">
+                              <span className="text-gray-600 dark:text-gray-400">Hora:</span>
+                              <span className="font-semibold text-gray-900 dark:text-white">{selectedTime}</span>
+                            </div>
+                            <div className="flex items-center justify-between">
+                              <span className="text-gray-600 dark:text-gray-400">Modalidad:</span>
+                              <span className="font-semibold text-gray-900 dark:text-white">
+                                {meetingTypes.find(t => t.id === selectedMeetingType)?.name}
+                              </span>
+                            </div>
                           </div>
                         </div>
-                        
-                        <div>
-                          <h4 className="font-semibold mb-3">Información personal</h4>
-                          <div className="space-y-2 text-sm">
-                            <div><strong>Nombre:</strong> {formData.nombre}</div>
-                            <div><strong>Email:</strong> {formData.email}</div>
-                            <div><strong>Teléfono:</strong> {formData.telefono}</div>
-                            {formData.empresa && <div><strong>Empresa:</strong> {formData.empresa}</div>}
+
+                        {/* Información Personal */}
+                        <div className="bg-purple-50/50 dark:bg-purple-900/10 border border-purple-200/30 dark:border-purple-700/20 rounded-2xl p-4">
+                          <h4 className="font-bold text-purple-700 dark:text-purple-400 mb-3 flex items-center gap-2">
+                            <User className="w-4 h-4" />
+                            Información personal
+                          </h4>
+                          <div className="space-y-3">
+                            <div className="flex items-center justify-between">
+                              <span className="text-gray-600 dark:text-gray-400">Nombre:</span>
+                              <span className="font-semibold text-gray-900 dark:text-white">{formData.nombre}</span>
+                            </div>
+                            <div className="flex items-center justify-between">
+                              <span className="text-gray-600 dark:text-gray-400">Email:</span>
+                              <span className="font-semibold text-gray-900 dark:text-white text-right break-all">{formData.email}</span>
+                            </div>
+                            <div className="flex items-center justify-between">
+                              <span className="text-gray-600 dark:text-gray-400">Teléfono:</span>
+                              <span className="font-semibold text-gray-900 dark:text-white">{formData.telefono}</span>
+                            </div>
+                            {formData.empresa && (
+                              <div className="flex items-center justify-between">
+                                <span className="text-gray-600 dark:text-gray-400">Empresa:</span>
+                                <span className="font-semibold text-gray-900 dark:text-white text-right">{formData.empresa}</span>
+                              </div>
+                            )}
                             {formData.codigoConvenio && (
-                              <div className="flex items-center gap-2">
-                                <strong>Código de Convenio:</strong> 
-                                <span className="text-green-600 font-medium">{formData.codigoConvenio}</span>
-                                {isConvenioValido && (
-                                  <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">
-                                    ✅ Válido
-                                  </span>
-                                )}
+                              <div className="bg-green-100/80 dark:bg-green-900/20 border border-green-200 dark:border-green-700/30 rounded-xl p-3 mt-3">
+                                <div className="flex items-center justify-between">
+                                  <span className="text-green-700 dark:text-green-400 font-medium">Código de Convenio:</span>
+                                  <div className="flex items-center gap-2">
+                                    <span className="font-bold text-green-800 dark:text-green-300">{formData.codigoConvenio}</span>
+                                    {isConvenioValido && (
+                                      <span className="bg-green-500 text-white text-xs px-2 py-1 rounded-full font-bold">
+                                        ✅ Válido
+                                      </span>
+                                    )}
+                                  </div>
+                                </div>
                               </div>
                             )}
                           </div>
                         </div>
                       </div>
                       
+                      {/* Descripción del Caso */}
                       {formData.descripcion && (
-                        <div>
-                          <h4 className="font-semibold mb-2">Descripción del caso</h4>
-                          <p className="text-sm text-muted-foreground bg-white/5 p-4 rounded-lg">
-                            {formData.descripcion}
+                        <motion.div
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: 0.3 }}
+                          className="bg-gray-50/80 dark:bg-gray-800/50 border border-gray-200/50 dark:border-gray-700/30 rounded-2xl p-5"
+                        >
+                          <h4 className="font-bold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
+                            <FileText className="w-4 h-4" />
+                            Descripción del caso
+                          </h4>
+                          <p className="text-gray-700 dark:text-gray-300 leading-relaxed italic">
+                            "{formData.descripcion}"
                           </p>
-                        </div>
+                        </motion.div>
                       )}
-                    </div>
+                    </motion.div>
                     
                     <div className="flex gap-4 mt-8">
                       <button
