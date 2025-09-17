@@ -245,7 +245,7 @@ export const PremiumMobileHero: React.FC = () => {
             <span>Hecho con ❤️ en 🇨🇱</span>
           </div>
         </motion.div>
-      </div>
+      </motion.div>
     </div>
   );
 };
