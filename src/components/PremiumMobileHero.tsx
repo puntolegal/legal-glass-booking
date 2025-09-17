@@ -6,7 +6,6 @@ import PremiumServiceSelector from './PremiumServiceSelector';
 export const PremiumMobileHero: React.FC = () => {
   const { scrollY } = useScroll();
   const backgroundY = useTransform(scrollY, [0, 500], [0, 150]);
-  const opacity = useTransform(scrollY, [0, 300], [1, 0]);
 
   return (
     <div className="relative min-h-screen bg-background overflow-hidden">
@@ -78,7 +77,6 @@ export const PremiumMobileHero: React.FC = () => {
       {/* Main Content */}
       <motion.div 
         className="relative z-10 flex flex-col items-center justify-center min-h-screen px-4 py-12"
-        style={{ opacity }}
       >
         {/* Header Section - Premium Style */}
         <motion.div
@@ -89,12 +87,10 @@ export const PremiumMobileHero: React.FC = () => {
         >
           {/* Logo - Orange gradient consistent with brand */}
           <motion.div
-            initial={{ scale: 0, rotate: -180 }}
-            animate={{ scale: 1, rotate: 0 }}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ 
-              type: "spring", 
-              stiffness: 200, 
-              damping: 15,
+              duration: 0.6,
               delay: 0.1 
             }}
             className="relative mx-auto mb-6"
@@ -103,17 +99,6 @@ export const PremiumMobileHero: React.FC = () => {
               <div className="absolute inset-0 bg-gradient-to-t from-white/0 to-white/20" />
               <span className="text-white font-bold text-3xl relative z-10">P</span>
             </div>
-            <motion.div
-              className="absolute inset-0 rounded-[1.75rem]"
-              animate={{
-                boxShadow: [
-                  '0 0 20px rgba(255, 107, 53, 0.3)',
-                  '0 0 40px rgba(255, 107, 53, 0.5)',
-                  '0 0 20px rgba(255, 107, 53, 0.3)'
-                ]
-              }}
-              transition={{ duration: 2, repeat: Infinity }}
-            />
           </motion.div>
 
           {/* Title with gradient */}
