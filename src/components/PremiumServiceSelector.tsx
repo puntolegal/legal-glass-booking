@@ -307,58 +307,93 @@ export const PremiumServiceSelector: React.FC = () => {
               transition={{ duration: 0.4, type: "spring", stiffness: 200, damping: 20 }}
               className="space-y-4"
             >
-              {/* Service Icon - Premium Design */}
-              <motion.div className="relative mx-auto w-fit">
+              {/* Service Icon - iOS Premium Glass */}
+              <motion.div className="relative mx-auto w-fit mb-6">
+                {/* Main icon container */}
                 <motion.div
-                  className={`w-24 h-24 rounded-[1.75rem] bg-gradient-to-br ${selectedService.color.gradient} flex items-center justify-center shadow-2xl relative overflow-hidden`}
-                  whileHover={{ scale: 1.05, rotate: 3 }}
-                  whileTap={{ scale: 0.95 }}
+                  className="relative w-28 h-28"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
                 >
-                  {/* Glass overlay */}
-                  <div className="absolute inset-0 bg-white/20 backdrop-blur-sm" />
-                  <selectedService.icon className="w-12 h-12 text-white relative z-10" />
+                  {/* Glass background layers */}
+                  <div className="absolute inset-0 bg-white/95 dark:bg-gray-900/95 backdrop-blur-2xl rounded-[2rem] shadow-2xl" />
                   
-                  {/* Floating particles */}
+                  {/* Premium gradient border */}
+                  <div className="absolute inset-0 rounded-[2rem] p-[1px] bg-gradient-to-br from-white/60 via-white/30 to-white/60 dark:from-gray-700/60 dark:via-gray-600/30 dark:to-gray-700/60">
+                    <div className="h-full w-full bg-gradient-to-br from-white/90 to-gray-50/90 dark:from-gray-900/90 dark:to-gray-800/90 rounded-[2rem]" />
+                  </div>
+                  
+                  {/* Inner icon container */}
+                  <div className="absolute inset-2 rounded-[1.5rem] bg-gradient-to-br from-primary to-accent shadow-inner overflow-hidden">
+                    {/* Glass shine effect */}
+                    <div className="absolute inset-0 bg-gradient-to-tr from-white/30 via-white/10 to-transparent" />
+                    
+                    {/* Icon */}
+                    <div className="relative h-full w-full flex items-center justify-center">
+                      <selectedService.icon className="w-14 h-14 text-white drop-shadow-lg" strokeWidth={1.5} />
+                    </div>
+                    
+                    {/* Animated particles inside */}
+                    <div className="absolute inset-0 overflow-hidden">
+                      {[...Array(3)].map((_, i) => (
+                        <motion.div
+                          key={i}
+                          className="absolute w-1 h-1 bg-white/60 rounded-full"
+                          animate={{
+                            y: [20, -20],
+                            x: [0, (i - 1) * 10],
+                            opacity: [0, 1, 0]
+                          }}
+                          transition={{
+                            duration: 3,
+                            repeat: Infinity,
+                            delay: i * 0.7,
+                            ease: "easeInOut"
+                          }}
+                          style={{
+                            left: `${30 + i * 20}%`,
+                            bottom: 0
+                          }}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                  
+                  {/* Outer glow */}
                   <motion.div
-                    className="absolute inset-0"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                  >
-                    {[...Array(3)].map((_, i) => (
-                      <motion.div
-                        key={i}
-                        className="absolute w-1 h-1 bg-white/40 rounded-full"
-                        animate={{
-                          x: [0, Math.random() * 40 - 20],
-                          y: [20, -20],
-                          opacity: [0, 1, 0]
-                        }}
-                        transition={{
-                          duration: 2 + Math.random() * 2,
-                          repeat: Infinity,
-                          delay: i * 0.5
-                        }}
-                        style={{
-                          left: `${20 + i * 25}%`,
-                          bottom: 0
-                        }}
-                      />
-                    ))}
-                  </motion.div>
+                    className="absolute -inset-1 rounded-[2rem] opacity-50"
+                    animate={{
+                      boxShadow: [
+                        '0 0 20px rgba(255, 107, 53, 0.0)',
+                        '0 0 30px rgba(255, 107, 53, 0.3)',
+                        '0 0 20px rgba(255, 107, 53, 0.0)'
+                      ]
+                    }}
+                    transition={{ duration: 3, repeat: Infinity }}
+                  />
                 </motion.div>
 
-                {/* Popularity indicator */}
+                {/* Popularity indicator - Premium Glass */}
                 {selectedService.popularity && (
                   <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    className="absolute -bottom-2 -right-2 bg-white dark:bg-gray-800 rounded-xl p-1.5 shadow-lg border border-gray-100 dark:border-gray-700"
+                    initial={{ scale: 0, rotate: -20 }}
+                    animate={{ scale: 1, rotate: 0 }}
+                    transition={{ type: "spring", stiffness: 200 }}
+                    className="absolute -bottom-3 -right-3"
                   >
-                    <div className="flex items-center gap-1">
-                      <TrendingUp className="w-3 h-3 text-green-500" />
-                      <span className="text-xs font-bold text-gray-700 dark:text-gray-300">
-                        {selectedService.popularity}%
-                      </span>
+                    <div className="relative">
+                      {/* Glass background */}
+                      <div className="absolute inset-0 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-xl shadow-lg" />
+                      
+                      {/* Content */}
+                      <div className="relative bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-xl p-2 border border-green-200/50 dark:border-green-700/50">
+                        <div className="flex items-center gap-1.5">
+                          <TrendingUp className="w-3.5 h-3.5 text-green-600 dark:text-green-400" />
+                          <span className="text-xs font-bold text-green-700 dark:text-green-300">
+                            {selectedService.popularity}%
+                          </span>
+                        </div>
+                      </div>
                     </div>
                   </motion.div>
                 )}
@@ -374,134 +409,291 @@ export const PremiumServiceSelector: React.FC = () => {
                 </p>
               </div>
 
-              {/* Highlights - Premium Cards */}
-              <div className="space-y-2 pt-2">
+              {/* Highlights - iOS Premium Glass Cards */}
+              <div className="space-y-2.5 pt-2">
                 {selectedService.highlights.map((highlight, index) => (
                   <motion.div
                     key={highlight}
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.1 }}
-                    className="flex items-center gap-3 bg-gray-50/50 dark:bg-gray-800/50 rounded-xl p-3 border border-gray-100 dark:border-gray-700"
+                    transition={{ delay: index * 0.1, type: "spring", stiffness: 100 }}
+                    whileHover={{ x: 4 }}
+                    className="relative group"
                   >
-                    <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${selectedService.color.secondary} flex items-center justify-center`}>
-                      <Star className="w-4 h-4" style={{ color: selectedService.id === 'general' ? '#ff6b35' : selectedService.id === 'familia' ? '#f43f5e' : selectedService.id === 'empresarial' ? '#a855f7' : '#10b981' }} />
+                    {/* Glass background */}
+                    <div className="absolute inset-0 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-xl" />
+                    
+                    {/* Premium border */}
+                    <div className="absolute inset-0 rounded-xl p-[0.5px] bg-gradient-to-r from-gray-200/30 to-gray-300/30 dark:from-gray-700/30 dark:to-gray-600/30">
+                      <div className="h-full w-full bg-white/80 dark:bg-gray-900/80 rounded-xl" />
                     </div>
-                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                      {highlight}
-                    </span>
+                    
+                    {/* Content */}
+                    <div className="relative flex items-center gap-3 p-3.5 rounded-xl">
+                      {/* Icon container */}
+                      <div className="relative">
+                        <div className="w-9 h-9 bg-gradient-to-br from-primary/10 to-accent/10 rounded-lg flex items-center justify-center group-hover:from-primary/20 group-hover:to-accent/20 transition-colors">
+                          <Star className="w-4.5 h-4.5 text-primary" strokeWidth={2} />
+                        </div>
+                        <motion.div
+                          className="absolute inset-0 rounded-lg"
+                          animate={{
+                            boxShadow: [
+                              '0 0 0 0 rgba(255, 107, 53, 0)',
+                              '0 0 0 4px rgba(255, 107, 53, 0.1)',
+                              '0 0 0 0 rgba(255, 107, 53, 0)'
+                            ]
+                          }}
+                          transition={{ duration: 2, repeat: Infinity, delay: index * 0.3 }}
+                        />
+                      </div>
+                      
+                      {/* Text */}
+                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300 flex-1">
+                        {highlight}
+                      </span>
+                      
+                      {/* Arrow on hover */}
+                      <ChevronRight className="w-4 h-4 text-primary/40 opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all" />
+                    </div>
                   </motion.div>
                 ))}
               </div>
 
-              {/* Price Section - Premium Design */}
+              {/* Price Section - Luxury Glass Design */}
               <motion.div 
                 className="relative mt-6"
-                whileHover={{ scale: 1.02 }}
+                whileHover={{ scale: 1.01 }}
               >
-                <div className="absolute inset-0 bg-gradient-to-r from-gray-100 to-gray-50 dark:from-gray-800 dark:to-gray-700 rounded-2xl blur-xl opacity-50" />
-                <div className="relative bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm rounded-2xl p-5 border border-gray-100 dark:border-gray-700">
-                  <div className="flex items-center justify-between mb-3">
-                    <div>
-                      <div className="flex items-baseline gap-2">
-                        <span className="text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
-                          ${selectedService.price}
-                        </span>
-                        <span className="text-lg text-gray-400 line-through">
-                          ${selectedService.originalPrice}
-                        </span>
-                      </div>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                        Precio especial por tiempo limitado
-                      </p>
-                    </div>
-                    
-                    <motion.div
-                      animate={{ rotate: [0, -5, 5, -5, 0] }}
-                      transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
-                      className={`bg-gradient-to-r ${selectedService.color.gradient} text-white text-sm font-bold px-4 py-2 rounded-xl shadow-lg`}
-                    >
-                      {selectedService.discount}
-                    </motion.div>
+                {/* Multi-layer glass effect */}
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-accent/5 rounded-2xl blur-2xl" />
+                
+                {/* Main glass container */}
+                <div className="relative">
+                  {/* Background glass */}
+                  <div className="absolute inset-0 bg-white/98 dark:bg-gray-900/98 backdrop-blur-2xl rounded-2xl" />
+                  
+                  {/* Premium border gradient */}
+                  <div className="absolute inset-0 rounded-2xl p-[1px] bg-gradient-to-br from-primary/20 via-transparent to-accent/20">
+                    <div className="h-full w-full bg-gradient-to-br from-white/95 to-gray-50/95 dark:from-gray-900/95 dark:to-gray-800/95 rounded-2xl" />
                   </div>
+                  
+                  {/* Content */}
+                  <div className="relative p-5 rounded-2xl">
+                    {/* Price header */}
+                    <div className="flex items-center justify-between mb-4">
+                      <div>
+                        <div className="flex items-baseline gap-3">
+                          <span className="text-4xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                            ${selectedService.price}
+                          </span>
+                          <span className="text-lg text-gray-400 line-through decoration-2">
+                            ${selectedService.originalPrice}
+                          </span>
+                        </div>
+                        <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
+                          <Sparkles className="w-3 h-3" />
+                          Precio especial por tiempo limitado
+                        </p>
+                      </div>
+                      
+                      {/* Discount badge */}
+                      <motion.div
+                        animate={{ 
+                          rotate: [0, -3, 3, -3, 0],
+                          scale: [1, 1.05, 1]
+                        }}
+                        transition={{ duration: 3, repeat: Infinity, repeatDelay: 2 }}
+                        className="relative"
+                      >
+                        <div className="absolute inset-0 bg-gradient-to-r from-red-500 to-orange-500 rounded-xl blur-lg opacity-50" />
+                        <div className="relative bg-gradient-to-r from-red-500 to-orange-500 text-white text-sm font-bold px-4 py-2 rounded-xl shadow-lg">
+                          {selectedService.discount}
+                        </div>
+                      </motion.div>
+                    </div>
 
-                  {/* Trust indicators */}
-                  <div className="flex items-center justify-center gap-4 pt-3 border-t border-gray-100 dark:border-gray-700">
-                    <div className="flex items-center gap-1.5 text-gray-500 dark:text-gray-400">
-                      <Shield className="w-4 h-4" />
-                      <span className="text-xs">Pago seguro</span>
+                    {/* Premium divider */}
+                    <div className="relative h-[1px] mb-4">
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-200 to-transparent dark:via-gray-700" />
                     </div>
-                    <div className="flex items-center gap-1.5 text-gray-500 dark:text-gray-400">
-                      <Clock className="w-4 h-4" />
-                      <span className="text-xs">Respuesta 24h</span>
-                    </div>
-                    <div className="flex items-center gap-1.5 text-gray-500 dark:text-gray-400">
-                      <Users className="w-4 h-4" />
-                      <span className="text-xs">+500 clientes</span>
+
+                    {/* Trust indicators - Glass pills */}
+                    <div className="flex items-center justify-center gap-2">
+                      {[
+                        { icon: Shield, text: 'Pago seguro', color: 'from-blue-500/10 to-cyan-500/10' },
+                        { icon: Clock, text: '24 horas', color: 'from-orange-500/10 to-amber-500/10' },
+                        { icon: Users, text: '+500', color: 'from-purple-500/10 to-pink-500/10' }
+                      ].map((item, index) => (
+                        <motion.div
+                          key={item.text}
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: 0.5 + index * 0.1 }}
+                          className="relative group"
+                        >
+                          <div className={`absolute inset-0 bg-gradient-to-r ${item.color} rounded-lg blur-sm opacity-0 group-hover:opacity-100 transition-opacity`} />
+                          <div className="relative bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-lg px-3 py-1.5 border border-gray-200/30 dark:border-gray-700/30">
+                            <div className="flex items-center gap-1.5">
+                              <item.icon className="w-3.5 h-3.5 text-gray-600 dark:text-gray-400" />
+                              <span className="text-xs font-medium text-gray-600 dark:text-gray-400">{item.text}</span>
+                            </div>
+                          </div>
+                        </motion.div>
+                      ))}
                     </div>
                   </div>
                 </div>
               </motion.div>
 
-              {/* CTA Button - Premium Style */}
+              {/* CTA Button - iOS Premium Glass Style */}
               <motion.button
                 onClick={handleAgendarClick}
-                whileHover={{ scale: 1.02, y: -2 }}
-                whileTap={{ scale: 0.98 }}
-                className="relative w-full overflow-hidden group"
+                whileHover={{ scale: 1.01 }}
+                whileTap={{ scale: 0.99 }}
+                className="relative w-full"
               >
-                <div className={`absolute inset-0 bg-gradient-to-r ${selectedService.color.gradient} opacity-90 group-hover:opacity-100 transition-opacity duration-300`} />
-                <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 opacity-0 group-hover:opacity-100 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-all duration-700" />
+                {/* Glass background */}
+                <div className="absolute inset-0 bg-gradient-to-r from-white/95 to-white/90 dark:from-gray-900/95 dark:to-gray-800/90 backdrop-blur-xl rounded-2xl" />
                 
-                <div className="relative bg-gradient-to-r from-primary to-accent text-white py-4 px-6 rounded-2xl font-bold text-lg flex items-center justify-center gap-3 shadow-xl">
-                  <Calendar className="w-5 h-5" />
-                  <span>Agendar Consulta</span>
-                  <motion.div
-                    animate={{ x: [0, 3, 0] }}
-                    transition={{ duration: 1.5, repeat: Infinity }}
-                  >
-                    <ChevronRight className="w-5 h-5" />
-                  </motion.div>
+                {/* Premium border gradient */}
+                <div className="absolute inset-0 rounded-2xl p-[1px] bg-gradient-to-r from-primary/40 via-accent/40 to-primary/40">
+                  <div className="h-full w-full bg-white/90 dark:bg-gray-900/90 rounded-2xl" />
+                </div>
+                
+                {/* Glow effect */}
+                <motion.div
+                  className="absolute inset-0 rounded-2xl"
+                  animate={{
+                    boxShadow: [
+                      '0 0 20px rgba(255, 107, 53, 0.0)',
+                      '0 0 30px rgba(255, 107, 53, 0.2)',
+                      '0 0 20px rgba(255, 107, 53, 0.0)'
+                    ]
+                  }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                />
+                
+                {/* Button content */}
+                <div className="relative py-4 px-6 rounded-2xl">
+                  {/* Shine effect */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 hover:opacity-100 transform -skew-x-12 -translate-x-full hover:translate-x-full transition-all duration-700 rounded-2xl" />
+                  
+                  <div className="relative flex items-center justify-center gap-3">
+                    <div className="w-10 h-10 bg-gradient-to-br from-primary to-accent rounded-xl flex items-center justify-center shadow-lg">
+                      <Calendar className="w-5 h-5 text-white" />
+                    </div>
+                    
+                    <span className="text-lg font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                      Agendar Consulta
+                    </span>
+                    
+                    <motion.div
+                      className="w-6 h-6 bg-primary/10 rounded-lg flex items-center justify-center"
+                      animate={{ x: [0, 3, 0] }}
+                      transition={{ duration: 1.5, repeat: Infinity }}
+                    >
+                      <ChevronRight className="w-4 h-4 text-primary" />
+                    </motion.div>
+                  </div>
+                  
+                  {/* Subtitle */}
+                  <p className="text-xs text-muted-foreground text-center mt-1">
+                    Respuesta garantizada en 24 horas
+                  </p>
                 </div>
               </motion.button>
             </motion.div>
           </AnimatePresence>
         </div>
 
-        {/* Navigation Controls - Premium Glass Style */}
-        <div className="absolute top-1/2 -translate-y-1/2 left-4 right-4 flex justify-between pointer-events-none">
+        {/* Navigation Controls - iOS Premium Glass */}
+        <div className="absolute top-1/2 -translate-y-1/2 left-3 right-3 flex justify-between pointer-events-none">
           <motion.button
             onClick={() => handleServiceChange('prev')}
             disabled={isAnimating}
-            whileHover={{ scale: 1.1, x: -2 }}
-            whileTap={{ scale: 0.9 }}
-            className="w-12 h-12 bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl shadow-lg border border-white/50 dark:border-gray-700/50 flex items-center justify-center text-gray-700 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-700 transition-all pointer-events-auto group"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="relative w-14 h-14 pointer-events-auto group"
           >
-            <ChevronLeft className="w-5 h-5 group-hover:-translate-x-0.5 transition-transform" />
+            {/* Glass background */}
+            <div className="absolute inset-0 bg-white/95 dark:bg-gray-900/95 backdrop-blur-2xl rounded-2xl shadow-lg" />
+            
+            {/* Premium border */}
+            <div className="absolute inset-0 rounded-2xl p-[0.5px] bg-gradient-to-br from-gray-200/50 to-gray-300/50 dark:from-gray-700/50 dark:to-gray-600/50">
+              <div className="h-full w-full bg-white/90 dark:bg-gray-900/90 rounded-2xl" />
+            </div>
+            
+            {/* Icon container */}
+            <div className="relative h-full w-full flex items-center justify-center rounded-2xl overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/0 to-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <ChevronLeft className="w-6 h-6 text-gray-600 dark:text-gray-400 group-hover:text-primary transition-colors relative z-10" />
+            </div>
           </motion.button>
           
           <motion.button
             onClick={() => handleServiceChange('next')}
             disabled={isAnimating}
-            whileHover={{ scale: 1.1, x: 2 }}
-            whileTap={{ scale: 0.9 }}
-            className="w-12 h-12 bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl shadow-lg border border-white/50 dark:border-gray-700/50 flex items-center justify-center text-gray-700 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-700 transition-all pointer-events-auto group"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="relative w-14 h-14 pointer-events-auto group"
           >
-            <ChevronRight className="w-5 h-5 group-hover:translate-x-0.5 transition-transform" />
+            {/* Glass background */}
+            <div className="absolute inset-0 bg-white/95 dark:bg-gray-900/95 backdrop-blur-2xl rounded-2xl shadow-lg" />
+            
+            {/* Premium border */}
+            <div className="absolute inset-0 rounded-2xl p-[0.5px] bg-gradient-to-br from-gray-200/50 to-gray-300/50 dark:from-gray-700/50 dark:to-gray-600/50">
+              <div className="h-full w-full bg-white/90 dark:bg-gray-900/90 rounded-2xl" />
+            </div>
+            
+            {/* Icon container */}
+            <div className="relative h-full w-full flex items-center justify-center rounded-2xl overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/0 to-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <ChevronRight className="w-6 h-6 text-gray-600 dark:text-gray-400 group-hover:text-primary transition-colors relative z-10" />
+            </div>
           </motion.button>
         </div>
       </motion.div>
 
-      {/* Bottom hint - Premium Style */}
+      {/* Bottom hint - Luxury Glass Pill */}
       <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.5 }}
-        className="mt-6 flex items-center justify-center gap-3 text-xs text-gray-500 dark:text-gray-400"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.5, type: "spring", stiffness: 100 }}
+        className="mt-6 flex justify-center"
       >
-        <Zap className="w-3 h-3" />
-        <span>Desliza o usa las flechas para explorar más opciones</span>
-        <Zap className="w-3 h-3 scale-x-[-1]" />
+        <div className="relative">
+          {/* Glass background */}
+          <div className="absolute inset-0 bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl rounded-full" />
+          
+          {/* Premium border */}
+          <div className="absolute inset-0 rounded-full p-[0.5px] bg-gradient-to-r from-gray-200/30 via-gray-300/30 to-gray-200/30 dark:from-gray-700/30 dark:via-gray-600/30 dark:to-gray-700/30">
+            <div className="h-full w-full bg-white/80 dark:bg-gray-900/80 rounded-full" />
+          </div>
+          
+          {/* Content */}
+          <div className="relative flex items-center gap-2 px-4 py-2 rounded-full">
+            <motion.div
+              animate={{ rotate: [0, 180, 360] }}
+              transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+            >
+              <Sparkles className="w-3 h-3 text-primary/60" />
+            </motion.div>
+            
+            <span className="text-xs font-medium text-muted-foreground">
+              Desliza para ver más servicios
+            </span>
+            
+            <motion.div
+              animate={{ x: [0, 3, 0] }}
+              transition={{ duration: 1.5, repeat: Infinity }}
+              className="flex items-center"
+            >
+              <ChevronRight className="w-3 h-3 text-primary/60" />
+              <ChevronRight className="w-3 h-3 text-primary/40 -ml-1.5" />
+            </motion.div>
+          </div>
+        </div>
       </motion.div>
     </div>
   );
