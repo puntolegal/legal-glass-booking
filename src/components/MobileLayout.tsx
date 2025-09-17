@@ -3,7 +3,9 @@ import { useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import PremiumMobileHeader from './PremiumMobileHeader';
 import PremiumMobileDock from './PremiumMobileDock';
+import MobileSidebar from './MobileSidebar';
 import ApuntesHeader from './ApuntesHeader';
+import { useSidebar } from '@/contexts/SidebarContext';
 
 interface MobileLayoutProps {
   children: React.ReactNode;
@@ -13,6 +15,7 @@ interface MobileLayoutProps {
 export const MobileLayout: React.FC<MobileLayoutProps> = ({ children, onAgendarClick }) => {
   const [isHeaderVisible, setIsHeaderVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
+  const { isOpen, closeSidebar } = useSidebar();
   const location = useLocation();
 
   // Detectar si estamos en la sección de Apuntes
@@ -46,22 +49,16 @@ export const MobileLayout: React.FC<MobileLayoutProps> = ({ children, onAgendarC
 
   return (
     <div className="lg:hidden min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900 dark:to-slate-800">
-      {/* Header - Condicional según la sección */}
-      {isApuntesSection ? (
-        // Header específico para Apuntes
-        <ApuntesHeader />
-      ) : (
-        // Header móvil premium para el resto del sitio
-        <PremiumMobileHeader />
-      )}
+      {/* Header - Solo para Apuntes */}
+      {isApuntesSection && <ApuntesHeader />}
 
       {/* Main content with dynamic padding */}
       <main 
         className={`transition-all duration-300 ${
-          isHeaderVisible ? 'pt-16' : 'pt-0'
+          isApuntesSection && isHeaderVisible ? 'pt-16' : 'pt-0'
         }`}
         style={{ 
-          minHeight: isHeaderVisible ? 'calc(100vh - 4rem)' : '100vh'
+          minHeight: isApuntesSection && isHeaderVisible ? 'calc(100vh - 4rem)' : '100vh'
         }}
       >
         {children}
@@ -69,6 +66,12 @@ export const MobileLayout: React.FC<MobileLayoutProps> = ({ children, onAgendarC
 
       {/* Premium Mobile Dock - Unificado y optimizado */}
       <PremiumMobileDock />
+
+      {/* Mobile Sidebar - Barra lateral deslizable */}
+      <MobileSidebar 
+        open={isOpen} 
+        onClose={closeSidebar} 
+      />
     </div>
   );
 };

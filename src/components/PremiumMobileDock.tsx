@@ -127,7 +127,7 @@ export const PremiumMobileDock: React.FC<PremiumMobileDockProps> = ({ className 
                       onClick={item.action}
                       className={`relative flex flex-col items-center justify-center w-14 h-14 rounded-xl transition-all duration-200 ${
                         item.isActive
-                          ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/30'
+                          ? 'bg-gradient-to-br from-orange-500 to-orange-600 text-white shadow-lg shadow-orange-500/30'
                           : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100/50 dark:hover:bg-gray-800/50'
                       }`}
                     >
@@ -163,8 +163,8 @@ export const PremiumMobileDock: React.FC<PremiumMobileDockProps> = ({ className 
           onClick={toggleSidebar}
           className={`w-12 h-12 rounded-2xl backdrop-blur-xl border shadow-lg transition-all duration-200 ${
             isOpen
-              ? 'bg-red-500 text-white border-red-500/30 shadow-red-500/20'
-              : 'bg-white/80 dark:bg-gray-900/80 text-gray-700 dark:text-gray-300 border-white/20 dark:border-gray-700/30 shadow-black/10'
+              ? 'bg-gradient-to-br from-orange-500 to-orange-600 text-white border-orange-500/30 shadow-orange-500/20'
+              : 'bg-white/80 dark:bg-gray-900/80 text-gray-700 dark:text-gray-300 border-white/20 dark:border-gray-700/30 shadow-black/10 hover:bg-orange-50/50 hover:border-orange-200/30'
           }`}
         >
           <AnimatePresence mode="wait">
