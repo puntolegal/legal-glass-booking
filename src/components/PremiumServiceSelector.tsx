@@ -58,13 +58,13 @@ const services: Service[] = [
       'Orientación legal completa'
     ],
     color: {
-      primary: 'from-primary to-accent',
+      primary: 'from-orange-500 to-amber-600',
       secondary: 'from-orange-50 to-amber-50',
-      accent: 'primary',
+      accent: '#ff6b35',
       bg: 'orange-50',
       text: 'orange-700',
       gradient: 'from-orange-500 to-amber-600',
-      shadow: 'shadow-orange-500/20'
+      shadow: '0 20px 40px rgba(255, 107, 53, 0.25)'
     },
     icon: Scale,
     plan: 'general',
@@ -85,13 +85,13 @@ const services: Service[] = [
       'Régimen de visitas'
     ],
     color: {
-      primary: 'from-rose-500 to-pink-600',
-      secondary: 'from-rose-50 to-pink-50',
-      accent: 'rose-500',
-      bg: 'rose-50',
-      text: 'rose-700',
-      gradient: 'from-rose-500 to-pink-600',
-      shadow: 'shadow-rose-500/20'
+      primary: 'from-pink-500 to-rose-600',
+      secondary: 'from-pink-50 to-rose-50',
+      accent: '#ec4899',
+      bg: 'pink-50',
+      text: 'pink-700',
+      gradient: 'from-pink-500 to-rose-600',
+      shadow: '0 20px 40px rgba(236, 72, 153, 0.25)'
     },
     icon: Heart,
     plan: 'familia',
@@ -111,13 +111,13 @@ const services: Service[] = [
       'Asesoría tributaria'
     ],
     color: {
-      primary: 'from-purple-500 to-indigo-600',
-      secondary: 'from-purple-50 to-indigo-50',
-      accent: 'purple-500',
-      bg: 'purple-50',
-      text: 'purple-700',
-      gradient: 'from-purple-500 to-indigo-600',
-      shadow: 'shadow-purple-500/20'
+      primary: 'from-blue-600 to-indigo-600',
+      secondary: 'from-blue-50 to-indigo-50',
+      accent: '#3b82f6',
+      bg: 'blue-50',
+      text: 'blue-700',
+      gradient: 'from-blue-600 to-indigo-600',
+      shadow: '0 20px 40px rgba(59, 130, 246, 0.25)'
     },
     icon: Building2,
     plan: 'corporativo',
@@ -138,13 +138,13 @@ const services: Service[] = [
       'Estudio de títulos'
     ],
     color: {
-      primary: 'from-emerald-500 to-teal-600',
-      secondary: 'from-emerald-50 to-teal-50',
-      accent: 'emerald-500',
+      primary: 'from-emerald-600 to-green-600',
+      secondary: 'from-emerald-50 to-green-50',
+      accent: '#10b981',
       bg: 'emerald-50',
       text: 'emerald-700',
-      gradient: 'from-emerald-500 to-teal-600',
-      shadow: 'shadow-emerald-500/20'
+      gradient: 'from-emerald-600 to-green-600',
+      shadow: '0 20px 40px rgba(16, 185, 129, 0.25)'
     },
     icon: Home,
     plan: 'inmobiliario',
@@ -180,6 +180,16 @@ export const PremiumServiceSelector: React.FC = () => {
 
   const handleAgendarClick = () => {
     navigate(`/agendamiento?plan=${selectedService.plan}`);
+  };
+
+  const handleServiceClick = () => {
+    if (selectedService.id === 'familia') {
+      navigate('/servicios/familia');
+    } else if (selectedService.id === 'empresarial') {
+      navigate('/servicios/corporativo');
+    } else if (selectedService.id === 'inmobiliaria') {
+      navigate('/servicios/inmobiliario');
+    }
   };
 
   // Touch handlers
@@ -258,9 +268,9 @@ export const PremiumServiceSelector: React.FC = () => {
             </motion.div>
           )}
 
-          {/* Progress Indicators - Premium Style */}
+          {/* Progress Indicators - Service Color Theme */}
           <div className="flex items-center justify-center gap-3 mb-6">
-            {services.map((_, index) => (
+            {services.map((service, index) => (
               <motion.button
                 key={index}
                 onClick={() => setSelectedIndex(index)}
@@ -269,25 +279,25 @@ export const PremiumServiceSelector: React.FC = () => {
                 whileTap={{ scale: 0.9 }}
               >
                 <motion.div
-                  className={`h-2 rounded-full transition-all duration-500 ${
+                  className={`h-2.5 rounded-full transition-all duration-500 ${
                     index === selectedIndex 
-                      ? 'w-8' 
-                      : 'w-2'
+                      ? 'w-10' 
+                      : 'w-2.5'
                   }`}
                   style={{
                     background: index === selectedIndex 
-                      ? `linear-gradient(90deg, ${selectedService.color.bg}, ${selectedService.color.accent})`
-                      : 'rgba(156, 163, 175, 0.3)'
+                      ? `linear-gradient(90deg, ${service.color.accent}, ${service.color.accent}dd)`
+                      : service.color.accent + '30'
                   }}
                 />
                 {index === selectedIndex && (
                   <motion.div
                     className="absolute inset-0 rounded-full"
-                    initial={{ scale: 1, opacity: 1 }}
-                    animate={{ scale: 1.5, opacity: 0 }}
-                    transition={{ duration: 1, repeat: Infinity }}
+                    animate={{ scale: [1, 1.8, 1], opacity: [0.8, 0, 0.8] }}
+                    transition={{ duration: 2, repeat: Infinity }}
                     style={{
-                      background: `linear-gradient(90deg, ${selectedService.color.bg}, ${selectedService.color.accent})`
+                      background: service.color.accent,
+                      filter: 'blur(4px)'
                     }}
                   />
                 )}
@@ -310,10 +320,12 @@ export const PremiumServiceSelector: React.FC = () => {
               {/* Service Icon - iOS Premium Glass */}
               <motion.div className="relative mx-auto w-fit mb-6">
                 {/* Main icon container */}
-                <motion.div
-                  className="relative w-28 h-28"
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
+                <motion.button
+                  className="relative w-28 h-28 cursor-pointer"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={handleServiceClick}
+                  disabled={selectedService.id === 'general'}
                 >
                   {/* Glass background layers */}
                   <div className="absolute inset-0 bg-white/95 dark:bg-gray-900/95 backdrop-blur-2xl rounded-[2rem] shadow-2xl" />
@@ -323,8 +335,8 @@ export const PremiumServiceSelector: React.FC = () => {
                     <div className="h-full w-full bg-gradient-to-br from-white/90 to-gray-50/90 dark:from-gray-900/90 dark:to-gray-800/90 rounded-[2rem]" />
                   </div>
                   
-                  {/* Inner icon container */}
-                  <div className="absolute inset-2 rounded-[1.5rem] bg-gradient-to-br from-primary to-accent shadow-inner overflow-hidden">
+                  {/* Inner icon container with service color */}
+                  <div className={`absolute inset-2 rounded-[1.5rem] bg-gradient-to-br ${selectedService.color.gradient} shadow-inner overflow-hidden`}>
                     {/* Glass shine effect */}
                     <div className="absolute inset-0 bg-gradient-to-tr from-white/30 via-white/10 to-transparent" />
                     
@@ -359,19 +371,16 @@ export const PremiumServiceSelector: React.FC = () => {
                     </div>
                   </div>
                   
-                  {/* Outer glow */}
+                  {/* Outer glow with service color */}
                   <motion.div
                     className="absolute -inset-1 rounded-[2rem] opacity-50"
+                    style={{ boxShadow: selectedService.color.shadow }}
                     animate={{
-                      boxShadow: [
-                        '0 0 20px rgba(255, 107, 53, 0.0)',
-                        '0 0 30px rgba(255, 107, 53, 0.3)',
-                        '0 0 20px rgba(255, 107, 53, 0.0)'
-                      ]
+                      opacity: [0.5, 0.8, 0.5]
                     }}
                     transition={{ duration: 3, repeat: Infinity }}
                   />
-                </motion.div>
+                </motion.button>
 
                 {/* Popularity indicator - Premium Glass */}
                 {selectedService.popularity && (
@@ -395,6 +404,23 @@ export const PremiumServiceSelector: React.FC = () => {
                         </div>
                       </div>
                     </div>
+                  </motion.div>
+                )}
+                
+                {/* Click indicator for services */}
+                {selectedService.id !== 'general' && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.5 }}
+                    className="absolute -top-2 -right-2 bg-white dark:bg-gray-800 rounded-full p-1.5 shadow-lg border border-gray-200 dark:border-gray-700"
+                  >
+                    <motion.div
+                      animate={{ scale: [1, 1.2, 1] }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                    >
+                      <ChevronRight className="w-3 h-3 text-gray-600 dark:text-gray-400" />
+                    </motion.div>
                   </motion.div>
                 )}
               </motion.div>
@@ -430,18 +456,27 @@ export const PremiumServiceSelector: React.FC = () => {
                     
                     {/* Content */}
                     <div className="relative flex items-center gap-3 p-3.5 rounded-xl">
-                      {/* Icon container */}
+                      {/* Icon container with service color */}
                       <div className="relative">
-                        <div className="w-9 h-9 bg-gradient-to-br from-primary/10 to-accent/10 rounded-lg flex items-center justify-center group-hover:from-primary/20 group-hover:to-accent/20 transition-colors">
-                          <Star className="w-4.5 h-4.5 text-primary" strokeWidth={2} />
+                        <div 
+                          className="w-9 h-9 rounded-lg flex items-center justify-center transition-all duration-300"
+                          style={{ 
+                            background: `linear-gradient(135deg, ${selectedService.color.accent}15, ${selectedService.color.accent}25)`,
+                          }}
+                        >
+                          <Star 
+                            className="w-4.5 h-4.5" 
+                            style={{ color: selectedService.color.accent }}
+                            strokeWidth={2} 
+                          />
                         </div>
                         <motion.div
                           className="absolute inset-0 rounded-lg"
                           animate={{
                             boxShadow: [
-                              '0 0 0 0 rgba(255, 107, 53, 0)',
-                              '0 0 0 4px rgba(255, 107, 53, 0.1)',
-                              '0 0 0 0 rgba(255, 107, 53, 0)'
+                              `0 0 0 0 ${selectedService.color.accent}00`,
+                              `0 0 0 4px ${selectedService.color.accent}20`,
+                              `0 0 0 0 ${selectedService.color.accent}00`
                             ]
                           }}
                           transition={{ duration: 2, repeat: Infinity, delay: index * 0.3 }}
@@ -484,7 +519,10 @@ export const PremiumServiceSelector: React.FC = () => {
                     <div className="flex items-center justify-between mb-4">
                       <div>
                         <div className="flex items-baseline gap-3">
-                          <span className="text-4xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                          <span 
+                            className="text-4xl font-bold bg-clip-text text-transparent"
+                            style={{ backgroundImage: `linear-gradient(135deg, ${selectedService.color.accent}, ${selectedService.color.accent}dd)` }}
+                          >
                             ${selectedService.price}
                           </span>
                           <span className="text-lg text-gray-400 line-through decoration-2">
@@ -497,7 +535,7 @@ export const PremiumServiceSelector: React.FC = () => {
                         </p>
                       </div>
                       
-                      {/* Discount badge */}
+                      {/* Discount badge with service color */}
                       <motion.div
                         animate={{ 
                           rotate: [0, -3, 3, -3, 0],
@@ -506,8 +544,14 @@ export const PremiumServiceSelector: React.FC = () => {
                         transition={{ duration: 3, repeat: Infinity, repeatDelay: 2 }}
                         className="relative"
                       >
-                        <div className="absolute inset-0 bg-gradient-to-r from-red-500 to-orange-500 rounded-xl blur-lg opacity-50" />
-                        <div className="relative bg-gradient-to-r from-red-500 to-orange-500 text-white text-sm font-bold px-4 py-2 rounded-xl shadow-lg">
+                        <div 
+                          className="absolute inset-0 rounded-xl blur-lg opacity-50"
+                          style={{ background: `linear-gradient(135deg, ${selectedService.color.accent}, ${selectedService.color.accent}dd)` }}
+                        />
+                        <div 
+                          className="relative text-white text-sm font-bold px-4 py-2 rounded-xl shadow-lg"
+                          style={{ background: `linear-gradient(135deg, ${selectedService.color.accent}, ${selectedService.color.accent}dd)` }}
+                        >
                           {selectedService.discount}
                         </div>
                       </motion.div>
@@ -546,59 +590,59 @@ export const PremiumServiceSelector: React.FC = () => {
                 </div>
               </motion.div>
 
-              {/* CTA Button - iOS Premium Glass Style */}
+              {/* CTA Button - Service Color Theme */}
               <motion.button
                 onClick={handleAgendarClick}
-                whileHover={{ scale: 1.01 }}
-                whileTap={{ scale: 0.99 }}
-                className="relative w-full"
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="relative w-full mt-4"
               >
-                {/* Glass background */}
-                <div className="absolute inset-0 bg-gradient-to-r from-white/95 to-white/90 dark:from-gray-900/95 dark:to-gray-800/90 backdrop-blur-xl rounded-2xl" />
+                {/* Dynamic background with service color */}
+                <div className={`absolute inset-0 bg-gradient-to-r ${selectedService.color.gradient} opacity-95 rounded-2xl`} />
                 
-                {/* Premium border gradient */}
-                <div className="absolute inset-0 rounded-2xl p-[1px] bg-gradient-to-r from-primary/40 via-accent/40 to-primary/40">
-                  <div className="h-full w-full bg-white/90 dark:bg-gray-900/90 rounded-2xl" />
-                </div>
+                {/* Glass overlay */}
+                <div className="absolute inset-0 bg-white/10 backdrop-blur-sm rounded-2xl" />
                 
-                {/* Glow effect */}
+                {/* Animated glow effect */}
                 <motion.div
                   className="absolute inset-0 rounded-2xl"
+                  style={{ boxShadow: selectedService.color.shadow }}
                   animate={{
-                    boxShadow: [
-                      '0 0 20px rgba(255, 107, 53, 0.0)',
-                      '0 0 30px rgba(255, 107, 53, 0.2)',
-                      '0 0 20px rgba(255, 107, 53, 0.0)'
-                    ]
+                    opacity: [0.5, 0.8, 0.5]
                   }}
                   transition={{ duration: 2, repeat: Infinity }}
                 />
                 
+                {/* Premium border */}
+                <div className="absolute inset-0 rounded-2xl p-[0.5px] bg-gradient-to-r from-white/20 via-white/10 to-white/20">
+                  <div className="h-full w-full bg-black/5 rounded-2xl" />
+                </div>
+                
                 {/* Button content */}
                 <div className="relative py-4 px-6 rounded-2xl">
                   {/* Shine effect */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 hover:opacity-100 transform -skew-x-12 -translate-x-full hover:translate-x-full transition-all duration-700 rounded-2xl" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 hover:opacity-100 transform -skew-x-12 -translate-x-full hover:translate-x-full transition-all duration-700 rounded-2xl" />
                   
                   <div className="relative flex items-center justify-center gap-3">
-                    <div className="w-10 h-10 bg-gradient-to-br from-primary to-accent rounded-xl flex items-center justify-center shadow-lg">
+                    <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center shadow-lg border border-white/30">
                       <Calendar className="w-5 h-5 text-white" />
                     </div>
                     
-                    <span className="text-lg font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                    <span className="text-lg font-bold text-white">
                       Agendar Consulta
                     </span>
                     
                     <motion.div
-                      className="w-6 h-6 bg-primary/10 rounded-lg flex items-center justify-center"
+                      className="w-6 h-6 bg-white/20 rounded-lg flex items-center justify-center"
                       animate={{ x: [0, 3, 0] }}
                       transition={{ duration: 1.5, repeat: Infinity }}
                     >
-                      <ChevronRight className="w-4 h-4 text-primary" />
+                      <ChevronRight className="w-4 h-4 text-white" />
                     </motion.div>
                   </div>
                   
                   {/* Subtitle */}
-                  <p className="text-xs text-muted-foreground text-center mt-1">
+                  <p className="text-xs text-white/80 text-center mt-1">
                     Respuesta garantizada en 24 horas
                   </p>
                 </div>
