@@ -14,64 +14,22 @@ export const PremiumMobileHero: React.FC = () => {
         {/* Base gradient */}
         <div className="absolute inset-0 bg-gradient-to-br from-orange-50/30 via-background to-amber-50/30 dark:from-orange-950/10 dark:via-background dark:to-amber-950/10" />
         
-        {/* Animated Gradient Orbs - Orange theme */}
-        <motion.div
-          style={{ y: backgroundY }}
-          className="absolute inset-0"
-        >
-          <motion.div
-            animate={{
-              scale: [1, 1.3, 1],
-              rotate: [0, 90, 0],
-            }}
-            transition={{
-              duration: 20,
-              repeat: Infinity,
-              ease: "easeInOut"
-            }}
-            className="absolute -top-20 -right-20 w-60 h-60 bg-gradient-to-br from-primary/20 to-accent/20 rounded-full blur-3xl"
-          />
-          
-          <motion.div
-            animate={{
-              scale: [1.3, 1, 1.3],
-              rotate: [180, 0, 180],
-            }}
-            transition={{
-              duration: 25,
-              repeat: Infinity,
-              ease: "easeInOut"
-            }}
-            className="absolute -bottom-20 -left-20 w-60 h-60 bg-gradient-to-br from-accent/20 to-primary/20 rounded-full blur-3xl"
-          />
-        </motion.div>
+        {/* Static Gradient Orbs - Professional look */}
+        <div className="absolute inset-0">
+          <div className="absolute -top-20 -right-20 w-60 h-60 bg-gradient-to-br from-primary/10 to-accent/10 rounded-full blur-3xl" />
+          <div className="absolute -bottom-20 -left-20 w-60 h-60 bg-gradient-to-br from-accent/10 to-primary/10 rounded-full blur-3xl" />
+        </div>
 
         {/* Premium Glass Overlay */}
         <div className="absolute inset-0 backdrop-blur-[1px]" />
 
-        {/* Floating Glass Elements */}
-        {[...Array(10)].map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute w-20 h-20 bg-white/5 dark:bg-white/5 rounded-2xl backdrop-blur-xl border border-white/10"
-            animate={{
-              y: [0, -30, 0],
-              rotate: [0, 180, 360],
-              opacity: [0.3, 0.6, 0.3]
-            }}
-            transition={{
-              duration: 15 + Math.random() * 10,
-              repeat: Infinity,
-              delay: Math.random() * 10,
-              ease: "easeInOut"
-            }}
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              transform: `scale(${0.5 + Math.random() * 0.5})`
-            }}
-          />
-        ))}
+        {/* Subtle Background Pattern - Professional */}
+        <div className="absolute inset-0 opacity-[0.03]">
+          <div className="absolute inset-0" style={{
+            backgroundImage: `radial-gradient(circle at 1px 1px, rgb(0 0 0 / 0.1) 1px, transparent 1px)`,
+            backgroundSize: '40px 40px'
+          }} />
+        </div>
       </div>
 
       {/* Main Content */}
@@ -95,9 +53,9 @@ export const PremiumMobileHero: React.FC = () => {
             }}
             className="relative mx-auto mb-6"
           >
-            <div className="w-20 h-20 bg-gradient-to-br from-primary to-accent rounded-[1.75rem] flex items-center justify-center shadow-2xl shadow-primary/30 relative overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-t from-white/0 to-white/20" />
-              <span className="text-white font-bold text-3xl relative z-10">P</span>
+            <div className="w-20 h-20 bg-gradient-to-br from-orange-500 to-orange-600 rounded-[1.75rem] flex items-center justify-center shadow-2xl shadow-orange-500/30 relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-t from-white/0 to-white/10" />
+              <span className="text-white font-bold text-3xl relative z-10 flex items-center justify-center w-full h-full">P</span>
             </div>
           </motion.div>
 
@@ -199,21 +157,17 @@ export const PremiumMobileHero: React.FC = () => {
           ))}
         </motion.div>
 
-        {/* Scroll Indicator */}
+        {/* Scroll Indicator - Static & Professional */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.6, delay: 1.8 }}
           className="absolute bottom-8 left-1/2 -translate-x-1/2"
         >
-          <motion.div
-            animate={{ y: [0, 8, 0] }}
-            transition={{ duration: 1.5, repeat: Infinity }}
-            className="flex flex-col items-center gap-2 text-muted-foreground"
-          >
+          <div className="flex flex-col items-center gap-2 text-muted-foreground">
             <span className="text-xs font-medium">Explora más</span>
             <ArrowDown className="w-4 h-4" />
-          </motion.div>
+          </div>
         </motion.div>
 
         {/* Bottom Branding */}

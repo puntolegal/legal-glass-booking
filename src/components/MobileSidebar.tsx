@@ -1,5 +1,24 @@
 import { useRef, useEffect } from "react";
-import { Phone, Mail, MessageCircle } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { 
+  Phone, 
+  Mail, 
+  MessageCircle, 
+  X, 
+  Home,
+  Briefcase,
+  Users,
+  Building2,
+  Home as HomeIcon,
+  FileText,
+  Shield,
+  Calculator,
+  Globe,
+  Scroll,
+  BookOpen,
+  MessageSquare,
+  ChevronRight
+} from "lucide-react";
 
 interface MobileSidebarProps {
   open: boolean;
@@ -7,19 +26,78 @@ interface MobileSidebarProps {
 }
 
 const menuItems = [
-  { name: "Inicio", href: "/" },
-  { name: "Derecho Laboral", href: "/servicios/laboral" },
-  { name: "Derecho Corporativo", href: "/servicios/corporativo" },
-  { name: "Derecho de Familia", href: "/servicios/familia" },
-  { name: "Derecho Inmobiliario", href: "/servicios/inmobiliario" },
-  { name: "Derecho Civil", href: "/servicios/civil" },
-  { name: "Derecho Penal", href: "/servicios/penal" },
-  { name: "Derecho Tributario", href: "/servicios/tributario" },
-  { name: "Derecho Penal Económico", href: "/servicios/penal-economico" },
-  { name: "Derecho Digital", href: "/servicios/digital" },
-  { name: "Herencias", href: "/herencias" },
-  { name: "Blog", href: "/blog" },
-  { name: "Contacto", href: "#contacto" },
+  { 
+    name: "Inicio", 
+    href: "/", 
+    icon: Home,
+    color: "from-orange-500 to-amber-600"
+  },
+  { 
+    name: "Derecho Laboral", 
+    href: "/servicios/laboral",
+    icon: Briefcase,
+    color: "from-blue-500 to-blue-600"
+  },
+  { 
+    name: "Derecho Corporativo", 
+    href: "/servicios/corporativo",
+    icon: Building2,
+    color: "from-blue-600 to-indigo-600"
+  },
+  { 
+    name: "Derecho de Familia", 
+    href: "/servicios/familia",
+    icon: Users,
+    color: "from-pink-500 to-rose-600"
+  },
+  { 
+    name: "Derecho Inmobiliario", 
+    href: "/servicios/inmobiliario",
+    icon: HomeIcon,
+    color: "from-emerald-600 to-green-600"
+  },
+  { 
+    name: "Derecho Civil", 
+    href: "/servicios/civil",
+    icon: FileText,
+    color: "from-purple-500 to-purple-600"
+  },
+  { 
+    name: "Derecho Penal", 
+    href: "/servicios/penal",
+    icon: Shield,
+    color: "from-red-500 to-red-600"
+  },
+  { 
+    name: "Derecho Tributario", 
+    href: "/servicios/tributario",
+    icon: Calculator,
+    color: "from-teal-500 to-teal-600"
+  },
+  { 
+    name: "Derecho Digital", 
+    href: "/servicios/digital",
+    icon: Globe,
+    color: "from-indigo-500 to-indigo-600"
+  },
+  { 
+    name: "Herencias", 
+    href: "/herencias",
+    icon: Scroll,
+    color: "from-amber-600 to-amber-700"
+  },
+  { 
+    name: "Blog", 
+    href: "/blog",
+    icon: BookOpen,
+    color: "from-gray-600 to-gray-700"
+  },
+  { 
+    name: "Contacto", 
+    href: "#contacto",
+    icon: MessageSquare,
+    color: "from-green-500 to-green-600"
+  },
 ];
 
 export default function MobileSidebar({ open, onClose }: MobileSidebarProps) {
@@ -41,59 +119,96 @@ export default function MobileSidebar({ open, onClose }: MobileSidebarProps) {
   }, [open, onClose]);
 
   return (
-    <>
-      {/* Overlay */}
-      <div
-        className={`fixed inset-0 bg-black/40 transition-opacity duration-300 z-[999] ${open ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
-        aria-hidden="true"
-        onClick={onClose}
-      />
-      {/* Sidebar */}
-      <aside
-        id="mobile-sidebar"
-        role="dialog"
-        aria-modal="true"
-        ref={sidebarRef}
-        className={`fixed top-0 left-0 h-full w-[80vw] max-w-[280px] z-[1000] flex flex-col
-          bg-slate-800/90 backdrop-blur-2xl border border-white/10 rounded-r-2xl shadow-2xl
-          transition-all duration-400 ease-[cubic-bezier(0.25,0.8,0.25,1)]
-          ${open ? "translate-x-0 opacity-100" : "-translate-x-full opacity-0"}`}
-      >
-        {/* Header fijo */}
-        <div className="flex-shrink-0 p-6 pt-8 border-b border-white/10">
-          <div className="flex items-center justify-between">
-            {/* Logo P naranja */}
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl flex items-center justify-center shadow-lg shadow-orange-500/30">
-                <span className="text-white font-bold text-xl">P</span>
+    <AnimatePresence>
+      {open && (
+        <>
+          {/* Overlay with blur */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[999]"
+            aria-hidden="true"
+            onClick={onClose}
+          />
+          
+          {/* Sidebar */}
+          <motion.aside
+            initial={{ x: "-100%" }}
+            animate={{ x: 0 }}
+            exit={{ x: "-100%" }}
+            transition={{ 
+              type: "spring", 
+              damping: 30, 
+              stiffness: 300,
+              mass: 0.8
+            }}
+            id="mobile-sidebar"
+            role="dialog"
+            aria-modal="true"
+            ref={sidebarRef}
+            className="fixed top-0 left-0 h-full w-[85vw] max-w-[320px] z-[1000] flex flex-col bg-white dark:bg-gray-900"
+          >
+            {/* Modern Header */}
+            <div className="relative flex-shrink-0 p-6 pb-4">
+              {/* Background gradient */}
+              <div className="absolute inset-0 bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-950/20 dark:to-amber-950/20" />
+              
+              <div className="relative flex items-center justify-between">
+                {/* Logo with glow */}
+                <div className="flex items-center gap-3">
+                  <motion.div 
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ delay: 0.1 }}
+                    className="relative"
+                  >
+                    <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl flex items-center justify-center shadow-lg relative overflow-hidden">
+                      <div className="absolute inset-0 bg-gradient-to-t from-white/0 to-white/20" />
+                      <span className="text-white font-bold text-xl relative z-10">P</span>
+                    </div>
+                    <div className="absolute inset-0 rounded-2xl bg-orange-500/30 blur-xl" />
+                  </motion.div>
+                  <div>
+                    <h2 className="text-lg font-bold text-foreground">Punto Legal</h2>
+                    <p className="text-xs text-muted-foreground">Menú Principal</p>
+                  </div>
+                </div>
+                
+                {/* Modern close button */}
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  aria-label="Cerrar menú"
+                  onClick={onClose}
+                  className="w-10 h-10 rounded-xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                >
+                  <X className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                </motion.button>
               </div>
-              <span className="text-white font-bold text-lg">Punto Legal</span>
             </div>
-            <button
-              aria-label="Cerrar menú"
-              onClick={onClose}
-              className="text-gray-200 text-2xl bg-transparent border-0 hover:text-accent focus:outline-none"
-            >
-              ✕
-            </button>
-          </div>
-        </div>
 
-        {/* Contenido scrolleable con scrollbar móvil personalizado */}
-        <div className="flex-1 overflow-y-auto scrollbar-mobile" style={{ 
-          scrollbarWidth: 'thin',
-          scrollbarColor: 'rgba(255, 255, 255, 0.3) transparent'
-        }}>
-          <div className="p-6">
-            {/* Navegación */}
-            <nav className="mb-8">
-              <ul className="flex flex-col gap-5">
-                {menuItems.map((item, i) => (
-                  <li key={item.name}>
-                    <a
-                      href={item.href}
+            {/* Content with custom scrollbar */}
+            <div 
+              className="flex-1 overflow-y-auto px-4 pb-6"
+              style={{ 
+                scrollbarWidth: 'thin',
+                scrollbarColor: 'rgba(255, 107, 53, 0.3) rgba(0, 0, 0, 0.05)'
+              }}
+            >
+              {/* Navigation with modern cards */}
+              <nav className="space-y-1.5">
+                {menuItems.map((item, i) => {
+                  const Icon = item.icon;
+                  return (
+                    <motion.a
+                      key={item.name}
                       ref={i === 0 ? firstLinkRef : undefined}
-                      className="text-gray-200 text-lg pl-4 relative focus:outline-none focus:text-accent hover:text-accent transition-colors group"
+                      href={item.href}
+                      initial={{ x: -20, opacity: 0 }}
+                      animate={{ x: 0, opacity: 1 }}
+                      transition={{ delay: 0.05 * i }}
+                      className="group relative flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-200"
                       onClick={(e) => {
                         if (item.href.startsWith('#')) {
                           e.preventDefault();
@@ -105,26 +220,85 @@ export default function MobileSidebar({ open, onClose }: MobileSidebarProps) {
                         onClose();
                       }}
                     >
-                      <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-orange-500 opacity-0 group-hover:opacity-100 group-focus:opacity-100 transition-opacity" />
-                      {item.name}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </nav>
+                      {/* Icon with gradient background */}
+                      <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${item.color} p-2 shadow-sm group-hover:shadow-md transition-shadow`}>
+                        <Icon className="w-6 h-6 text-white" strokeWidth={1.5} />
+                      </div>
+                      
+                      {/* Text */}
+                      <span className="flex-1 font-medium text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-gray-100">
+                        {item.name}
+                      </span>
+                      
+                      {/* Arrow indicator */}
+                      <ChevronRight className="w-4 h-4 text-gray-400 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+                    </motion.a>
+                  );
+                })}
+              </nav>
 
-            {/* Contactos */}
-            <div className="flex flex-col gap-3 text-gray-300 text-base">
-              <a href="mailto:puntolegalelgolf@gmail.com" className="flex items-center hover:text-accent transition-colors">
-                <Mail className="w-4 h-4 mr-2" /> Email
-              </a>
-              <a href="https://wa.me/56962321883" target="_blank" rel="noopener noreferrer" className="flex items-center hover:text-accent transition-colors">
-                <MessageCircle className="w-4 h-4 mr-2" /> WhatsApp
-              </a>
+              {/* Divider */}
+              <div className="my-6 h-px bg-gray-200 dark:bg-gray-700" />
+
+              {/* Contact section with modern cards */}
+              <motion.div 
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.3 }}
+                className="space-y-3"
+              >
+                <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider px-4">
+                  Contacto Directo
+                </h3>
+                
+                {/* Contact cards */}
+                <a 
+                  href="mailto:puntolegalelgolf@gmail.com" 
+                  className="flex items-center gap-3 p-4 rounded-xl bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 hover:from-blue-100 hover:to-indigo-100 dark:hover:from-blue-950/30 dark:hover:to-indigo-950/30 transition-all"
+                >
+                  <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center shadow-sm">
+                    <Mail className="w-5 h-5 text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Email</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">Respuesta en 24h</p>
+                  </div>
+                </a>
+                
+                <a 
+                  href="https://wa.me/56962321883" 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="flex items-center gap-3 p-4 rounded-xl bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20 hover:from-green-100 hover:to-emerald-100 dark:hover:from-green-950/30 dark:hover:to-emerald-950/30 transition-all"
+                >
+                  <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg flex items-center justify-center shadow-sm">
+                    <MessageCircle className="w-5 h-5 text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-gray-700 dark:text-gray-300">WhatsApp</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">Chat instantáneo</p>
+                  </div>
+                </a>
+              </motion.div>
+
+              {/* Bottom branding */}
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.5 }}
+                className="mt-8 p-4 text-center"
+              >
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  © 2025 Punto Legal
+                </p>
+                <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                  Innovación Legal Chilena 🇨🇱
+                </p>
+              </motion.div>
             </div>
-          </div>
-        </div>
-      </aside>
-    </>
+          </motion.aside>
+        </>
+      )}
+    </AnimatePresence>
   );
-} 
+}
