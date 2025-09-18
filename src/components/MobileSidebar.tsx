@@ -147,12 +147,19 @@ export default function MobileSidebar({ open, onClose }: MobileSidebarProps) {
             role="dialog"
             aria-modal="true"
             ref={sidebarRef}
-            className="fixed top-0 left-0 h-full w-[85vw] max-w-[320px] z-[1000] flex flex-col bg-white dark:bg-gray-900"
+            className="fixed top-0 left-0 h-full w-[85vw] max-w-[320px] z-[1000] flex flex-col overflow-hidden"
           >
+            {/* Glassmorphism Background */}
+            <div className="absolute inset-0 bg-white/70 dark:bg-gray-900/70 backdrop-blur-2xl" />
+            <div className="absolute inset-0 bg-gradient-to-br from-white/40 via-white/20 to-transparent dark:from-gray-800/40 dark:via-gray-800/20" />
+            
+            {/* Glass Border Effect */}
+            <div className="absolute inset-y-0 right-0 w-px bg-gradient-to-b from-white/60 via-white/20 to-white/60 dark:from-gray-600/60 dark:via-gray-600/20 dark:to-gray-600/60" />
+            
             {/* Modern Header */}
-            <div className="relative flex-shrink-0 p-6 pb-4">
+            <div className="relative flex-shrink-0 p-6 pb-4 border-b border-white/20 dark:border-gray-700/20">
               {/* Background gradient */}
-              <div className="absolute inset-0 bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-950/20 dark:to-amber-950/20" />
+              <div className="absolute inset-0 bg-gradient-to-br from-orange-50/50 to-amber-50/50 dark:from-orange-950/10 dark:to-amber-950/10" />
               
               <div className="relative flex items-center justify-between">
                 {/* Logo with glow */}
@@ -175,13 +182,13 @@ export default function MobileSidebar({ open, onClose }: MobileSidebarProps) {
                   </div>
                 </div>
                 
-                {/* Modern close button */}
+                {/* Modern close button with glass effect */}
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   aria-label="Cerrar menú"
                   onClick={onClose}
-                  className="w-10 h-10 rounded-xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                  className="w-10 h-10 rounded-xl bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm flex items-center justify-center hover:bg-white/70 dark:hover:bg-gray-700/70 transition-all border border-white/30 dark:border-gray-700/30"
                 >
                   <X className="w-5 h-5 text-gray-600 dark:text-gray-400" />
                 </motion.button>
@@ -208,7 +215,7 @@ export default function MobileSidebar({ open, onClose }: MobileSidebarProps) {
                       initial={{ x: -20, opacity: 0 }}
                       animate={{ x: 0, opacity: 1 }}
                       transition={{ delay: 0.05 * i }}
-                      className="group relative flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-200"
+                      className="group relative flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/50 dark:hover:bg-gray-800/50 backdrop-blur-sm transition-all duration-200 border border-transparent hover:border-white/20 dark:hover:border-gray-700/20"
                       onClick={(e) => {
                         if (item.href.startsWith('#')) {
                           e.preventDefault();
@@ -237,8 +244,8 @@ export default function MobileSidebar({ open, onClose }: MobileSidebarProps) {
                 })}
               </nav>
 
-              {/* Divider */}
-              <div className="my-6 h-px bg-gray-200 dark:bg-gray-700" />
+              {/* Glass Divider */}
+              <div className="my-6 h-px bg-gradient-to-r from-transparent via-gray-300/50 to-transparent dark:from-transparent dark:via-gray-600/50 dark:to-transparent" />
 
               {/* Contact section with modern cards */}
               <motion.div 
@@ -254,7 +261,7 @@ export default function MobileSidebar({ open, onClose }: MobileSidebarProps) {
                 {/* Contact cards */}
                 <a 
                   href="mailto:puntolegalelgolf@gmail.com" 
-                  className="flex items-center gap-3 p-4 rounded-xl bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 hover:from-blue-100 hover:to-indigo-100 dark:hover:from-blue-950/30 dark:hover:to-indigo-950/30 transition-all"
+                  className="flex items-center gap-3 p-4 rounded-xl bg-white/30 dark:bg-gray-800/30 backdrop-blur-sm hover:bg-white/50 dark:hover:bg-gray-800/50 transition-all border border-white/20 dark:border-gray-700/20"
                 >
                   <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center shadow-sm">
                     <Mail className="w-5 h-5 text-white" />
@@ -269,7 +276,7 @@ export default function MobileSidebar({ open, onClose }: MobileSidebarProps) {
                   href="https://wa.me/56962321883" 
                   target="_blank" 
                   rel="noopener noreferrer" 
-                  className="flex items-center gap-3 p-4 rounded-xl bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20 hover:from-green-100 hover:to-emerald-100 dark:hover:from-green-950/30 dark:hover:to-emerald-950/30 transition-all"
+                  className="flex items-center gap-3 p-4 rounded-xl bg-white/30 dark:bg-gray-800/30 backdrop-blur-sm hover:bg-white/50 dark:hover:bg-gray-800/50 transition-all border border-white/20 dark:border-gray-700/20"
                 >
                   <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg flex items-center justify-center shadow-sm">
                     <MessageCircle className="w-5 h-5 text-white" />

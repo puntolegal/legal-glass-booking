@@ -53,9 +53,11 @@ export const PremiumMobileHero: React.FC = () => {
             }}
             className="relative mx-auto mb-6"
           >
-            <div className="w-20 h-20 bg-gradient-to-br from-orange-500 to-orange-600 rounded-[1.75rem] flex items-center justify-center shadow-2xl shadow-orange-500/30 relative overflow-hidden">
+            <div className="w-20 h-20 bg-gradient-to-br from-orange-500 to-orange-600 rounded-[1.75rem] flex items-center justify-center shadow-2xl shadow-orange-500/30 relative overflow-hidden mx-auto">
               <div className="absolute inset-0 bg-gradient-to-t from-white/0 to-white/10" />
-              <span className="text-white font-bold text-3xl relative z-10 flex items-center justify-center w-full h-full">P</span>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="text-white font-bold text-3xl">P</span>
+              </div>
             </div>
           </motion.div>
 
@@ -146,10 +148,10 @@ export const PremiumMobileHero: React.FC = () => {
                 <div className={`w-10 h-10 mx-auto mb-2 bg-gradient-to-br ${feature.gradient} rounded-xl flex items-center justify-center shadow-lg`}>
                   <feature.icon className="w-5 h-5 text-white" />
                 </div>
-                <p className="text-xs font-bold text-foreground">
+                <p className="text-xs font-bold text-foreground text-center">
                   {feature.text}
                 </p>
-                <p className="text-[10px] text-muted-foreground">
+                <p className="text-[10px] text-muted-foreground text-center">
                   {feature.subtext}
                 </p>
               </div>
@@ -157,18 +159,6 @@ export const PremiumMobileHero: React.FC = () => {
           ))}
         </motion.div>
 
-        {/* Scroll Indicator - Static & Professional */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.6, delay: 1.8 }}
-          className="absolute bottom-8 left-1/2 -translate-x-1/2"
-        >
-          <div className="flex flex-col items-center gap-2 text-muted-foreground">
-            <span className="text-xs font-medium">Explora más</span>
-            <ArrowDown className="w-4 h-4" />
-          </div>
-        </motion.div>
 
         {/* Bottom Branding */}
         <motion.div
