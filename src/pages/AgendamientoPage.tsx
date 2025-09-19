@@ -672,32 +672,9 @@ export default function AgendamientoPage() {
                 )}
             </AnimatePresence>
 
-            {/* Ejemplo de uso del ServiceIcon */}
-            <div className="flex justify-center mt-8 mb-4">
-              <div className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-xl rounded-2xl p-6 border border-gray-200/40 dark:border-gray-700/40 shadow-xl">
-                <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4 text-center">
-                  Icono con colores del servicio
-                </h3>
-                <div className="flex items-center justify-center gap-4">
-                  <ServiceIcon 
-                    icon={User} 
-                    serviceCategory={service.category}
-                    size="md"
-                  />
-                  <div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                      Servicio: <span className="font-semibold text-gray-900 dark:text-gray-100">{service.category}</span>
-                    </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-500">
-                      Colores aplicados automáticamente
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
 
             {/* Supabase Status */}
-            <div className="flex justify-center mt-4">
+            <div className="flex justify-center mt-8">
               <SupabaseStatusIndicator 
                 showDetails={false} 
                 className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm px-4 py-2 rounded-full border border-gray-200/30 dark:border-gray-700/30 text-xs shadow-sm" 
