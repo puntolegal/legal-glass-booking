@@ -674,8 +674,47 @@ export default function AgendamientoPage() {
 
 
 
+            {/* Ejemplo de elemento corregido con colores naranjas */}
+            <div className="flex justify-center mt-8 mb-4">
+              <div className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-xl rounded-2xl p-6 border border-gray-200/40 dark:border-gray-700/40 shadow-xl">
+                <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4 text-center">
+                  Elemento corregido para Consulta General
+                </h3>
+                
+                {/* ANTES (azul) */}
+                <div className="flex items-center justify-center gap-4 mb-4">
+                  <div className="w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+                    <User className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      ANTES (azul - incorrecto)
+                    </p>
+                    <p className="text-xs text-gray-500 dark:text-gray-500">
+                      bg-blue-100, text-blue-600
+                    </p>
+                  </div>
+                </div>
+
+                {/* DESPUÉS (naranja) */}
+                <div className="flex items-center justify-center gap-4">
+                  <div className="w-12 h-12 rounded-xl bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center">
+                    <User className="w-6 h-6 text-orange-600 dark:text-orange-400" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      DESPUÉS (naranja - correcto)
+                    </p>
+                    <p className="text-xs text-gray-500 dark:text-gray-500">
+                      bg-orange-100, text-orange-600
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             {/* Supabase Status */}
-            <div className="flex justify-center mt-8">
+            <div className="flex justify-center mt-4">
               <SupabaseStatusIndicator 
                 showDetails={false} 
                 className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm px-4 py-2 rounded-full border border-gray-200/30 dark:border-gray-700/30 text-xs shadow-sm" 
