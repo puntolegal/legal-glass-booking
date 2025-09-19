@@ -121,7 +121,6 @@ const services: Service[] = [
     },
     icon: Building2,
     plan: 'corporativo',
-    badge: 'Startups',
     popularity: 90
   },
   {
@@ -268,39 +267,29 @@ export const PremiumServiceSelector: React.FC = () => {
             </motion.div>
           )}
 
-          {/* Progress Indicators - Service Color Theme */}
-          <div className="flex items-center justify-center gap-3 mb-6">
+          {/* Progress Indicators - iOS Style */}
+          <div className="flex items-center justify-center gap-2 mb-6">
             {services.map((service, index) => (
               <motion.button
                 key={index}
                 onClick={() => setSelectedIndex(index)}
-                className="relative"
-                whileHover={{ scale: 1.2 }}
-                whileTap={{ scale: 0.9 }}
+                className="relative p-1"
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
               >
                 <motion.div
-                  className={`h-2.5 rounded-full transition-all duration-500 ${
+                  className={`rounded-full transition-all duration-300 ${
                     index === selectedIndex 
-                      ? 'w-10' 
-                      : 'w-2.5'
+                      ? 'w-8 h-2' 
+                      : 'w-2 h-2'
                   }`}
                   style={{
-                    background: index === selectedIndex 
-                      ? `linear-gradient(90deg, ${service.color.accent}, ${service.color.accent}dd)`
-                      : service.color.accent + '30'
+                    backgroundColor: index === selectedIndex 
+                      ? service.color.accent
+                      : service.color.accent + '40'
                   }}
+                  layout
                 />
-                {index === selectedIndex && (
-                  <motion.div
-                    className="absolute inset-0 rounded-full"
-                    animate={{ scale: [1, 1.8, 1], opacity: [0.8, 0, 0.8] }}
-                    transition={{ duration: 2, repeat: Infinity }}
-                    style={{
-                      background: service.color.accent,
-                      filter: 'blur(4px)'
-                    }}
-                  />
-                )}
               </motion.button>
             ))}
           </div>
