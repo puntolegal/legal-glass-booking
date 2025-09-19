@@ -95,19 +95,7 @@ export default function AgendamientoPage() {
     for (let i = 1; i <= 30; i++) {
       const date = new Date(today);
       date.setDate(today.getDate() + i);
-      
-      const dayName = date.toLocaleDateString('es-ES', { weekday: 'long' });
-      const dateString = date.toLocaleDateString('es-ES', { 
-        day: 'numeric', 
-        month: 'long',
-        year: 'numeric'
-      });
-      
-      dates.push({
-        value: dateString,
-        label: `${dayName.charAt(0).toUpperCase() + dayName.slice(1)}, ${dateString}`,
-        date: date
-      });
+      dates.push(date);
     }
     
     return dates;
