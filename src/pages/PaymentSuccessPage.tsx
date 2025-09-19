@@ -3,26 +3,138 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { CheckCircle, Calendar, Clock, User, Mail, Phone, ArrowRight, Home, CreditCard } from 'lucide-react';
 import SEO from '../components/SEO';
+import { createReservation } from '../services/reservationService';
+import { sendBookingEmails } from '../services/emailService';
 
 export default function PaymentSuccessPage() {
   const [paymentData, setPaymentData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [processingStatus, setProcessingStatus] = useState<string>('');
 
   useEffect(() => {
-    // Recuperar datos del pago desde localStorage
-    const data = localStorage.getItem('paymentSuccess');
-    if (data) {
-      setPaymentData(JSON.parse(data));
-    }
-    setIsLoading(false);
+    processPaymentSuccess();
   }, []);
+
+  const processPaymentSuccess = async () => {
+    try {
+      setIsProcessing(true);
+      setProcessingStatus('Procesando datos del pago...');
+
+      // Extraer parámetros de la URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const mercadopagoData = {
+        collection_id: urlParams.get('collection_id'),
+        collection_status: urlParams.get('collection_status'),
+        payment_id: urlParams.get('payment_id'),
+        status: urlParams.get('status'),
+        external_reference: urlParams.get('external_reference'),
+        payment_type: urlParams.get('payment_type'),
+        merchant_order_id: urlParams.get('merchant_order_id'),
+        preference_id: urlParams.get('preference_id'),
+        site_id: urlParams.get('site_id'),
+        processing_mode: urlParams.get('processing_mode')
+      };
+
+      console.log('💳 Datos de MercadoPago:', mercadopagoData);
+
+      // Recuperar datos del pago desde localStorage
+      const storedData = localStorage.getItem('paymentData');
+      if (!storedData) {
+        throw new Error('No se encontraron datos de pago');
+      }
+
+      const paymentInfo = JSON.parse(storedData);
+      console.log('📋 Datos de pago almacenados:', paymentInfo);
+
+      // Crear reserva en la base de datos
+      setProcessingStatus('Guardando reserva en la base de datos...');
+      
+      const reservationData = {
+        nombre: paymentInfo.cliente?.nombre || paymentInfo.name || 'Cliente',
+        rut: paymentInfo.cliente?.rut || paymentInfo.rut || 'No especificado',
+        email: paymentInfo.cliente?.email || paymentInfo.email || 'No especificado',
+        telefono: paymentInfo.cliente?.telefono || paymentInfo.phone || 'No especificado',
+        fecha: paymentInfo.fecha || paymentInfo.date || new Date().toISOString().split('T')[0],
+        hora: paymentInfo.hora || paymentInfo.time || '10:00',
+        descripcion: `Consulta ${paymentInfo.service} - Pago confirmado via MercadoPago`,
+        servicio: paymentInfo.service || 'Consulta General',
+        precio: paymentInfo.price || '35000',
+        categoria: paymentInfo.category || 'General',
+        tipo_reunion: paymentInfo.tipo_reunion || 'online',
+        estado: 'confirmada' as const,
+        webhook_sent: false
+      };
+
+      const reservation = await createReservation(reservationData);
+      console.log('✅ Reserva creada:', reservation);
+
+      // Enviar emails de confirmación
+      setProcessingStatus('Enviando emails de confirmación...');
+      
+      const emailData = {
+        id: reservation.id,
+        cliente_nombre: reservation.nombre,
+        cliente_email: reservation.email,
+        cliente_telefono: reservation.telefono,
+        servicio_tipo: reservation.servicio || 'Consulta General',
+        servicio_precio: reservation.precio || '35000',
+        fecha: reservation.fecha,
+        hora: reservation.hora,
+        pago_metodo: 'MercadoPago',
+        pago_estado: mercadopagoData.status === 'approved' ? 'Aprobado' : 'Pendiente',
+        created_at: reservation.created_at || new Date().toISOString()
+      };
+
+      const emailResult = await sendBookingEmails(emailData);
+      console.log('📧 Resultado de emails:', emailResult);
+
+      // Actualizar estado
+      setPaymentData({
+        ...paymentInfo,
+        reservation,
+        mercadopagoData,
+        emailResult
+      });
+
+      setProcessingStatus('¡Proceso completado exitosamente!');
+
+    } catch (error) {
+      console.error('❌ Error procesando pago exitoso:', error);
+      setProcessingStatus(`Error: ${error instanceof Error ? error.message : 'Error desconocido'}`);
+    } finally {
+      setIsProcessing(false);
+      setIsLoading(false);
+    }
+  };
 
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 flex items-center justify-center">
-        <div className="text-center">
+        <div className="text-center max-w-md mx-auto px-4">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
-          <h2 className="text-xl font-semibold text-gray-700">Cargando confirmación...</h2>
+          <h2 className="text-xl font-semibold text-gray-700 mb-2">
+            {isProcessing ? 'Procesando pago...' : 'Cargando confirmación...'}
+          </h2>
+          {processingStatus && (
+            <p className="text-sm text-gray-600 mb-4">{processingStatus}</p>
+          )}
+          <div className="bg-white/80 backdrop-blur-sm rounded-lg p-4 border border-green-200/50">
+            <div className="space-y-2 text-sm text-gray-700">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                <span>Verificando datos de MercadoPago</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                <span>Guardando reserva en la base de datos</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                <span>Enviando emails de confirmación</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -154,20 +266,58 @@ export default function PaymentSuccessPage() {
             </div>
           </motion.div>
 
+          {/* Estado del procesamiento */}
+          {paymentData?.emailResult && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+              className="bg-blue-50 border border-blue-200 rounded-xl p-6 mb-8"
+            >
+              <h3 className="text-lg font-semibold text-blue-900 mb-3">
+                📧 Estado de confirmación
+              </h3>
+              <div className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <CheckCircle className="w-5 h-5 text-green-500" />
+                  <span className="text-blue-800">Reserva guardada en la base de datos</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle className="w-5 h-5 text-green-500" />
+                  <span className="text-blue-800">Pago confirmado via MercadoPago</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle className="w-5 h-5 text-green-500" />
+                  <span className="text-blue-800">Emails de confirmación enviados</span>
+                </div>
+                {paymentData.reservation && (
+                  <div className="mt-4 p-3 bg-white rounded-lg border border-blue-200">
+                    <p className="text-sm text-blue-700">
+                      <strong>ID de Reserva:</strong> {paymentData.reservation.id}
+                    </p>
+                    <p className="text-sm text-blue-700">
+                      <strong>Estado:</strong> {paymentData.reservation.estado}
+                    </p>
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          )}
+
           {/* Información importante */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            className="bg-blue-50 border border-blue-200 rounded-xl p-6 mb-8"
+            transition={{ delay: 0.5 }}
+            className="bg-green-50 border border-green-200 rounded-xl p-6 mb-8"
           >
-            <h3 className="text-lg font-semibold text-blue-900 mb-3">
+            <h3 className="text-lg font-semibold text-green-900 mb-3">
               📧 Confirmación por email
             </h3>
-            <p className="text-blue-800 mb-4">
+            <p className="text-green-800 mb-4">
               Hemos enviado un email de confirmación a tu dirección de correo con todos los detalles de tu consulta.
             </p>
-            <div className="text-sm text-blue-700 space-y-2">
+            <div className="text-sm text-green-700 space-y-2">
               <p>• Revisa tu bandeja de entrada y carpeta de spam</p>
               <p>• Guarda este email como comprobante</p>
               <p>• Si no recibes el email en 10 minutos, contáctanos</p>

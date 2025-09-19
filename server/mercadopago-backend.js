@@ -53,7 +53,7 @@ app.post('/create-preference', async (req, res) => {
         failure: `https://puntolegal.online/payment-failure?source=mercadopago`,
         pending: `https://puntolegal.online/payment-pending?source=mercadopago`
       },
-      external_reference: `PL-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      external_reference: paymentData.external_reference || `PL-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       notification_url: `https://puntolegal.online/api/mercadopago/webhook`,
       metadata: {
         client_name: paymentData.name,

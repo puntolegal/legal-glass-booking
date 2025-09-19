@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { CreditCard, ExternalLink, Shield, Lock, CheckCircle, Server, AlertTriangle } from 'lucide-react';
+import { createReservation } from '../services/reservationService';
 
 interface PaymentData {
   amount: number;
@@ -57,8 +58,29 @@ const MercadoPagoOfficialButton: React.FC<MercadoPagoOfficialButtonProps> = ({
       if (backendStatus !== 'available') {
         throw new Error('Backend no disponible. Ejecuta: cd server && npm install && npm start');
       }
-      
-      // Llamar al backend oficial
+
+      // Crear reserva en la base de datos primero
+      console.log('💾 Creando reserva en la base de datos...');
+      const reservationData = {
+        nombre: paymentData.payer.name,
+        rut: paymentData.metadata?.client_rut || 'No especificado',
+        email: paymentData.payer.email,
+        telefono: paymentData.payer.phone || 'No especificado',
+        fecha: paymentData.metadata?.appointment_date || new Date().toISOString().split('T')[0],
+        hora: paymentData.metadata?.appointment_time || '10:00',
+        descripcion: `Consulta ${paymentData.description} - Pago pendiente`,
+        servicio: paymentData.metadata?.service_name || 'Consulta General',
+        precio: paymentData.amount.toString(),
+        categoria: paymentData.metadata?.service_category || 'General',
+        tipo_reunion: paymentData.metadata?.meeting_type || 'online',
+        estado: 'pendiente' as const,
+        webhook_sent: false
+      };
+
+      const reservation = await createReservation(reservationData);
+      console.log('✅ Reserva creada:', reservation.id);
+
+      // Llamar al backend oficial con el ID de la reserva
       const response = await fetch('http://localhost:3001/create-preference', {
         method: 'POST',
         headers: {
@@ -73,7 +95,8 @@ const MercadoPagoOfficialButton: React.FC<MercadoPagoOfficialButtonProps> = ({
             phone: paymentData.payer.phone || '',
             date: paymentData.metadata?.appointment_date || new Date().toISOString().split('T')[0],
             time: paymentData.metadata?.appointment_time || '10:00',
-            description: paymentData.description
+            description: paymentData.description,
+            external_reference: reservation.id // Usar el ID de la reserva como external_reference
           }
         })
       });
