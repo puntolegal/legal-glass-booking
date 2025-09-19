@@ -345,40 +345,30 @@ export const PremiumServiceSelector: React.FC = () => {
                       <selectedService.icon className="w-14 h-14 text-white drop-shadow-lg" strokeWidth={1.5} />
                     </div>
                     
-                    {/* Animated particles inside */}
+                    {/* Subtle shimmer effect */}
                     <div className="absolute inset-0 overflow-hidden">
-                      {[...Array(3)].map((_, i) => (
-                        <motion.div
-                          key={i}
-                          className="absolute w-1 h-1 bg-white/60 rounded-full"
-                          animate={{
-                            y: [20, -20],
-                            x: [0, (i - 1) * 10],
-                            opacity: [0, 1, 0]
-                          }}
-                          transition={{
-                            duration: 3,
-                            repeat: Infinity,
-                            delay: i * 0.7,
-                            ease: "easeInOut"
-                          }}
-                          style={{
-                            left: `${30 + i * 20}%`,
-                            bottom: 0
-                          }}
-                        />
-                      ))}
+                      <motion.div
+                        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/15 to-transparent"
+                        animate={{
+                          x: ['-100%', '100%']
+                        }}
+                        transition={{
+                          duration: 2.5,
+                          repeat: Infinity,
+                          repeatDelay: 4,
+                          ease: "easeInOut"
+                        }}
+                        style={{
+                          transform: 'skewX(-15deg)'
+                        }}
+                      />
                     </div>
                   </div>
                   
-                  {/* Outer glow with service color */}
-                  <motion.div
-                    className="absolute -inset-1 rounded-[2rem] opacity-50"
+                  {/* Subtle outer glow */}
+                  <div
+                    className="absolute -inset-1 rounded-[2rem] opacity-20"
                     style={{ boxShadow: selectedService.color.shadow }}
-                    animate={{
-                      opacity: [0.5, 0.8, 0.5]
-                    }}
-                    transition={{ duration: 3, repeat: Infinity }}
                   />
                 </motion.button>
 
@@ -407,20 +397,31 @@ export const PremiumServiceSelector: React.FC = () => {
                   </motion.div>
                 )}
                 
+                {/* Service Badge */}
+                {selectedService.badge && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.8, y: -10 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    transition={{ delay: 0.3, type: "spring", stiffness: 200 }}
+                    className="absolute -top-3 left-1/2 transform -translate-x-1/2"
+                  >
+                    <div className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50 rounded-full px-3 py-1 shadow-sm">
+                      <span className="text-xs font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">
+                        {selectedService.badge}
+                      </span>
+                    </div>
+                  </motion.div>
+                )}
+
                 {/* Click indicator for services */}
                 {selectedService.id !== 'general' && (
                   <motion.div
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: 0.5 }}
-                    className="absolute -top-2 -right-2 bg-white dark:bg-gray-800 rounded-full p-1.5 shadow-lg border border-gray-200 dark:border-gray-700"
+                    className="absolute -bottom-2 -right-2 bg-white dark:bg-gray-800 rounded-full p-1.5 shadow-lg border border-gray-200 dark:border-gray-700"
                   >
-                    <motion.div
-                      animate={{ scale: [1, 1.2, 1] }}
-                      transition={{ duration: 2, repeat: Infinity }}
-                    >
-                      <ChevronRight className="w-3 h-3 text-gray-600 dark:text-gray-400" />
-                    </motion.div>
+                    <ChevronRight className="w-3 h-3 text-gray-600 dark:text-gray-400" />
                   </motion.div>
                 )}
               </motion.div>
@@ -470,16 +471,12 @@ export const PremiumServiceSelector: React.FC = () => {
                             strokeWidth={2} 
                           />
                         </div>
-                        <motion.div
-                          className="absolute inset-0 rounded-lg"
-                          animate={{
-                            boxShadow: [
-                              `0 0 0 0 ${selectedService.color.accent}00`,
-                              `0 0 0 4px ${selectedService.color.accent}20`,
-                              `0 0 0 0 ${selectedService.color.accent}00`
-                            ]
+                        {/* Subtle static glow on hover only */}
+                        <div
+                          className="absolute inset-0 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                          style={{
+                            boxShadow: `0 0 0 2px ${selectedService.color.accent}20`
                           }}
-                          transition={{ duration: 2, repeat: Infinity, delay: index * 0.3 }}
                         />
                       </div>
                       
@@ -535,26 +532,33 @@ export const PremiumServiceSelector: React.FC = () => {
                         </p>
                       </div>
                       
-                      {/* Discount badge with service color */}
-                      <motion.div
-                        animate={{ 
-                          rotate: [0, -3, 3, -3, 0],
-                          scale: [1, 1.05, 1]
-                        }}
-                        transition={{ duration: 3, repeat: Infinity, repeatDelay: 2 }}
-                        className="relative"
-                      >
+                      {/* Discount badge - Elegant Legal Style */}
+                      <div className="relative">
+                        {/* Subtle glow effect */}
                         <div 
-                          className="absolute inset-0 rounded-xl blur-lg opacity-50"
-                          style={{ background: `linear-gradient(135deg, ${selectedService.color.accent}, ${selectedService.color.accent}dd)` }}
+                          className="absolute inset-0 rounded-lg blur-md opacity-20"
+                          style={{ background: selectedService.color.accent }}
                         />
-                        <div 
-                          className="relative text-white text-sm font-bold px-4 py-2 rounded-xl shadow-lg"
-                          style={{ background: `linear-gradient(135deg, ${selectedService.color.accent}, ${selectedService.color.accent}dd)` }}
-                        >
-                          {selectedService.discount}
+                        
+                        {/* Main badge */}
+                        <div className="relative bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50 rounded-lg px-3 py-1.5 shadow-sm">
+                          <div className="flex items-center gap-2">
+                            {/* Accent dot */}
+                            <div 
+                              className="w-2 h-2 rounded-full"
+                              style={{ backgroundColor: selectedService.color.accent }}
+                            />
+                            
+                            {/* Discount text */}
+                            <span 
+                              className="text-xs font-semibold"
+                              style={{ color: selectedService.color.accent }}
+                            >
+                              {selectedService.discount}
+                            </span>
+                          </div>
                         </div>
-                      </motion.div>
+                      </div>
                     </div>
 
                     {/* Premium divider */}
