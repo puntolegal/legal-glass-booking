@@ -32,12 +32,18 @@ export const PremiumMobileDock: React.FC<PremiumMobileDockProps> = ({ className 
     setCanGoBack(hasHistory && location.pathname !== '/');
   }, [location.pathname]);
 
-  // Auto-hide on scroll (estilo iOS)
+  // Auto-hide on scroll (estilo iOS mejorado)
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
+      const windowHeight = window.innerHeight;
+      const documentHeight = document.documentElement.scrollHeight;
+      const scrollPercentage = (currentScrollY + windowHeight) / documentHeight;
       
-      if (currentScrollY < 100) {
+      // Mostrar dock al llegar al final de la página
+      if (scrollPercentage >= 0.95) {
+        setIsVisible(true);
+      } else if (currentScrollY < 100) {
         setIsVisible(true);
       } else if (currentScrollY > lastScrollY && currentScrollY > 200) {
         setIsVisible(false);
@@ -96,50 +102,50 @@ export const PremiumMobileDock: React.FC<PremiumMobileDockProps> = ({ className 
 
   return (
     <>
-      {/* Dock Principal - Estilo iOS Premium */}
+      {/* Dock Principal - Estilo iOS Premium Optimizado */}
       <AnimatePresence>
         {isVisible && (
           <motion.div
-            initial={{ y: 100, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: 100, opacity: 0 }}
+            initial={{ y: 100, opacity: 0, scale: 0.9 }}
+            animate={{ y: 0, opacity: 1, scale: 1 }}
+            exit={{ y: 100, opacity: 0, scale: 0.9 }}
             transition={{ 
               type: "spring", 
-              stiffness: 300, 
-              damping: 30,
-              opacity: { duration: 0.2 }
+              stiffness: 400, 
+              damping: 25,
+              opacity: { duration: 0.3 }
             }}
-            className={`lg:hidden fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50 ${className}`}
+            className={`lg:hidden fixed bottom-4 left-1/2 transform -translate-x-1/2 z-50 ${className}`}
           >
             {/* Dock Container - Glassmorphism Premium */}
             <div className="relative">
-              {/* Glow Effect */}
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-blue-500/20 rounded-2xl blur-xl" />
+              {/* Glow Effect - Más sutil */}
+              <div className="absolute inset-0 bg-gradient-to-r from-orange-500/10 via-orange-500/15 to-orange-500/10 rounded-3xl blur-2xl" />
               
-              {/* Main Dock */}
-              <div className="relative bg-white/80 dark:bg-gray-900/80 backdrop-blur-2xl border border-white/20 dark:border-gray-700/30 rounded-2xl px-4 py-3 shadow-2xl shadow-black/10">
-                <div className="flex items-center gap-1">
+              {/* Main Dock - Más compacto y elegante */}
+              <div className="relative bg-white/90 dark:bg-gray-900/90 backdrop-blur-3xl border border-white/30 dark:border-gray-700/40 rounded-3xl px-3 py-2 shadow-2xl shadow-black/20">
+                <div className="flex items-center gap-0.5">
                   {dockItems.map((item, index) => (
                     <motion.button
                       key={item.label}
-                      whileHover={{ scale: 1.1, y: -2 }}
+                      whileHover={{ scale: 1.05, y: -1 }}
                       whileTap={{ scale: 0.95 }}
                       onClick={item.action}
-                      className={`relative flex flex-col items-center justify-center w-14 h-14 rounded-xl transition-all duration-200 ${
+                      className={`relative flex flex-col items-center justify-center w-12 h-12 rounded-2xl transition-all duration-300 ${
                         item.isActive
-                          ? 'bg-gradient-to-br from-orange-500 to-orange-600 text-white shadow-lg shadow-orange-500/30'
-                          : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100/50 dark:hover:bg-gray-800/50'
+                          ? 'bg-gradient-to-br from-orange-500 to-orange-600 text-white shadow-lg shadow-orange-500/40'
+                          : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100/60 dark:hover:bg-gray-800/60'
                       }`}
                     >
-                      <item.icon className="w-5 h-5 mb-1" />
-                      <span className="text-xs font-medium">{item.label}</span>
+                      <item.icon className="w-4 h-4 mb-0.5" />
+                      <span className="text-[10px] font-medium leading-none">{item.label}</span>
                       
-                      {/* Active Indicator */}
+                      {/* Active Indicator - Más elegante */}
                       {item.isActive && (
                         <motion.div
                           layoutId="activeIndicator"
-                          className="absolute -bottom-1 w-1 h-1 bg-white rounded-full"
-                          transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                          className="absolute -bottom-0.5 w-1 h-1 bg-white rounded-full shadow-sm"
+                          transition={{ type: "spring", stiffness: 400, damping: 25 }}
                         />
                       )}
                     </motion.button>
@@ -153,40 +159,41 @@ export const PremiumMobileDock: React.FC<PremiumMobileDockProps> = ({ className 
 
       {/* Botón de Menú Lateral - Esquina Superior Izquierda */}
       <motion.div
-        initial={{ opacity: 0, scale: 0.8 }}
-        animate={{ opacity: 1, scale: 1 }}
+        initial={{ opacity: 0, scale: 0.8, x: -20 }}
+        animate={{ opacity: 1, scale: 1, x: 0 }}
+        transition={{ type: "spring", stiffness: 300, damping: 25 }}
         className="lg:hidden fixed top-4 left-4 z-40"
       >
         <motion.button
-          whileHover={{ scale: 1.05 }}
+          whileHover={{ scale: 1.05, y: -1 }}
           whileTap={{ scale: 0.95 }}
           onClick={toggleSidebar}
-          className={`w-12 h-12 rounded-2xl backdrop-blur-xl border shadow-lg transition-all duration-200 ${
+          className={`w-11 h-11 rounded-2xl backdrop-blur-2xl border shadow-xl transition-all duration-300 ${
             isOpen
-              ? 'bg-gradient-to-br from-orange-500 to-orange-600 text-white border-orange-500/30 shadow-orange-500/20'
-              : 'bg-white/80 dark:bg-gray-900/80 text-gray-700 dark:text-gray-300 border-white/20 dark:border-gray-700/30 shadow-black/10 hover:bg-orange-50/50 hover:border-orange-200/30'
+              ? 'bg-gradient-to-br from-orange-500 to-orange-600 text-white border-orange-500/40 shadow-orange-500/30'
+              : 'bg-white/90 dark:bg-gray-900/90 text-gray-700 dark:text-gray-300 border-white/30 dark:border-gray-700/40 shadow-black/20 hover:bg-orange-50/60 hover:border-orange-200/40'
           }`}
         >
           <AnimatePresence mode="wait">
             {isOpen ? (
               <motion.div
                 key="close"
-                initial={{ rotate: -90, opacity: 0 }}
-                animate={{ rotate: 0, opacity: 1 }}
-                exit={{ rotate: 90, opacity: 0 }}
-                transition={{ duration: 0.15 }}
+                initial={{ rotate: -90, opacity: 0, scale: 0.8 }}
+                animate={{ rotate: 0, opacity: 1, scale: 1 }}
+                exit={{ rotate: 90, opacity: 0, scale: 0.8 }}
+                transition={{ duration: 0.2, type: "spring", stiffness: 300 }}
               >
-                <X className="w-5 h-5 mx-auto" />
+                <X className="w-4 h-4 mx-auto" />
               </motion.div>
             ) : (
               <motion.div
                 key="menu"
-                initial={{ rotate: 90, opacity: 0 }}
-                animate={{ rotate: 0, opacity: 1 }}
-                exit={{ rotate: -90, opacity: 0 }}
-                transition={{ duration: 0.15 }}
+                initial={{ rotate: 90, opacity: 0, scale: 0.8 }}
+                animate={{ rotate: 0, opacity: 1, scale: 1 }}
+                exit={{ rotate: -90, opacity: 0, scale: 0.8 }}
+                transition={{ duration: 0.2, type: "spring", stiffness: 300 }}
               >
-                <Menu className="w-5 h-5 mx-auto" />
+                <Menu className="w-4 h-4 mx-auto" />
               </motion.div>
             )}
           </AnimatePresence>
@@ -200,15 +207,16 @@ export const PremiumMobileDock: React.FC<PremiumMobileDockProps> = ({ className 
             initial={{ opacity: 0, scale: 0.8, x: 20 }}
             animate={{ opacity: 1, scale: 1, x: 0 }}
             exit={{ opacity: 0, scale: 0.8, x: 20 }}
+            transition={{ type: "spring", stiffness: 300, damping: 25 }}
             className="lg:hidden fixed top-4 right-4 z-40"
           >
             <motion.button
-              whileHover={{ scale: 1.05 }}
+              whileHover={{ scale: 1.05, y: -1 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => navigate(-1)}
-              className="w-12 h-12 rounded-2xl bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border border-white/20 dark:border-gray-700/30 shadow-lg shadow-black/10 text-gray-700 dark:text-gray-300 transition-all duration-200 hover:bg-gray-100/80 dark:hover:bg-gray-800/80"
+              className="w-11 h-11 rounded-2xl bg-white/90 dark:bg-gray-900/90 backdrop-blur-2xl border border-white/30 dark:border-gray-700/40 shadow-xl shadow-black/20 text-gray-700 dark:text-gray-300 transition-all duration-300 hover:bg-gray-100/80 dark:hover:bg-gray-800/80"
             >
-              <ArrowLeft className="w-5 h-5 mx-auto" />
+              <ArrowLeft className="w-4 h-4 mx-auto" />
             </motion.button>
           </motion.div>
         )}
@@ -217,16 +225,17 @@ export const PremiumMobileDock: React.FC<PremiumMobileDockProps> = ({ className 
       {/* Botón de Búsqueda - Flotante cuando sea necesario */}
       {location.pathname.includes('/apuntes') && (
         <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
+          initial={{ opacity: 0, scale: 0.8, x: 20 }}
+          animate={{ opacity: 1, scale: 1, x: 0 }}
+          transition={{ type: "spring", stiffness: 300, damping: 25 }}
           className="lg:hidden fixed top-4 right-20 z-40"
         >
           <motion.button
-            whileHover={{ scale: 1.05 }}
+            whileHover={{ scale: 1.05, y: -1 }}
             whileTap={{ scale: 0.95 }}
-            className="w-12 h-12 rounded-2xl bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border border-white/20 dark:border-gray-700/30 shadow-lg shadow-black/10 text-gray-700 dark:text-gray-300 transition-all duration-200 hover:bg-gray-100/80 dark:hover:bg-gray-800/80"
+            className="w-11 h-11 rounded-2xl bg-white/90 dark:bg-gray-900/90 backdrop-blur-2xl border border-white/30 dark:border-gray-700/40 shadow-xl shadow-black/20 text-gray-700 dark:text-gray-300 transition-all duration-300 hover:bg-gray-100/80 dark:hover:bg-gray-800/80"
           >
-            <Search className="w-5 h-5 mx-auto" />
+            <Search className="w-4 h-4 mx-auto" />
           </motion.button>
         </motion.div>
       )}
@@ -234,16 +243,17 @@ export const PremiumMobileDock: React.FC<PremiumMobileDockProps> = ({ className 
       {/* Usuario/Login - Solo en páginas corporativas */}
       {location.pathname.includes('/corporativo') && (
         <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
+          initial={{ opacity: 0, scale: 0.8, y: -20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          transition={{ type: "spring", stiffness: 300, damping: 25 }}
           className="lg:hidden fixed top-20 right-4 z-40"
         >
           <motion.button
-            whileHover={{ scale: 1.05 }}
+            whileHover={{ scale: 1.05, y: -1 }}
             whileTap={{ scale: 0.95 }}
-            className="w-12 h-12 rounded-2xl bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border border-white/20 dark:border-gray-700/30 shadow-lg shadow-black/10 text-gray-700 dark:text-gray-300 transition-all duration-200 hover:bg-gray-100/80 dark:hover:bg-gray-800/80"
+            className="w-11 h-11 rounded-2xl bg-white/90 dark:bg-gray-900/90 backdrop-blur-2xl border border-white/30 dark:border-gray-700/40 shadow-xl shadow-black/20 text-gray-700 dark:text-gray-300 transition-all duration-300 hover:bg-gray-100/80 dark:hover:bg-gray-800/80"
           >
-            <User className="w-5 h-5 mx-auto" />
+            <User className="w-4 h-4 mx-auto" />
           </motion.button>
         </motion.div>
       )}
