@@ -16,7 +16,8 @@ import {
   MapPin,
   X,
   Info,
-  FileText
+  FileText,
+  Building2
 } from 'lucide-react';
 import SEO from '../components/SEO';
 import WeeklyDatePicker from '../components/WeeklyDatePicker';
@@ -305,42 +306,51 @@ export default function AgendamientoPage() {
               </h1>
               
               {/* Service Card - iOS Premium */}
-              <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-2xl p-4 border border-gray-200/30 dark:border-gray-700/30 shadow-lg mb-4">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm text-muted-foreground">Precio</span>
-                  <span className="text-sm text-muted-foreground">{service.category}</span>
-                </div>
-                
-                <div className="flex items-center justify-between">
-                  <div className="text-left">
-                    <div className="text-2xl font-bold text-primary">
-                      ${precioFinal}
-                      {isConvenioValido && (
-                        <span className="text-sm text-muted-foreground line-through ml-2">
-                          ${service.price}
-                        </span>
-                      )}
+              <div className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-xl rounded-2xl p-5 border border-gray-200/40 dark:border-gray-700/40 shadow-xl mb-6">
+                <div className="flex items-center gap-4">
+                  {/* Service Icon */}
+                  <div className="w-14 h-14 rounded-xl flex items-center justify-center bg-gradient-to-br from-orange-100 to-orange-200 dark:from-orange-900/30 dark:to-orange-800/30">
+                    {service.category === 'General' && <FileText className="w-7 h-7 text-orange-600" />}
+                    {service.category === 'Familia' && <User className="w-7 h-7 text-pink-600" />}
+                    {service.category === 'Corporativo' && <Building2 className="w-7 h-7 text-blue-600" />}
+                    {service.category === 'Inmobiliario' && <MapPin className="w-7 h-7 text-emerald-600" />}
+                    {service.category === 'Laboral' && <Shield className="w-7 h-7 text-purple-600" />}
+                    {!['General', 'Familia', 'Corporativo', 'Inmobiliario', 'Laboral'].includes(service.category) && <FileText className="w-7 h-7 text-orange-600" />}
+                  </div>
+                  
+                  {/* Service Info */}
+                  <div className="flex-1">
+                    <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-1">{service.name}</h2>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">{service.category}</p>
+                  </div>
+                  
+                  {/* Price Section */}
+                  <div className="text-right">
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-2xl font-bold text-orange-600">
+                        ${precioFinal}
+                      </span>
                       {!isConvenioValido && service.originalPrice && (
-                        <span className="text-sm text-muted-foreground line-through ml-2">
+                        <span className="text-sm text-gray-400 line-through">
                           ${service.originalPrice}
                         </span>
                       )}
                     </div>
-                    {service.note && !isConvenioValido && (
-                      <p className="text-xs text-muted-foreground">{service.note}</p>
-                    )}
-                  </div>
-                  
-                  <div className="text-right">
+                    
+                    {/* Discount Badge */}
                     {isConvenioValido && (
-                      <span className="inline-block bg-gradient-to-r from-green-400 to-emerald-500 text-white text-xs font-bold px-2 py-1 rounded-full">
-                        80% OFF
-                      </span>
+                      <div className="mt-1">
+                        <span className="inline-block bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 text-xs font-medium px-2 py-1 rounded-full">
+                          80% OFF
+                        </span>
+                      </div>
                     )}
                     {!isConvenioValido && service.discount && (
-                      <span className="inline-block bg-gradient-to-r from-yellow-400 to-orange-500 text-black text-xs font-bold px-2 py-1 rounded-full">
-                        {service.discount}
-                      </span>
+                      <div className="mt-1">
+                        <span className="inline-block bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 text-xs font-medium px-2 py-1 rounded-full">
+                          {service.discount}
+                        </span>
+                      </div>
                     )}
                   </div>
                 </div>
