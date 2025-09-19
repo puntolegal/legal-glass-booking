@@ -16,7 +16,6 @@ import {
   Zap
 } from 'lucide-react';
 import SEO from '../components/SEO';
-import { MobileFloatingNav } from '../components/MobileFloatingNav';
 
 export default function ImprovedPaymentPage() {
   const [paymentData, setPaymentData] = useState<any>(null);
@@ -97,7 +96,6 @@ export default function ImprovedPaymentPage() {
         description={`Completa el pago de tu consulta de ${paymentData.service} de forma segura con Transbank o MercadoPago.`}
       />
       
-      <MobileFloatingNav />
       
       <div className="min-h-screen bg-gradient-to-b from-background to-background/50 pt-8 relative overflow-hidden">
         {/* Efectos de fondo mejorados */}

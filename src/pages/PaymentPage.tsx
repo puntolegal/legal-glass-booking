@@ -22,7 +22,6 @@ import {
   MessageCircle
 } from 'lucide-react';
 import SEO from '../components/SEO';
-import { MobileFloatingNav } from '../components/MobileFloatingNav';
 
 export default function PaymentPage() {
   const [paymentData, setPaymentData] = useState<any>(null);
@@ -162,7 +161,6 @@ export default function PaymentPage() {
         description={`Completa el pago para tu consulta de ${paymentData.service}. Múltiples métodos de pago disponibles.`}
       />
       
-      <MobileFloatingNav />
       
       <div className="min-h-screen bg-gradient-to-b from-background to-background/50 pt-20 relative overflow-hidden">
         {/* Partículas de fondo elegantes */}

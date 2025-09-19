@@ -8,7 +8,6 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Shield, Users, Calendar, Settings, Eye, Edit, Trash2, UserCheck, UserX, Mail } from "lucide-react";
-import { MobileFloatingNav } from "@/components/MobileFloatingNav";
 import NotificationPanel from "@/components/NotificationPanel";
 
 interface UserProfile {
@@ -170,7 +169,6 @@ const AdminPage = () => {
   return (
     <>
       {/* Navegación Flotante Móvil */}
-      <MobileFloatingNav />
       
       <div className="min-h-screen bg-background p-4 lg:p-8">
         <div className="max-w-7xl mx-auto">

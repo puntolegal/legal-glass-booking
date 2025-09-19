@@ -19,7 +19,6 @@ import {
   FileText
 } from 'lucide-react';
 import SEO from '../components/SEO';
-import { MobileFloatingNav } from '../components/MobileFloatingNav';
 import WeeklyDatePicker from '../components/WeeklyDatePicker';
 import BankTransferCard3D from '../components/BankTransferCard3D';
 import { createBookingWithEmails, type BookingData } from '@/services/supabaseBooking';
@@ -258,7 +257,6 @@ export default function AgendamientoPage() {
       />
       
       {/* Navegación Flotante Móvil */}
-      <MobileFloatingNav />
       
       <div className="min-h-screen bg-gradient-to-b from-background to-background/50">
         {/* Header Móvil Optimizado */}

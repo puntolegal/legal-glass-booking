@@ -20,8 +20,6 @@ import Index from '@/pages/Index';
 import ServicesPage from '@/pages/ServicesPage';
 import BlogPage from '@/pages/BlogPage';
 import AgendamientoPage from '@/pages/AgendamientoPage';
-import PaymentPage from '@/pages/PaymentPage';
-import ImprovedPaymentPage from '@/pages/ImprovedPaymentPage';
 import PremiumPaymentPage from '@/pages/PremiumPaymentPage';
 import MercadoPagoPaymentPage from '@/pages/MercadoPagoPaymentPage';
 import PaymentSuccessPage from '@/pages/PaymentSuccessPage';
