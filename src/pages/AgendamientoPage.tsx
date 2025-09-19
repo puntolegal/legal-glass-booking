@@ -390,38 +390,50 @@ export default function AgendamientoPage() {
                     
                     <div className="grid grid-cols-1 gap-3">
                       {[
-                        { value: 'videollamada', label: 'Videollamada', icon: Video, desc: 'Google Meet', color: 'blue' },
-                        { value: 'presencial', label: 'Presencial', icon: MapPin, desc: 'En oficina', color: 'green' },
-                        { value: 'telefonica', label: 'Telefónica', icon: Phone, desc: 'Llamada directa', color: 'purple' }
+                        { value: 'videollamada', label: 'Videollamada', icon: Video, desc: 'Google Meet', color: 'blue', available: true },
+                        { value: 'presencial', label: 'Presencial', icon: MapPin, desc: 'Próximamente', color: 'green', available: false },
+                        { value: 'telefonica', label: 'Telefónica', icon: Phone, desc: 'Llamada directa', color: 'purple', available: true }
                       ].map((option) => (
                         <motion.button
                           key={option.value}
-                          onClick={() => setSelectedMeetingType(option.value)}
-                          className={`p-4 rounded-xl border-2 transition-all ${
-                            selectedMeetingType === option.value
-                              ? `border-${option.color}-500 bg-${option.color}-50 dark:bg-${option.color}-900/20`
+                          onClick={() => option.available && setSelectedMeetingType(option.value)}
+                          disabled={!option.available}
+                          className={`p-4 rounded-xl border-2 transition-all relative ${
+                            !option.available
+                              ? 'border-gray-200 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 opacity-60 cursor-not-allowed'
+                              : selectedMeetingType === option.value
+                              ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
                               : 'border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600'
                           }`}
-                          whileTap={{ scale: 0.98 }}
+                          whileTap={option.available ? { scale: 0.98 } : {}}
                         >
                           <div className="flex items-center gap-3">
                             <option.icon className={`w-5 h-5 ${
-                              selectedMeetingType === option.value 
-                                ? `text-${option.color}-600 dark:text-${option.color}-400` 
+                              !option.available
+                                ? 'text-gray-400 dark:text-gray-500'
+                                : selectedMeetingType === option.value 
+                                ? 'text-blue-600 dark:text-blue-400' 
                                 : 'text-gray-500 dark:text-gray-400'
                             }`} />
                             <div className="text-left flex-1">
                               <p className={`font-semibold ${
-                                selectedMeetingType === option.value 
-                                  ? `text-${option.color}-900 dark:text-${option.color}-100` 
+                                !option.available
+                                  ? 'text-gray-400 dark:text-gray-500'
+                                  : selectedMeetingType === option.value 
+                                  ? 'text-blue-900 dark:text-blue-100' 
                                   : 'text-gray-900 dark:text-gray-100'
                               }`}>
                                 {option.label}
                               </p>
                               <p className="text-xs text-gray-500 dark:text-gray-400">{option.desc}</p>
                             </div>
-                            {selectedMeetingType === option.value && (
-                              <CheckCircle className={`w-5 h-5 text-${option.color}-600 dark:text-${option.color}-400`} />
+                            {selectedMeetingType === option.value && option.available && (
+                              <CheckCircle className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                            )}
+                            {!option.available && (
+                              <div className="bg-gray-200 dark:bg-gray-600 text-gray-500 dark:text-gray-400 text-xs px-2 py-1 rounded-full font-medium">
+                                Próximamente
+                              </div>
                             )}
                           </div>
                         </motion.button>
@@ -429,13 +441,16 @@ export default function AgendamientoPage() {
                     </div>
                   </div>
 
-                  {/* Date & Time Selection */}
+                  {/* Date Selection - Elegant */}
                   <div className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-xl rounded-2xl p-6 border border-gray-200/40 dark:border-gray-700/40 shadow-xl">
                     <div className="flex items-center gap-3 mb-6">
                       <div className="w-12 h-12 rounded-xl bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
                         <Calendar className="w-6 h-6 text-green-600 dark:text-green-400" />
                       </div>
-                      <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100">Fecha y Hora</h3>
+                      <div>
+                        <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100">Selecciona tu fecha</h3>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">Elige el día que mejor te convenga</p>
+                      </div>
                     </div>
                     
                     <WeeklyDatePicker
@@ -443,33 +458,43 @@ export default function AgendamientoPage() {
                       onDateSelect={setSelectedDate}
                       availableDates={getAvailableDates()}
                     />
-                    
-                    {selectedDate && (
-                      <motion.div
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: 'auto' }}
-                        transition={{ duration: 0.3 }}
-                        className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700"
-                      >
-                        <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4">Horarios disponibles</h4>
-                        <div className="grid grid-cols-3 gap-3">
-                          {getAvailableTimes().map((time) => (
-                            <button
-                              key={time}
-                              onClick={() => setSelectedTime(time)}
-                              className={`py-3 px-2 rounded-xl text-sm font-semibold transition-all ${
-                                selectedTime === time
-                                  ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/30'
-                                  : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-                              }`}
-                            >
-                              {time}
-                            </button>
-                          ))}
-                        </div>
-                      </motion.div>
-                    )}
                   </div>
+
+                  {/* Time Selection - Appears after date selection */}
+                  {selectedDate && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-xl rounded-2xl p-6 border border-gray-200/40 dark:border-gray-700/40 shadow-xl"
+                    >
+                      <div className="flex items-center gap-3 mb-6">
+                        <div className="w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+                          <Clock className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+                        </div>
+                        <div>
+                          <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100">Elige tu horario</h3>
+                          <p className="text-sm text-gray-500 dark:text-gray-400">Horarios disponibles para {selectedDate}</p>
+                        </div>
+                      </div>
+                      
+                      <div className="grid grid-cols-2 gap-3">
+                        {getAvailableTimes().map((time) => (
+                          <button
+                            key={time}
+                            onClick={() => setSelectedTime(time)}
+                            className={`py-4 px-4 rounded-xl font-semibold transition-all ${
+                              selectedTime === time
+                                ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/30 scale-105'
+                                : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 hover:scale-102'
+                            }`}
+                          >
+                            {time}
+                          </button>
+                        ))}
+                      </div>
+                    </motion.div>
+                  )}
 
                   {/* Navigation Buttons */}
                   <div className="flex gap-4">
@@ -601,7 +626,7 @@ export default function AgendamientoPage() {
                         }
                       }}
                       disabled={!selectedDate || !selectedTime}
-                      className="flex-2 py-4 rounded-xl font-semibold text-white shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="flex-[2] py-5 rounded-xl font-bold text-white shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed text-lg"
                       style={{ 
                         background: `linear-gradient(135deg, ${serviceColor}, ${serviceColor}dd)`,
                         boxShadow: `0 8px 25px ${serviceColor}30`
