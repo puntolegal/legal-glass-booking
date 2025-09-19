@@ -23,6 +23,7 @@ import {
 import SEO from '../components/SEO';
 import WeeklyDatePicker from '../components/WeeklyDatePicker';
 import BankTransferCard3D from '../components/BankTransferCard3D';
+import ServiceIcon from '../components/ServiceIcon';
 import { createBookingWithEmails, type BookingData } from '@/services/supabaseBooking';
 import { createOfflineBookingWithEmail, type OfflineBookingData } from '@/services/offlineBooking';
 import { sendRealBookingEmails, type BookingEmailData } from '@/services/realEmailService';
@@ -95,7 +96,7 @@ export default function AgendamientoPage() {
     for (let i = 1; i <= 30; i++) {
       const date = new Date(today);
       date.setDate(today.getDate() + i);
-      dates.push(date);
+        dates.push(date);
     }
     
     return dates;
@@ -157,6 +158,7 @@ export default function AgendamientoPage() {
   const serviceColors = getServiceColors();
   const serviceColor = serviceColors.primary;
 
+
   return (
     <>
       <SEO 
@@ -175,15 +177,15 @@ export default function AgendamientoPage() {
             <div className="max-w-md mx-auto">
               {/* Navigation Bar */}
               <div className="flex items-center justify-between mb-6">
-                <Link 
-                  to="/" 
+              <Link 
+                to="/" 
                   className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
                 >
                   <div className="w-9 h-9 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
                     <ArrowLeft className="w-4 h-4" />
                   </div>
                   <span className="font-medium">Inicio</span>
-                </Link>
+              </Link>
                 
                 <div className="text-center">
                   <h1 className="text-lg font-bold text-gray-900 dark:text-gray-100">Agendamiento</h1>
@@ -193,8 +195,8 @@ export default function AgendamientoPage() {
                 </div>
                 
                 <div className="w-9 h-9" /> {/* Spacer */}
-              </div>
-
+            </div>
+            
               {/* Service Preview Card */}
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
@@ -254,7 +256,7 @@ export default function AgendamientoPage() {
               </motion.div>
             </div>
           </div>
-        </div>
+              </div>
 
         {/* Main Content */}
         <div className="px-4 pb-32">
@@ -262,11 +264,11 @@ export default function AgendamientoPage() {
             
             <AnimatePresence mode="wait">
               {/* Step 1: Información Personal */}
-              {step === 1 && (
-                <motion.div
+                {step === 1 && (
+                  <motion.div
                   key="step1"
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -20 }}
                   transition={{ duration: 0.3 }}
                   className="space-y-6"
@@ -363,19 +365,19 @@ export default function AgendamientoPage() {
                             <span className="font-medium">Código válido - Descuento del 80% aplicado</span>
                           </motion.div>
                         )}
-                      </div>
-                      
+                    </div>
+                    
                       <div>
                         <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                           Descripción del caso
                         </label>
-                        <textarea
-                          rows={4}
-                          value={formData.descripcion}
-                          onChange={(e) => setFormData({...formData, descripcion: e.target.value})}
+                      <textarea
+                        rows={4}
+                        value={formData.descripcion}
+                        onChange={(e) => setFormData({...formData, descripcion: e.target.value})}
                           className="w-full px-4 py-4 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all text-gray-900 dark:text-gray-100 resize-none text-base"
-                          placeholder="Describe brevemente tu situación legal..."
-                        />
+                        placeholder="Describe brevemente tu situación legal..."
+                      />
                       </div>
                     </div>
                     
@@ -397,15 +399,15 @@ export default function AgendamientoPage() {
                       Continuar a Fecha y Hora
                     </button>
                   </div>
-                </motion.div>
-              )}
+                  </motion.div>
+                )}
 
               {/* Step 2: Fecha y Hora */}
-              {step === 2 && (
-                <motion.div
+                {step === 2 && (
+                  <motion.div
                   key="step2"
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -20 }}
                   transition={{ duration: 0.3 }}
                   className="space-y-6"
@@ -464,14 +466,14 @@ export default function AgendamientoPage() {
                             {!option.available && (
                               <div className="bg-gray-200 dark:bg-gray-600 text-gray-500 dark:text-gray-400 text-xs px-2 py-1 rounded-full font-medium">
                                 Próximamente
-                              </div>
+                            </div>
                             )}
                           </div>
                         </motion.button>
                       ))}
-                    </div>
-                  </div>
-
+                        </div>
+                      </div>
+                      
                   {/* Date Selection - Elegant */}
                   <div className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-xl rounded-2xl p-6 border border-gray-200/40 dark:border-gray-700/40 shadow-xl">
                       <div className="flex items-center gap-3 mb-6">
@@ -482,18 +484,18 @@ export default function AgendamientoPage() {
                           <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100">Selecciona tu fecha</h3>
                           <p className="text-sm text-gray-500 dark:text-gray-400">Elige el día que mejor te convenga</p>
                         </div>
-                      </div>
+                    </div>
                     
                     <WeeklyDatePicker
                       selectedDate={selectedDate}
                       onDateSelect={setSelectedDate}
                       availableDates={getAvailableDates()}
                     />
-                  </div>
+                    </div>
 
                   {/* Time Selection - Appears after date selection */}
                   {selectedDate && (
-                    <motion.div
+                      <motion.div
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.3 }}
@@ -506,9 +508,9 @@ export default function AgendamientoPage() {
                           <div>
                             <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100">Elige tu horario</h3>
                             <p className="text-sm text-gray-500 dark:text-gray-400">Horarios disponibles para {selectedDate}</p>
-                          </div>
                         </div>
-                      
+                      </div>
+
                       <div className="grid grid-cols-2 gap-3">
                         {getAvailableTimes().map((time) => (
                           <button
@@ -524,42 +526,42 @@ export default function AgendamientoPage() {
                           </button>
                         ))}
                       </div>
-                    </motion.div>
-                  )}
+                      </motion.div>
+                    )}
 
                   {/* Navigation Buttons */}
-                  <div className="flex gap-4">
-                    <button
-                      type="button"
+                    <div className="flex gap-4">
+                      <button
+                        type="button"
                       onClick={() => setStep(1)}
                       className="flex-1 py-4 rounded-xl font-semibold bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-all"
-                    >
-                      Anterior
-                    </button>
-                    <button
-                      type="button"
+                      >
+                        Anterior
+                      </button>
+                      <button
+                        type="button"
                       onClick={async () => {
                         if (!selectedDate || !selectedTime) {
                           alert('Por favor selecciona fecha y hora');
                           return;
                         }
 
-                        const paymentData = {
-                          ...formData,
-                          service: service.name,
+                          const paymentData = {
+                            ...formData,
+                            service: service.name,
                           price: precioFinal,
                           originalPrice: (service as any).price,
-                          category: service.category,
-                          fecha: selectedDate,
-                          hora: selectedTime,
-                          tipo_reunion: selectedMeetingType,
-                          descripcion: formData.descripcion,
+                            category: service.category,
+                            fecha: selectedDate,
+                            hora: selectedTime,
+                            tipo_reunion: selectedMeetingType,
+                            descripcion: formData.descripcion,
                           codigoConvenio: formData.codigoConvenio,
                           descuentoConvenio: isConvenioValido,
                           porcentajeDescuento: isConvenioValido ? '80%' : ((service as any).discount || null),
-                          id: Date.now().toString()
-                        };
-                        
+                            id: Date.now().toString()
+                          };
+                          
                         // Si el precio final es 0, crear reserva directamente
                         if (precioFinal === '0' || precioConConvenio === 0) {
                           try {
@@ -589,14 +591,14 @@ export default function AgendamientoPage() {
                             if (isSupabaseAvailable) {
                               const result = await createBookingWithEmails(bookingData);
                               if (result.success) {
-                                localStorage.setItem('paymentData', JSON.stringify({
-                                  ...paymentData,
-                                  paymentMethod: 'gratis',
+                            localStorage.setItem('paymentData', JSON.stringify({
+                              ...paymentData,
+                              paymentMethod: 'gratis',
                                   paymentStatus: 'completed',
                                   reservaId: result.reserva?.id
-                                }));
-                                window.location.href = '/payment-success';
-                              } else {
+                            }));
+                            window.location.href = '/payment-success';
+                          } else {
                                 alert('Error al crear la consulta. Por favor intenta nuevamente.');
                               }
                             } else {
@@ -664,14 +666,38 @@ export default function AgendamientoPage() {
                       }}
                     >
                       {precioFinal === '0' || precioConConvenio === 0 ? 'Confirmar Reserva Gratis' : 'Proceder al Pago'}
-                    </button>
-                  </div>
-                </motion.div>
-              )}
+                      </button>
+                    </div>
+                  </motion.div>
+                )}
             </AnimatePresence>
 
+            {/* Ejemplo de uso del ServiceIcon */}
+            <div className="flex justify-center mt-8 mb-4">
+              <div className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-xl rounded-2xl p-6 border border-gray-200/40 dark:border-gray-700/40 shadow-xl">
+                <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4 text-center">
+                  Icono con colores del servicio
+                </h3>
+                <div className="flex items-center justify-center gap-4">
+                  <ServiceIcon 
+                    icon={User} 
+                    serviceCategory={service.category}
+                    size="md"
+                  />
+                  <div>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      Servicio: <span className="font-semibold text-gray-900 dark:text-gray-100">{service.category}</span>
+                    </p>
+                    <p className="text-xs text-gray-500 dark:text-gray-500">
+                      Colores aplicados automáticamente
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             {/* Supabase Status */}
-            <div className="flex justify-center mt-8">
+            <div className="flex justify-center mt-4">
               <SupabaseStatusIndicator 
                 showDetails={false} 
                 className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm px-4 py-2 rounded-full border border-gray-200/30 dark:border-gray-700/30 text-xs shadow-sm" 
@@ -682,4 +708,4 @@ export default function AgendamientoPage() {
       </div>
     </>
   );
-}
+} 

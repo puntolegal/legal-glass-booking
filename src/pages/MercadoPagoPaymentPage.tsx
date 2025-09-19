@@ -4,12 +4,19 @@ import { Link } from 'react-router-dom';
 import { ArrowLeft, CheckCircle, AlertCircle, CreditCard, Lock, User, Calendar, Clock } from 'lucide-react';
 import SEO from '../components/SEO';
 import MercadoPagoOfficialButton from '../components/MercadoPagoOfficialButton';
+import ServiceIcon from '../components/ServiceIcon';
 import { PaymentData } from '../services/mercadopagoEdgeFunction';
 
 export default function MercadoPagoPaymentPage() {
   const [paymentData, setPaymentData] = useState<any>(null);
   const [paymentError, setPaymentError] = useState<string>('');
   const [isProcessing, setIsProcessing] = useState(false);
+
+  // Obtener categoría del servicio para los colores
+  const getServiceCategory = () => {
+    if (!paymentData?.category) return 'General';
+    return paymentData.category;
+  };
 
   useEffect(() => {
     // Recuperar datos del localStorage
@@ -138,7 +145,12 @@ export default function MercadoPagoPaymentPage() {
                 
                 <div className="space-y-4">
                   <div className="flex items-start gap-3">
-                    <User className="w-5 h-5 text-gray-400 mt-0.5" />
+                    <ServiceIcon 
+                      icon={User} 
+                      serviceCategory={getServiceCategory()}
+                      size="sm"
+                      className="mt-0.5"
+                    />
                     <div>
                       <p className="text-sm text-gray-500">Servicio</p>
                       <p className="font-medium text-gray-900">{paymentData.service}</p>
@@ -153,7 +165,12 @@ export default function MercadoPagoPaymentPage() {
                   </div>
                   
                   <div className="flex items-start gap-3">
-                    <Calendar className="w-5 h-5 text-gray-400 mt-0.5" />
+                    <ServiceIcon 
+                      icon={Calendar} 
+                      serviceCategory={getServiceCategory()}
+                      size="sm"
+                      className="mt-0.5"
+                    />
                     <div>
                       <p className="text-sm text-gray-500">Fecha</p>
                       <p className="font-medium text-gray-900">{formatDate(paymentData.fecha || paymentData.date)}</p>
@@ -161,7 +178,12 @@ export default function MercadoPagoPaymentPage() {
                   </div>
                   
                   <div className="flex items-start gap-3">
-                    <Clock className="w-5 h-5 text-gray-400 mt-0.5" />
+                    <ServiceIcon 
+                      icon={Clock} 
+                      serviceCategory={getServiceCategory()}
+                      size="sm"
+                      className="mt-0.5"
+                    />
                     <div>
                       <p className="text-sm text-gray-500">Hora</p>
                       <p className="font-medium text-gray-900">{paymentData.hora || paymentData.time || '10:00'} hrs</p>
