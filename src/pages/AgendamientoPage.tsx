@@ -84,6 +84,11 @@ export default function AgendamientoPage() {
   const service = serviceCatalog[plan as keyof typeof serviceCatalog] || serviceCatalog.general;
   
   const [step, setStep] = useState(1);
+  
+  // Debug logging
+  useEffect(() => {
+    console.log('Current step:', step);
+  }, [step]);
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedTime, setSelectedTime] = useState('');
   const [selectedMeetingType, setSelectedMeetingType] = useState('videollamada');
@@ -198,7 +203,9 @@ export default function AgendamientoPage() {
               
               <div className="text-center">
                 <h1 className="text-lg font-bold text-gray-900 dark:text-gray-100">Agendamiento</h1>
-                <p className="text-xs text-gray-500 dark:text-gray-400">Paso {step} de 2</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  Paso {step} de 2 • {step === 1 ? 'Datos personales' : 'Fecha y hora'}
+                </p>
               </div>
               
               <div className="w-8 h-8" /> {/* Spacer */}
@@ -364,7 +371,17 @@ export default function AgendamientoPage() {
                     </div>
                     
                     <button
-                      type="submit"
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        // Validar campos requeridos
+                        if (!formData.nombre || !formData.email || !formData.telefono) {
+                          alert('Por favor completa todos los campos requeridos');
+                          return;
+                        }
+                        console.log('Avanzando al paso 2...');
+                        setStep(2);
+                      }}
                       className="w-full py-4 rounded-xl font-semibold text-white shadow-lg transition-all"
                       style={{ 
                         background: `linear-gradient(135deg, ${serviceColor}, ${serviceColor}dd)`,
