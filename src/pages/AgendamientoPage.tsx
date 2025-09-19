@@ -146,9 +146,12 @@ export default function AgendamientoPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (step < 2) {
-      setStep(step + 1);
+    // Validar campos requeridos
+    if (!formData.nombre || !formData.email || !formData.telefono) {
+      alert('Por favor completa todos los campos requeridos');
+      return;
     }
+    setStep(2);
   };
 
   // Obtener color del servicio
@@ -248,23 +251,25 @@ export default function AgendamientoPage() {
         <div className="px-4 pb-24">
           <div className="max-w-md mx-auto space-y-6">
             
-            {/* Step 1: Información Personal */}
-            {step === 1 && (
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                className="space-y-4"
-              >
-                <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-2xl p-6 border border-gray-200/30 dark:border-gray-700/30 shadow-lg">
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
-                      <User className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+            <AnimatePresence mode="wait">
+              {/* Step 1: Información Personal */}
+              {step === 1 && (
+                <motion.div
+                  key="step1"
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  className="space-y-4"
+                >
+                  <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-2xl p-6 border border-gray-200/30 dark:border-gray-700/30 shadow-lg">
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className="w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+                        <User className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                      </div>
+                      <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">Información Personal</h3>
                     </div>
-                    <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">Información Personal</h3>
-                  </div>
-                  
-                  <form onSubmit={handleSubmit} className="space-y-4">
+                    
+                    <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Nombre Completo *
@@ -373,14 +378,15 @@ export default function AgendamientoPage() {
               </motion.div>
             )}
 
-            {/* Step 2: Fecha y Hora */}
-            {step === 2 && (
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                className="space-y-4"
-              >
+              {/* Step 2: Fecha y Hora */}
+              {step === 2 && (
+                <motion.div
+                  key="step2"
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  className="space-y-4"
+                >
                 {/* Tipo de Reunión */}
                 <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-2xl p-6 border border-gray-200/30 dark:border-gray-700/30 shadow-lg">
                   <div className="flex items-center gap-3 mb-6">
@@ -626,7 +632,8 @@ export default function AgendamientoPage() {
                   </button>
                 </div>
               </motion.div>
-            )}
+              )}
+            </AnimatePresence>
 
             {/* Supabase Status */}
             <div className="flex justify-center">
