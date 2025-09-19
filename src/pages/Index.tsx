@@ -96,7 +96,6 @@ const Index = () => {
 
         {/* Desktop Layout */}
         <div className="hidden lg:block">
-          <Header />
           {pageContent}
         </div>
 
