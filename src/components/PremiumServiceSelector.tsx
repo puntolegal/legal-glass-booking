@@ -12,11 +12,10 @@ import {
   Sparkles,
   Clock,
   Shield,
-  Star,
+  CheckCircle,
   Zap,
   Users,
   TrendingUp,
-  Award
 } from 'lucide-react';
 
 interface Service {
@@ -68,7 +67,6 @@ const services: Service[] = [
     },
     icon: Scale,
     plan: 'general',
-    badge: 'Más Popular',
     popularity: 95
   },
   {
@@ -253,19 +251,6 @@ export const PremiumServiceSelector: React.FC = () => {
       >
         {/* Premium Header */}
         <div className="relative p-6 pb-0">
-          {/* Badge (if any) */}
-          {selectedService.badge && (
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="absolute -top-3 right-6 z-10"
-            >
-              <div className={`bg-gradient-to-r ${selectedService.color.gradient} text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1`}>
-                <Award className="w-3 h-3" />
-                {selectedService.badge}
-              </div>
-            </motion.div>
-          )}
 
           {/* Progress Indicators - iOS Style */}
           <div className="flex items-center justify-center gap-2 mb-6">
@@ -385,34 +370,6 @@ export const PremiumServiceSelector: React.FC = () => {
                     </div>
                   </motion.div>
                 )}
-                
-                {/* Service Badge */}
-                {selectedService.badge && (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.8, y: -10 }}
-                    animate={{ opacity: 1, scale: 1, y: 0 }}
-                    transition={{ delay: 0.3, type: "spring", stiffness: 200 }}
-                    className="absolute -top-3 left-1/2 transform -translate-x-1/2"
-                  >
-                    <div className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50 rounded-full px-3 py-1 shadow-sm">
-                      <span className="text-xs font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">
-                        {selectedService.badge}
-                      </span>
-                    </div>
-                  </motion.div>
-                )}
-
-                {/* Click indicator for services */}
-                {selectedService.id !== 'general' && (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 0.5 }}
-                    className="absolute -bottom-2 -right-2 bg-white dark:bg-gray-800 rounded-full p-1.5 shadow-lg border border-gray-200 dark:border-gray-700"
-                  >
-                    <ChevronRight className="w-3 h-3 text-gray-600 dark:text-gray-400" />
-                  </motion.div>
-                )}
               </motion.div>
 
               {/* Service Name & Description */}
@@ -454,7 +411,7 @@ export const PremiumServiceSelector: React.FC = () => {
                             background: `linear-gradient(135deg, ${selectedService.color.accent}15, ${selectedService.color.accent}25)`,
                           }}
                         >
-                          <Star 
+                          <CheckCircle 
                             className="w-4.5 h-4.5" 
                             style={{ color: selectedService.color.accent }}
                             strokeWidth={2} 
@@ -474,8 +431,6 @@ export const PremiumServiceSelector: React.FC = () => {
                         {highlight}
                       </span>
                       
-                      {/* Arrow on hover */}
-                      <ChevronRight className="w-4 h-4 text-primary/40 opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all" />
                     </div>
                   </motion.div>
                 ))}
