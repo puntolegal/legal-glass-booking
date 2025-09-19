@@ -673,8 +673,47 @@ export default function AgendamientoPage() {
             </AnimatePresence>
 
 
+            {/* Ejemplos de elementos con colores naranjas de consulta general */}
+            <div className="flex justify-center mt-8 mb-4">
+              <div className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-xl rounded-2xl p-6 border border-gray-200/40 dark:border-gray-700/40 shadow-xl">
+                <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4 text-center">
+                  Elementos con colores de Consulta General
+                </h3>
+                
+                {/* Botón con colores naranjas */}
+                <div className="flex items-center justify-center gap-4 mb-4">
+                  <div className="w-12 h-12 rounded-xl bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center">
+                    <User className="w-6 h-6 text-orange-600 dark:text-orange-400" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      Botón con colores naranjas
+                    </p>
+                    <p className="text-xs text-gray-500 dark:text-gray-500">
+                      bg-orange-100, text-orange-600
+                    </p>
+                  </div>
+                </div>
+
+                {/* Icono FileText con colores naranjas */}
+                <div className="flex items-center justify-center gap-4">
+                  <div className="w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg" style={{backgroundColor: 'rgba(255, 107, 53, 0.125)'}}>
+                    <FileText className="w-8 h-8" style={{color: 'rgb(255, 107, 53)'}} />
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      Icono FileText naranja
+                    </p>
+                    <p className="text-xs text-gray-500 dark:text-gray-500">
+                      rgba(255, 107, 53, 0.125) background
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             {/* Supabase Status */}
-            <div className="flex justify-center mt-8">
+            <div className="flex justify-center mt-4">
               <SupabaseStatusIndicator 
                 showDetails={false} 
                 className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm px-4 py-2 rounded-full border border-gray-200/30 dark:border-gray-700/30 text-xs shadow-sm" 
