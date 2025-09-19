@@ -359,43 +359,27 @@ export default function AgendamientoPage() {
         <section className="pb-24 px-4">
           <div className="max-w-md mx-auto lg:max-w-4xl lg:mx-auto">
             <div className="lg:max-w-4xl lg:mx-auto">
-              {/* Progress Steps - Diseño Premium */}
-              <div className="flex items-center justify-center mb-8 px-4">
-                {[
-                  { number: 1, label: 'Datos', icon: User },
-                  { number: 2, label: 'Fecha', icon: Calendar }
-                ].map((stepInfo, index) => (
-                  <div key={stepInfo.number} className="flex items-center">
-                    <div className="flex flex-col items-center">
-                      <div className={`
-                        w-12 h-12 rounded-2xl flex items-center justify-center font-bold text-sm transition-all duration-300
-                        ${step >= stepInfo.number 
-                          ? 'bg-gradient-to-br from-orange-500 to-orange-600 text-white shadow-lg shadow-orange-500/25' 
-                          : 'bg-white/60 dark:bg-gray-800/60 text-muted-foreground backdrop-blur-sm border border-white/30'
-                        }
-                      `}>
-                        {step > stepInfo.number ? 
-                          <CheckCircle className="w-6 h-6" /> : 
-                          <stepInfo.icon className="w-6 h-6" />
-                        }
-                      </div>
-                      <span className={`
-                        text-xs font-medium mt-2 transition-colors duration-300
-                        ${step >= stepInfo.number ? 'text-orange-600' : 'text-muted-foreground'}
-                      `}>
-                        {stepInfo.label}
-                      </span>
+              {/* Progress Steps - Móvil Optimizado */}
+              <div className="flex items-center justify-center mb-8">
+                {[1, 2, 3, 4].map((stepNumber) => (
+                  <div key={stepNumber} className="flex items-center">
+                    <div className={`
+                      w-8 h-8 lg:w-10 lg:h-10 rounded-full flex items-center justify-center font-semibold text-sm lg:text-base
+                      ${step >= stepNumber 
+                        ? 'bg-gradient-to-br from-orange-500 to-orange-600 text-white shadow-lg shadow-orange-500/30' 
+                        : 'bg-white/20 text-muted-foreground'
+                      }
+                    `}>
+                      {step > stepNumber ? <CheckCircle className="w-4 h-4 lg:w-6 lg:h-6" /> : stepNumber}
                     </div>
-                    {index < 1 && (
-                      <div className="flex-1 mx-4">
-                        <div className={`
-                          h-1 rounded-full transition-all duration-500
-                          ${step > stepInfo.number 
-                            ? 'bg-gradient-to-r from-orange-500 to-orange-600' 
-                            : 'bg-white/30 dark:bg-gray-700/30'
-                          }
-                        `} />
-                      </div>
+                    {stepNumber < 4 && (
+                      <div className={`
+                        w-8 lg:w-16 h-1 mx-2 lg:mx-4 rounded-full
+                        ${step > stepNumber 
+                          ? 'bg-gradient-to-r from-orange-500 to-orange-600' 
+                          : 'bg-white/20'
+                        }
+                      `} />
                     )}
                   </div>
                 ))}
@@ -407,7 +391,7 @@ export default function AgendamientoPage() {
                   <motion.div
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
-                    className="bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl rounded-2xl p-6 lg:p-8 border border-white/30 dark:border-gray-700/30 shadow-2xl"
+                    className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm rounded-2xl p-4 lg:p-8 border border-white/20 shadow-lg"
                   >
                     <h2 className="text-xl lg:text-2xl font-bold mb-4 lg:mb-6 flex items-center gap-3 text-foreground">
                       <User className="w-5 h-5 lg:w-6 lg:h-6 text-orange-500" />
@@ -512,10 +496,10 @@ export default function AgendamientoPage() {
                   <motion.div
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
-                    className="bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl rounded-2xl p-6 lg:p-8 border border-white/30 dark:border-gray-700/30 shadow-2xl"
+                    className="bg-white/5 backdrop-blur-sm rounded-2xl p-8 border border-white/10"
                   >
-                    <h2 className="text-xl lg:text-2xl font-bold mb-4 lg:mb-6 flex items-center gap-3 text-foreground">
-                      <Calendar className="w-5 h-5 lg:w-6 lg:h-6 text-orange-500" />
+                    <h2 className="text-2xl font-bold mb-6 flex items-center gap-3 text-foreground">
+                      <Calendar className="w-6 h-6 text-primary" />
                       Fecha y Hora
                     </h2>
                     
@@ -1056,14 +1040,22 @@ export default function AgendamientoPage() {
                     <div className="flex gap-4">
                       <button
                         type="button"
-                        onClick={() => setStep(3)}
+                        onClick={() => setStep(1)}
                         className="flex-1 bg-white/20 dark:bg-gray-800/20 text-foreground py-3 lg:py-3 px-6 rounded-xl font-semibold hover:bg-white/30 dark:hover:bg-gray-800/30 transition-all border border-white/20 text-base"
                       >
                         Anterior
                       </button>
                       <button
                         type="button"
-                        onClick={async () => {
+                        onClick={() => setStep(3)}
+                        className="flex-1 bg-gradient-to-r from-orange-500 to-orange-600 text-white py-4 lg:py-3 px-6 rounded-xl font-semibold hover:from-orange-600 hover:to-orange-700 transition-all flex items-center justify-center gap-2 shadow-lg shadow-orange-500/20 text-base"
+                      >
+                        Continuar
+                      </button>
+                    </div>
+                  </motion.div>
+                )}
+
                           const paymentData = {
                             ...formData,
                             service: service.name,
@@ -1202,6 +1194,293 @@ export default function AgendamientoPage() {
                     </div>
                   </motion.div>
                 )}
+
+                {/* Paso 3: Confirmación */}
+                {step === 3 && (
+                  <motion.div
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl rounded-2xl p-6 lg:p-8 border border-white/20 dark:border-gray-700/20 shadow-2xl"
+                  >
+                    <div className="text-center mb-8">
+                      <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <CheckCircle className="w-8 h-8 text-white" />
+                      </div>
+                      <h3 className="text-2xl font-bold text-foreground mb-2">Confirmar Agendamiento</h3>
+                      <p className="text-muted-foreground">Revisa los detalles antes de proceder al pago</p>
+                    </div>
+
+                    {/* Resumen de la consulta */}
+                    <div className="bg-gradient-to-br from-orange-50/50 to-amber-50/50 dark:from-orange-950/20 dark:to-amber-950/20 rounded-xl p-6 mb-6 border border-orange-200/30 dark:border-orange-800/30">
+                      <div className="flex items-start justify-between mb-4">
+                        <div>
+                          <h4 className="text-lg font-bold text-foreground">{service.name}</h4>
+                          <p className="text-sm text-muted-foreground">{service.category}</p>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-2xl font-bold text-primary">
+                            ${precioFinal}
+                            {isConvenioValido && (
+                              <span className="text-sm text-muted-foreground line-through ml-2">
+                                ${service.price}
+                              </span>
+                            )}
+                            {!isConvenioValido && service.originalPrice && (
+                              <span className="text-sm text-muted-foreground line-through ml-2">
+                                ${service.originalPrice}
+                              </span>
+                            )}
+                          </div>
+                          {isConvenioValido && (
+                            <span className="inline-block bg-gradient-to-r from-green-400 to-emerald-500 text-white text-xs font-bold px-2 py-1 rounded-full mt-1">
+                              80% OFF - CONVENIO
+                            </span>
+                          )}
+                          {!isConvenioValido && service.discount && (
+                            <span className="inline-block bg-gradient-to-r from-yellow-400 to-orange-500 text-black text-xs font-bold px-2 py-1 rounded-full mt-1">
+                              {service.discount}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Detalles de la cita */}
+                    <div className="bg-white/50 dark:bg-gray-800/50 rounded-xl p-6 mb-6 border border-white/30 dark:border-gray-700/30">
+                      <h5 className="font-semibold text-foreground mb-4 flex items-center gap-2">
+                        <Calendar className="w-5 h-5 text-primary" />
+                        Detalles de la cita
+                      </h5>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                          <p className="text-sm text-muted-foreground">Fecha:</p>
+                          <p className="font-medium text-foreground">{selectedDate}</p>
+                        </div>
+                        <div>
+                          <p className="text-sm text-muted-foreground">Hora:</p>
+                          <p className="font-medium text-foreground">{selectedTime}</p>
+                        </div>
+                        <div>
+                          <p className="text-sm text-muted-foreground">Modalidad:</p>
+                          <p className="font-medium text-foreground flex items-center gap-2">
+                            {selectedMeetingType === 'videollamada' && <Video className="w-4 h-4 text-blue-500" />}
+                            {selectedMeetingType === 'presencial' && <MapPin className="w-4 h-4 text-green-500" />}
+                            {selectedMeetingType === 'telefonica' && <Phone className="w-4 h-4 text-purple-500" />}
+                            {selectedMeetingType === 'videollamada' ? 'Videollamada' : 
+                             selectedMeetingType === 'presencial' ? 'Presencial' : 'Telefónica'}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Información personal */}
+                    <div className="bg-white/50 dark:bg-gray-800/50 rounded-xl p-6 mb-6 border border-white/30 dark:border-gray-700/30">
+                      <h5 className="font-semibold text-foreground mb-4 flex items-center gap-2">
+                        <User className="w-5 h-5 text-primary" />
+                        Información personal
+                      </h5>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <p className="text-sm text-muted-foreground">Nombre:</p>
+                          <p className="font-medium text-foreground">{formData.nombre}</p>
+                        </div>
+                        <div>
+                          <p className="text-sm text-muted-foreground">Email:</p>
+                          <p className="font-medium text-foreground">{formData.email}</p>
+                        </div>
+                        <div>
+                          <p className="text-sm text-muted-foreground">Teléfono:</p>
+                          <p className="font-medium text-foreground">{formData.telefono}</p>
+                        </div>
+                        {formData.empresa && (
+                          <div>
+                            <p className="text-sm text-muted-foreground">Empresa:</p>
+                            <p className="font-medium text-foreground">{formData.empresa}</p>
+                          </div>
+                        )}
+                        {isConvenioValido && (
+                          <div className="md:col-span-2">
+                            <p className="text-sm text-muted-foreground">Código de Convenio:</p>
+                            <p className="font-medium text-green-600 flex items-center gap-2">
+                              <span className="bg-green-100 dark:bg-green-900/30 px-2 py-1 rounded text-sm">
+                                {formData.codigoConvenio}
+                              </span>
+                              <span className="text-xs text-green-500">✓ Descuento aplicado</span>
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Descripción del caso */}
+                    {formData.descripcion && (
+                      <div className="bg-white/50 dark:bg-gray-800/50 rounded-xl p-6 mb-6 border border-white/30 dark:border-gray-700/30">
+                        <h5 className="font-semibold text-foreground mb-3 flex items-center gap-2">
+                          <FileText className="w-5 h-5 text-primary" />
+                          Descripción del caso
+                        </h5>
+                        <p className="text-foreground bg-white/30 dark:bg-gray-700/30 p-4 rounded-lg border border-white/20 dark:border-gray-600/20">
+                          "{formData.descripcion}"
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Botones de acción */}
+                    <div className="flex gap-4">
+                      <button
+                        type="button"
+                        onClick={() => setStep(2)}
+                        className="flex-1 bg-white/20 dark:bg-gray-800/20 text-foreground py-4 px-6 rounded-xl font-semibold hover:bg-white/30 dark:hover:bg-gray-800/30 transition-all border border-white/20 flex items-center justify-center gap-2"
+                      >
+                        <ArrowLeft className="w-5 h-5" />
+                        Modificar
+                      </button>
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          console.log('📊 Guardando datos de pago...', {
+                            precioFinal,
+                            originalPrice: service.price,
+                            codigoConvenio: formData.codigoConvenio,
+                            descuentoConvenio: isConvenioValido,
+                            porcentajeDescuento: isConvenioValido ? '80%' : (service.discount || null)
+                          });
+
+                          const paymentData = {
+                            ...formData,
+                            service: service.name,
+                            price: precioFinal,
+                            originalPrice: service.price,
+                            category: service.category,
+                            fecha: selectedDate,
+                            hora: selectedTime,
+                            tipo_reunion: selectedMeetingType,
+                            descripcion: formData.descripcion,
+                            codigoConvenio: formData.codigoConvenio,
+                            descuentoConvenio: isConvenioValido,
+                            porcentajeDescuento: isConvenioValido ? '80%' : (service.discount || null),
+                            id: Date.now().toString()
+                          };
+                          
+                          // Si el precio final es 0, crear reserva directamente con Supabase
+                          if (precioFinal === '0' || precioConConvenio === 0) {
+                            try {
+                              console.log('📧 Creando consulta gratuita con Supabase...');
+                              
+                              const bookingData: BookingData = {
+                                cliente: {
+                                  nombre: formData.nombre,
+                                  email: formData.email,
+                                  telefono: formData.telefono
+                                },
+                                servicio: {
+                                  tipo: service.name,
+                                  precio: precioFinal,
+                                  descripcion: `${service.category}${isConvenioValido ? ' - CONVENIO 80% OFF' : ''}`,
+                                  fecha: selectedDate,
+                                  hora: selectedTime
+                                },
+                                pago: {
+                                  metodo: 'gratis',
+                                  estado: 'approved'
+                                },
+                                motivoConsulta: formData.descripcion,
+                                notas: `Tipo de reunión: ${selectedMeetingType}${isConvenioValido ? ` | Código de convenio aplicado: ${formData.codigoConvenio} (80% descuento)` : ''}`
+                              };
+                              
+                              // Verificar si Supabase está disponible
+                              const isSupabaseAvailable = await checkSupabaseConnection();
+                              
+                              if (isSupabaseAvailable) {
+                                // Usar Supabase si está disponible
+                                console.log('🌐 Usando Supabase para crear reserva...');
+                                const result = await createBookingWithEmails(bookingData);
+                                
+                                if (result.success) {
+                                  console.log('✅ Consulta gratuita creada y emails enviados');
+                                  localStorage.setItem('paymentData', JSON.stringify({
+                                    ...paymentData,
+                                    paymentMethod: 'gratis',
+                                    paymentStatus: 'completed',
+                                    reservaId: result.reserva?.id
+                                  }));
+                                  window.location.href = '/payment-success';
+                                } else {
+                                  console.error('❌ Error creando consulta:', result.error);
+                                  alert('Error al crear la consulta. Por favor intenta nuevamente.');
+                                }
+                              } else {
+                                // Usar sistema offline si Supabase no está disponible
+                                console.log('💾 Supabase no disponible, usando sistema offline...');
+                                
+                                const offlineBookingData: Omit<OfflineBookingData, 'id' | 'created_at' | 'updated_at'> = {
+                                  cliente_nombre: formData.nombre,
+                                  cliente_email: formData.email,
+                                  cliente_telefono: formData.telefono,
+                                  cliente_empresa: formData.empresa,
+                                  servicio_tipo: service.name,
+                                  servicio_precio: precioFinal,
+                                  servicio_categoria: `${service.category}${isConvenioValido ? ' - CONVENIO 80% OFF' : ''}`,
+                                  fecha: selectedDate,
+                                  hora: selectedTime,
+                                  tipo_reunion: selectedMeetingType,
+                                  descripcion: `${formData.descripcion}${isConvenioValido ? ` | Código de convenio: ${formData.codigoConvenio} (80% descuento)` : ''}`,
+                                  estado: 'pendiente'
+                                };
+                                
+                                const offlineResult = await createOfflineBookingWithEmail(offlineBookingData);
+                                
+                                // Enviar emails reales incluso en modo offline
+                                const emailData: BookingEmailData = {
+                                  id: offlineResult.id,
+                                  cliente_nombre: offlineResult.cliente_nombre,
+                                  cliente_email: offlineResult.cliente_email,
+                                  cliente_telefono: offlineResult.cliente_telefono,
+                                  cliente_empresa: offlineResult.cliente_empresa,
+                                  servicio_tipo: offlineResult.servicio_tipo,
+                                  servicio_precio: offlineResult.servicio_precio,
+                                  fecha: offlineResult.fecha,
+                                  hora: offlineResult.hora,
+                                  tipo_reunion: offlineResult.tipo_reunion,
+                                  descripcion: offlineResult.descripcion,
+                                  created_at: offlineResult.created_at
+                                };
+
+                                try {
+                                  await sendRealBookingEmails(emailData);
+                                  console.log('✅ Emails enviados exitosamente');
+                                } catch (emailError) {
+                                  console.error('❌ Error enviando emails:', emailError);
+                                }
+
+                                localStorage.setItem('paymentData', JSON.stringify({
+                                  ...paymentData,
+                                  paymentMethod: 'gratis',
+                                  paymentStatus: 'completed',
+                                  reservaId: offlineResult.id
+                                }));
+                                window.location.href = '/payment-success';
+                              }
+                            } catch (error) {
+                              console.error('❌ Error en proceso de consulta gratuita:', error);
+                              alert('Error al procesar la consulta. Por favor intenta nuevamente.');
+                            }
+                          } else {
+                            // Guardar datos y proceder al pago
+                            localStorage.setItem('paymentData', JSON.stringify(paymentData));
+                            console.log('💾 Datos guardados en localStorage:', paymentData);
+                            window.location.href = '/mercadopago';
+                          }
+                        }}
+                        className="flex-1 bg-gradient-to-r from-orange-500 to-orange-600 text-white py-4 px-6 rounded-xl font-semibold hover:from-orange-600 hover:to-orange-700 transition-all flex items-center justify-center gap-2 shadow-lg shadow-orange-500/20"
+                      >
+                        <CreditCard className="w-5 h-5" />
+                        {precioFinal === '0' || precioConConvenio === 0 ? 'Confirmar Reserva Gratis' : 'Proceder al Pago'}
+                      </button>
+                    </div>
+                  </motion.div>
+                )}
+
               </form>
             </div>
           </div>
