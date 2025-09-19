@@ -17,6 +17,7 @@ interface ServiceCard {
   features: string[];
   icon: React.ReactNode;
   badge?: string;
+  href?: string;
 }
 
 const ServiceCard: React.FC<ServiceCard & { onAgendarClick: (service: ServiceCard) => void }> = ({ 
@@ -167,7 +168,7 @@ const PremiumGrid: React.FC<{ onAgendarClick: (service: ServiceCard) => void }> 
             </div>
             <h2 className="text-4xl md:text-5xl font-bold">
               <span className="bg-gradient-to-r from-amber-400 via-orange-500 to-red-500 bg-clip-text text-transparent">
-                Soluciones Premium
+                Soluciones Corporativas
               </span>
             </h2>
           </div>
@@ -192,7 +193,7 @@ const PremiumGrid: React.FC<{ onAgendarClick: (service: ServiceCard) => void }> 
   );
 };
 
-const SpecializedGrid: React.FC = () => {
+const SpecializedGrid: React.FC<{ onAgendarClick: (service: ServiceCard) => void }> = ({ onAgendarClick }) => {
   const specializedServices: ServiceCard[] = [
     {
       title: "Derecho Laboral",
@@ -295,7 +296,7 @@ const SpecializedGrid: React.FC = () => {
               className="animate-scale-in service-card-mobile"
               style={{ animationDelay: `${index * 0.15}s` }}
             >
-              <ServiceCard {...service} />
+              <ServiceCard {...service} onAgendarClick={onAgendarClick} />
             </div>
           ))}
         </div>
@@ -304,7 +305,7 @@ const SpecializedGrid: React.FC = () => {
   );
 };
 
-const ExpressGrid: React.FC = () => {
+const ExpressGrid: React.FC<{ onAgendarClick: (service: ServiceCard) => void }> = ({ onAgendarClick }) => {
   const expressServices: ServiceCard[] = [
     {
       title: "Contratos Express",
@@ -394,7 +395,7 @@ const ExpressGrid: React.FC = () => {
               className="animate-scale-in service-card-mobile"
               style={{ animationDelay: `${index * 0.15}s` }}
             >
-              <ServiceCard {...service} />
+              <ServiceCard {...service} onAgendarClick={onAgendarClick} />
             </div>
           ))}
         </div>
@@ -456,7 +457,8 @@ const ServicesPage: React.FC = () => {
           <Header />
           <div className="pt-20">
             <PremiumGrid onAgendarClick={handleAgendarClick} />
-            {/* ... otros grids con onAgendarClick ... */}
+            <SpecializedGrid onAgendarClick={handleAgendarClick} />
+            <ExpressGrid onAgendarClick={handleAgendarClick} />
           </div>
         </div>
 
@@ -464,7 +466,8 @@ const ServicesPage: React.FC = () => {
         <div className="lg:hidden">
           <MobileLayout>
             <PremiumGrid onAgendarClick={handleAgendarClick} />
-            {/* ... otros grids con onAgendarClick ... */}
+            <SpecializedGrid onAgendarClick={handleAgendarClick} />
+            <ExpressGrid onAgendarClick={handleAgendarClick} />
           </MobileLayout>
         </div>
 
