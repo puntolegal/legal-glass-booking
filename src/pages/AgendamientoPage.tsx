@@ -86,7 +86,7 @@ export default function AgendamientoPage() {
   const descuentoConvenio = 0.8; // 80% de descuento
   const precioOriginal = parseFloat((service as any).price?.replace(/\./g, '') || '0');
   const precioConConvenio = isConvenioValido ? precioOriginal * (1 - descuentoConvenio) : precioOriginal;
-  const precioFinal = Math.round(precioConConvenio).toString();
+  const precioFinal = Math.round(precioConConvenio).toLocaleString('es-CL');
 
   const getAvailableDates = () => {
     const dates = [];
@@ -112,19 +112,50 @@ export default function AgendamientoPage() {
     return times;
   };
 
-  // Obtener color del servicio
-  const getServiceColor = () => {
+  // Obtener colores del servicio
+  const getServiceColors = () => {
     const colorMap = {
-      'General': '#ff6b35',
-      'Familia': '#ec4899', 
-      'Corporativo': '#3b82f6',
-      'Inmobiliario': '#10b981',
-      'Laboral': '#8b5cf6'
+      'General': {
+        primary: '#ff6b35',
+        bg: 'orange-100',
+        darkBg: 'orange-900/30',
+        text: 'orange-600',
+        darkText: 'orange-400'
+      },
+      'Familia': {
+        primary: '#ec4899',
+        bg: 'pink-100',
+        darkBg: 'pink-900/30',
+        text: 'pink-600',
+        darkText: 'pink-400'
+      },
+      'Corporativo': {
+        primary: '#3b82f6',
+        bg: 'blue-100',
+        darkBg: 'blue-900/30',
+        text: 'blue-600',
+        darkText: 'blue-400'
+      },
+      'Inmobiliario': {
+        primary: '#10b981',
+        bg: 'emerald-100',
+        darkBg: 'emerald-900/30',
+        text: 'emerald-600',
+        darkText: 'emerald-400'
+      },
+      'Laboral': {
+        primary: '#8b5cf6',
+        bg: 'purple-100',
+        darkBg: 'purple-900/30',
+        text: 'purple-600',
+        darkText: 'purple-400'
+      }
     };
-    return colorMap[service.category as keyof typeof colorMap] || '#ff6b35';
+    return colorMap[service.category as keyof typeof colorMap] || colorMap.General;
   };
 
-  const serviceColor = getServiceColor();
+  const serviceColors = getServiceColors();
+  const serviceColor = serviceColors.primary;
 
   return (
     <>
@@ -382,8 +413,8 @@ export default function AgendamientoPage() {
                   {/* Meeting Type Selection */}
                   <div className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-xl rounded-2xl p-6 border border-gray-200/40 dark:border-gray-700/40 shadow-xl">
                     <div className="flex items-center gap-3 mb-6">
-                      <div className="w-12 h-12 rounded-xl bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
-                        <Video className="w-6 h-6 text-purple-600 dark:text-purple-400" />
+                      <div className={`w-12 h-12 rounded-xl bg-${serviceColors.bg} dark:bg-${serviceColors.darkBg} flex items-center justify-center`}>
+                        <Video className={`w-6 h-6 text-${serviceColors.text} dark:text-${serviceColors.darkText}`} />
                       </div>
                       <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100">Tipo de Reunión</h3>
                     </div>
@@ -443,15 +474,15 @@ export default function AgendamientoPage() {
 
                   {/* Date Selection - Elegant */}
                   <div className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-xl rounded-2xl p-6 border border-gray-200/40 dark:border-gray-700/40 shadow-xl">
-                    <div className="flex items-center gap-3 mb-6">
-                      <div className="w-12 h-12 rounded-xl bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
-                        <Calendar className="w-6 h-6 text-green-600 dark:text-green-400" />
+                      <div className="flex items-center gap-3 mb-6">
+                        <div className={`w-12 h-12 rounded-xl bg-${serviceColors.bg} dark:bg-${serviceColors.darkBg} flex items-center justify-center`}>
+                          <Calendar className={`w-6 h-6 text-${serviceColors.text} dark:text-${serviceColors.darkText}`} />
+                        </div>
+                        <div>
+                          <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100">Selecciona tu fecha</h3>
+                          <p className="text-sm text-gray-500 dark:text-gray-400">Elige el día que mejor te convenga</p>
+                        </div>
                       </div>
-                      <div>
-                        <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100">Selecciona tu fecha</h3>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">Elige el día que mejor te convenga</p>
-                      </div>
-                    </div>
                     
                     <WeeklyDatePicker
                       selectedDate={selectedDate}
@@ -468,15 +499,15 @@ export default function AgendamientoPage() {
                       transition={{ duration: 0.3 }}
                       className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-xl rounded-2xl p-6 border border-gray-200/40 dark:border-gray-700/40 shadow-xl"
                     >
-                      <div className="flex items-center gap-3 mb-6">
-                        <div className="w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
-                          <Clock className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+                        <div className="flex items-center gap-3 mb-6">
+                          <div className={`w-12 h-12 rounded-xl bg-${serviceColors.bg} dark:bg-${serviceColors.darkBg} flex items-center justify-center`}>
+                            <Clock className={`w-6 h-6 text-${serviceColors.text} dark:text-${serviceColors.darkText}`} />
+                          </div>
+                          <div>
+                            <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100">Elige tu horario</h3>
+                            <p className="text-sm text-gray-500 dark:text-gray-400">Horarios disponibles para {selectedDate}</p>
+                          </div>
                         </div>
-                        <div>
-                          <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100">Elige tu horario</h3>
-                          <p className="text-sm text-gray-500 dark:text-gray-400">Horarios disponibles para {selectedDate}</p>
-                        </div>
-                      </div>
                       
                       <div className="grid grid-cols-2 gap-3">
                         {getAvailableTimes().map((time) => (

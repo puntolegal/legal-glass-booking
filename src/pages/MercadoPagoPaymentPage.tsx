@@ -186,7 +186,11 @@ export default function MercadoPagoPaymentPage() {
                     <div className="flex items-center justify-between">
                       <span className="text-lg font-semibold text-gray-900">Total</span>
                       <div className="text-right">
-                        <span className="text-2xl font-bold text-blue-600">${paymentData.price}</span>
+                        <span className="text-2xl font-bold text-blue-600">
+                          ${typeof paymentData.price === 'string' && !paymentData.price.includes('.') && paymentData.price.length >= 4 
+                            ? parseInt(paymentData.price).toLocaleString('es-CL') 
+                            : paymentData.price}
+                        </span>
                         {paymentData.descuentoConvenio && (
                           <div className="text-xs text-green-600 font-medium">Con descuento de convenio</div>
                         )}

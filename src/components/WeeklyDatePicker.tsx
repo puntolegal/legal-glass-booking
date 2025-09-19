@@ -65,34 +65,24 @@ export default function WeeklyDatePicker({ selectedDate, onDateSelect, available
 
   return (
     <div className="w-full">
-      {/* Header con navegación */}
-      <div className="flex items-center justify-between mb-6">
-        <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
-          <Calendar className="w-5 h-5 text-primary" />
-          Selecciona una fecha
-        </h3>
-        <div className="flex items-center gap-4">
-          <span className="text-sm text-muted-foreground font-medium">{getMonthYear()}</span>
-          <div className="flex gap-2">
-            <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              onClick={() => setCurrentWeekOffset(currentWeekOffset - 1)}
-              disabled={currentWeekOffset <= 0}
-              className="p-2 rounded-lg bg-white/5 border border-white/20 hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-            >
-              <ChevronLeft className="w-4 h-4" />
-            </motion.button>
-            <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              onClick={() => setCurrentWeekOffset(currentWeekOffset + 1)}
-              disabled={currentWeekOffset >= 3} // Limitar a 4 semanas
-              className="p-2 rounded-lg bg-white/5 border border-white/20 hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-            >
-              <ChevronRight className="w-4 h-4" />
-            </motion.button>
-          </div>
+      {/* Simple Header */}
+      <div className="flex items-center justify-between mb-4">
+        <span className="text-sm font-medium text-gray-600 dark:text-gray-400">{getMonthYear()}</span>
+        <div className="flex gap-2">
+          <button
+            onClick={() => setCurrentWeekOffset(currentWeekOffset - 1)}
+            disabled={currentWeekOffset <= 0}
+            className="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+          >
+            <ChevronLeft className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+          </button>
+          <button
+            onClick={() => setCurrentWeekOffset(currentWeekOffset + 1)}
+            disabled={currentWeekOffset >= 3}
+            className="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+          >
+            <ChevronRight className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+          </button>
         </div>
       </div>
 
