@@ -52,37 +52,8 @@ const Index = () => {
     window.location.href = `/agendamiento?plan=${plan}`;
   };
 
-  const handleAgendarClick = () => {
-    // Redirigir a consulta general por $35.000
-    window.location.href = '/agendamiento?plan=general';
-  };
-
-
   const pageContent = (
     <>
-      {/* Botón de agendamiento consulta general con descuento */}
-      <div className="w-full flex justify-center mt-32 mb-8 z-20 relative px-4">
-        <button
-          onClick={handleAgendarClick}
-          className="group relative px-6 py-4 md:px-8 md:py-5 rounded-2xl bg-gradient-to-r from-primary via-primary/90 to-accent text-white font-bold text-base md:text-lg shadow-lg shadow-primary/20 border border-primary/30 hover:scale-105 transition-all duration-300 backdrop-blur-xl w-full max-w-sm md:w-auto md:max-w-none overflow-hidden"
-        >
-          {/* Efecto de brillo premium */}
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform -skew-x-12 group-hover:translate-x-full" />
-          
-          <div className="relative flex flex-col items-center gap-1">
-            <div className="flex items-center gap-2">
-              <span className="text-lg font-bold">Agendar Consulta General</span>
-            </div>
-            
-            {/* Precios con descuento */}
-            <div className="flex items-center gap-2">
-              <span className="text-2xl font-black text-white">$35.000</span>
-              <span className="text-sm line-through text-white/70">$70.000</span>
-              <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full font-bold animate-pulse">50% OFF</span>
-            </div>
-          </div>
-        </button>
-      </div>
       <HeroSection 
         showForm={false} 
         setShowForm={() => {}}
@@ -125,13 +96,13 @@ const Index = () => {
 
         {/* Desktop Layout */}
         <div className="hidden lg:block">
-          <Header onAgendarClick={handleAgendarClick} />
+          <Header />
           {pageContent}
         </div>
 
         {/* Mobile Layout - Hero Premium Definitivo */}
         <div className="lg:hidden">
-          <MobileLayout onAgendarClick={handleAgendarClick}>
+          <MobileLayout>
             <PremiumMobileHero />
           </MobileLayout>
         </div>
