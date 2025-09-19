@@ -176,26 +176,14 @@ export default function AgendamientoPage() {
           <div className="relative pt-14 pb-6 px-4">
             <div className="max-w-md mx-auto">
               {/* Navigation Bar */}
-              <div className="flex items-center justify-between mb-6">
-              <Link 
-                to="/" 
-                  className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
-                >
-                  <div className="w-9 h-9 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
-                    <ArrowLeft className="w-4 h-4" />
-                  </div>
-                  <span className="font-medium">Inicio</span>
-              </Link>
-                
+              <div className="flex items-center justify-center mb-6">
                 <div className="text-center">
                   <h1 className="text-lg font-bold text-gray-900 dark:text-gray-100">Agendamiento</h1>
                   <p className="text-xs text-gray-500 dark:text-gray-400">
                     Paso {step} de 2
                   </p>
                 </div>
-                
-                <div className="w-9 h-9" /> {/* Spacer */}
-            </div>
+              </div>
             
               {/* Service Preview Card */}
               <motion.div
