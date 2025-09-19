@@ -49,12 +49,12 @@ app.post('/create-preference', async (req, res) => {
         }
       },
       back_urls: {
-        success: `http://localhost:8080/payment-success?source=mercadopago`,
-        failure: `http://localhost:8080/payment-failure?source=mercadopago`,
-        pending: `http://localhost:8080/payment-pending?source=mercadopago`
+        success: `https://puntolegal.online/payment-success?source=mercadopago`,
+        failure: `https://puntolegal.online/payment-failure?source=mercadopago`,
+        pending: `https://puntolegal.online/payment-pending?source=mercadopago`
       },
       external_reference: `PL-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      notification_url: `http://localhost:8080/api/mercadopago/webhook`,
+      notification_url: `https://puntolegal.online/api/mercadopago/webhook`,
       metadata: {
         client_name: paymentData.name,
         client_email: paymentData.email,

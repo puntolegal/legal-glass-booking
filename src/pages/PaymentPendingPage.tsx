@@ -1,188 +1,180 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
-import { Link, useSearchParams } from 'react-router-dom';
-import { Clock, ArrowLeft, MessageCircle, FileText, MapPin, Phone } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Clock, ArrowLeft, RefreshCw, Home, CreditCard, CheckCircle } from 'lucide-react';
 import SEO from '../components/SEO';
-import { Button } from '../components/ui/button';
 
 export default function PaymentPendingPage() {
-  const [searchParams] = useSearchParams();
-  const [paymentInfo, setPaymentInfo] = useState<any>(null);
-  
-  // Parámetros de MercadoPago
-  const paymentId = searchParams.get('payment_id');
-  const status = searchParams.get('status');
-  const externalReference = searchParams.get('external_reference');
-  const merchantOrderId = searchParams.get('merchant_order_id');
-  const preferenceId = searchParams.get('preference_id');
-  const source = searchParams.get('source');
-  
-  useEffect(() => {
-    const storedData = localStorage.getItem('paymentData');
-    if (storedData) {
-      setPaymentInfo(JSON.parse(storedData));
-    }
-    
-    console.log('⏳ Pago pendiente - Parámetros:', {
-      paymentId, status, externalReference, merchantOrderId, preferenceId, source
-    });
-  }, [paymentId, status, externalReference, merchantOrderId, preferenceId, source]);
-
   return (
     <>
       <SEO 
         title="Pago Pendiente - Punto Legal"
-        description="Tu pago está siendo procesado. Te notificaremos cuando se confirme."
+        description="Tu pago está siendo procesado. Te notificaremos cuando esté confirmado."
       />
       
-      <div className="min-h-screen bg-gradient-to-b from-background to-background/50 pt-8 relative overflow-hidden">
-        {/* Efectos de fondo */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-yellow-500/5 rounded-full blur-3xl" />
-          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-orange-500/5 rounded-full blur-3xl" />
-        </div>
-
-        <div className="relative z-10 max-w-2xl mx-auto px-4">
+      <div className="min-h-screen bg-gradient-to-br from-yellow-50 via-amber-50 to-orange-50">
+        <div className="max-w-4xl mx-auto px-4 py-16">
+          {/* Header de pendiente */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-center"
+            className="text-center mb-12"
           >
-            {/* Header de pendiente */}
-            <div className="bg-white/5 backdrop-blur-xl rounded-3xl p-8 border border-yellow-500/20 mb-8">
-              <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-                className="w-20 h-20 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-6"
-              >
-                <Clock className="w-10 h-10 text-white" />
-              </motion.div>
-              
-              <h1 className="text-3xl font-bold text-foreground mb-4">Pago en Proceso</h1>
-              <p className="text-lg text-muted-foreground mb-6">
-                Tu pago está siendo procesado. Te notificaremos cuando se confirme.
-              </p>
-              
-              {/* Detalles del pago */}
-              {paymentInfo && (
-                <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-2xl p-6 mb-6">
-                  <h3 className="font-semibold text-yellow-400 mb-4">Detalles de tu consulta:</h3>
-                  <div className="grid md:grid-cols-2 gap-4 text-left">
-                    <div>
-                      <p className="text-sm text-muted-foreground"><strong>Servicio:</strong> {paymentInfo.service}</p>
-                      <p className="text-sm text-muted-foreground"><strong>Fecha:</strong> {paymentInfo.date}</p>
-                      <p className="text-sm text-muted-foreground"><strong>Hora:</strong> {paymentInfo.time}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground"><strong>Monto:</strong> ${paymentInfo.price}</p>
-                      <p className="text-sm text-muted-foreground"><strong>Cliente:</strong> {paymentInfo.name}</p>
-                      {paymentId && <p className="text-sm text-muted-foreground"><strong>ID Pago:</strong> {paymentId}</p>}
-                    </div>
-                  </div>
-                </div>
-              )}
+            <div className="w-20 h-20 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <Clock className="w-10 h-10 text-yellow-600" />
             </div>
+            <h1 className="text-4xl font-bold text-gray-900 mb-4">
+              Pago Pendiente
+            </h1>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              Tu pago está siendo procesado. Te notificaremos cuando esté confirmado.
+            </p>
+          </motion.div>
 
-            {/* Próximos pasos */}
-            <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 mb-8">
-              <h3 className="font-semibold text-foreground mb-4">¿Qué sigue ahora?</h3>
+          {/* Información del estado */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 border border-yellow-200/50 shadow-xl mb-8"
+          >
+            <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
+              <CreditCard className="w-6 h-6 text-yellow-600" />
+              Estado del Pago
+            </h2>
+            
+            <div className="space-y-4 text-gray-700">
+              <p>Tu pago está en proceso de verificación. Esto puede tomar unos minutos.</p>
               
-              <div className="space-y-4 text-left">
-                <div className="flex items-start gap-4 p-4 bg-blue-500/10 rounded-xl border border-blue-500/20">
-                  <div className="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 mt-0.5">
-                    1
-                  </div>
-                  <div>
-                    <h4 className="font-medium text-foreground mb-1">Procesamiento automático</h4>
-                    <p className="text-sm text-muted-foreground">
-                      MercadoPago está procesando tu pago. Esto puede tomar algunos minutos.
-                    </p>
-                  </div>
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                <div className="flex items-center gap-3 mb-2">
+                  <Clock className="w-5 h-5 text-yellow-600" />
+                  <span className="font-semibold text-yellow-800">Procesando...</span>
                 </div>
-                
-                <div className="flex items-start gap-4 p-4 bg-green-500/10 rounded-xl border border-green-500/20">
-                  <div className="w-8 h-8 bg-green-500 text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 mt-0.5">
-                    2
-                  </div>
-                  <div>
-                    <h4 className="font-medium text-foreground mb-1">Notificación automática</h4>
-                    <p className="text-sm text-muted-foreground">
-                      Te enviaremos un email cuando se confirme tu pago y tu cita esté lista.
-                    </p>
-                  </div>
+                <p className="text-yellow-700 text-sm">
+                  MercadoPago está verificando tu pago con el banco emisor.
+                </p>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Qué esperar */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            className="bg-blue-50 border border-blue-200 rounded-xl p-6 mb-8"
+          >
+            <h3 className="text-lg font-semibold text-blue-900 mb-4">
+              ⏰ ¿Qué esperar?
+            </h3>
+            <div className="space-y-3">
+              <div className="flex items-start gap-3">
+                <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <span className="text-xs font-bold text-blue-600">1</span>
                 </div>
-                
-                <div className="flex items-start gap-4 p-4 bg-purple-500/10 rounded-xl border border-purple-500/20">
-                  <div className="w-8 h-8 bg-purple-500 text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 mt-0.5">
-                    3
-                  </div>
-                  <div>
-                    <h4 className="font-medium text-foreground mb-1">Confirmación de cita</h4>
-                    <p className="text-sm text-muted-foreground">
-                      Una vez confirmado el pago, tu cita se agendará automáticamente.
-                    </p>
-                  </div>
+                <p className="text-blue-800">El banco verificará tu pago (1-5 minutos)</p>
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <span className="text-xs font-bold text-blue-600">2</span>
+                </div>
+                <p className="text-blue-800">Recibirás un email de confirmación</p>
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <span className="text-xs font-bold text-blue-600">3</span>
+                </div>
+                <p className="text-blue-800">Tu consulta quedará confirmada</p>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Tiempos de procesamiento */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6 }}
+            className="bg-gray-50 border border-gray-200 rounded-xl p-6 mb-8"
+          >
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">
+              Tiempos de Procesamiento
+            </h3>
+            <div className="grid md:grid-cols-2 gap-4 text-sm">
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-500" />
+                  <span className="font-medium">Tarjetas de débito:</span>
+                  <span className="text-gray-600">1-3 minutos</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-500" />
+                  <span className="font-medium">Tarjetas de crédito:</span>
+                  <span className="text-gray-600">2-5 minutos</span>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-500" />
+                  <span className="font-medium">Transferencias:</span>
+                  <span className="text-gray-600">5-15 minutos</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-500" />
+                  <span className="font-medium">Billeteras digitales:</span>
+                  <span className="text-gray-600">1-2 minutos</span>
                 </div>
               </div>
             </div>
+          </motion.div>
 
-            {/* Acciones */}
-            <div className="space-y-4">
-              <div className="grid md:grid-cols-2 gap-4">
-                <Button
-                  onClick={() => window.location.href = '/'}
-                  className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-white py-3 px-6 rounded-2xl font-semibold transition-all duration-300 flex items-center justify-center gap-2"
-                >
-                  <ArrowLeft className="w-5 h-5" />
-                  Volver al Inicio
-                </Button>
-                
-                <Button
-                  onClick={() => window.open('https://wa.me/56962321883?text=Hola, mi pago está pendiente y necesito ayuda con mi consulta legal.', '_blank')}
-                  className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-3 px-6 rounded-2xl font-semibold transition-all duration-300 flex items-center justify-center gap-2"
-                >
-                  <MessageCircle className="w-5 h-5" />
-                  Contactar por WhatsApp
-                </Button>
+          {/* Información de contacto */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.8 }}
+            className="bg-gray-50 border border-gray-200 rounded-xl p-6 mb-8"
+          >
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">
+              ¿Tienes dudas?
+            </h3>
+            <p className="text-gray-700 mb-4">
+              Si no recibes confirmación en 15 minutos, contáctanos para verificar el estado.
+            </p>
+            <div className="grid md:grid-cols-2 gap-4 text-sm">
+              <div className="flex items-center gap-2">
+                <span className="font-medium">📧 Email:</span>
+                <span className="text-blue-600">contacto@puntolegal.online</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="font-medium">📱 WhatsApp:</span>
+                <span className="text-blue-600">+56 9 1234 5678</span>
               </div>
             </div>
+          </motion.div>
 
-            {/* Información de contacto */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6 }}
-              className="mt-8 bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10"
+          {/* Botones de acción */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.0 }}
+            className="flex flex-col sm:flex-row gap-4 justify-center"
+          >
+            <button
+              onClick={() => window.location.reload()}
+              className="inline-flex items-center gap-2 bg-yellow-600 hover:bg-yellow-700 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200 hover:scale-105"
             >
-              <h3 className="font-semibold text-foreground mb-4">¿Necesitas ayuda?</h3>
-              
-              <div className="grid md:grid-cols-3 gap-4 text-center">
-                <div className="flex flex-col items-center gap-2">
-                  <div className="w-12 h-12 bg-green-500/20 rounded-xl flex items-center justify-center">
-                    <MessageCircle className="w-6 h-6 text-green-500" />
-                  </div>
-                  <h4 className="font-medium text-foreground">WhatsApp</h4>
-                  <p className="text-sm text-muted-foreground">+56 9 6232 1883</p>
-                </div>
-                
-                <div className="flex flex-col items-center gap-2">
-                  <div className="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center">
-                    <Phone className="w-6 h-6 text-blue-500" />
-                  </div>
-                  <h4 className="font-medium text-foreground">Teléfono</h4>
-                  <p className="text-sm text-muted-foreground">Soporte inmediato</p>
-                </div>
-                
-                <div className="flex flex-col items-center gap-2">
-                  <div className="w-12 h-12 bg-purple-500/20 rounded-xl flex items-center justify-center">
-                    <MapPin className="w-6 h-6 text-purple-500" />
-                  </div>
-                  <h4 className="font-medium text-foreground">Oficina</h4>
-                  <p className="text-sm text-muted-foreground">El Golf, Las Condes</p>
-                </div>
-              </div>
-            </motion.div>
+              <RefreshCw className="w-5 h-5" />
+              Actualizar estado
+            </button>
+            
+            <Link
+              to="/"
+              className="inline-flex items-center gap-2 bg-white hover:bg-gray-50 text-gray-700 font-semibold py-3 px-6 rounded-xl border border-gray-300 transition-all duration-200 hover:scale-105"
+            >
+              <Home className="w-5 h-5" />
+              Volver al inicio
+            </Link>
           </motion.div>
         </div>
       </div>
