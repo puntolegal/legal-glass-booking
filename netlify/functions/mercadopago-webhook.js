@@ -148,15 +148,41 @@ exports.handler = async (event, context) => {
           created_at: updatedReserva.created_at
         };
 
-        // Llamar a la función de envío de emails
-        const { data: emailResult, error: emailError } = await supabase.functions.invoke('send-booking-emails', {
-          body: { bookingData: emailData }
-        });
+        // Enviar emails usando webhook de Make.com
+        try {
+          const webhookUrl = 'https://hook.us2.make.com/qahisda8n5e6bh9my4f9fm6dkgdg71sq';
+          
+          const emailPayload = {
+            client_name: emailData.cliente_nombre,
+            client_email: emailData.cliente_email,
+            client_phone: emailData.cliente_telefono,
+            service_type: emailData.servicio_tipo,
+            service_price: emailData.servicio_precio,
+            appointment_date: emailData.fecha,
+            appointment_time: emailData.hora,
+            reservation_id: emailData.id,
+            payment_method: emailData.pago_metodo,
+            payment_status: emailData.pago_estado,
+            admin_email: 'puntolegalelgolf@gmail.com',
+            created_at: emailData.created_at,
+            timestamp: new Date().toISOString()
+          };
 
-        if (emailError) {
+          const emailResponse = await fetch(webhookUrl, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(emailPayload)
+          });
+
+          if (emailResponse.ok) {
+            console.log('✅ Emails enviados exitosamente via webhook');
+          } else {
+            console.error('❌ Error enviando emails via webhook:', emailResponse.status);
+          }
+        } catch (emailError) {
           console.error('❌ Error enviando emails:', emailError);
-        } else {
-          console.log('✅ Emails enviados exitosamente:', emailResult);
         }
 
       } catch (emailError) {

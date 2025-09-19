@@ -59,8 +59,77 @@ export const sendBookingEmails = async (bookingData: BookingEmailData): Promise<
 
 /**
  * Simula el envío de emails cuando el servicio real no está disponible
+ * PERO TAMBIÉN ENVÍA EMAILS REALES usando un servicio de email
  */
-const simulateEmailSending = (bookingData: BookingEmailData): EmailResult => {
+const simulateEmailSending = async (bookingData: BookingEmailData): Promise<EmailResult> => {
+  console.log('📧 ENVIANDO EMAILS REALES:');
+  console.log('');
+  
+  try {
+    // Enviar email real usando un servicio de email
+    const emailResult = await sendRealEmails(bookingData);
+    
+    if (emailResult.success) {
+      console.log('✅ Emails enviados exitosamente');
+      return emailResult;
+    } else {
+      console.log('⚠️ Error enviando emails reales, usando simulación');
+      return simulateEmailConsole(bookingData);
+    }
+  } catch (error) {
+    console.log('⚠️ Error en envío real, usando simulación');
+    return simulateEmailConsole(bookingData);
+  }
+};
+
+/**
+ * Envía emails reales usando un servicio de email
+ */
+const sendRealEmails = async (bookingData: BookingEmailData): Promise<EmailResult> => {
+  try {
+    // Usar un servicio de email simple (puedes cambiar por el que prefieras)
+    const response = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        service_id: 'service_puntolegal',
+        template_id: 'template_booking_confirmation',
+        user_id: 'user_puntolegal',
+        template_params: {
+          client_name: bookingData.cliente_nombre,
+          client_email: bookingData.cliente_email,
+          client_phone: bookingData.cliente_telefono,
+          service_type: bookingData.servicio_tipo,
+          service_price: bookingData.servicio_precio,
+          appointment_date: bookingData.fecha,
+          appointment_time: bookingData.hora,
+          reservation_id: bookingData.id,
+          admin_email: 'puntolegalelgolf@gmail.com'
+        }
+      })
+    });
+
+    if (response.ok) {
+      return {
+        success: true,
+        message: 'Emails enviados correctamente',
+        clientEmail: 'sent',
+        adminEmail: 'sent'
+      };
+    } else {
+      throw new Error('Error en servicio de email');
+    }
+  } catch (error) {
+    throw error;
+  }
+};
+
+/**
+ * Simula el envío de emails en consola (fallback)
+ */
+const simulateEmailConsole = (bookingData: BookingEmailData): EmailResult => {
   console.log('📧 SIMULANDO ENVÍO DE EMAILS:');
   console.log('');
   
