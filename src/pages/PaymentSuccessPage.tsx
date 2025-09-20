@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { CheckCircle, Calendar, Clock, User, Mail, Phone, ArrowRight, Home, CreditCard } from 'lucide-react';
 import SEO from '../components/SEO';
 import { createReservation } from '../services/reservationService';
-import { sendBookingEmailsWebhook } from '../services/emailWebhookService';
+import { sendBookingEmailsWorking } from '../services/workingEmailService';
 
 export default function PaymentSuccessPage() {
   const [paymentData, setPaymentData] = useState<any>(null);
@@ -86,7 +86,7 @@ export default function PaymentSuccessPage() {
         created_at: reservation.created_at || new Date().toISOString()
       };
 
-      const emailResult = await sendBookingEmailsWebhook(emailData);
+      const emailResult = await sendBookingEmailsWorking(emailData);
       console.log('📧 Resultado de emails:', emailResult);
 
       // Actualizar estado
