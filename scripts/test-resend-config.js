@@ -16,10 +16,10 @@ console.log('2. Settings → Configuration → Secrets');
 console.log('3. Agregar las siguientes variables:\n');
 
 console.log('RESEND_API_KEY=' + RESEND_API_KEY);
-console.log('MAIL_FROM=Punto Legal <noreply@puntolegal.cl>');
+console.log('MAIL_FROM=Punto Legal <puntolegalelgolf@gmail.com>');
 console.log('ADMIN_EMAIL=puntolegalelgolf@gmail.com');
 console.log('SUPABASE_URL=https://qrgelocijmwnxcckxbdg.supabase.co');
-console.log('SUPABASE_SERVICE_ROLE_KEY=[obtener desde Settings → API]');
+console.log('SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFyZ2Vsb2Npam13bnhjY2t4YmRnIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NzgwMjQyOSwiZXhwIjoyMDczMzc4NDI5fQ.eKvVrXiuz39_JP9lydQI6gxyrYX2tLQWIJzlI4lqnYg');
 console.log('EDGE_ADMIN_TOKEN=puntolegal-admin-token-2025\n');
 
 console.log('🔧 PASOS SIGUIENTES:');

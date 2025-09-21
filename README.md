@@ -88,11 +88,11 @@ Frontend Fallback → Edge Function (si trigger falla)
 
 #### Variables de Entorno en Supabase Dashboard:
 ```bash
-RESEND_API_KEY=re_your_api_key_here
-MAIL_FROM=Punto Legal <noreply@puntolegal.cl>
+RESEND_API_KEY=re_gvt6L3ER_5JiDjxtbkT1UpYowirF24DFW
+MAIL_FROM=Punto Legal <puntolegalelgolf@gmail.com>
 ADMIN_EMAIL=puntolegalelgolf@gmail.com
 SUPABASE_URL=https://qrgelocijmwnxcckxbdg.supabase.co
-SUPABASE_SERVICE_ROLE_KEY=eyJ...
+SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFyZ2Vsb2Npam13bnhjY2t4YmRnIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NzgwMjQyOSwiZXhwIjoyMDczMzc4NDI5fQ.eKvVrXiuz39_JP9lydQI6gxyrYX2tLQWIJzlI4lqnYg
 EDGE_ADMIN_TOKEN=puntolegal-admin-token-2025
 ```
 

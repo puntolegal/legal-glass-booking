@@ -51,17 +51,19 @@ PROJECT_REF=qrgelocijmwnxcckxbdg
 **Variables a configurar:**
 ```
 RESEND_API_KEY=re_gvt6L3ER_5JiDjxtbkT1UpYowirF24DFW
-MAIL_FROM=Punto Legal <noreply@puntolegal.cl>
+MAIL_FROM=Punto Legal <puntolegalelgolf@gmail.com>
 ADMIN_EMAIL=puntolegalelgolf@gmail.com
 SUPABASE_URL=https://qrgelocijmwnxcckxbdg.supabase.co
-SUPABASE_SERVICE_ROLE_KEY=[obtener desde Settings → API]
+SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFyZ2Vsb2Npam13bnhjY2t4YmRnIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NzgwMjQyOSwiZXhwIjoyMDczMzc4NDI5fQ.eKvVrXiuz39_JP9lydQI6gxyrYX2tLQWIJzlI4lqnYg
 EDGE_ADMIN_TOKEN=puntolegal-admin-token-2025
 ```
 
-### 3. Obtener Service Role Key
-1. En Supabase Dashboard
-2. Ir a Settings → API
-3. Copiar "service_role" key (formato: `eyJ...`)
+### 3. Service Role Key (CONFIGURADO)
+✅ **Service Role Key obtenida:** `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`
+
+**Pasos completados:**
+1. ✅ Service Role Key obtenida desde Supabase Dashboard
+2. ✅ Key configurada en variables de entorno
 
 ### 4. Verificar Configuración
 ```bash
