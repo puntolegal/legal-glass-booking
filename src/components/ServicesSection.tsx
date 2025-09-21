@@ -25,8 +25,8 @@ const ServicesSection = ({ title = "Elige el servicio legal que necesitas", serv
       title: "Punto Legal Laboral",
       description: "Protección ante vulneraciones de derechos fundamentales, despidos y asesoría Ley Karin.",
       features: ["Tutela de derechos", "Nulidad del despido", "Ley Karin"],
-      regularPrice: "$70.000",
-      promoPrice: "$35.000"
+      regularPrice: "$60.000",
+      promoPrice: "$30.000"
     },
     // Derecho de Familia
     {
