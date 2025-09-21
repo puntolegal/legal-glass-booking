@@ -30,25 +30,26 @@ const Index = () => {
     const serviceMap: { [key: string]: string } = {
       'Punto Legal Laboral': 'laboral',
       'Punto Legal Familia': 'familia', 
-      'Punto Legal Sucesorio': 'herencias',
+      'Punto Legal Sucesorio': 'sucesorio',
       'Punto Legal Inmobiliario': 'inmobiliario',
       'Punto Legal Empresarial': 'empresarial',
-      'Punto Legal Contratos': 'contratos-express',
+      'Punto Legal Contratos': 'contratos',
       'Punto Legal Administración Pública': 'administracion-publica',
       'Punto Legal Tributario': 'tributario',
-      'Punto Legal Compliance': 'compliance-riesgo',
+      'Punto Legal Compliance': 'compliance',
       'Punto Legal Migratorio': 'migratorio',
-      'Punto Legal Propiedad Intelectual': 'marcas-patentes',
-      'Punto Legal Consumidor': 'reclamos-sernac',
+      'Punto Legal Propiedad Intelectual': 'propiedad-intelectual',
+      'Punto Legal Consumidor': 'consumidor',
       'Punto Legal Penal Económico': 'penal-economico',
       // Fallbacks para variaciones de nombres
       'Punto Legal Corporativo': 'premium',
-      'Punto Legal Express': 'contratos-express',
-      'Punto Legal Sociedades': 'sociedades-express',
-      'Punto Legal Protección de Datos': 'proteccion-datos',
-      'Punto Legal Digital': 'ecommerce'
+      'Punto Legal Express': 'contratos',
+      'Punto Legal Sociedades': 'empresarial',
+      'Punto Legal Protección de Datos': 'compliance',
+      'Punto Legal Digital': 'consumidor'
     };
-    const plan = serviceMap[service.title] || 'laboral'; // Cambio default a laboral
+    const plan = serviceMap[service.title] || 'general'; // Cambio default a general
+    console.log(`🔗 Redirigiendo ${service.title} a /agendamiento?plan=${plan}`);
     window.location.href = `/agendamiento?plan=${plan}`;
   };
 

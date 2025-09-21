@@ -647,67 +647,45 @@ export const PremiumServiceSelector: React.FC = () => {
         </div>
       </motion.div>
 
-      {/* Bottom hint - Luxury Redesign */}
+      {/* Bottom hint - Luxury Glass Pill */}
       <motion.div
-        initial={{ opacity: 0, y: 30 }}
+        initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.5, type: "spring", stiffness: 100 }}
-        className="mt-8 flex justify-center"
+        className="mt-6 flex justify-center"
       >
-        <motion.div
-          whileHover={{ scale: 1.05 }}
-          className="relative group"
-        >
-          {/* Luxury Glow Effect */}
-          <div className="absolute -inset-1 bg-gradient-to-r from-orange-500/20 via-amber-500/20 to-orange-500/20 rounded-full blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+        <div className="relative">
+          {/* Glass background */}
+          <div className="absolute inset-0 bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl rounded-full" />
           
-          {/* Main Container */}
-          <div className="relative">
-            {/* Glass background with premium border */}
-            <div className="absolute inset-0 bg-white/95 dark:bg-gray-900/95 backdrop-blur-2xl rounded-full shadow-lg" />
-            
-            {/* Premium gradient border */}
-            <div className="absolute inset-0 rounded-full p-[1px] bg-gradient-to-r from-orange-500/30 via-amber-500/30 to-orange-500/30">
-              <div className="h-full w-full bg-white/90 dark:bg-gray-900/90 rounded-full" />
-            </div>
-            
-            {/* Content */}
-            <div className="relative flex items-center gap-3 px-6 py-3 rounded-full">
-              {/* Animated Sparkle */}
-              <motion.div
-                animate={{ 
-                  rotate: [0, 180, 360],
-                  scale: [1, 1.1, 1]
-                }}
-                transition={{ 
-                  duration: 3, 
-                  repeat: Infinity, 
-                  ease: "easeInOut" 
-                }}
-                className="relative"
-              >
-                <Sparkles className="w-4 h-4 text-orange-500" />
-                <div className="absolute inset-0 bg-orange-500/20 rounded-full blur-sm" />
-              </motion.div>
-              
-              {/* Text */}
-              <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                Desliza para ver más servicios
-              </span>
-              
-              {/* Animated Arrows */}
-              <motion.div
-                animate={{ x: [0, 4, 0] }}
-                transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-                className="flex items-center gap-1"
-              >
-                <ChevronRight className="w-4 h-4 text-orange-500" />
-                <ChevronRight className="w-4 h-4 text-orange-400 -ml-2" />
-                <ChevronRight className="w-4 h-4 text-orange-300 -ml-2" />
-              </motion.div>
-            </div>
+          {/* Premium border */}
+          <div className="absolute inset-0 rounded-full p-[0.5px] bg-gradient-to-r from-gray-200/30 via-gray-300/30 to-gray-200/30 dark:from-gray-700/30 dark:via-gray-600/30 dark:to-gray-700/30">
+            <div className="h-full w-full bg-white/80 dark:bg-gray-900/80 rounded-full" />
           </div>
-        </motion.div>
+          
+          {/* Content */}
+          <div className="relative flex items-center gap-2 px-4 py-2 rounded-full">
+            <motion.div
+              animate={{ rotate: [0, 180, 360] }}
+              transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+            >
+              <Sparkles className="w-3 h-3 text-primary/60" />
+            </motion.div>
+            
+            <span className="text-xs font-medium text-muted-foreground">
+              Desliza para ver más servicios
+            </span>
+            
+            <motion.div
+              animate={{ x: [0, 3, 0] }}
+              transition={{ duration: 1.5, repeat: Infinity }}
+              className="flex items-center"
+            >
+              <ChevronRight className="w-3 h-3 text-primary/60" />
+              <ChevronRight className="w-3 h-3 text-primary/40 -ml-1.5" />
+            </motion.div>
+          </div>
+        </div>
       </motion.div>
     </div>
   );
