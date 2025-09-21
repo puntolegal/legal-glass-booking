@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { ArrowLeft, CheckCircle, AlertCircle, CreditCard, Lock, User, Calendar, Clock } from 'lucide-react';
 import SEO from '../components/SEO';
 import MercadoPagoOfficialButton from '../components/MercadoPagoOfficialButton';
+import MobileMercadoPagoButton from '../components/MobileMercadoPagoButton';
 import ServiceIcon from '../components/ServiceIcon';
 import { PaymentData } from '../services/mercadopagoEdgeFunction';
 
@@ -11,6 +12,7 @@ export default function MercadoPagoPaymentPage() {
   const [paymentData, setPaymentData] = useState<any>(null);
   const [paymentError, setPaymentError] = useState<string>('');
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   // Obtener categoría del servicio para los colores
   const getServiceCategory = () => {
@@ -19,6 +21,14 @@ export default function MercadoPagoPaymentPage() {
   };
 
   useEffect(() => {
+    // Detectar si estamos en móvil
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 1024);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
     // Recuperar datos del localStorage
     const data = localStorage.getItem('paymentData');
     if (data) {
@@ -29,6 +39,8 @@ export default function MercadoPagoPaymentPage() {
       // Si no hay datos, redirigir al agendamiento
       window.location.href = '/agendamiento';
     }
+    
+    return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
   const formatDate = (dateString: string) => {
@@ -236,31 +248,59 @@ export default function MercadoPagoPaymentPage() {
               <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 border border-gray-200/50 shadow-lg">
                 <h3 className="text-lg font-semibold text-gray-900 mb-6">Proceder con el pago</h3>
                 
-                <MercadoPagoOfficialButton
-                  paymentData={{
-                    amount: parseInt(paymentData.price.replace(/\./g, '')),
-                    description: `${paymentData.service} - Punto Legal`,
-                    payer: {
-                      name: paymentData.cliente?.nombre || paymentData.name,
-                      email: paymentData.cliente?.email || paymentData.email,
-                      phone: paymentData.cliente?.telefono || paymentData.phone
-                    },
-                    metadata: {
-                      reservation_id: paymentData.id,
-                      service_name: paymentData.service,
-                      appointment_date: paymentData.fecha || paymentData.date,
-                      appointment_time: paymentData.hora || paymentData.time,
-                      client_name: paymentData.cliente?.nombre || paymentData.name,
-                      client_email: paymentData.cliente?.email || paymentData.email,
-                      codigo_convenio: paymentData.codigoConvenio || null,
-                      descuento_convenio: paymentData.descuentoConvenio || false,
-                      precio_original: paymentData.originalPrice || null,
-                      porcentaje_descuento: paymentData.porcentajeDescuento || null
-                    }
-                  }}
-                  onSuccess={handlePaymentSuccess}
-                  onError={handlePaymentError}
-                />
+                {isMobile ? (
+                  <MobileMercadoPagoButton
+                    paymentData={{
+                      amount: parseInt(paymentData.price.replace(/\./g, '')),
+                      description: `${paymentData.service} - Punto Legal`,
+                      payer: {
+                        name: paymentData.cliente?.nombre || paymentData.name,
+                        email: paymentData.cliente?.email || paymentData.email,
+                        phone: paymentData.cliente?.telefono || paymentData.phone
+                      },
+                      metadata: {
+                        reservation_id: paymentData.id,
+                        service_name: paymentData.service,
+                        appointment_date: paymentData.fecha || paymentData.date,
+                        appointment_time: paymentData.hora || paymentData.time,
+                        client_name: paymentData.cliente?.nombre || paymentData.name,
+                        client_email: paymentData.cliente?.email || paymentData.email,
+                        codigo_convenio: paymentData.codigoConvenio || null,
+                        descuento_convenio: paymentData.descuentoConvenio || false,
+                        precio_original: paymentData.originalPrice || null,
+                        porcentaje_descuento: paymentData.porcentajeDescuento || null
+                      }
+                    }}
+                    onSuccess={handlePaymentSuccess}
+                    onError={handlePaymentError}
+                  />
+                ) : (
+                  <MercadoPagoOfficialButton
+                    paymentData={{
+                      amount: parseInt(paymentData.price.replace(/\./g, '')),
+                      description: `${paymentData.service} - Punto Legal`,
+                      payer: {
+                        name: paymentData.cliente?.nombre || paymentData.name,
+                        email: paymentData.cliente?.email || paymentData.email,
+                        phone: paymentData.cliente?.telefono || paymentData.phone
+                      },
+                      metadata: {
+                        reservation_id: paymentData.id,
+                        service_name: paymentData.service,
+                        appointment_date: paymentData.fecha || paymentData.date,
+                        appointment_time: paymentData.hora || paymentData.time,
+                        client_name: paymentData.cliente?.nombre || paymentData.name,
+                        client_email: paymentData.cliente?.email || paymentData.email,
+                        codigo_convenio: paymentData.codigoConvenio || null,
+                        descuento_convenio: paymentData.descuentoConvenio || false,
+                        precio_original: paymentData.originalPrice || null,
+                        porcentaje_descuento: paymentData.porcentajeDescuento || null
+                      }
+                    }}
+                    onSuccess={handlePaymentSuccess}
+                    onError={handlePaymentError}
+                  />
+                )}
 
                 {/* Información de seguridad */}
                 <motion.div

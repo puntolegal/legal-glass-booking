@@ -35,16 +35,27 @@ const MercadoPagoOfficialButton: React.FC<MercadoPagoOfficialButtonProps> = ({
 
   const checkBackendStatus = async () => {
     try {
-      const response = await fetch('http://localhost:3001/health');
+      setBackendStatus('checking');
+      const response = await fetch('http://localhost:3001/health', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        // Agregar timeout
+        signal: AbortSignal.timeout(5000)
+      });
+      
       if (response.ok) {
+        const data = await response.json();
         setBackendStatus('available');
-        console.log('✅ Backend MercadoPago disponible');
+        console.log('✅ Backend MercadoPago disponible:', data);
       } else {
         setBackendStatus('unavailable');
+        console.log('⚠️ Backend respondió con error:', response.status);
       }
     } catch (error) {
       setBackendStatus('unavailable');
-      console.log('⚠️ Backend MercadoPago no disponible');
+      console.log('⚠️ Backend MercadoPago no disponible:', error.message);
     }
   };
 
@@ -135,36 +146,46 @@ const MercadoPagoOfficialButton: React.FC<MercadoPagoOfficialButtonProps> = ({
 
   return (
     <div className="space-y-4">
-      {/* Estado del backend - Solo mostrar si no está disponible */}
+      {/* Estado del backend */}
       {backendStatus !== 'available' && (
         <div className={`border rounded-lg p-3 ${
           backendStatus === 'unavailable'
             ? 'bg-red-50 border-red-200'
             : 'bg-yellow-50 border-yellow-200'
         }`}>
-          <div className="flex items-center space-x-2">
-            <Server className={`h-4 w-4 ${
-              backendStatus === 'unavailable'
-                ? 'text-red-600'
-                : 'text-yellow-600'
-            }`} />
-            <span className={`text-sm font-medium ${
-              backendStatus === 'unavailable'
-                ? 'text-red-800'
-                : 'text-yellow-800'
-            }`}>
-              Backend MercadoPago: {
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <Server className={`h-4 w-4 ${
                 backendStatus === 'unavailable'
-                  ? 'No disponible'
-                  : 'Verificando...'
-              }
-            </span>
+                  ? 'text-red-600'
+                  : 'text-yellow-600'
+              }`} />
+              <span className={`text-sm font-medium ${
+                backendStatus === 'unavailable'
+                  ? 'text-red-800'
+                  : 'text-yellow-800'
+              }`}>
+                Backend MercadoPago: {
+                  backendStatus === 'unavailable'
+                    ? 'No disponible'
+                    : 'Verificando...'
+                }
+              </span>
+            </div>
+            
+            <button
+              onClick={checkBackendStatus}
+              className="text-xs px-2 py-1 bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition-colors"
+            >
+              Reintentar
+            </button>
           </div>
           
           {backendStatus === 'unavailable' && (
             <div className="mt-2 text-xs text-red-700">
               <p>Para usar la integración oficial:</p>
               <code className="bg-red-100 px-2 py-1 rounded">cd server && npm install && npm start</code>
+              <p className="mt-1">O haz clic en "Reintentar" si ya está ejecutándose.</p>
             </div>
           )}
         </div>

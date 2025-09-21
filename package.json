@@ -21,6 +21,7 @@
   },
   "scripts": {
     "dev": "vite",
+    "dev:full": "npm run ensure-mercadopago && npm run dev",
     "build": "vite build",
     "build:dev": "vite build --mode development",
     "build:prod": "vite build --mode production",
@@ -30,7 +31,10 @@
     "docker:build": "docker build -t punto-legal-apuntes .",
     "docker:run": "docker run -p 8080:80 punto-legal-apuntes",
     "docker:dev": "docker-compose up --build",
-    "supabase:security-fix": "node scripts/apply-security-fixes.js"
+    "supabase:security-fix": "node scripts/apply-security-fixes.js",
+    "ensure-mercadopago": "node scripts/ensure-mercadopago-running.js",
+    "mercadopago:start": "cd server && node mercadopago-backend.js",
+    "mercadopago:check": "curl -s http://localhost:3001/health"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
