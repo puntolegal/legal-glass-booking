@@ -212,7 +212,7 @@ export default function AgendamientoPage() {
                     Paso {step} de 2
                   </p>
                 </div>
-              </div>
+            </div>
             
               {/* Service Preview Card */}
               <motion.div

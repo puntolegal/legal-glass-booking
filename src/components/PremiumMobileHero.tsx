@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
-import { Sparkles, Shield, Clock, Award, Scale, CheckCircle, Building2, Users, Gavel, Crown } from 'lucide-react';
+import { Sparkles, Shield, Zap, Star, ArrowDown, CheckCircle } from 'lucide-react';
 import PremiumServiceSelector from './PremiumServiceSelector';
 
 export const PremiumMobileHero: React.FC = () => {
@@ -108,108 +108,55 @@ export const PremiumMobileHero: React.FC = () => {
           <PremiumServiceSelector />
         </motion.div>
 
-        {/* Trust Indicators - Manhattan Legal Style */}
+        {/* Trust Indicators - Premium Glass Cards */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 1.2 }}
-          className="w-full max-w-sm"
+          className="grid grid-cols-3 gap-3 w-full max-w-sm"
         >
-          {/* Header elegante */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5, delay: 1.3 }}
-            className="text-center mb-6"
-          >
-            <h3 className="text-lg font-bold text-foreground mb-2">
-              Estudio Jurídico de Excelencia
-            </h3>
-            <p className="text-muted-foreground text-sm">
-              Estándares internacionales • Manhattan Style
-            </p>
-          </motion.div>
-
-          {/* Grid de indicadores profesionales */}
-          <div className="grid grid-cols-2 gap-4">
-            {[
-              { 
-                icon: Shield, 
-                text: 'Confidencialidad', 
-                subtext: '100% Protegido',
-                gradient: 'from-slate-600 to-slate-700',
-                accent: 'from-blue-500 to-blue-600'
-              },
-              { 
-                icon: Clock, 
-                text: 'Respuesta Inmediata', 
-                subtext: '24/7 Disponible',
-                gradient: 'from-slate-600 to-slate-700',
-                accent: 'from-orange-500 to-amber-600'
-              },
-              { 
-                icon: Award, 
-                text: 'Excelencia Legal', 
-                subtext: '10+ Años Experiencia',
-                gradient: 'from-slate-600 to-slate-700',
-                accent: 'from-amber-500 to-yellow-600'
-              },
-              { 
-                icon: Scale, 
-                text: 'Ética Profesional', 
-                subtext: 'Certificado',
-                gradient: 'from-slate-600 to-slate-700',
-                accent: 'from-emerald-500 to-green-600'
-              }
-            ].map((feature, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 1.4 + index * 0.1 }}
-                whileHover={{ scale: 1.02, y: -2 }}
-                whileTap={{ scale: 0.98 }}
-                className="group relative bg-gradient-to-br from-slate-800/80 to-slate-900/80 dark:from-slate-700/80 dark:to-slate-800/80 backdrop-blur-xl rounded-2xl p-4 border border-slate-700/50 dark:border-slate-600/50 shadow-xl hover:shadow-2xl hover:shadow-slate-900/50 dark:hover:shadow-slate-800/50 transition-all duration-300"
-              >
-                {/* Efecto de brillo sutil */}
-                <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                
-                {/* Icono con gradiente elegante */}
-                <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${feature.accent} flex items-center justify-center mb-3 mx-auto shadow-lg group-hover:shadow-xl transition-all duration-300`}>
+          {[
+            { 
+              icon: Shield, 
+              text: '100% Seguro', 
+              subtext: 'Protegido',
+              gradient: 'from-blue-500 to-cyan-600' 
+            },
+            { 
+              icon: Zap, 
+              text: 'Respuesta 24h', 
+              subtext: 'Garantizada',
+              gradient: 'from-primary to-accent' 
+            },
+            { 
+              icon: Star, 
+              text: '5.0 Rating', 
+              subtext: 'Excelencia',
+              gradient: 'from-purple-500 to-pink-600' 
+            }
+          ].map((feature, index) => (
+            <motion.div
+              key={feature.text}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 1.4 + index * 0.1 }}
+              whileHover={{ scale: 1.05, y: -5 }}
+              className="relative group"
+            >
+              <div className="absolute inset-0 bg-gradient-to-br from-white/50 to-white/30 dark:from-gray-800/50 dark:to-gray-700/30 rounded-xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <div className="relative bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl rounded-xl p-3 border border-white/50 dark:border-gray-700/50 shadow-lg">
+                <div className={`w-10 h-10 mx-auto mb-2 bg-gradient-to-br ${feature.gradient} rounded-xl flex items-center justify-center shadow-lg`}>
                   <feature.icon className="w-5 h-5 text-white" />
                 </div>
-                
-                {/* Texto principal */}
-                <p className="text-foreground text-sm font-semibold text-center mb-1 group-hover:text-orange-500 dark:group-hover:text-orange-400 transition-colors duration-300">
+                <p className="text-xs font-bold text-foreground text-center">
                   {feature.text}
                 </p>
-                
-                {/* Subtexto */}
-                <p className="text-muted-foreground text-xs text-center group-hover:text-foreground/80 transition-colors duration-300">
+                <p className="text-[10px] text-muted-foreground text-center">
                   {feature.subtext}
                 </p>
-
-                {/* Línea de acento sutil */}
-                <div className={`absolute bottom-0 left-1/2 transform -translate-x-1/2 w-8 h-0.5 bg-gradient-to-r ${feature.accent} rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
-              </motion.div>
-            ))}
-          </div>
-
-          {/* Badge de certificación profesional */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 1.5 }}
-            className="mt-6 text-center"
-          >
-            <div className="inline-flex items-center gap-2 bg-gradient-to-r from-slate-800/60 to-slate-900/60 dark:from-slate-700/60 dark:to-slate-800/60 backdrop-blur-xl rounded-full px-4 py-2 border border-slate-700/50 dark:border-slate-600/50 shadow-lg">
-              <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
-              <span className="text-foreground text-xs font-medium">
-                Estudio Jurídico Certificado
-              </span>
-              <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" style={{ animationDelay: '0.5s' }} />
-            </div>
-          </motion.div>
+              </div>
+            </motion.div>
+          ))}
         </motion.div>
 
 

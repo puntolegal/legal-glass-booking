@@ -420,8 +420,8 @@ export default function PaymentPage() {
                                     <p className="text-red-300/80 text-sm">Método seguro y confiable - Tarjetas chilenas</p>
                                   </div>
                                 </div>
-                              </div>
-                            </div>
+                        </div>
+                      </div>
 
                             {/* Información de Transbank */}
                             <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-8 border border-white/10">
