@@ -228,8 +228,8 @@ const SpecializedGrid: React.FC<{ onAgendarClick: (service: ServiceCard) => void
     {
       title: "Punto Legal Sucesorio",
       description: "Gestión completa de herencias, testamentos y trámites sucesorios.",
-      price: "$27.500",
-      originalPrice: "$55.000",
+      price: "$30.000",
+      originalPrice: "$60.000",
       features: [
         "Testamentos",
         "Posesión efectiva",
@@ -288,8 +288,8 @@ const SpecializedGrid: React.FC<{ onAgendarClick: (service: ServiceCard) => void
     {
       title: "Punto Legal Administración Pública",
       description: "Impugnación de multas, recursos y defensa en fiscalizaciones administrativas.",
-      price: "$30.000",
-      originalPrice: "$60.000",
+      price: "$25.000",
+      originalPrice: "$50.000",
       features: [
         "Impugnación multas",
         "Recursos",
@@ -303,8 +303,8 @@ const SpecializedGrid: React.FC<{ onAgendarClick: (service: ServiceCard) => void
     {
       title: "Punto Legal Tributario",
       description: "Asesoría fiscal, planificación tributaria y recursos contra liquidaciones del SII.",
-      price: "$40.000",
-      originalPrice: "$80.000",
+      price: "$30.000",
+      originalPrice: "$60.000",
       features: [
         "Planificación fiscal",
         "Recursos SII",
@@ -318,8 +318,8 @@ const SpecializedGrid: React.FC<{ onAgendarClick: (service: ServiceCard) => void
     {
       title: "Punto Legal Compliance",
       description: "Programas de cumplimiento, políticas internas y gestión de riesgos corporativos.",
-      price: "$27.500",
-      originalPrice: "$55.000",
+      price: "$40.000",
+      originalPrice: "$80.000",
       features: [
         "Programas compliance",
         "Auditorías",

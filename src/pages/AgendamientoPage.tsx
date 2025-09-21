@@ -54,7 +54,7 @@ const serviceCatalog = {
   'general': { name: 'Consulta General', price: '35.000', category: 'General', originalPrice: '70.000', discount: '50% OFF' },
   
   // Sucesorio
-  'sucesorio': { name: 'Punto Legal Sucesorio', price: '27.500', category: 'Sucesorio', originalPrice: '55.000', discount: '50% OFF' },
+  'sucesorio': { name: 'Punto Legal Sucesorio', price: '30.000', category: 'Sucesorio', originalPrice: '60.000', discount: '50% OFF' },
   
   // Empresarial
   'empresarial': { name: 'Punto Legal Empresarial', price: '45.000', category: 'Empresarial', originalPrice: '90.000', discount: '50% OFF' },
@@ -63,13 +63,13 @@ const serviceCatalog = {
   'contratos': { name: 'Punto Legal Contratos', price: '15.000', category: 'Contratos', originalPrice: '30.000', discount: '50% OFF' },
   
   // Administración Pública
-  'administracion-publica': { name: 'Punto Legal Administración Pública', price: '30.000', category: 'Administración Pública', originalPrice: '60.000', discount: '50% OFF' },
+  'administracion-publica': { name: 'Punto Legal Administración Pública', price: '25.000', category: 'Administración Pública', originalPrice: '50.000', discount: '50% OFF' },
   
   // Tributario
-  'tributario': { name: 'Punto Legal Tributario', price: '40.000', category: 'Tributario', originalPrice: '80.000', discount: '50% OFF' },
+  'tributario': { name: 'Punto Legal Tributario', price: '30.000', category: 'Tributario', originalPrice: '60.000', discount: '50% OFF' },
   
   // Compliance
-  'compliance': { name: 'Punto Legal Compliance', price: '27.500', category: 'Compliance', originalPrice: '55.000', discount: '50% OFF' },
+  'compliance': { name: 'Punto Legal Compliance', price: '40.000', category: 'Compliance', originalPrice: '80.000', discount: '50% OFF' },
   
   // Migratorio
   'migratorio': { name: 'Punto Legal Migratorio', price: '32.500', category: 'Migratorio', originalPrice: '65.000', discount: '50% OFF' },
