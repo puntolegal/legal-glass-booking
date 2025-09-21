@@ -3,7 +3,6 @@ import { useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import PremiumMobileHeader from './PremiumMobileHeader';
 import PremiumMobileDock from './PremiumMobileDock';
-import PremiumMobileFooter from './PremiumMobileFooter';
 import MobileSidebar from './MobileSidebar';
 import ApuntesHeader from './ApuntesHeader';
 import { useSidebar } from '@/contexts/SidebarContext';
@@ -64,9 +63,6 @@ export const MobileLayout: React.FC<MobileLayoutProps> = ({ children, onAgendarC
       >
         {children}
       </main>
-
-      {/* Premium Mobile Footer */}
-      <PremiumMobileFooter />
 
       {/* Premium Mobile Dock - Unificado y optimizado */}
       <PremiumMobileDock />
