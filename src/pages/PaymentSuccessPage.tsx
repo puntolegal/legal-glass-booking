@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { CheckCircle, Calendar, Clock, User, Mail, Phone, ArrowRight, Home, CreditCard } from 'lucide-react';
 import SEO from '../components/SEO';
 import { createReservation } from '../services/reservationService';
-import { sendBookingEmailsWorking } from '../services/workingEmailService';
+import { sendBookingEmailsMake } from '../services/makeEmailService';
 
 export default function PaymentSuccessPage() {
   const [paymentData, setPaymentData] = useState<any>(null);
@@ -86,7 +86,7 @@ export default function PaymentSuccessPage() {
         created_at: reservation.created_at || new Date().toISOString()
       };
 
-      const emailResult = await sendBookingEmailsWorking(emailData);
+      const emailResult = await sendBookingEmailsMake(emailData);
       console.log('📧 Resultado de emails:', emailResult);
 
       // Actualizar estado
@@ -179,15 +179,15 @@ export default function PaymentSuccessPage() {
             </h2>
             
             <div className="grid md:grid-cols-2 gap-6">
-                <div className="space-y-4">
+              <div className="space-y-4">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
                     <User className="w-5 h-5 text-green-600" />
-                    </div>
+                  </div>
                   <div>
                     <p className="text-sm text-gray-500">Cliente</p>
                     <p className="font-semibold text-gray-900">
-                      {paymentData?.cliente?.nombre || paymentData?.name || 'No especificado'}
+                      {paymentData?.reservation?.nombre || paymentData?.cliente?.nombre || paymentData?.name || 'No especificado'}
                     </p>
                   </div>
                 </div>
@@ -195,23 +195,23 @@ export default function PaymentSuccessPage() {
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
                     <Mail className="w-5 h-5 text-green-600" />
-                    </div>
-                    <div>
+                  </div>
+                  <div>
                     <p className="text-sm text-gray-500">Email</p>
                     <p className="font-semibold text-gray-900">
-                      {paymentData?.cliente?.email || paymentData?.email || 'No especificado'}
-                      </p>
-                    </div>
+                      {paymentData?.reservation?.email || paymentData?.cliente?.email || paymentData?.email || 'No especificado'}
+                    </p>
                   </div>
-                  
+                </div>
+                
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
                     <Phone className="w-5 h-5 text-green-600" />
-                    </div>
-                    <div>
+                  </div>
+                  <div>
                     <p className="text-sm text-gray-500">Teléfono</p>
                     <p className="font-semibold text-gray-900">
-                      {paymentData?.cliente?.telefono || paymentData?.phone || 'No especificado'}
+                      {paymentData?.reservation?.telefono || paymentData?.cliente?.telefono || paymentData?.phone || 'No especificado'}
                     </p>
                   </div>
                 </div>
@@ -225,21 +225,21 @@ export default function PaymentSuccessPage() {
                   <div>
                     <p className="text-sm text-gray-500">Fecha</p>
                     <p className="font-semibold text-gray-900">
-                      {paymentData?.fecha || paymentData?.date || 'No especificada'}
-                      </p>
-                    </div>
+                      {paymentData?.reservation?.fecha || paymentData?.fecha || paymentData?.date || 'No especificada'}
+                    </p>
                   </div>
-                  
+                </div>
+                
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
                     <Clock className="w-5 h-5 text-green-600" />
-                    </div>
-                    <div>
+                  </div>
+                  <div>
                     <p className="text-sm text-gray-500">Hora</p>
                     <p className="font-semibold text-gray-900">
-                      {paymentData?.hora || paymentData?.time || '10:00'} hrs
-                      </p>
-                    </div>
+                      {paymentData?.reservation?.hora || paymentData?.hora || paymentData?.time || '10:00'} hrs
+                    </p>
+                  </div>
                 </div>
                 
                 <div className="flex items-center gap-3">
@@ -249,7 +249,7 @@ export default function PaymentSuccessPage() {
                   <div>
                     <p className="text-sm text-gray-500">Servicio</p>
                     <p className="font-semibold text-gray-900">
-                      {paymentData?.service || 'Consulta Legal'}
+                      {paymentData?.reservation?.servicio || paymentData?.service || 'Consulta Legal'}
                     </p>
                   </div>
                 </div>
@@ -260,7 +260,7 @@ export default function PaymentSuccessPage() {
               <div className="flex items-center justify-between">
                 <span className="text-lg font-semibold text-gray-900">Total pagado</span>
                 <span className="text-2xl font-bold text-green-600">
-                  ${paymentData?.price || '0'}
+                  ${paymentData?.reservation?.precio || paymentData?.price || '0'}
                 </span>
               </div>
             </div>
@@ -298,6 +298,24 @@ export default function PaymentSuccessPage() {
                     <p className="text-sm text-blue-700">
                       <strong>Estado:</strong> {paymentData.reservation.estado}
                     </p>
+                    {paymentData.emailResult?.tracking_code && (
+                      <p className="text-sm text-blue-700">
+                        <strong>Código de Seguimiento:</strong> {paymentData.emailResult.tracking_code}
+                      </p>
+                    )}
+                    {paymentData.emailResult?.google_meet_link && (
+                      <p className="text-sm text-blue-700">
+                        <strong>Link de Google Meet:</strong> 
+                        <a 
+                          href={paymentData.emailResult.google_meet_link} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-blue-600 hover:text-blue-800 underline ml-1"
+                        >
+                          {paymentData.emailResult.google_meet_link}
+                        </a>
+                      </p>
+                    )}
                   </div>
                 )}
               </div>
