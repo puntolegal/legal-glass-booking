@@ -1,0 +1,104 @@
+{
+  "name": "Punto Legal Emails",
+  "description": "Sistema de emails automáticos para consultas legales",
+  "version": "1.0.0",
+  "scenario": {
+    "name": "Punto Legal Emails",
+    "description": "Envía emails de confirmación al cliente y admin",
+    "modules": [
+      {
+        "id": 1,
+        "name": "Webhook",
+        "type": "webhook",
+        "config": {
+          "url": "https://hook.us2.make.com/your-webhook-url-here",
+          "method": "POST",
+          "contentType": "application/json"
+        }
+      },
+      {
+        "id": 2,
+        "name": "Email Cliente",
+        "type": "email",
+        "config": {
+          "to": "{{1.cliente.email}}",
+          "subject": "Confirmacion de Consulta Legal - {{1.reserva.tracking_code}}",
+          "body": "HTML",
+          "htmlBody": "<h1>Consulta Legal Confirmada</h1><p>Hola {{1.cliente.nombre}},</p><p>Tu consulta legal ha sido confirmada exitosamente.</p><h2>Detalles de tu consulta:</h2><ul><li>Servicio: {{1.servicio.tipo}}</li><li>Fecha: {{1.servicio.fecha}}</li><li>Hora: {{1.servicio.hora}}</li><li>Precio: ${{1.servicio.precio}}</li></ul><h2>Informacion importante:</h2><ul><li>Codigo de seguimiento: {{1.reserva.tracking_code}}</li><li>Link de Google Meet: <a href='{{1.reserva.google_meet_link}}'>{{1.reserva.google_meet_link}}</a></li><li>ID de Reserva: {{1.reserva.id}}</li></ul><p>Te contactaremos 24 horas antes de tu consulta.</p><p>Saludos,<br>Equipo Punto Legal</p>"
+        }
+      },
+      {
+        "id": 3,
+        "name": "Email Admin",
+        "type": "email",
+        "config": {
+          "to": "puntolegalelgolf@gmail.com",
+          "subject": "Nueva Consulta Legal - {{1.reserva.tracking_code}}",
+          "body": "HTML",
+          "htmlBody": "<h1>Nueva Consulta Legal</h1><h2>Cliente:</h2><ul><li>Nombre: {{1.cliente.nombre}}</li><li>Email: {{1.cliente.email}}</li><li>Telefono: {{1.cliente.telefono}}</li></ul><h2>Servicio:</h2><ul><li>Tipo: {{1.servicio.tipo}}</li><li>Fecha: {{1.servicio.fecha}}</li><li>Hora: {{1.servicio.hora}}</li><li>Precio: ${{1.servicio.precio}}</li></ul><h2>Pago:</h2><ul><li>Metodo: {{1.pago.metodo}}</li><li>Estado: {{1.pago.estado}}</li><li>Fecha: {{1.pago.fecha_pago}}</li></ul><h2>Informacion tecnica:</h2><ul><li>ID de Reserva: {{1.reserva.id}}</li><li>Codigo de seguimiento: {{1.reserva.tracking_code}}</li><li>Link de Google Meet: <a href='{{1.reserva.google_meet_link}}'>{{1.reserva.google_meet_link}}</a></li></ul><p>Equipo Punto Legal</p>"
+        }
+      },
+      {
+        "id": 4,
+        "name": "Google Calendar",
+        "type": "google_calendar",
+        "config": {
+          "calendarId": "primary",
+          "summary": "Consulta Legal - {{1.cliente.nombre}}",
+          "description": "Consulta de {{1.servicio.tipo}} con {{1.cliente.nombre}}",
+          "start": {
+            "dateTime": "{{1.calendar.start_date}}",
+            "timeZone": "America/Santiago"
+          },
+          "end": {
+            "dateTime": "{{1.calendar.end_date}}",
+            "timeZone": "America/Santiago"
+          },
+          "attendees": [
+            {
+              "email": "{{1.cliente.email}}",
+              "displayName": "{{1.cliente.nombre}}"
+            },
+            {
+              "email": "puntolegalelgolf@gmail.com",
+              "displayName": "Punto Legal"
+            }
+          ]
+        }
+      },
+      {
+        "id": 5,
+        "name": "Response",
+        "type": "webhook_response",
+        "config": {
+          "status": 200,
+          "body": {
+            "success": true,
+            "message": "Emails enviados exitosamente",
+            "tracking_code": "{{1.reserva.tracking_code}}",
+            "google_meet_link": "{{1.reserva.google_meet_link}}",
+            "reservation_id": "{{1.reserva.id}}"
+          }
+        }
+      }
+    ],
+    "connections": [
+      {
+        "from": 1,
+        "to": 2
+      },
+      {
+        "from": 1,
+        "to": 3
+      },
+      {
+        "from": 1,
+        "to": 4
+      },
+      {
+        "from": 4,
+        "to": 5
+      }
+    ]
+  }
+}
