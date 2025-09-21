@@ -218,15 +218,6 @@ const MercadoPagoOfficialButton: React.FC<MercadoPagoOfficialButtonProps> = ({
         )}
       </motion.button>
 
-      {/* Información de seguridad minimalista */}
-      {backendStatus === 'available' && (
-        <div className="bg-green-50/50 border border-green-200/50 rounded-lg p-3">
-          <div className="flex items-center gap-2 text-sm text-green-800">
-            <CheckCircle className="h-4 w-4" />
-            <span className="font-medium">Integración oficial verificada</span>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

@@ -47,20 +47,29 @@ export default function PaymentSuccessPage() {
       const paymentInfo = JSON.parse(storedData);
       console.log('📋 Datos de pago almacenados:', paymentInfo);
 
+      // Si no hay datos suficientes, usar datos por defecto
+      if (!paymentInfo.cliente && !paymentInfo.name) {
+        console.warn('⚠️ Datos de cliente incompletos, usando datos por defecto');
+      }
+
       // Crear reserva en la base de datos
       setProcessingStatus('Guardando reserva en la base de datos...');
       
+      // Extraer datos de manera más robusta
+      const clienteData = paymentInfo.cliente || {};
+      const serviceData = paymentInfo.servicio || {};
+      
       const reservationData = {
-        nombre: paymentInfo.cliente?.nombre || paymentInfo.name || 'Cliente',
-        rut: paymentInfo.cliente?.rut || paymentInfo.rut || 'No especificado',
-        email: paymentInfo.cliente?.email || paymentInfo.email || 'No especificado',
-        telefono: paymentInfo.cliente?.telefono || paymentInfo.phone || 'No especificado',
+        nombre: clienteData.nombre || paymentInfo.name || 'Cliente',
+        rut: clienteData.rut || paymentInfo.rut || 'No especificado',
+        email: clienteData.email || paymentInfo.email || 'No especificado',
+        telefono: clienteData.telefono || paymentInfo.phone || 'No especificado',
         fecha: paymentInfo.fecha || paymentInfo.date || new Date().toISOString().split('T')[0],
         hora: paymentInfo.hora || paymentInfo.time || '10:00',
-        descripcion: `Consulta ${paymentInfo.service} - Pago confirmado via MercadoPago`,
-        servicio: paymentInfo.service || 'Consulta General',
-        precio: paymentInfo.price || '35000',
-        categoria: paymentInfo.category || 'General',
+        descripcion: `Consulta ${paymentInfo.service || serviceData.tipo || 'General'} - Pago confirmado via MercadoPago`,
+        servicio: paymentInfo.service || serviceData.tipo || 'Consulta General',
+        precio: paymentInfo.price || serviceData.precio || '35000',
+        categoria: paymentInfo.category || serviceData.categoria || 'General',
         tipo_reunion: paymentInfo.tipo_reunion || 'online',
         estado: 'confirmada' as const,
         webhook_sent: false
@@ -187,7 +196,7 @@ export default function PaymentSuccessPage() {
                   <div>
                     <p className="text-sm text-gray-500">Cliente</p>
                     <p className="font-semibold text-gray-900">
-                      {paymentData?.reservation?.nombre || paymentData?.cliente?.nombre || paymentData?.name || 'No especificado'}
+                      {paymentData?.reservation?.nombre || 'Cliente'}
                     </p>
                   </div>
                 </div>
@@ -199,7 +208,7 @@ export default function PaymentSuccessPage() {
                   <div>
                     <p className="text-sm text-gray-500">Email</p>
                     <p className="font-semibold text-gray-900">
-                      {paymentData?.reservation?.email || paymentData?.cliente?.email || paymentData?.email || 'No especificado'}
+                      {paymentData?.reservation?.email || 'No especificado'}
                     </p>
                   </div>
                 </div>
@@ -211,7 +220,7 @@ export default function PaymentSuccessPage() {
                   <div>
                     <p className="text-sm text-gray-500">Teléfono</p>
                     <p className="font-semibold text-gray-900">
-                      {paymentData?.reservation?.telefono || paymentData?.cliente?.telefono || paymentData?.phone || 'No especificado'}
+                      {paymentData?.reservation?.telefono || 'No especificado'}
                     </p>
                   </div>
                 </div>
@@ -225,7 +234,7 @@ export default function PaymentSuccessPage() {
                   <div>
                     <p className="text-sm text-gray-500">Fecha</p>
                     <p className="font-semibold text-gray-900">
-                      {paymentData?.reservation?.fecha || paymentData?.fecha || paymentData?.date || 'No especificada'}
+                      {paymentData?.reservation?.fecha ? new Date(paymentData.reservation.fecha).toLocaleDateString('es-CL') : 'No especificada'}
                     </p>
                   </div>
                 </div>
@@ -237,7 +246,7 @@ export default function PaymentSuccessPage() {
                   <div>
                     <p className="text-sm text-gray-500">Hora</p>
                     <p className="font-semibold text-gray-900">
-                      {paymentData?.reservation?.hora || paymentData?.hora || paymentData?.time || '10:00'} hrs
+                      {paymentData?.reservation?.hora || '10:00'} hrs
                     </p>
                   </div>
                 </div>
@@ -249,7 +258,7 @@ export default function PaymentSuccessPage() {
                   <div>
                     <p className="text-sm text-gray-500">Servicio</p>
                     <p className="font-semibold text-gray-900">
-                      {paymentData?.reservation?.servicio || paymentData?.service || 'Consulta Legal'}
+                      {paymentData?.reservation?.servicio || 'Consulta Legal'}
                     </p>
                   </div>
                 </div>
@@ -260,64 +269,100 @@ export default function PaymentSuccessPage() {
               <div className="flex items-center justify-between">
                 <span className="text-lg font-semibold text-gray-900">Total pagado</span>
                 <span className="text-2xl font-bold text-green-600">
-                  ${paymentData?.reservation?.precio || paymentData?.price || '0'}
+                  ${paymentData?.reservation?.precio ? Number(paymentData.reservation.precio).toLocaleString('es-CL') : '0'}
                 </span>
               </div>
             </div>
           </motion.div>
 
           {/* Estado del procesamiento */}
-          {paymentData?.emailResult && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            className="bg-blue-50 border border-blue-200 rounded-xl p-6 mb-8"
+          >
+            <h3 className="text-lg font-semibold text-blue-900 mb-3">
+              📧 Estado de confirmación
+            </h3>
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <CheckCircle className="w-5 h-5 text-green-500" />
+                <span className="text-blue-800">Reserva guardada en la base de datos</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <CheckCircle className="w-5 h-5 text-green-500" />
+                <span className="text-blue-800">Pago confirmado via MercadoPago</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <CheckCircle className="w-5 h-5 text-green-500" />
+                <span className="text-blue-800">Emails de confirmación enviados</span>
+              </div>
+              {paymentData?.reservation && (
+                <div className="mt-4 p-3 bg-white rounded-lg border border-blue-200">
+                  <p className="text-sm text-blue-700">
+                    <strong>ID de Reserva:</strong> {paymentData.reservation.id}
+                  </p>
+                  <p className="text-sm text-blue-700">
+                    <strong>Estado:</strong> {paymentData.reservation.estado}
+                  </p>
+                  {paymentData.emailResult?.tracking_code && (
+                    <p className="text-sm text-blue-700">
+                      <strong>Código de Seguimiento:</strong> {paymentData.emailResult.tracking_code}
+                    </p>
+                  )}
+                  {paymentData.emailResult?.google_meet_link && (
+                    <p className="text-sm text-blue-700">
+                      <strong>Link de Google Meet:</strong> 
+                      <a 
+                        href={paymentData.emailResult.google_meet_link} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:text-blue-800 underline ml-1"
+                      >
+                        {paymentData.emailResult.google_meet_link}
+                      </a>
+                    </p>
+                  )}
+                </div>
+              )}
+            </div>
+          </motion.div>
+
+          {/* Información del pago */}
+          {paymentData?.mercadopagoData && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
-              className="bg-blue-50 border border-blue-200 rounded-xl p-6 mb-8"
+              transition={{ delay: 0.5 }}
+              className="bg-gray-50 border border-gray-200 rounded-xl p-6 mb-8"
             >
-              <h3 className="text-lg font-semibold text-blue-900 mb-3">
-                📧 Estado de confirmación
+              <h3 className="text-lg font-semibold text-gray-900 mb-3">
+                💳 Información del pago
               </h3>
-                <div className="space-y-3">
-                <div className="flex items-center gap-2">
-                  <CheckCircle className="w-5 h-5 text-green-500" />
-                  <span className="text-blue-800">Reserva guardada en la base de datos</span>
+              <div className="grid md:grid-cols-2 gap-4 text-sm">
+                <div>
+                  <p className="text-gray-600">
+                    <strong>ID de Pago:</strong> {paymentData.mercadopagoData.payment_id || 'N/A'}
+                  </p>
+                  <p className="text-gray-600">
+                    <strong>Estado:</strong> {paymentData.mercadopagoData.status || 'N/A'}
+                  </p>
+                  <p className="text-gray-600">
+                    <strong>Método:</strong> {paymentData.mercadopagoData.payment_type || 'N/A'}
+                  </p>
                 </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle className="w-5 h-5 text-green-500" />
-                  <span className="text-blue-800">Pago confirmado via MercadoPago</span>
+                <div>
+                  <p className="text-gray-600">
+                    <strong>Referencia:</strong> {paymentData.mercadopagoData.external_reference || 'N/A'}
+                  </p>
+                  <p className="text-gray-600">
+                    <strong>Orden:</strong> {paymentData.mercadopagoData.merchant_order_id || 'N/A'}
+                  </p>
+                  <p className="text-gray-600">
+                    <strong>Procesado:</strong> {new Date().toLocaleString('es-CL')}
+                  </p>
                 </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle className="w-5 h-5 text-green-500" />
-                  <span className="text-blue-800">Emails de confirmación enviados</span>
-                </div>
-                {paymentData.reservation && (
-                  <div className="mt-4 p-3 bg-white rounded-lg border border-blue-200">
-                    <p className="text-sm text-blue-700">
-                      <strong>ID de Reserva:</strong> {paymentData.reservation.id}
-                    </p>
-                    <p className="text-sm text-blue-700">
-                      <strong>Estado:</strong> {paymentData.reservation.estado}
-                    </p>
-                    {paymentData.emailResult?.tracking_code && (
-                      <p className="text-sm text-blue-700">
-                        <strong>Código de Seguimiento:</strong> {paymentData.emailResult.tracking_code}
-                      </p>
-                    )}
-                    {paymentData.emailResult?.google_meet_link && (
-                      <p className="text-sm text-blue-700">
-                        <strong>Link de Google Meet:</strong> 
-                        <a 
-                          href={paymentData.emailResult.google_meet_link} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="text-blue-600 hover:text-blue-800 underline ml-1"
-                        >
-                          {paymentData.emailResult.google_meet_link}
-                        </a>
-                      </p>
-                    )}
-                  </div>
-                )}
               </div>
             </motion.div>
           )}
@@ -388,6 +433,16 @@ export default function PaymentSuccessPage() {
               <Home className="w-5 h-5" />
               Volver al inicio
             </Link>
+            
+            {paymentData?.reservation?.id && (
+              <Link
+                to={`/agendamiento?reserva=${paymentData.reservation.id}`}
+                className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200 hover:scale-105"
+              >
+                <Calendar className="w-5 h-5" />
+                Ver mi agendamiento
+              </Link>
+            )}
             
             <Link
               to="/servicios"
