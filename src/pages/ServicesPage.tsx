@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Shield, Scale, Zap, Building, Lock, Gavel, Briefcase, Heart, ScrollText, ShoppingCart, FileCheck, Crown, ArrowRight, Star, CheckCircle } from 'lucide-react';
+import { Shield, Scale, Zap, Building, Lock, Gavel, Briefcase, Heart, ScrollText, ShoppingCart, FileCheck, Crown, ArrowRight, Star, CheckCircle, Building2, User } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -196,73 +196,199 @@ const PremiumGrid: React.FC<{ onAgendarClick: (service: ServiceCard) => void }> 
 const SpecializedGrid: React.FC<{ onAgendarClick: (service: ServiceCard) => void }> = ({ onAgendarClick }) => {
   const specializedServices: ServiceCard[] = [
     {
-      title: "Derecho Laboral",
-      description: "Defensa especializada de los derechos de los trabajadores con máxima indemnización.",
-      price: "$35.000",
+      title: "Punto Legal Laboral",
+      description: "Protección ante vulneraciones de derechos fundamentales, despidos y asesoría Ley Karin.",
+      price: "$30.000",
+      originalPrice: "$60.000",
       features: [
-        "Evaluación del caso",
-        "Cálculo de indemnización",
-        "Representación legal",
-        "Negociación con empleador",
-        "Seguimiento completo"
+        "Tutela de derechos",
+        "Nulidad del despido",
+        "Ley Karin",
+        "Asesoría especializada",
+        "Representación legal"
       ],
-      icon: <Briefcase className="w-6 h-6 text-primary" />
+      icon: <Briefcase className="w-6 h-6 text-primary" />,
+      badge: "Oferta válida por tiempo limitado"
     },
     {
-      title: "Derecho Familia",
-      description: "Asesoría especializada en pensiones de alimentos, custodia y divorcios.",
-      price: "$25.000",
+      title: "Punto Legal Familia",
+      description: "Asesoría integral en divorcios, pensiones alimenticias y temas familiares.",
+      price: "$30.000",
+      originalPrice: "$60.000",
       features: [
-        "Evaluación del caso",
-        "Cálculo de pensión",
-        "Representación legal",
+        "Divorcios",
+        "Pensiones alimenticias",
         "Mediación familiar",
-        "Seguimiento judicial"
+        "Asesoría integral",
+        "Representación legal"
       ],
       icon: <Heart className="w-6 h-6 text-primary" />,
-      href: "/familia"
+      badge: "Oferta válida por tiempo limitado"
     },
     {
-      title: "Herencias & Sucesiones",
-      description: "Procesos sucesorios completos con asesoría especializada en herencias.",
-      price: "$30.000",
+      title: "Punto Legal Sucesorio",
+      description: "Gestión completa de herencias, testamentos y trámites sucesorios.",
+      price: "$27.500",
+      originalPrice: "$55.000",
       features: [
-        "Evaluación de la herencia",
-        "Inventario de bienes",
-        "Representación legal",
-        "Tramitación judicial",
-        "Distribución de bienes"
+        "Testamentos",
+        "Posesión efectiva",
+        "Particiones",
+        "Gestión completa",
+        "Asesoría especializada"
       ],
       icon: <ScrollText className="w-6 h-6 text-primary" />,
-      href: "/herencias"
+      badge: "Oferta válida por tiempo limitado"
     },
     {
-      title: "Protección de Datos",
-      description: "Cumplimiento de la LGPD y protección de datos personales para empresas.",
-      price: "$35.000",
+      title: "Punto Legal Inmobiliario",
+      description: "Contratos de compraventa, arrendamientos, desalojos y litigios inmobiliarios.",
+      price: "$27.500",
+      originalPrice: "$55.000",
       features: [
-        "Auditoría de datos",
-        "Políticas de privacidad",
-        "Implementación LGPD",
-        "Capacitación del equipo",
-        "Seguimiento continuo"
+        "Compraventas",
+        "Arrendamientos",
+        "Desalojos",
+        "Litigios inmobiliarios",
+        "Asesoría especializada"
+      ],
+      icon: <Building className="w-6 h-6 text-primary" />,
+      badge: "Oferta válida por tiempo limitado"
+    },
+    {
+      title: "Punto Legal Empresarial",
+      description: "Constitución de sociedades, modificaciones estatutarias y compliance corporativo.",
+      price: "$45.000",
+      originalPrice: "$90.000",
+      features: [
+        "Constitución de sociedades",
+        "Modificaciones",
+        "Compliance",
+        "Asesoría corporativa",
+        "Representación legal"
+      ],
+      icon: <Building2 className="w-6 h-6 text-primary" />,
+      badge: "Oferta válida por tiempo limitado"
+    },
+    {
+      title: "Punto Legal Contratos",
+      description: "Redacción express de contratos de servicios, NDA, licencias y franquicias.",
+      price: "$15.000",
+      originalPrice: "$30.000",
+      features: [
+        "Contratos de servicios",
+        "NDA",
+        "Licencias",
+        "Franquicias",
+        "Redacción express"
+      ],
+      icon: <FileCheck className="w-6 h-6 text-primary" />,
+      badge: "Oferta válida por tiempo limitado"
+    },
+    {
+      title: "Punto Legal Administración Pública",
+      description: "Impugnación de multas, recursos y defensa en fiscalizaciones administrativas.",
+      price: "$30.000",
+      originalPrice: "$60.000",
+      features: [
+        "Impugnación multas",
+        "Recursos",
+        "Fiscalizaciones",
+        "Defensa administrativa",
+        "Asesoría especializada"
+      ],
+      icon: <Gavel className="w-6 h-6 text-primary" />,
+      badge: "Oferta válida por tiempo limitado"
+    },
+    {
+      title: "Punto Legal Tributario",
+      description: "Asesoría fiscal, planificación tributaria y recursos contra liquidaciones del SII.",
+      price: "$40.000",
+      originalPrice: "$80.000",
+      features: [
+        "Planificación fiscal",
+        "Recursos SII",
+        "Optimización",
+        "Asesoría tributaria",
+        "Representación legal"
+      ],
+      icon: <Scale className="w-6 h-6 text-primary" />,
+      badge: "Oferta válida por tiempo limitado"
+    },
+    {
+      title: "Punto Legal Compliance",
+      description: "Programas de cumplimiento, políticas internas y gestión de riesgos corporativos.",
+      price: "$27.500",
+      originalPrice: "$55.000",
+      features: [
+        "Programas compliance",
+        "Auditorías",
+        "Políticas internas",
+        "Gestión de riesgos",
+        "Asesoría corporativa"
       ],
       icon: <Lock className="w-6 h-6 text-primary" />,
-      href: "/proteccion-datos"
+      badge: "Oferta válida por tiempo limitado"
     },
     {
-      title: "E-Commerce",
-      description: "Asesoría legal especializada para negocios digitales y comercio electrónico.",
-      price: "$40.000",
+      title: "Punto Legal Migratorio",
+      description: "Visas de trabajo y residencia, reagrupación familiar y recursos migratorios.",
+      price: "$32.500",
+      originalPrice: "$65.000",
       features: [
-        "Términos y condiciones",
-        "Políticas de privacidad",
-        "Contratos de venta",
-        "Cumplimiento normativo",
-        "Protección de marca"
+        "Visas de trabajo",
+        "Residencia",
+        "Reagrupación familiar",
+        "Recursos migratorios",
+        "Asesoría especializada"
+      ],
+      icon: <User className="w-6 h-6 text-primary" />,
+      badge: "Oferta válida por tiempo limitado"
+    },
+    {
+      title: "Punto Legal Propiedad Intelectual",
+      description: "Registro de marcas y patentes, derechos de autor y defensa contra infracciones.",
+      price: "$22.500",
+      originalPrice: "$45.000",
+      features: [
+        "Registro marcas",
+        "Patentes",
+        "Derechos de autor",
+        "Defensa contra infracciones",
+        "Asesoría especializada"
+      ],
+      icon: <Crown className="w-6 h-6 text-primary" />,
+      badge: "Oferta válida por tiempo limitado"
+    },
+    {
+      title: "Punto Legal Consumidor",
+      description: "Reclamos ante SERNAC, defensa en juicios y asesoría en cláusulas abusivas.",
+      price: "$45.000",
+      originalPrice: "$90.000",
+      features: [
+        "Reclamos SERNAC",
+        "Garantías",
+        "Cláusulas abusivas",
+        "Defensa del consumidor",
+        "Asesoría especializada"
       ],
       icon: <ShoppingCart className="w-6 h-6 text-primary" />,
-      href: "/ecommerce"
+      badge: "Oferta válida por tiempo limitado"
+    },
+    {
+      title: "Punto Legal Penal Económico",
+      description: "Defensa en delitos económicos, societarios y acuerdos de colaboración.",
+      price: "$45.000",
+      originalPrice: "$90.000",
+      features: [
+        "Delitos económicos",
+        "Defensa penal",
+        "Colaboración eficaz",
+        "Asesoría especializada",
+        "Representación legal"
+      ],
+      icon: <Gavel className="w-6 h-6 text-primary" />,
+      badge: "Oferta válida por tiempo limitado"
     }
   ];
 
@@ -407,23 +533,36 @@ const ExpressGrid: React.FC<{ onAgendarClick: (service: ServiceCard) => void }> 
 const ServicesPage: React.FC = () => {
   // Eliminar estados de modal ya que siempre redirigimos
   const handleAgendarClick = (service: ServiceCard) => {
-    // Siempre redirigir a AgendamientoPage para experiencia unificada
-    const serviceMap: { [key: string]: string } = {
-      'Legal Health Check Corporativo': 'premium',
-      'Escudo Legal Mensual': 'corporativo',
-      'M&A Express': 'ma-express',
-      'Compliance & Protección Datos': 'compliance',
-      'Defensa Fiscalizaciones & DT': 'fiscalizacion',
-      'Derecho Laboral': 'laboral',
-      'Derecho Familia': 'familia',
-      'Herencias & Sucesiones': 'herencias',
-      'Protección de Datos': 'proteccion-datos',
-      'E-Commerce': 'ecommerce',
-      'Contratos Express': 'contratos-express',
-      'Sociedades Express': 'sociedades-express',
-      'Marcas & Patentes': 'marcas-patentes',
-      'Reclamos SERNAC': 'reclamos-sernac'
-    };
+  // Siempre redirigir a AgendamientoPage para experiencia unificada
+  const serviceMap: { [key: string]: string } = {
+    // Corporativos
+    'Legal Health Check Corporativo': 'premium',
+    'Escudo Legal Mensual': 'corporativo',
+    'M&A Express': 'ma-express',
+    'Compliance & Protección Datos': 'compliance',
+    'Defensa Fiscalizaciones & DT': 'fiscalizacion',
+    
+    // Servicios especializados
+    'Punto Legal Laboral': 'laboral',
+    'Punto Legal Familia': 'familia',
+    'Punto Legal Sucesorio': 'sucesorio',
+    'Punto Legal Inmobiliario': 'inmobiliario',
+    'Punto Legal Empresarial': 'empresarial',
+    'Punto Legal Contratos': 'contratos',
+    'Punto Legal Administración Pública': 'administracion-publica',
+    'Punto Legal Tributario': 'tributario',
+    'Punto Legal Compliance': 'compliance',
+    'Punto Legal Migratorio': 'migratorio',
+    'Punto Legal Propiedad Intelectual': 'propiedad-intelectual',
+    'Punto Legal Consumidor': 'consumidor',
+    'Punto Legal Penal Económico': 'penal-economico',
+    
+    // Servicios express (mantener para compatibilidad)
+    'Contratos Express': 'contratos-express',
+    'Sociedades Express': 'sociedades-express',
+    'Marcas & Patentes': 'marcas-patentes',
+    'Reclamos SERNAC': 'reclamos-sernac'
+  };
     const plan = serviceMap[service.title] || 'premium';
     window.location.href = `/agendamiento?plan=${plan}`;
   };

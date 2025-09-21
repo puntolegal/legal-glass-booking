@@ -45,18 +45,47 @@ const serviceCatalog = {
   'inmobiliario': { name: 'Punto Legal Inmobiliario', price: '27.500', category: 'Inmobiliario', originalPrice: '55.000', discount: '50% OFF' },
   
   // Familia
-  'familia': { name: 'Consulta Familia', price: '35.000', category: 'Familia', originalPrice: '70.000', discount: '50% OFF' },
+  'familia': { name: 'Punto Legal Familia', price: '30.000', category: 'Familia', originalPrice: '60.000', discount: '50% OFF' },
   
   // Laboral
-  'laboral': { name: 'Punto Legal Laboral', price: '35.000', category: 'Laboral', originalPrice: '70.000', discount: '50% OFF' },
+  'laboral': { name: 'Punto Legal Laboral', price: '30.000', category: 'Laboral', originalPrice: '60.000', discount: '50% OFF' },
   
   // General
   'general': { name: 'Consulta General', price: '35.000', category: 'General', originalPrice: '70.000', discount: '50% OFF' },
   
+  // Sucesorio
+  'sucesorio': { name: 'Punto Legal Sucesorio', price: '27.500', category: 'Sucesorio', originalPrice: '55.000', discount: '50% OFF' },
+  
+  // Empresarial
+  'empresarial': { name: 'Punto Legal Empresarial', price: '45.000', category: 'Empresarial', originalPrice: '90.000', discount: '50% OFF' },
+  
+  // Contratos
+  'contratos': { name: 'Punto Legal Contratos', price: '15.000', category: 'Contratos', originalPrice: '30.000', discount: '50% OFF' },
+  
+  // Administración Pública
+  'administracion-publica': { name: 'Punto Legal Administración Pública', price: '30.000', category: 'Administración Pública', originalPrice: '60.000', discount: '50% OFF' },
+  
+  // Tributario
+  'tributario': { name: 'Punto Legal Tributario', price: '40.000', category: 'Tributario', originalPrice: '80.000', discount: '50% OFF' },
+  
+  // Compliance
+  'compliance': { name: 'Punto Legal Compliance', price: '27.500', category: 'Compliance', originalPrice: '55.000', discount: '50% OFF' },
+  
+  // Migratorio
+  'migratorio': { name: 'Punto Legal Migratorio', price: '32.500', category: 'Migratorio', originalPrice: '65.000', discount: '50% OFF' },
+  
+  // Propiedad Intelectual
+  'propiedad-intelectual': { name: 'Punto Legal Propiedad Intelectual', price: '22.500', category: 'Propiedad Intelectual', originalPrice: '45.000', discount: '50% OFF' },
+  
+  // Consumidor
+  'consumidor': { name: 'Punto Legal Consumidor', price: '45.000', category: 'Consumidor', originalPrice: '90.000', discount: '50% OFF' },
+  
+  // Penal Económico
+  'penal-economico': { name: 'Punto Legal Penal Económico', price: '45.000', category: 'Penal Económico', originalPrice: '90.000', discount: '50% OFF' },
+  
   // Otros servicios
   'civil': { name: 'Derecho Civil', price: '45.000', category: 'Civil' },
   'penal': { name: 'Derecho Penal', price: '65.000', category: 'Penal' },
-  'tributario': { name: 'Derecho Tributario', price: '55.000', category: 'Tributario' },
 };
 
 const CODIGO_CONVENIO_VALIDO = "PUNTOLEGAL!";
