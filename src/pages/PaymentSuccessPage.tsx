@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { CheckCircle, Calendar, Clock, User, Mail, Phone, ArrowRight, Home, CreditCard } from 'lucide-react';
 import SEO from '../components/SEO';
-import { createReservation } from '../services/reservationService';
+import { createReservation, confirmReservation } from '../services/reservationService';
 import { sendBookingEmailsMake } from '../services/makeEmailService';
 
 export default function PaymentSuccessPage() {
@@ -78,8 +78,14 @@ export default function PaymentSuccessPage() {
       const reservation = await createReservation(reservationData);
       console.log('✅ Reserva creada:', reservation);
 
-      // Enviar emails de confirmación
-      setProcessingStatus('Enviando emails de confirmación...');
+      // Confirmar la reserva y enviar emails automáticamente
+      setProcessingStatus('Confirmando reserva y enviando emails...');
+      
+      const confirmationResult = await confirmReservation(reservation.id);
+      console.log('✅ Reserva confirmada:', confirmationResult);
+
+      // También enviar via Make como backup
+      setProcessingStatus('Enviando emails de confirmación adicionales...');
       
       const emailData = {
         id: reservation.id,
@@ -96,7 +102,7 @@ export default function PaymentSuccessPage() {
       };
 
       const emailResult = await sendBookingEmailsMake(emailData);
-      console.log('📧 Resultado de emails:', emailResult);
+      console.log('📧 Resultado de emails Make:', emailResult);
 
       // Actualizar estado
       setPaymentData({

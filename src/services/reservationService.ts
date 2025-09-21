@@ -109,6 +109,69 @@ export async function sendToMakeWebhook(reservation: Reservation, tipo: 'nueva_r
   }
 }
 
+// Función para enviar emails usando Supabase Edge Function (fallback)
+export async function sendBookingEmailsSupabase(reservationId: string): Promise<boolean> {
+  try {
+    console.log('📧 Enviando emails via Supabase Edge Function para reserva:', reservationId);
+    
+    const response = await fetch('/functions/v1/send-booking-emails', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ booking_id: reservationId })
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(`Edge Function failed: ${response.status} - ${errorData.error || 'Unknown error'}`);
+    }
+
+    const result = await response.json();
+    console.log('✅ Emails enviados exitosamente via Edge Function:', result);
+    
+    return result.ok === true;
+  } catch (error) {
+    console.error('❌ Error enviando emails via Edge Function:', error);
+    return false;
+  }
+}
+
+// Función para confirmar una reserva y enviar emails
+export async function confirmReservation(reservationId: string): Promise<boolean> {
+  try {
+    // Actualizar estado a confirmada
+    const { error: updateError } = await supabase
+      .from('reservas')
+      .update({ 
+        estado: 'confirmada',
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', reservationId);
+
+    if (updateError) {
+      throw new Error(`Error updating reservation: ${updateError.message}`);
+    }
+
+    console.log('✅ Reserva confirmada:', reservationId);
+    
+    // El trigger de la base de datos debería enviar los emails automáticamente
+    // Pero como fallback, también intentamos enviar manualmente
+    setTimeout(async () => {
+      try {
+        await sendBookingEmailsSupabase(reservationId);
+      } catch (error) {
+        console.warn('⚠️ Fallback email sending failed:', error);
+      }
+    }, 2000); // Esperar 2 segundos para que el trigger se ejecute primero
+
+    return true;
+  } catch (error) {
+    console.error('❌ Error confirmando reserva:', error);
+    return false;
+  }
+}
+
 // Función para obtener reservas por fecha
 export async function getReservationsByDate(fecha: string): Promise<Reservation[]> {
   const { data, error } = await supabase
