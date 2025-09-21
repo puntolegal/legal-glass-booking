@@ -33,19 +33,30 @@ PROJECT_REF=qrgelocijmwnxcckxbdg
 
 ## Pasos de Configuración
 
-### 1. Obtener API Key de Resend
-1. Ir a [resend.com](https://resend.com)
-2. Crear cuenta o iniciar sesión
-3. Ir a API Keys
-4. Crear nueva API Key
-5. Copiar la key (formato: `re_...`)
+### 1. API Key de Resend (CONFIGURADA)
+✅ **API Key obtenida:** `re_gvt6L3ER_5JiDjxtbkT1UpYowirF24DFW`
+
+**Pasos completados:**
+1. ✅ Cuenta creada en [resend.com](https://resend.com)
+2. ✅ API Key generada
+3. ✅ Key copiada: `re_gvt6L3ER_5JiDjxtbkT1UpYowirF24DFW`
 
 ### 2. Configurar en Supabase Dashboard
 1. Ir a [supabase.com](https://supabase.com)
 2. Seleccionar proyecto `qrgelocijmwnxcckxbdg`
 3. Ir a Settings → Configuration
 4. Ir a Secrets
-5. Agregar cada variable de entorno
+5. Agregar las siguientes variables de entorno:
+
+**Variables a configurar:**
+```
+RESEND_API_KEY=re_gvt6L3ER_5JiDjxtbkT1UpYowirF24DFW
+MAIL_FROM=Punto Legal <noreply@puntolegal.cl>
+ADMIN_EMAIL=puntolegalelgolf@gmail.com
+SUPABASE_URL=https://qrgelocijmwnxcckxbdg.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=[obtener desde Settings → API]
+EDGE_ADMIN_TOKEN=puntolegal-admin-token-2025
+```
 
 ### 3. Obtener Service Role Key
 1. En Supabase Dashboard
