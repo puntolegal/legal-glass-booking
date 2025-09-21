@@ -1,0 +1,228 @@
+{
+  "name": "Punto Legal - Emails Automáticos",
+  "description": "Sistema de emails automáticos para confirmación de consultas legales con Google Calendar",
+  "version": "1.0.0",
+  "scenario": {
+    "name": "Punto Legal - Emails y Calendar",
+    "description": "Envía emails de confirmación al cliente y admin, crea eventos en Google Calendar",
+    "modules": [
+      {
+        "id": 1,
+        "name": "Webhook Trigger",
+        "type": "webhook",
+        "position": {
+          "x": 100,
+          "y": 100
+        },
+        "config": {
+          "url": "https://hook.us2.make.com/your-webhook-url-here",
+          "method": "POST",
+          "contentType": "application/json",
+          "responseMode": "immediate"
+        },
+        "mapping": {
+          "cliente": "{{body.cliente}}",
+          "servicio": "{{body.servicio}}",
+          "pago": "{{body.pago}}",
+          "reserva": "{{body.reserva}}",
+          "emails": "{{body.emails}}",
+          "calendar": "{{body.calendar}}"
+        }
+      },
+      {
+        "id": 2,
+        "name": "Email Cliente",
+        "type": "email",
+        "position": {
+          "x": 300,
+          "y": 100
+        },
+        "config": {
+          "to": "{{cliente.email}}",
+          "subject": "✅ Confirmación de Consulta Legal - {{reserva.tracking_code}}",
+          "body": "HTML",
+          "htmlBody": "<!DOCTYPE html><html><head><meta charset='utf-8'><title>Confirmación de Consulta Legal</title><style>body{font-family:Arial,sans-serif;line-height:1.6;color:#333;max-width:600px;margin:0 auto;padding:20px}header{background:linear-gradient(135deg,#ff6b35,#ff8e53);color:white;padding:30px;border-radius:10px;text-align:center;margin-bottom:30px}h1{margin:0;font-size:28px}h2{color:#ff6b35;border-bottom:2px solid #ff6b35;padding-bottom:10px}.info-box{background:#f8f9fa;border-left:4px solid #ff6b35;padding:20px;margin:20px 0;border-radius:5px}.highlight{background:#fff3cd;border:1px solid #ffeaa7;padding:15px;border-radius:5px;margin:15px 0}.footer{background:#f8f9fa;padding:20px;text-align:center;border-radius:5px;margin-top:30px;font-size:14px;color:#666}</style></head><body><header><h1>✅ Consulta Legal Confirmada</h1><p>Tu consulta ha sido procesada exitosamente</p></header><h2>Hola {{cliente.nombre}},</h2><p>¡Tu consulta legal ha sido confirmada exitosamente!</p><div class='info-box'><h3>📋 DETALLES DE TU CONSULTA</h3><ul><li><strong>Servicio:</strong> {{servicio.tipo}}</li><li><strong>Fecha:</strong> {{servicio.fecha}}</li><li><strong>Hora:</strong> {{servicio.hora}}</li><li><strong>Duración:</strong> 45 minutos</li><li><strong>Precio:</strong> ${{servicio.precio}}</li></ul></div><div class='highlight'><h3>🔗 INFORMACIÓN IMPORTANTE</h3><ul><li><strong>Código de seguimiento:</strong> {{reserva.tracking_code}}</li><li><strong>Link de Google Meet:</strong> <a href='{{reserva.google_meet_link}}' target='_blank'>{{reserva.google_meet_link}}</a></li><li><strong>ID de Reserva:</strong> {{reserva.id}}</li></ul></div><div class='info-box'><h3>📅 PRÓXIMOS PASOS</h3><ol><li>Te contactaremos 24 horas antes de tu consulta</li><li>Recibirás un recordatorio con el link de la videollamada</li><li>Guarda este email como comprobante</li></ol></div><p>Si tienes alguna pregunta, contáctanos al +56 9 XXXX XXXX</p><div class='footer'><p><strong>Saludos,</strong><br>Equipo Punto Legal</p></div></body></html>"
+        }
+      },
+      {
+        "id": 3,
+        "name": "Email Admin",
+        "type": "email",
+        "position": {
+          "x": 300,
+          "y": 250
+        },
+        "config": {
+          "to": "puntolegalelgolf@gmail.com",
+          "subject": "📋 Nueva Consulta Legal - {{reserva.tracking_code}}",
+          "body": "HTML",
+          "htmlBody": "<!DOCTYPE html><html><head><meta charset='utf-8'><title>Nueva Consulta Legal</title><style>body{font-family:Arial,sans-serif;line-height:1.6;color:#333;max-width:600px;margin:0 auto;padding:20px}header{background:linear-gradient(135deg,#dc3545,#e74c3c);color:white;padding:30px;border-radius:10px;text-align:center;margin-bottom:30px}h1{margin:0;font-size:28px}h2{color:#dc3545;border-bottom:2px solid #dc3545;padding-bottom:10px}.info-box{background:#f8f9fa;border-left:4px solid #dc3545;padding:20px;margin:20px 0;border-radius:5px}.highlight{background:#d1ecf1;border:1px solid #bee5eb;padding:15px;border-radius:5px;margin:15px 0}.footer{background:#f8f9fa;padding:20px;text-align:center;border-radius:5px;margin-top:30px;font-size:14px;color:#666}</style></head><body><header><h1>📋 Nueva Consulta Legal</h1><p>NUEVA CONSULTA LEGAL CONFIRMADA</p></header><div class='info-box'><h3>👤 CLIENTE</h3><ul><li><strong>Nombre:</strong> {{cliente.nombre}}</li><li><strong>Email:</strong> {{cliente.email}}</li><li><strong>Teléfono:</strong> {{cliente.telefono}}</li></ul></div><div class='info-box'><h3>📋 SERVICIO</h3><ul><li><strong>Tipo:</strong> {{servicio.tipo}}</li><li><strong>Fecha:</strong> {{servicio.fecha}}</li><li><strong>Hora:</strong> {{servicio.hora}}</li><li><strong>Precio:</strong> ${{servicio.precio}}</li></ul></div><div class='info-box'><h3>💰 PAGO</h3><ul><li><strong>Método:</strong> {{pago.metodo}}</li><li><strong>Estado:</strong> {{pago.estado}}</li><li><strong>Fecha:</strong> {{pago.fecha_pago}}</li></ul></div><div class='highlight'><h3>🔗 INFORMACIÓN TÉCNICA</h3><ul><li><strong>ID de Reserva:</strong> {{reserva.id}}</li><li><strong>Código de seguimiento:</strong> {{reserva.tracking_code}}</li><li><strong>Link de Google Meet:</strong> <a href='{{reserva.google_meet_link}}' target='_blank'>{{reserva.google_meet_link}}</a></li></ul></div><div class='info-box'><h3>📅 ACCIÓN REQUERIDA</h3><ol><li>Crear evento en Google Calendar</li><li>Enviar recordatorio 24h antes</li><li>Preparar documentación del caso</li></ol></div><div class='footer'><p><strong>Equipo Punto Legal</strong></p></div></body></html>"
+        }
+      },
+      {
+        "id": 4,
+        "name": "Google Calendar Event",
+        "type": "google_calendar",
+        "position": {
+          "x": 500,
+          "y": 175
+        },
+        "config": {
+          "calendarId": "primary",
+          "summary": "Consulta Legal - {{cliente.nombre}}",
+          "description": "Consulta de {{servicio.tipo}} con {{cliente.nombre}}\n\nCódigo de seguimiento: {{reserva.tracking_code}}\nLink de Google Meet: {{reserva.google_meet_link}}\nID de Reserva: {{reserva.id}}",
+          "start": {
+            "dateTime": "{{calendar.start_date}}",
+            "timeZone": "America/Santiago"
+          },
+          "end": {
+            "dateTime": "{{calendar.end_date}}",
+            "timeZone": "America/Santiago"
+          },
+          "attendees": [
+            {
+              "email": "{{cliente.email}}",
+              "displayName": "{{cliente.nombre}}"
+            },
+            {
+              "email": "puntolegalelgolf@gmail.com",
+              "displayName": "Punto Legal"
+            }
+          ],
+          "conferenceData": {
+            "createRequest": {
+              "requestId": "{{reserva.tracking_code}}",
+              "conferenceSolutionKey": {
+                "type": "hangoutsMeet"
+              }
+            }
+          },
+          "reminders": {
+            "useDefault": false,
+            "overrides": [
+              {
+                "method": "email",
+                "minutes": 1440
+              },
+              {
+                "method": "popup",
+                "minutes": 30
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": 5,
+        "name": "Response",
+        "type": "webhook_response",
+        "position": {
+          "x": 700,
+          "y": 175
+        },
+        "config": {
+          "status": 200,
+          "body": {
+            "success": true,
+            "message": "Emails enviados y evento creado exitosamente",
+            "tracking_code": "{{reserva.tracking_code}}",
+            "google_meet_link": "{{reserva.google_meet_link}}",
+            "calendar_event_id": "{{google_calendar_event.id}}",
+            "reservation_id": "{{reserva.id}}"
+          }
+        }
+      }
+    ],
+    "connections": [
+      {
+        "from": 1,
+        "to": 2,
+        "condition": "always"
+      },
+      {
+        "from": 1,
+        "to": 3,
+        "condition": "always"
+      },
+      {
+        "from": 1,
+        "to": 4,
+        "condition": "always"
+      },
+      {
+        "from": 4,
+        "to": 5,
+        "condition": "always"
+      }
+    ]
+  },
+  "setup_instructions": {
+    "step_1": {
+      "title": "Crear Scenario en Make.com",
+      "description": "1. Ir a https://www.make.com\n2. Crear nuevo scenario\n3. Importar este blueprint JSON\n4. Configurar webhook URL"
+    },
+    "step_2": {
+      "title": "Configurar Webhook",
+      "description": "1. Copiar URL del webhook del módulo 1\n2. Actualizar en src/services/makeEmailService.ts\n3. Probar webhook con datos de prueba"
+    },
+    "step_3": {
+      "title": "Configurar Google Calendar",
+      "description": "1. Conectar cuenta de Google\n2. Autorizar acceso a Google Calendar\n3. Seleccionar calendario principal\n4. Probar creación de eventos"
+    },
+    "step_4": {
+      "title": "Configurar Emails",
+      "description": "1. Configurar SMTP o servicio de email\n2. Probar envío de emails\n3. Verificar templates HTML\n4. Configurar remitente"
+    },
+    "step_5": {
+      "title": "Activar Scenario",
+      "description": "1. Activar el scenario\n2. Probar con datos reales\n3. Verificar emails enviados\n4. Confirmar eventos en calendario"
+    }
+  },
+  "test_data": {
+    "cliente": {
+      "nombre": "Juan Pérez",
+      "email": "juan@ejemplo.com",
+      "telefono": "+56 9 1234 5678"
+    },
+    "servicio": {
+      "tipo": "Consulta Laboral",
+      "precio": "30000",
+      "fecha": "2024-01-15",
+      "hora": "10:00"
+    },
+    "pago": {
+      "metodo": "MercadoPago",
+      "estado": "Aprobado",
+      "fecha_pago": "2024-01-10T10:30:00Z"
+    },
+    "reserva": {
+      "id": "12345",
+      "tracking_code": "PL-ABC123",
+      "google_meet_link": "https://meet.google.com/abc-def-ghi"
+    },
+    "calendar": {
+      "start_date": "2024-01-15T10:00:00",
+      "end_date": "2024-01-15T10:45:00"
+    }
+  },
+  "troubleshooting": {
+    "common_issues": [
+      {
+        "issue": "Webhook no recibe datos",
+        "solution": "Verificar URL del webhook y método POST"
+      },
+      {
+        "issue": "Emails no se envían",
+        "solution": "Verificar configuración SMTP y credenciales"
+      },
+      {
+        "issue": "Google Calendar no crea eventos",
+        "solution": "Verificar permisos de Google Calendar y autenticación"
+      },
+      {
+        "issue": "Variables no se mapean correctamente",
+        "solution": "Verificar estructura de datos JSON y mapeo de variables"
+      }
+    ]
+  }
+}

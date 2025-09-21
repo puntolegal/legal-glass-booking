@@ -1,139 +1,100 @@
-// Usar fetch nativo (disponible en Node.js 18+)
+/**
+ * Script para probar el webhook de Make.com
+ * Ejecutar: node scripts/test-make-webhook.js
+ */
 
-// URL del webhook (reemplaza con tu URL real)
-const WEBHOOK_URL = process.env.MAKE_WEBHOOK_URL || 'https://hook.eu2.make.com/YOUR_WEBHOOK_ID';
-
-// Datos de prueba
 const testData = {
-    name: "Juan Pérez",
-    email: "juan.perez@ejemplo.com",
-    phone: "+56912345678",
-    service: "Consultoría Legal Corporativa",
-    date: "2025-01-15",
-    time: "14:00",
-    message: "Necesito asesoría sobre contratos comerciales para mi empresa",
-    user_id: "test-user-123",
-    source: "website",
-    created_at: new Date().toISOString()
+  cliente: {
+    nombre: "Juan Pérez",
+    email: "juan@ejemplo.com",
+    telefono: "+56 9 1234 5678"
+  },
+  servicio: {
+    tipo: "Consulta Laboral",
+    precio: "30000",
+    fecha: "2024-01-15",
+    hora: "10:00"
+  },
+  pago: {
+    metodo: "MercadoPago",
+    estado: "Aprobado",
+    fecha_pago: "2024-01-10T10:30:00Z"
+  },
+  reserva: {
+    id: "12345",
+    tracking_code: "PL-ABC123",
+    google_meet_link: "https://meet.google.com/abc-def-ghi"
+  },
+  emails: {
+    cliente: {
+      to: "juan@ejemplo.com",
+      subject: "✅ Confirmación de Consulta Legal - PL-ABC123",
+      template: "booking_confirmation_client"
+    },
+    admin: {
+      to: "puntolegalelgolf@gmail.com",
+      subject: "📋 Nueva Consulta Legal - PL-ABC123",
+      template: "booking_confirmation_admin"
+    }
+  },
+  calendar: {
+    title: "Consulta Legal - Juan Pérez",
+    description: "Consulta de Consulta Laboral con Juan Pérez",
+    start_date: "2024-01-15T10:00:00",
+    duration_minutes: 45,
+    google_meet_link: "https://meet.google.com/abc-def-ghi",
+    attendees: ["juan@ejemplo.com", "puntolegalelgolf@gmail.com"]
+  }
 };
 
-async function testWebhook() {
-    try {
-        console.log('🧪 Probando webhook de Make.com...');
-        console.log('📡 URL:', WEBHOOK_URL);
-        console.log('📋 Datos de prueba:', JSON.stringify(testData, null, 2));
-        
-        const response = await fetch(WEBHOOK_URL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'User-Agent': 'PuntoLegal-Test/1.0'
-            },
-            body: JSON.stringify(testData)
-        });
-        
-        console.log('📊 Respuesta del webhook:');
-        console.log('Status:', response.status);
-        console.log('Status Text:', response.statusText);
-        
-        if (response.ok) {
-            const responseText = await response.text();
-            console.log('✅ Webhook respondió exitosamente!');
-            console.log('📄 Respuesta:', responseText);
-        } else {
-            console.log('❌ Error en el webhook');
-            const errorText = await response.text();
-            console.log('📄 Error:', errorText);
-        }
-        
-    } catch (error) {
-        console.error('💥 Error al probar webhook:', error.message);
-    }
-}
-
-// Función para probar con datos aleatorios
-function generateRandomTestData() {
-    const names = ["María González", "Carlos Rodríguez", "Ana Silva", "Luis Martínez"];
-    const services = [
-        "Consultoría Legal Corporativa",
-        "Derecho Laboral",
-        "Derecho de Familia",
-        "Derecho Tributario",
-        "Protección de Datos"
-    ];
+async function testMakeWebhook() {
+  try {
+    console.log('🧪 PROBANDO WEBHOOK DE MAKE.COM\n');
     
-    return {
-        name: names[Math.floor(Math.random() * names.length)],
-        email: `test${Date.now()}@ejemplo.com`,
-        phone: `+569${Math.floor(Math.random() * 90000000) + 10000000}`,
-        service: services[Math.floor(Math.random() * services.length)],
-        date: new Date(Date.now() + Math.random() * 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-        time: `${Math.floor(Math.random() * 12) + 9}:${Math.random() > 0.5 ? '00' : '30'}`,
-        message: "Solicitud de prueba generada automáticamente",
-        user_id: `test-user-${Date.now()}`,
-        source: "test-script",
-        created_at: new Date().toISOString()
-    };
-}
-
-async function testWithRandomData() {
-    console.log('🎲 Probando con datos aleatorios...\n');
+    // URL del webhook (reemplazar con tu URL real)
+    const webhookUrl = 'https://hook.us2.make.com/your-webhook-url-here';
     
-    const randomData = generateRandomTestData();
-    console.log('📋 Datos aleatorios:', JSON.stringify(randomData, null, 2));
+    console.log('📤 Enviando datos de prueba...');
+    console.log('📋 Datos:', JSON.stringify(testData, null, 2));
     
-    try {
-        const response = await fetch(WEBHOOK_URL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'User-Agent': 'PuntoLegal-Test/1.0'
-            },
-            body: JSON.stringify(randomData)
-        });
-        
-        console.log('📊 Respuesta:', response.status, response.statusText);
-        
-        if (response.ok) {
-            console.log('✅ Prueba exitosa!');
-        } else {
-            console.log('❌ Prueba fallida');
-        }
-        
-    } catch (error) {
-        console.error('💥 Error:', error.message);
-    }
-}
-
-// Función principal
-async function main() {
-    console.log('🚀 Test Suite para Webhook de Make.com');
-    console.log('=====================================\n');
+    const response = await fetch(webhookUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(testData)
+    });
     
-    if (WEBHOOK_URL.includes('YOUR_WEBHOOK_ID')) {
-        console.log('⚠️  ADVERTENCIA: URL del webhook no configurada');
-        console.log('💡 Configura la variable de entorno MAKE_WEBHOOK_URL');
-        console.log('💡 O actualiza la URL en el script\n');
-        return;
+    console.log('\n📊 RESULTADO:');
+    console.log('Status:', response.status);
+    console.log('Status Text:', response.statusText);
+    
+    if (response.ok) {
+      const result = await response.json();
+      console.log('✅ Respuesta exitosa:');
+      console.log(JSON.stringify(result, null, 2));
+      
+      console.log('\n🎯 VERIFICAR:');
+      console.log('1. Email enviado a:', testData.cliente.email);
+      console.log('2. Email enviado a:', testData.emails.admin.to);
+      console.log('3. Evento creado en Google Calendar');
+      console.log('4. Código de seguimiento:', testData.reserva.tracking_code);
+      
+    } else {
+      console.log('❌ Error en la respuesta');
+      const errorText = await response.text();
+      console.log('Error:', errorText);
     }
     
-    // Prueba con datos fijos
-    await testWebhook();
-    console.log('\n' + '='.repeat(50) + '\n');
-    
-    // Prueba con datos aleatorios
-    await testWithRandomData();
-    
-    console.log('\n📝 Próximos pasos:');
-    console.log('1. Verifica en Make.com que el escenario se ejecutó');
-    console.log('2. Revisa los logs de ejecución');
-    console.log('3. Verifica que se enviaron los emails');
-    console.log('4. Revisa la base de datos para las notificaciones');
+  } catch (error) {
+    console.error('❌ Error probando webhook:', error.message);
+    console.log('\n🔧 SOLUCIONES:');
+    console.log('1. Verificar que la URL del webhook sea correcta');
+    console.log('2. Confirmar que Make.com esté activo');
+    console.log('3. Revisar configuración de módulos');
+    console.log('4. Probar con datos más simples');
+  }
 }
 
-// Ejecutar si es el archivo principal
-if (import.meta.url === `file://${process.argv[1]}`) {
-    main();
-}
-
-export { testWebhook, testWithRandomData }; 
+// Ejecutar prueba
+testMakeWebhook();
