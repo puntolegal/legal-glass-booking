@@ -2242,3 +2242,70 @@ select:focus {
       0 0 60px rgba(59, 130, 246, 0.15);
   }
 }
+
+/* Optimizaciones móviles */
+@media (max-width: 768px) {
+  /* Reducir glassmorphism en móvil para mejor rendimiento */
+  .glass {
+    background: rgba(255, 255, 255, 0.85) !important;
+    backdrop-filter: blur(8px) !important;
+  }
+  
+  .glass-intense {
+    background: rgba(255, 255, 255, 0.9) !important;
+    backdrop-filter: blur(10px) !important;
+  }
+  
+  .glass-card {
+    background: rgba(255, 255, 255, 0.9) !important;
+    backdrop-filter: blur(8px) !important;
+  }
+  
+  .dark .glass {
+    background: rgba(0, 0, 0, 0.8) !important;
+  }
+  
+  .dark .glass-intense {
+    background: rgba(0, 0, 0, 0.85) !important;
+  }
+  
+  .dark .glass-card {
+    background: rgba(0, 0, 0, 0.8) !important;
+  }
+  
+  /* Mejorar contraste en móvil */
+  .text-muted-foreground {
+    color: rgb(71 85 105) !important;
+  }
+  
+  .dark .text-muted-foreground {
+    color: rgb(156 163 175) !important;
+  }
+  
+  /* Reducir animaciones en móvil */
+  .animate-magic-glow,
+  .animate-energy-pulse,
+  .animate-float-gentle,
+  .animate-gradient-shift,
+  .animate-rotate-smooth,
+  .animate-zoom-pulse,
+  .animate-light-travel {
+    animation-duration: 0.5s !important;
+  }
+  
+  /* Mejorar espaciado en móvil */
+  .container {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+  
+  /* Botones más grandes para touch */
+  button, 
+  [role="button"], 
+  input[type="button"], 
+  input[type="submit"], 
+  input[type="reset"] {
+    min-height: 44px !important;
+    min-width: 44px !important;
+  }
+}

@@ -74,7 +74,7 @@ const ApuntesLayout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
 // Layout principal para el resto de la aplicación
 const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900 dark:to-slate-800">
+    <div className="min-h-dvh bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900 dark:to-slate-800 pb-[calc(env(safe-area-inset-bottom)+64px)] pt-[env(safe-area-inset-top)]">
       <ScrollToTop />
       
       {/* Desktop Layout */}

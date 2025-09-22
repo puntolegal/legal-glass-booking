@@ -5,7 +5,7 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 relative overflow-hidden group",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 relative overflow-hidden group active:scale-[0.98] min-h-[48px]",
   {
     variants: {
       variant: {
@@ -20,11 +20,12 @@ const buttonVariants = cva(
         neon: "bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white shadow-lg hover:shadow-xl hover:shadow-cyan-500/25 rounded-xl border border-cyan-400/20 hover:border-cyan-300/30 relative before:absolute before:inset-0 before:bg-gradient-to-r before:from-cyan-400/20 before:to-blue-400/20 before:rounded-xl before:opacity-0 hover:before:opacity-100 before:transition-opacity before:duration-300",
       },
       size: {
-        default: "h-11 px-6 py-2.5 text-sm",
-        sm: "h-9 px-4 py-2 text-xs",
-        lg: "h-12 px-8 py-3 text-base font-semibold",
-        icon: "h-10 w-10",
-        xl: "h-14 px-10 py-4 text-lg font-bold",
+        default: "h-12 px-6 py-2.5 text-sm",
+        sm: "h-10 px-4 py-2 text-xs",
+        lg: "h-14 px-8 py-3 text-base font-semibold",
+        icon: "h-12 w-12",
+        xl: "h-16 px-10 py-4 text-lg font-bold",
+        touch: "h-12 min-h-[48px] px-4 rounded-xl font-medium",
       },
     },
     defaultVariants: {
