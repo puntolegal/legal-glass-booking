@@ -35,6 +35,7 @@ import ApuntesHome from './pages/ApuntesHome';
 
 // Service Pages
 import ServicioCorporativoPage from '@/pages/ServicioCorporativoPage';
+import ServicioLaboralPage from '@/pages/ServicioLaboralPage';
 import ServicioDigitalPage from '@/pages/ServicioDigitalPage';
 import ServicioInmobiliarioPage from '@/pages/ServicioInmobiliarioPage';
 import ServicioCivilPage from '@/pages/ServicioCivilPage';
@@ -144,6 +145,7 @@ const LayoutWrapper: React.FC = () => {
       
       {/* Service Routes */}
       <Route path="/servicios/corporativo" element={<ServicioCorporativoPage />} />
+      <Route path="/servicios/laboral" element={<ServicioLaboralPage />} />
       <Route path="/servicios/digital" element={<ServicioDigitalPage />} />
       <Route path="/servicios/inmobiliario" element={<ServicioInmobiliarioPage />} />
       <Route path="/servicios/civil" element={<ServicioCivilPage />} />
