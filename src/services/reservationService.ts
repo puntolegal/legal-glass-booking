@@ -32,8 +32,8 @@ export interface ReservaTable {
   created_at: string;
   updated_at: string;
   user_id: string;
-  servicio: string;
-  precio: string;
+  servicio_tipo: string;
+  servicio_precio: string;
   servicio_categoria: string;
   tipo_reunion: string;
   estado: 'pendiente' | 'confirmada' | 'completada' | 'cancelada';
@@ -67,8 +67,8 @@ export async function createReservation(reservationData: Omit<Reservation, 'id' 
       fecha: reservationData.fecha,
       hora: reservationData.hora,
       descripcion: reservationData.descripcion,
-      servicio: reservationData.servicio_tipo || 'Consulta General',
-      precio: reservationData.servicio_precio || '35000',
+      servicio_tipo: reservationData.servicio_tipo || 'Consulta General',
+      servicio_precio: reservationData.servicio_precio || '35000',
       servicio_categoria: reservationData.servicio_categoria || 'General',
       tipo_reunion: reservationData.tipo_reunion || 'online',
       estado: 'pendiente' as const,
@@ -99,8 +99,8 @@ export async function createReservation(reservationData: Omit<Reservation, 'id' 
       hora: data.hora,
       descripcion: data.descripcion,
       created_at: data.created_at,
-      servicio_tipo: data.servicio,
-      servicio_precio: data.precio,
+      servicio_tipo: data.servicio_tipo,
+      servicio_precio: data.servicio_precio,
       servicio_categoria: data.servicio_categoria,
       tipo_reunion: data.tipo_reunion,
       estado: data.estado,
@@ -152,8 +152,8 @@ export async function confirmReservation(reservationId: string): Promise<{ succe
       cliente_email: reservation.cliente_email,
       cliente_telefono: reservation.cliente_telefono,
       cliente_rut: reservation.cliente_rut,
-      servicio_tipo: reservation.servicio,
-      servicio_precio: reservation.precio,
+      servicio_tipo: reservation.servicio_tipo,
+      servicio_precio: reservation.servicio_precio,
       servicio_descripcion: reservation.descripcion,
       fecha: reservation.fecha,
       hora: reservation.hora,
@@ -278,8 +278,8 @@ export async function getReservationsByDate(fecha: string): Promise<Reservation[
     hora: reserva.hora,
     descripcion: reserva.descripcion,
     created_at: reserva.created_at,
-    servicio_tipo: reserva.servicio,
-    servicio_precio: reserva.precio,
+    servicio_tipo: reserva.servicio_tipo,
+    servicio_precio: reserva.servicio_precio,
     servicio_categoria: reserva.servicio_categoria,
     tipo_reunion: reserva.tipo_reunion,
     estado: reserva.estado,
@@ -329,8 +329,8 @@ export async function getAllReservations(): Promise<Reservation[]> {
     hora: reserva.hora,
     descripcion: reserva.descripcion,
     created_at: reserva.created_at,
-    servicio_tipo: reserva.servicio,
-    servicio_precio: reserva.precio,
+    servicio_tipo: reserva.servicio_tipo,
+    servicio_precio: reserva.servicio_precio,
     servicio_categoria: reserva.servicio_categoria,
     tipo_reunion: reserva.tipo_reunion,
     estado: reserva.estado,
@@ -368,8 +368,8 @@ export async function scheduleReminders(): Promise<void> {
         hora: reserva.hora,
         descripcion: reserva.descripcion,
         created_at: reserva.created_at,
-        servicio_tipo: reserva.servicio,
-        servicio_precio: reserva.precio,
+        servicio_tipo: reserva.servicio_tipo,
+        servicio_precio: reserva.servicio_precio,
         servicio_categoria: reserva.servicio_categoria,
         tipo_reunion: reserva.tipo_reunion,
         estado: reserva.estado,
