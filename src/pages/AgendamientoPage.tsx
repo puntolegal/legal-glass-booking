@@ -640,11 +640,9 @@ export default function AgendamientoPage() {
                               if (result.success) {
                             localStorage.setItem('paymentData', JSON.stringify({
                               ...paymentData,
-                              paymentMethod: 'gratis',
-                                  paymentStatus: 'completed',
-                                  reservaId: result.reserva?.id
+                              reservaId: result.reserva?.id
                             }));
-                            window.location.href = '/payment-success';
+                            window.location.href = '/mercadopago';
                           } else {
                                 alert('Error al crear la consulta. Por favor intenta nuevamente.');
                               }
@@ -689,11 +687,9 @@ export default function AgendamientoPage() {
 
                               localStorage.setItem('paymentData', JSON.stringify({
                                 ...paymentData,
-                                paymentMethod: 'gratis',
-                                paymentStatus: 'completed',
                                 reservaId: offlineResult.id
                               }));
-                              window.location.href = '/payment-success';
+                              window.location.href = '/mercadopago';
                             }
                           } catch (error) {
                             console.error('Error en proceso:', error);
