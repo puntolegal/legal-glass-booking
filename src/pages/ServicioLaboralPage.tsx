@@ -322,13 +322,13 @@ export default function ServicioLaboralPage() {
 
         {/* Modal de Login - Posicionamiento fijo para móvil */}
         {showLogin && (
-          <div className="fixed inset-0 z-50 flex items-start justify-center p-4 pt-8 bg-black/50 backdrop-blur-sm">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
             <motion.div
-              initial={{ opacity: 0, scale: 0.9, y: -20 }}
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: -20 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
               transition={{ duration: 0.3, type: "spring", stiffness: 300 }}
-              className="relative w-full max-w-md max-h-[85vh] overflow-y-auto"
+              className="relative w-full max-w-md max-h-[80vh] overflow-y-auto"
             >
               {/* Botón de cerrar */}
               <button
