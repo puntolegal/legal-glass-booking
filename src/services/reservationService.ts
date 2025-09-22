@@ -185,40 +185,6 @@ export async function sendBookingEmailsSupabase(reservationId: string): Promise<
   }
 }
 
-// Función para confirmar una reserva y enviar emails
-export async function confirmReservation(reservationId: string): Promise<boolean> {
-  try {
-    // Actualizar estado a confirmada
-    const { error: updateError } = await supabase
-      .from('reservas')
-      .update({ 
-        estado: 'confirmada',
-        updated_at: new Date().toISOString()
-      })
-      .eq('id', reservationId);
-
-    if (updateError) {
-      throw new Error(`Error updating reservation: ${updateError.message}`);
-    }
-
-    console.log('✅ Reserva confirmada:', reservationId);
-    
-    // El trigger de la base de datos debería enviar los emails automáticamente
-    // Pero como fallback, también intentamos enviar manualmente
-    setTimeout(async () => {
-      try {
-        await sendBookingEmailsSupabase(reservationId);
-      } catch (error) {
-        console.warn('⚠️ Fallback email sending failed:', error);
-      }
-    }, 2000); // Esperar 2 segundos para que el trigger se ejecute primero
-
-    return true;
-  } catch (error) {
-    console.error('❌ Error confirmando reserva:', error);
-    return false;
-  }
-}
 
 // Función para obtener reservas por fecha
 export async function getReservationsByDate(fecha: string): Promise<Reservation[]> {
