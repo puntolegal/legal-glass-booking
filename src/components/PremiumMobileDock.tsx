@@ -10,7 +10,9 @@ import {
   X,
   ArrowLeft,
   Search,
-  User
+  User,
+  Accessibility,
+  ArrowUp
 } from 'lucide-react';
 import { useSidebar } from '@/contexts/SidebarContext';
 
@@ -63,6 +65,18 @@ export const PremiumMobileDock: React.FC<PremiumMobileDockProps> = ({ className 
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } else {
       navigate('/');
+    }
+  };
+
+  const handleScrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleAccessibilityClick = () => {
+    // Simular click en el botón de accesibilidad
+    const accessibilityButton = document.querySelector('[aria-label="Abrir panel de accesibilidad"]') as HTMLButtonElement;
+    if (accessibilityButton) {
+      accessibilityButton.click();
     }
   };
 
@@ -122,34 +136,62 @@ export const PremiumMobileDock: React.FC<PremiumMobileDockProps> = ({ className 
               {/* Glow Effect - Más sutil */}
               <div className="absolute inset-0 bg-gradient-to-r from-orange-500/10 via-orange-500/15 to-orange-500/10 rounded-3xl blur-2xl" />
               
-              {/* Main Dock - Más compacto y elegante */}
-              <div className="relative bg-white/90 dark:bg-gray-900/90 backdrop-blur-3xl border border-white/30 dark:border-gray-700/40 rounded-3xl px-3 py-2 shadow-2xl shadow-black/20">
-                <div className="flex items-center gap-0.5">
-                  {dockItems.map((item, index) => (
+              {/* Main Dock - Reorganizado horizontalmente */}
+              <div className="relative bg-white/90 dark:bg-gray-900/90 backdrop-blur-3xl border border-white/30 dark:border-gray-700/40 rounded-3xl px-4 py-3 shadow-2xl shadow-black/20">
+                <div className="flex items-center justify-between gap-2">
+                  {/* Dock principal - 4 botones */}
+                  <div className="flex items-center gap-0.5">
+                    {dockItems.map((item, index) => (
+                      <motion.button
+                        key={item.label}
+                        whileHover={{ scale: 1.05, y: -1 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={item.action}
+                        className={`relative flex flex-col items-center justify-center w-12 h-12 rounded-2xl transition-all duration-300 ${
+                          item.isActive
+                            ? 'bg-gradient-to-br from-orange-500 to-orange-600 text-white shadow-lg shadow-orange-500/40'
+                            : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100/60 dark:hover:bg-gray-800/60'
+                        }`}
+                      >
+                        <item.icon className="w-4 h-4 mb-0.5" />
+                        <span className="text-[10px] font-medium leading-none">{item.label}</span>
+                        
+                        {/* Active Indicator - Más elegante */}
+                        {item.isActive && (
+                          <motion.div
+                            layoutId="activeIndicator"
+                            className="absolute -bottom-0.5 w-1 h-1 bg-white rounded-full shadow-sm"
+                            transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                          />
+                        )}
+                      </motion.button>
+                    ))}
+                  </div>
+
+                  {/* Botones adicionales - Accesibilidad y Subir */}
+                  <div className="flex items-center gap-2">
+                    {/* Botón de Accesibilidad */}
                     <motion.button
-                      key={item.label}
                       whileHover={{ scale: 1.05, y: -1 }}
                       whileTap={{ scale: 0.95 }}
-                      onClick={item.action}
-                      className={`relative flex flex-col items-center justify-center w-12 h-12 rounded-2xl transition-all duration-300 ${
-                        item.isActive
-                          ? 'bg-gradient-to-br from-orange-500 to-orange-600 text-white shadow-lg shadow-orange-500/40'
-                          : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100/60 dark:hover:bg-gray-800/60'
-                      }`}
+                      onClick={handleAccessibilityClick}
+                      className="w-10 h-10 rounded-2xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl border border-white/20 dark:border-gray-700/30 shadow-lg shadow-black/10 text-gray-700 dark:text-gray-300 transition-all duration-200 hover:bg-gray-100/80 dark:hover:bg-gray-700/80 flex items-center justify-center"
+                      aria-label="Accesibilidad"
                     >
-                      <item.icon className="w-4 h-4 mb-0.5" />
-                      <span className="text-[10px] font-medium leading-none">{item.label}</span>
-                      
-                      {/* Active Indicator - Más elegante */}
-                      {item.isActive && (
-                        <motion.div
-                          layoutId="activeIndicator"
-                          className="absolute -bottom-0.5 w-1 h-1 bg-white rounded-full shadow-sm"
-                          transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                        />
-                      )}
+                      <Accessibility className="w-4 h-4" />
                     </motion.button>
-                  ))}
+
+                    {/* Botón de Subir */}
+                    <motion.button
+                      whileHover={{ scale: 1.05, y: -1 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={handleScrollToTop}
+                      className="w-10 h-10 rounded-2xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl border border-white/20 dark:border-gray-700/30 shadow-lg shadow-black/10 text-gray-700 dark:text-gray-300 transition-all duration-200 hover:bg-gray-100/80 dark:hover:bg-gray-700/80 flex items-center justify-center"
+                      aria-label="Subir arriba"
+                    >
+                      <ArrowUp className="w-4 h-4" />
+                    </motion.button>
+                  </div>
                 </div>
               </div>
             </div>

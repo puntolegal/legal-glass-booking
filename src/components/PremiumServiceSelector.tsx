@@ -665,13 +665,6 @@ export const PremiumServiceSelector: React.FC = () => {
           
           {/* Content */}
           <div className="relative flex items-center gap-2 px-4 py-2 rounded-full">
-            <motion.div
-              animate={{ rotate: [0, 180, 360] }}
-              transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-            >
-              <Sparkles className="w-3 h-3 text-primary/60" />
-            </motion.div>
-            
             <span className="text-xs font-medium text-muted-foreground">
               Desliza para ver más servicios
             </span>
