@@ -89,6 +89,7 @@ const serviceCatalog = {
 };
 
 const CODIGO_CONVENIO_VALIDO = "PUNTOLEGAL!";
+const CODIGO_ADMIN_VALIDO = "PUNTOLEGALADMIN";
 
 export default function AgendamientoPage() {
   const [searchParams] = useSearchParams();
@@ -111,12 +112,22 @@ export default function AgendamientoPage() {
   // Verificar si es emergencia
   const isEmergency = plan === 'emergencia';
 
-  // Lógica del código de convenio
+  // Lógica del código de convenio y admin
   const isConvenioValido = formData.codigoConvenio === CODIGO_CONVENIO_VALIDO;
+  const isAdminValido = formData.codigoConvenio === CODIGO_ADMIN_VALIDO;
   const descuentoConvenio = 0.8; // 80% de descuento
+  const precioAdmin = 1000; // Precio fijo para código admin
   const precioOriginal = parseFloat((service as any).price?.replace(/\./g, '') || '0');
-  const precioConConvenio = isConvenioValido ? precioOriginal * (1 - descuentoConvenio) : precioOriginal;
-  const precioFinal = Math.round(precioConConvenio).toLocaleString('es-CL');
+  
+  let precioFinal;
+  if (isAdminValido) {
+    precioFinal = precioAdmin.toLocaleString('es-CL');
+  } else if (isConvenioValido) {
+    const precioConConvenio = precioOriginal * (1 - descuentoConvenio);
+    precioFinal = Math.round(precioConConvenio).toLocaleString('es-CL');
+  } else {
+    precioFinal = precioOriginal.toLocaleString('es-CL');
+  }
 
   const getAvailableDates = () => {
     const dates = [];
@@ -256,13 +267,19 @@ export default function AgendamientoPage() {
                     </div>
                     
                     {/* Discount Badge */}
-                    {isConvenioValido && (
+                    {isAdminValido && (
+                      <div className="inline-flex items-center gap-1 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 text-xs font-semibold px-2 py-1 rounded-full">
+                        <Sparkles className="w-3 h-3" />
+                        ADMIN - $1.000
+                      </div>
+                    )}
+                    {isConvenioValido && !isAdminValido && (
                       <div className="inline-flex items-center gap-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 text-xs font-semibold px-2 py-1 rounded-full">
                         <Sparkles className="w-3 h-3" />
                         80% OFF
                       </div>
                     )}
-                    {(service as any).discount && !isConvenioValido && (
+                    {(service as any).discount && !isConvenioValido && !isAdminValido && (
                       <div className="inline-flex items-center gap-1 bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 text-xs font-semibold px-2 py-1 rounded-full">
                         <Sparkles className="w-3 h-3" />
                         {(service as any).discount}
@@ -591,7 +608,7 @@ export default function AgendamientoPage() {
                               servicio: {
                                 tipo: service.name,
                                 precio: precioFinal,
-                                descripcion: `${service.category}${isConvenioValido ? ' - CONVENIO 80% OFF' : ''}`,
+                                descripcion: `${service.category}${isAdminValido ? ' - ADMIN $1.000' : isConvenioValido ? ' - CONVENIO 80% OFF' : ''}`,
                                 fecha: selectedDate,
                                 hora: selectedTime
                               },
@@ -600,7 +617,7 @@ export default function AgendamientoPage() {
                                 estado: 'approved'
                               },
                               motivoConsulta: formData.descripcion,
-                              notas: `Tipo de reunión: ${selectedMeetingType}${isConvenioValido ? ` | Código de convenio aplicado: ${formData.codigoConvenio} (80% descuento)` : ''}`
+                              notas: `Tipo de reunión: ${selectedMeetingType}${isAdminValido ? ` | Código admin aplicado: ${formData.codigoConvenio} (Precio especial $1.000)` : isConvenioValido ? ` | Código de convenio aplicado: ${formData.codigoConvenio} (80% descuento)` : ''}`
                             };
                             
                             const isSupabaseAvailable = await checkSupabaseConnection();
@@ -627,11 +644,11 @@ export default function AgendamientoPage() {
                                 cliente_empresa: formData.empresa,
                                 servicio_tipo: service.name,
                                 servicio_precio: precioFinal,
-                                servicio_categoria: `${service.category}${isConvenioValido ? ' - CONVENIO 80% OFF' : ''}`,
+                                servicio_categoria: `${service.category}${isAdminValido ? ' - ADMIN $1.000' : isConvenioValido ? ' - CONVENIO 80% OFF' : ''}`,
                                 fecha: selectedDate,
                                 hora: selectedTime,
                                 tipo_reunion: selectedMeetingType,
-                                descripcion: `${formData.descripcion}${isConvenioValido ? ` | Código de convenio: ${formData.codigoConvenio} (80% descuento)` : ''}`,
+                                descripcion: `${formData.descripcion}${isAdminValido ? ` | Código admin: ${formData.codigoConvenio} (Precio especial $1.000)` : isConvenioValido ? ` | Código de convenio: ${formData.codigoConvenio} (80% descuento)` : ''}`,
                                 estado: 'pendiente'
                               };
                               
