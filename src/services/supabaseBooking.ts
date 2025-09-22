@@ -33,7 +33,7 @@ export interface Reserva {
   cliente_nombre: string;
   cliente_email: string;
   cliente_telefono: string;
-  cliente_rut?: string;
+  cliente_rut: string;
   servicio_tipo: string;
   servicio_precio: string;
   descripcion?: string;
@@ -127,7 +127,7 @@ export const createBooking = async (bookingData: BookingData): Promise<{ success
       cliente_nombre: bookingData.cliente.nombre,
       cliente_email: bookingData.cliente.email,
       cliente_telefono: bookingData.cliente.telefono,
-      cliente_rut: bookingData.cliente.rut,
+      cliente_rut: bookingData.cliente.rut || 'No especificado',
       servicio_tipo: bookingData.servicio.tipo,
       servicio_precio: bookingData.servicio.precio,
       descripcion: bookingData.servicio.descripcion,
@@ -188,7 +188,7 @@ const createOfflineReserva = (bookingData: BookingData): { success: boolean; res
       cliente_nombre: bookingData.cliente.nombre,
       cliente_email: bookingData.cliente.email,
       cliente_telefono: bookingData.cliente.telefono,
-      cliente_rut: bookingData.cliente.rut,
+      cliente_rut: bookingData.cliente.rut || 'No especificado',
       servicio_tipo: bookingData.servicio.tipo,
       servicio_precio: bookingData.servicio.precio,
       descripcion: bookingData.servicio.descripcion,
