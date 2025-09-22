@@ -1,11 +1,19 @@
 /**
- * Servicio para envío de emails de confirmación de reservas
- * Utiliza Edge Functions de Supabase para enviar emails
+ * Servicio de emails directo con Resend
+ * Alternativa a la Edge Function para mayor confiabilidad
  */
 
-import { supabase } from '@/integrations/supabase/client';
+const RESEND_API_KEY = 're_gvt6L3ER_5JiDjxtbkT1UpYowirF24DFW';
+const MAIL_FROM = 'Punto Legal <team@puntolegal.online>';
+const ADMIN_EMAIL = 'puntolegalelgolf@gmail.com';
 
-export interface BookingEmailData {
+interface EmailData {
+  to: string;
+  subject: string;
+  html: string;
+}
+
+interface BookingData {
   id: string;
   cliente_nombre: string;
   cliente_email: string;
@@ -14,241 +22,233 @@ export interface BookingEmailData {
   servicio_precio: string;
   fecha: string;
   hora: string;
-  pago_metodo?: string;
-  pago_estado?: string;
-  created_at: string;
+  tipo_reunion: string;
+  servicio_descripcion?: string;
+  cliente_rut?: string;
 }
 
-export interface EmailResult {
-  success: boolean;
-  message: string;
-  clientEmail?: any;
-  adminEmail?: any;
-  error?: string;
-}
-
-/**
- * Envía emails de confirmación al cliente y notificación al admin
- */
-export const sendBookingEmails = async (bookingData: BookingEmailData): Promise<EmailResult> => {
+async function sendEmail(emailData: EmailData): Promise<{ success: boolean; id?: string; error?: string }> {
   try {
-    console.log('📧 Enviando emails para reserva:', bookingData.id);
-
-    // Llamar a la Edge Function de Supabase
-    const { data, error } = await supabase.functions.invoke('send-booking-emails', {
-      body: { bookingData }
-    });
-
-    if (error) {
-      console.error('❌ Error llamando Edge Function:', error);
-      
-      // Fallback: simular envío de emails si la Edge Function no está disponible
-      return simulateEmailSending(bookingData);
-    }
-
-    console.log('✅ Emails enviados exitosamente:', data);
-    return data as EmailResult;
-
-  } catch (error) {
-    console.error('❌ Error enviando emails:', error);
-    
-    // Fallback: simular envío de emails
-    return simulateEmailSending(bookingData);
-  }
-};
-
-/**
- * Simula el envío de emails cuando el servicio real no está disponible
- * PERO TAMBIÉN ENVÍA EMAILS REALES usando un servicio de email
- */
-const simulateEmailSending = async (bookingData: BookingEmailData): Promise<EmailResult> => {
-  console.log('📧 ENVIANDO EMAILS REALES:');
-  console.log('');
-  
-  try {
-    // Enviar email real usando un servicio de email
-    const emailResult = await sendRealEmails(bookingData);
-    
-    if (emailResult.success) {
-      console.log('✅ Emails enviados exitosamente');
-      return emailResult;
-    } else {
-      console.log('⚠️ Error enviando emails reales, usando simulación');
-      return simulateEmailConsole(bookingData);
-    }
-  } catch (error) {
-    console.log('⚠️ Error en envío real, usando simulación');
-    return simulateEmailConsole(bookingData);
-  }
-};
-
-/**
- * Envía emails reales usando un servicio de email
- */
-const sendRealEmails = async (bookingData: BookingEmailData): Promise<EmailResult> => {
-  try {
-    // Usar un servicio de email simple (puedes cambiar por el que prefieras)
-    const response = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+    const response = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
+        'Authorization': `Bearer ${RESEND_API_KEY}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        service_id: 'service_puntolegal',
-        template_id: 'template_booking_confirmation',
-        user_id: 'user_puntolegal',
-        template_params: {
-          client_name: bookingData.cliente_nombre,
-          client_email: bookingData.cliente_email,
-          client_phone: bookingData.cliente_telefono,
-          service_type: bookingData.servicio_tipo,
-          service_price: bookingData.servicio_precio,
-          appointment_date: bookingData.fecha,
-          appointment_time: bookingData.hora,
-          reservation_id: bookingData.id,
-          admin_email: 'puntolegalelgolf@gmail.com'
-        }
-      })
+        from: MAIL_FROM,
+        to: [emailData.to],
+        subject: emailData.subject,
+        html: emailData.html,
+      }),
     });
 
-    if (response.ok) {
-      return {
-        success: true,
-        message: 'Emails enviados correctamente',
-        clientEmail: 'sent',
-        adminEmail: 'sent'
-      };
-    } else {
-      throw new Error('Error en servicio de email');
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(`Resend error ${response.status}: ${error}`);
     }
+
+    const result = await response.json();
+    return { success: true, id: result.id };
   } catch (error) {
-    throw error;
+    console.error('Error enviando email:', error);
+    return { success: false, error: error instanceof Error ? error.message : 'Error desconocido' };
   }
-};
+}
 
-/**
- * Simula el envío de emails en consola (fallback)
- */
-const simulateEmailConsole = (bookingData: BookingEmailData): EmailResult => {
-  console.log('📧 SIMULANDO ENVÍO DE EMAILS:');
-  console.log('');
-  
-  // Simular email al cliente
-  console.log('📧 EMAIL AL CLIENTE:');
-  console.log(`Para: ${bookingData.cliente_email}`);
-  console.log(`Asunto: ✅ Confirmación de tu cita - ${bookingData.servicio_tipo}`);
-  console.log(`Contenido:`);
-  console.log(`  Estimado/a ${bookingData.cliente_nombre},`);
-  console.log(`  Tu cita ha sido confirmada para el ${bookingData.fecha} a las ${bookingData.hora}.`);
-  console.log(`  Servicio: ${bookingData.servicio_tipo}`);
-  console.log(`  Precio: $${bookingData.servicio_precio}`);
-  console.log(`  ID de Reserva: ${bookingData.id}`);
-  console.log('');
-  
-  // Simular email al admin
-  console.log('📧 EMAIL AL ADMINISTRADOR:');
-  console.log('Para: puntolegalelgolf@gmail.com');
-  console.log(`Asunto: 🔔 Nueva reserva - ${bookingData.cliente_nombre}`);
-  console.log(`Contenido:`);
-  console.log(`  Nueva reserva registrada:`);
-  console.log(`  Cliente: ${bookingData.cliente_nombre} (${bookingData.cliente_email})`);
-  console.log(`  Teléfono: ${bookingData.cliente_telefono}`);
-  console.log(`  Servicio: ${bookingData.servicio_tipo}`);
-  console.log(`  Fecha: ${bookingData.fecha} a las ${bookingData.hora}`);
-  console.log(`  Precio: $${bookingData.servicio_precio}`);
-  console.log(`  Estado de Pago: ${bookingData.pago_estado || 'Pendiente'}`);
-  console.log(`  ID: ${bookingData.id}`);
-  console.log('');
-  
-  return {
-    success: true,
-    message: 'Emails simulados enviados correctamente (modo desarrollo)',
-    clientEmail: 'simulated',
-    adminEmail: 'simulated'
-  };
-};
+function generateTrackingCode(): string {
+  return `PL-${Date.now().toString().slice(-6)}`;
+}
 
-/**
- * Envía un email de recordatorio 24 horas antes de la cita
- */
-export const sendReminderEmail = async (bookingData: BookingEmailData): Promise<EmailResult> => {
+function generateGoogleMeetLink(): string {
+  return `https://meet.google.com/${Math.random().toString(36).substring(2, 15)}`;
+}
+
+export async function sendBookingEmailsDirect(booking: BookingData): Promise<{
+  success: boolean;
+  clientEmail?: { id: string };
+  adminEmail?: { id: string };
+  trackingCode?: string;
+  googleMeetLink?: string;
+  error?: string;
+}> {
   try {
-    console.log('📧 Enviando recordatorio para reserva:', bookingData.id);
+    console.log('📧 Enviando emails directos via Resend...');
+    
+    const trackingCode = generateTrackingCode();
+    const googleMeetLink = generateGoogleMeetLink();
 
-    // Llamar a Edge Function específica para recordatorios (por implementar)
-    const { data, error } = await supabase.functions.invoke('send-reminder-email', {
-      body: { bookingData }
+    // Generar HTML para emails
+    const clientEmailHtml = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <title>Confirmación de Consulta Legal</title>
+        <style>
+          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+          .header { background: linear-gradient(135deg, #ff6b35, #f7931e); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+          .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
+          .info-box { background: white; padding: 20px; margin: 20px 0; border-radius: 8px; border-left: 4px solid #ff6b35; }
+          .button { display: inline-block; background: #ff6b35; color: white; padding: 12px 30px; text-decoration: none; border-radius: 25px; margin: 20px 0; }
+          .footer { text-align: center; margin-top: 30px; color: #666; font-size: 14px; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>🎉 ¡Consulta Legal Confirmada!</h1>
+            <p>Tu consulta ha sido agendada exitosamente</p>
+          </div>
+          <div class="content">
+            <h2>Hola ${booking.cliente_nombre},</h2>
+            <p>Tu consulta legal ha sido confirmada y el pago procesado correctamente.</p>
+            
+            <div class="info-box">
+              <h3>📋 Detalles de tu consulta:</h3>
+              <p><strong>Servicio:</strong> ${booking.servicio_tipo}</p>
+              <p><strong>Fecha:</strong> ${booking.fecha}</p>
+              <p><strong>Hora:</strong> ${booking.hora}</p>
+              <p><strong>Tipo:</strong> ${booking.tipo_reunion === 'online' ? 'Videollamada' : 'Presencial'}</p>
+              <p><strong>Precio:</strong> $${parseInt(booking.servicio_precio).toLocaleString('es-CL')}</p>
+            </div>
+
+            <div class="info-box">
+              <h3>🔗 Información de la reunión:</h3>
+              <p><strong>Código de seguimiento:</strong> ${trackingCode}</p>
+              <p><strong>Link de Google Meet:</strong> <a href="${googleMeetLink}">${googleMeetLink}</a></p>
+              <p><strong>Fecha y hora:</strong> ${booking.fecha} a las ${booking.hora}</p>
+            </div>
+
+            <div style="text-align: center;">
+              <a href="${googleMeetLink}" class="button">🔗 Unirse a la Videollamada</a>
+            </div>
+
+            <div class="info-box">
+              <h3>📝 Próximos pasos:</h3>
+              <ol>
+                <li>Guarda este email como comprobante</li>
+                <li>Te contactaremos 24 horas antes para confirmar</li>
+                <li>El día de la consulta, haz clic en el link de Google Meet</li>
+                <li>Ten a mano tu código de seguimiento: <strong>${trackingCode}</strong></li>
+              </ol>
+            </div>
+          </div>
+          <div class="footer">
+            <p>Punto Legal - Asesoría Legal Profesional</p>
+            <p>Email: team@puntolegal.online | Web: puntolegal.online</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
+
+    const adminEmailHtml = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <title>Nueva Consulta Legal - ${trackingCode}</title>
+        <style>
+          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+          .header { background: linear-gradient(135deg, #2563eb, #1d4ed8); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+          .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
+          .info-box { background: white; padding: 20px; margin: 20px 0; border-radius: 8px; border-left: 4px solid #2563eb; }
+          .button { display: inline-block; background: #2563eb; color: white; padding: 12px 30px; text-decoration: none; border-radius: 25px; margin: 20px 0; }
+          .footer { text-align: center; margin-top: 30px; color: #666; font-size: 14px; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>📋 Nueva Consulta Legal</h1>
+            <p>Código de seguimiento: ${trackingCode}</p>
+          </div>
+          <div class="content">
+            <h2>Nueva consulta agendada</h2>
+            <p>Se ha recibido una nueva consulta legal que requiere tu atención.</p>
+            
+            <div class="info-box">
+              <h3>👤 Datos del cliente:</h3>
+              <p><strong>Nombre:</strong> ${booking.cliente_nombre}</p>
+              <p><strong>Email:</strong> ${booking.cliente_email}</p>
+              <p><strong>Teléfono:</strong> ${booking.cliente_telefono}</p>
+              <p><strong>RUT:</strong> ${booking.cliente_rut || 'No especificado'}</p>
+            </div>
+
+            <div class="info-box">
+              <h3>📅 Detalles de la consulta:</h3>
+              <p><strong>Servicio:</strong> ${booking.servicio_tipo}</p>
+              <p><strong>Fecha:</strong> ${booking.fecha}</p>
+              <p><strong>Hora:</strong> ${booking.hora}</p>
+              <p><strong>Tipo:</strong> ${booking.tipo_reunion === 'online' ? 'Videollamada' : 'Presencial'}</p>
+              <p><strong>Precio:</strong> $${parseInt(booking.servicio_precio).toLocaleString('es-CL')}</p>
+              <p><strong>Descripción:</strong> ${booking.servicio_descripcion || 'No especificada'}</p>
+            </div>
+
+            <div class="info-box">
+              <h3>🔗 Información técnica:</h3>
+              <p><strong>Código de seguimiento:</strong> ${trackingCode}</p>
+              <p><strong>ID de reserva:</strong> ${booking.id}</p>
+              <p><strong>Link de Google Meet:</strong> <a href="${googleMeetLink}">${googleMeetLink}</a></p>
+              <p><strong>Estado:</strong> confirmada</p>
+            </div>
+
+            <div style="text-align: center;">
+              <a href="${googleMeetLink}" class="button">📅 Ver en Google Calendar</a>
+            </div>
+          </div>
+          <div class="footer">
+            <p>Punto Legal - Panel de Administración</p>
+            <p>Email: team@puntolegal.online | Web: puntolegal.online</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
+
+    // Enviar email al cliente
+    const clientEmailResult = await sendEmail({
+      to: booking.cliente_email,
+      subject: `✅ Consulta Legal Confirmada - ${trackingCode}`,
+      html: clientEmailHtml
     });
 
-    if (error) {
-      console.error('❌ Error enviando recordatorio:', error);
-      return {
-        success: false,
-        error: error.message
-      };
+    if (!clientEmailResult.success) {
+      throw new Error(`Error enviando email al cliente: ${clientEmailResult.error}`);
     }
 
-    return data as EmailResult;
+    // Enviar email al admin
+    const adminEmailResult = await sendEmail({
+      to: ADMIN_EMAIL,
+      subject: `📋 Nueva Consulta Legal - ${trackingCode} - ${booking.cliente_nombre}`,
+      html: adminEmailHtml
+    });
+
+    if (!adminEmailResult.success) {
+      throw new Error(`Error enviando email al admin: ${adminEmailResult.error}`);
+    }
+
+    console.log('✅ Emails enviados exitosamente');
+    console.log(`   Cliente: ${clientEmailResult.id}`);
+    console.log(`   Admin: ${adminEmailResult.id}`);
+    console.log(`   Código: ${trackingCode}`);
+
+    return {
+      success: true,
+      clientEmail: { id: clientEmailResult.id! },
+      adminEmail: { id: adminEmailResult.id! },
+      trackingCode,
+      googleMeetLink
+    };
 
   } catch (error) {
-    console.error('❌ Error enviando recordatorio:', error);
+    console.error('❌ Error enviando emails:', error);
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Error desconocido'
     };
   }
-};
-
-/**
- * Envía un email cuando se actualiza el estado de una reserva
- */
-export const sendStatusUpdateEmail = async (
-  bookingData: BookingEmailData, 
-  newStatus: string, 
-  message?: string
-): Promise<EmailResult> => {
-  try {
-    console.log('📧 Enviando actualización de estado para reserva:', bookingData.id);
-
-    const { data, error } = await supabase.functions.invoke('send-status-update-email', {
-      body: { 
-        bookingData, 
-        newStatus, 
-        message 
-      }
-    });
-
-    if (error) {
-      console.error('❌ Error enviando actualización:', error);
-      return {
-        success: false,
-        error: error.message
-      };
-    }
-
-    return data as EmailResult;
-
-  } catch (error) {
-    console.error('❌ Error enviando actualización:', error);
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : 'Error desconocido'
-    };
-  }
-};
-
-/**
- * Verifica si el servicio de emails está disponible
- */
-export const checkEmailServiceStatus = async (): Promise<boolean> => {
-  try {
-    const { error } = await supabase.functions.invoke('send-booking-emails', {
-      body: { test: true }
-    });
-
-    return !error;
-  } catch (error) {
-    console.warn('⚠️ Servicio de emails no disponible:', error);
-    return false;
-  }
-};
+}

@@ -1,4 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
+import { sendBookingEmailsDirect } from './emailService';
 
 export interface Reservation {
   id: string;
@@ -62,10 +63,22 @@ export async function createReservation(reservationData: Omit<Reservation, 'id' 
 }
 
 // Función para confirmar reserva y enviar emails via Edge Function
-export async function confirmReservation(reservationId: string): Promise<{ success: boolean; error?: string }> {
+export async function confirmReservation(reservationId: string): Promise<{ success: boolean; error?: string; trackingCode?: string; googleMeetLink?: string }> {
   try {
     console.log('📧 Confirmando reserva y enviando emails:', reservationId);
     
+    // Obtener datos de la reserva
+    const { data: reservation, error: fetchError } = await supabase
+      .from('reservas')
+      .select('*')
+      .eq('id', reservationId)
+      .single();
+
+    if (fetchError || !reservation) {
+      console.error('❌ Error obteniendo reserva:', fetchError);
+      return { success: false, error: fetchError?.message || 'Reserva no encontrada' };
+    }
+
     // Actualizar estado de la reserva a confirmada
     const { error: updateError } = await supabase
       .from('reservas')
@@ -77,35 +90,39 @@ export async function confirmReservation(reservationId: string): Promise<{ succe
       return { success: false, error: updateError.message };
     }
 
-    // Llamar a la Edge Function para enviar emails
-    try {
-      const { data, error } = await supabase.functions.invoke('clever-action', {
-        body: { booking_id: reservationId },
-        headers: {
-          'X-Admin-Token': 'puntolegal-admin-token-2025'
-        }
-      });
+    // Enviar emails directamente via Resend
+    const emailResult = await sendBookingEmailsDirect({
+      id: reservation.id,
+      cliente_nombre: reservation.cliente_nombre,
+      cliente_email: reservation.cliente_email,
+      cliente_telefono: reservation.cliente_telefono,
+      cliente_rut: reservation.cliente_rut,
+      servicio_tipo: reservation.servicio_tipo,
+      servicio_precio: reservation.servicio_precio,
+      servicio_descripcion: reservation.servicio_descripcion,
+      fecha: reservation.fecha,
+      hora: reservation.hora,
+      tipo_reunion: reservation.tipo_reunion
+    });
 
-      if (error) {
-        console.error('❌ Error en Edge Function:', error);
-        return { success: false, error: error.message };
-      }
-
-      console.log('✅ Emails enviados exitosamente:', data);
-      return { success: true };
-
-    } catch (emailError) {
-      console.error('❌ Error enviando emails:', emailError);
-      // No fallar el proceso principal si fallan los emails
-      return { success: true, error: 'Emails no enviados pero reserva confirmada' };
+    if (!emailResult.success) {
+      console.error('❌ Error enviando emails:', emailResult.error);
+      return { success: false, error: emailResult.error };
     }
+
+    console.log('✅ Emails enviados exitosamente');
+    console.log(`   Código de seguimiento: ${emailResult.trackingCode}`);
+    console.log(`   Google Meet: ${emailResult.googleMeetLink}`);
+
+    return { 
+      success: true, 
+      trackingCode: emailResult.trackingCode,
+      googleMeetLink: emailResult.googleMeetLink
+    };
 
   } catch (error) {
     console.error('❌ Error confirmando reserva:', error);
-    return { 
-      success: false, 
-      error: error instanceof Error ? error.message : 'Error desconocido' 
-    };
+    return { success: false, error: error instanceof Error ? error.message : 'Error desconocido' };
   }
 }
 
