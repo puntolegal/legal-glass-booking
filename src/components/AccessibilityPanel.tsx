@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
@@ -10,7 +10,9 @@ import {
   Move, 
   Keyboard, 
   X,
-  Settings
+  Settings,
+  Moon,
+  Sun
 } from 'lucide-react';
 
 const AccessibilityPanel: React.FC = () => {
@@ -19,6 +21,16 @@ const AccessibilityPanel: React.FC = () => {
   const [fontSize, setFontSize] = useState<'small' | 'medium' | 'large'>('medium');
   const [reducedMotion, setReducedMotion] = useState(false);
   const [focusVisible, setFocusVisible] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('theme');
+      if (saved) {
+        return saved === 'dark';
+      }
+      return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    }
+    return false;
+  });
 
   const fontSizeOptions = [
     { value: 'small', label: 'Pequeña' },
@@ -63,11 +75,40 @@ const AccessibilityPanel: React.FC = () => {
     }
   };
 
+  const toggleDarkMode = () => {
+    const newDarkMode = !isDarkMode;
+    setIsDarkMode(newDarkMode);
+    
+    // Aplicar inmediatamente
+    if (newDarkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+    
+    // Guardar preferencia
+    localStorage.setItem('theme', newDarkMode ? 'dark' : 'light');
+  };
+
+  // Sincronizar con cambios externos del tema
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleChange = (e: MediaQueryListEvent) => {
+      const savedTheme = localStorage.getItem('theme');
+      if (!savedTheme) {
+        setIsDarkMode(e.matches);
+      }
+    };
+
+    mediaQuery.addEventListener('change', handleChange);
+    return () => mediaQuery.removeEventListener('change', handleChange);
+  }, []);
+
   if (!isOpen) {
     return (
       <Button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 z-50 w-12 h-12 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 text-white shadow-lg shadow-amber-500/30 hover:shadow-amber-500/50 transition-all duration-300 hover:scale-110"
+        className="fixed bottom-20 right-4 z-40 w-12 h-12 rounded-full bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-white shadow-lg shadow-primary/30 hover:shadow-primary/50 transition-all duration-300 hover:scale-110 backdrop-blur-xl border border-white/20"
         size="icon"
         aria-label="Abrir panel de accesibilidad"
       >
@@ -77,19 +118,19 @@ const AccessibilityPanel: React.FC = () => {
   }
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 w-80 max-w-[calc(100vw-3rem)]">
-      <Card className="shadow-2xl border-amber-200 dark:border-amber-800">
+    <div className="fixed bottom-20 right-4 z-50 w-80 max-w-[calc(100vw-2rem)] sm:bottom-6 sm:right-6">
+      <Card className="shadow-2xl border-primary/20 dark:border-primary/30 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl">
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
-            <CardTitle className="flex items-center gap-2 text-lg">
-              <Accessibility className="w-5 h-5 text-amber-500" />
+            <CardTitle className="flex items-center gap-2 text-lg text-primary">
+              <Accessibility className="w-5 h-5" />
               Accesibilidad
             </CardTitle>
             <Button
               onClick={() => setIsOpen(false)}
               variant="ghost"
               size="icon"
-              className="h-8 w-8"
+              className="h-8 w-8 hover:bg-primary/10"
               aria-label="Cerrar panel de accesibilidad"
             >
               <X className="w-4 h-4" />
@@ -98,10 +139,30 @@ const AccessibilityPanel: React.FC = () => {
         </CardHeader>
         
         <CardContent className="space-y-6">
+          {/* Modo Oscuro */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              {isDarkMode ? (
+                <Moon className="w-4 h-4 text-primary" />
+              ) : (
+                <Sun className="w-4 h-4 text-primary" />
+              )}
+              <Label htmlFor="dark-mode" className="text-sm font-medium">
+                Modo {isDarkMode ? 'Oscuro' : 'Claro'}
+              </Label>
+            </div>
+            <Switch
+              id="dark-mode"
+              checked={isDarkMode}
+              onCheckedChange={toggleDarkMode}
+              aria-label={`Cambiar a modo ${isDarkMode ? 'claro' : 'oscuro'}`}
+            />
+          </div>
+
           {/* Alto Contraste */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Eye className="w-4 h-4 text-amber-500" />
+              <Eye className="w-4 h-4 text-primary" />
               <Label htmlFor="high-contrast" className="text-sm font-medium">
                 Alto Contraste
               </Label>
@@ -117,7 +178,7 @@ const AccessibilityPanel: React.FC = () => {
           {/* Tamaño de Fuente */}
           <div className="space-y-3">
             <div className="flex items-center gap-2">
-              <Type className="w-4 h-4 text-amber-500" />
+              <Type className="w-4 h-4 text-primary" />
               <Label className="text-sm font-medium">Tamaño de Fuente</Label>
             </div>
             <div className="flex gap-2">
@@ -129,8 +190,8 @@ const AccessibilityPanel: React.FC = () => {
                   onClick={() => handleFontSizeChange(option.value)}
                   className={`text-xs ${
                     fontSize === option.value
-                      ? 'bg-amber-500 text-white border-amber-500'
-                      : 'border-amber-300 text-amber-600 hover:bg-amber-50'
+                      ? 'bg-primary text-white border-primary'
+                      : 'border-primary/30 text-primary hover:bg-primary/10'
                   }`}
                 >
                   {option.label}
@@ -142,7 +203,7 @@ const AccessibilityPanel: React.FC = () => {
           {/* Movimiento Reducido */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Move className="w-4 h-4 text-amber-500" />
+              <Move className="w-4 h-4 text-primary" />
               <Label htmlFor="reduced-motion" className="text-sm font-medium">
                 Movimiento Reducido
               </Label>
@@ -158,7 +219,7 @@ const AccessibilityPanel: React.FC = () => {
           {/* Focus Visible */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Keyboard className="w-4 h-4 text-amber-500" />
+              <Keyboard className="w-4 h-4 text-primary" />
               <Label htmlFor="focus-visible" className="text-sm font-medium">
                 Focus Visible
               </Label>
@@ -178,12 +239,14 @@ const AccessibilityPanel: React.FC = () => {
               setFontSize('medium');
               setReducedMotion(false);
               setFocusVisible(false);
+              setIsDarkMode(false);
               const root = document.documentElement;
-              root.classList.remove('high-contrast', 'reduced-motion', 'focus-visible', 'font-size-small', 'font-size-medium', 'font-size-large');
+              root.classList.remove('high-contrast', 'reduced-motion', 'focus-visible', 'font-size-small', 'font-size-medium', 'font-size-large', 'dark');
               root.classList.add('font-size-medium');
+              localStorage.setItem('theme', 'light');
             }}
             variant="outline"
-            className="w-full border-amber-300 text-amber-600 hover:bg-amber-50"
+            className="w-full border-primary/30 text-primary hover:bg-primary/10"
           >
             <Settings className="w-4 h-4 mr-2" />
             Restablecer Valores
