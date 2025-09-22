@@ -268,7 +268,7 @@ export default function AgendamientoPage() {
                     
                     {/* Discount Badge */}
                     {isAdminValido && (
-                      <div className="inline-flex items-center gap-1 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 text-xs font-semibold px-2 py-1 rounded-full">
+                      <div className="inline-flex items-center gap-1 bg-gradient-to-r from-purple-100 to-violet-100 dark:from-purple-900/40 dark:to-violet-900/40 text-purple-800 dark:text-purple-200 text-xs font-bold px-3 py-1.5 rounded-full border border-purple-200 dark:border-purple-700/50 shadow-sm">
                         <Sparkles className="w-3 h-3" />
                         ADMIN - $1.000
                       </div>
