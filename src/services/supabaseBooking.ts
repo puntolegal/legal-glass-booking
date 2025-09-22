@@ -24,7 +24,7 @@ export interface BookingData {
     id?: string;
     monto?: number;
   };
-  notas?: string;
+  descripcion?: string;
   motivoConsulta?: string;
 }
 
@@ -44,7 +44,7 @@ export interface Reserva {
   pago_id?: string;
   pago_monto?: number;
   estado: 'pendiente' | 'confirmada' | 'completada' | 'cancelada';
-  notas?: string;
+  descripcion?: string;
   descripcion?: string;
   email_enviado: boolean;
   recordatorio_enviado: boolean;
@@ -137,8 +137,7 @@ export const createBooking = async (bookingData: BookingData): Promise<{ success
       pago_estado: bookingData.pago?.estado || 'pendiente',
       pago_id: bookingData.pago?.id,
       pago_monto: bookingData.pago?.monto,
-      notas: bookingData.notas,
-      descripcion: bookingData.motivoConsulta,
+      descripcion: bookingData.notas || bookingData.motivoConsulta,
       estado: 'pendiente' as const
     };
 
@@ -200,8 +199,7 @@ const createOfflineReserva = (bookingData: BookingData): { success: boolean; res
       pago_id: bookingData.pago?.id,
       pago_monto: bookingData.pago?.monto,
       estado: 'pendiente',
-      notas: bookingData.notas,
-      descripcion: bookingData.motivoConsulta,
+      descripcion: bookingData.notas || bookingData.motivoConsulta,
       email_enviado: false,
       recordatorio_enviado: false,
       created_at: new Date().toISOString(),
@@ -299,7 +297,7 @@ const sendPaymentConfirmationEmail = async (reserva: Reserva) => {
         id: reserva.pago_id,
         monto: reserva.pago_monto
       },
-      notas: reserva.notas,
+      notas: reserva.descripcion,
       motivoConsulta: reserva.descripcion
     };
 
@@ -388,8 +386,8 @@ export const findReservaByCriteria = async (criteria: {
     } else if (criteria.pagoId) {
       query = query.eq('pago_id', criteria.pagoId);
     } else if (criteria.externalReference) {
-      // Buscar por referencia externa en notas o ID
-      query = query.or(`id.eq.${criteria.externalReference},notas.ilike.%${criteria.externalReference}%`);
+      // Buscar por referencia externa en descripcion o ID
+      query = query.or(`id.eq.${criteria.externalReference},descripcion.ilike.%${criteria.externalReference}%`);
     }
 
     const { data: reservas, error } = await query.order('created_at', { ascending: false }).limit(1);
