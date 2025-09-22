@@ -748,16 +748,16 @@ export default function ServicioCorporativoPage() {
         </MobileLayout>
       </div>
 
-        {/* Login Modal - Posicionamiento fijo para móvil */}
-        {showLogin && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              transition={{ duration: 0.3, type: "spring", stiffness: 300 }}
-              className="relative w-full max-w-md max-h-[80vh] overflow-y-auto"
-            >
+       {/* Login Modal - Posicionamiento fijo para móvil */}
+       {showLogin && (
+         <div className="fixed inset-0 z-50 flex items-start justify-center p-4 bg-black/50 backdrop-blur-sm sm:items-center">
+           <motion.div
+             initial={{ opacity: 0, scale: 0.9, y: -20 }}
+             animate={{ opacity: 1, scale: 1, y: 0 }}
+             exit={{ opacity: 0, scale: 0.9, y: -20 }}
+             transition={{ duration: 0.3, type: "spring", stiffness: 300 }}
+             className="relative w-full max-w-md max-h-[90vh] overflow-y-auto mt-4 sm:mt-0"
+           >
             {/* Botón de cerrar */}
             <button
               onClick={() => setShowLogin(false)}
