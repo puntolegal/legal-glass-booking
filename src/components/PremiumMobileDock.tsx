@@ -73,11 +73,9 @@ export const PremiumMobileDock: React.FC<PremiumMobileDockProps> = ({ className 
   };
 
   const handleAccessibilityClick = () => {
-    // Simular click en el botón de accesibilidad
-    const accessibilityButton = document.querySelector('[aria-label="Abrir panel de accesibilidad"]') as HTMLButtonElement;
-    if (accessibilityButton) {
-      accessibilityButton.click();
-    }
+    // Disparar evento personalizado para abrir el panel de accesibilidad
+    const event = new CustomEvent('accessibility-toggle');
+    window.dispatchEvent(event);
   };
 
   const dockItems = [

@@ -104,12 +104,22 @@ const AccessibilityPanel: React.FC = () => {
     return () => mediaQuery.removeEventListener('change', handleChange);
   }, []);
 
+  // Exponer función para abrir el panel desde el dock
+  useEffect(() => {
+    const handleAccessibilityToggle = () => {
+      setIsOpen(true);
+    };
+    
+    window.addEventListener('accessibility-toggle', handleAccessibilityToggle);
+    return () => window.removeEventListener('accessibility-toggle', handleAccessibilityToggle);
+  }, []);
+
   if (!isOpen) {
     return null; // Ocultar botón flotante ya que está integrado en el dock
   }
 
   return (
-    <div className="fixed bottom-20 right-4 z-50 w-80 max-w-[calc(100vw-2rem)] sm:bottom-6 sm:right-6">
+    <div className="fixed bottom-20 right-4 z-50 w-80 max-w-[calc(100vw-2rem)] sm:bottom-6 sm:right-6" data-accessibility-panel>
       <Card className="shadow-2xl border-primary/20 dark:border-primary/30 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-3xl overflow-hidden">
         <CardHeader className="pb-4 px-6 pt-6">
           <div className="flex items-center justify-between">
