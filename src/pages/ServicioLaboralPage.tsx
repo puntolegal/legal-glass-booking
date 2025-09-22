@@ -1,10 +1,11 @@
 import { motion } from 'framer-motion'
-import { Scale, FileText, Users, TrendingUp, Shield, Globe, CheckCircle, Star, Clock, Award, LogIn, BarChart3, Calendar, AlertTriangle, Briefcase, Gavel, UserCheck, Building } from 'lucide-react'
+import { Scale, FileText, Users, TrendingUp, Shield, Globe, CheckCircle, Star, Clock, Award, LogIn, BarChart3, Calendar, AlertTriangle, Briefcase, Gavel, UserCheck, Building, X } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useState } from 'react'
 import SEO from '../components/SEO'
 import Header from '../components/Header'
 import { MobileLayout } from '../components/MobileLayout'
+import CorporateLoginSimple from '../components/CorporateLoginSimple'
 
 const services = [
   {
@@ -75,6 +76,17 @@ const stats = [
 
 export default function ServicioLaboralPage() {
   const [showLogin, setShowLogin] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
+
+  const handleLoginSuccess = (user: any) => {
+    setCurrentUser(user);
+    setShowLogin(false);
+    // Aquí podrías redirigir a un dashboard laboral si lo creas
+  };
+
+  const handleCloseLogin = () => {
+    setShowLogin(false);
+  };
 
   const pageContent = (
     <div className="bg-gradient-to-b from-background to-background/95">
@@ -307,6 +319,33 @@ export default function ServicioLaboralPage() {
         <div className="hidden lg:block">
           {pageContent}
         </div>
+
+        {/* Modal de Login - Posicionamiento fijo para móvil */}
+        {showLogin && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              transition={{ duration: 0.3, type: "spring", stiffness: 300 }}
+              className="relative w-full max-w-md max-h-[90vh] overflow-y-auto"
+            >
+              {/* Botón de cerrar */}
+              <button
+                onClick={handleCloseLogin}
+                className="absolute top-4 right-4 z-10 w-8 h-8 rounded-full bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm flex items-center justify-center shadow-lg hover:bg-white dark:hover:bg-gray-700 transition-colors"
+              >
+                <X className="w-4 h-4 text-gray-600 dark:text-gray-300" />
+              </button>
+
+              {/* Contenido del modal */}
+              <CorporateLoginSimple
+                onClose={handleCloseLogin}
+                onLoginSuccess={handleLoginSuccess}
+              />
+            </motion.div>
+          </div>
+        )}
       </div>
     </>
   );
