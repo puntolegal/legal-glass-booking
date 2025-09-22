@@ -5,7 +5,6 @@ import PremiumMobileHeader from './PremiumMobileHeader';
 import PremiumMobileDock from './PremiumMobileDock';
 import MobileSidebar from './MobileSidebar';
 import ApuntesHeader from './ApuntesHeader';
-import { TabBar } from './layout/TabBar';
 import { useSidebar } from '@/contexts/SidebarContext';
 
 interface MobileLayoutProps {
@@ -67,9 +66,6 @@ export const MobileLayout: React.FC<MobileLayoutProps> = ({ children, onAgendarC
 
       {/* Premium Mobile Dock - Unificado y optimizado */}
       <PremiumMobileDock />
-
-      {/* Tab Bar - Navegación inferior */}
-      <TabBar />
 
       {/* Mobile Sidebar - Barra lateral deslizable */}
       <MobileSidebar 
