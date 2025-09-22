@@ -52,16 +52,16 @@ export default function PaymentSuccessPage() {
       
       // Extraer datos de manera más robusta - estructura correcta desde AgendamientoPage
       const reservationData = {
-        nombre: paymentInfo.nombre || paymentInfo.cliente?.nombre || 'Cliente',
-        rut: paymentInfo.rut || paymentInfo.cliente?.rut || 'No especificado',
-        email: paymentInfo.email || paymentInfo.cliente?.email || 'No especificado',
-        telefono: paymentInfo.telefono || paymentInfo.cliente?.telefono || 'No especificado',
+        cliente_nombre: paymentInfo.nombre || paymentInfo.cliente?.nombre || 'Cliente',
+        cliente_rut: paymentInfo.rut || paymentInfo.cliente?.rut || 'No especificado',
+        cliente_email: paymentInfo.email || paymentInfo.cliente?.email || 'No especificado',
+        cliente_telefono: paymentInfo.telefono || paymentInfo.cliente?.telefono || 'No especificado',
         fecha: paymentInfo.fecha || new Date().toISOString().split('T')[0],
         hora: paymentInfo.hora || '10:00',
         descripcion: `Consulta ${paymentInfo.service || paymentInfo.servicio?.tipo || 'General'} - Pago confirmado via MercadoPago`,
-        servicio: paymentInfo.service || paymentInfo.servicio?.tipo || 'Consulta General',
-        precio: paymentInfo.price || paymentInfo.servicio?.precio || '35000',
-        categoria: paymentInfo.category || paymentInfo.servicio?.categoria || 'General',
+        servicio_tipo: paymentInfo.service || paymentInfo.servicio?.tipo || 'Consulta General',
+        servicio_precio: paymentInfo.price || paymentInfo.servicio?.precio || '35000',
+        servicio_categoria: paymentInfo.category || paymentInfo.servicio?.categoria || 'General',
         tipo_reunion: paymentInfo.tipo_reunion || 'online',
         estado: 'confirmada' as const,
         webhook_sent: false
@@ -88,11 +88,11 @@ export default function PaymentSuccessPage() {
       
       const emailData = {
         id: reservation.id,
-        cliente_nombre: reservation.nombre,
-        cliente_email: reservation.email,
-        cliente_telefono: reservation.telefono,
-        servicio_tipo: reservation.servicio || 'Consulta General',
-        servicio_precio: reservation.precio || '35000',
+        cliente_nombre: reservation.cliente_nombre,
+        cliente_email: reservation.cliente_email,
+        cliente_telefono: reservation.cliente_telefono,
+        servicio_tipo: reservation.servicio_tipo || 'Consulta General',
+        servicio_precio: reservation.servicio_precio || '35000',
         fecha: reservation.fecha,
         hora: reservation.hora,
         pago_metodo: 'MercadoPago',
@@ -110,20 +110,20 @@ export default function PaymentSuccessPage() {
         emailResult,
         // Datos del cliente para mostrar en la UI
         cliente: {
-          nombre: paymentInfo.nombre || paymentInfo.cliente?.nombre || reservation.nombre,
-          email: paymentInfo.email || paymentInfo.cliente?.email || reservation.email,
-          telefono: paymentInfo.telefono || paymentInfo.cliente?.telefono || reservation.telefono
+          nombre: paymentInfo.nombre || paymentInfo.cliente?.nombre || reservation.cliente_nombre,
+          email: paymentInfo.email || paymentInfo.cliente?.email || reservation.cliente_email,
+          telefono: paymentInfo.telefono || paymentInfo.cliente?.telefono || reservation.cliente_telefono
         },
         servicio: {
-          tipo: paymentInfo.service || paymentInfo.servicio?.tipo || reservation.servicio,
-          precio: paymentInfo.price || paymentInfo.servicio?.precio || reservation.precio,
-          categoria: paymentInfo.category || paymentInfo.servicio?.categoria || reservation.categoria
+          tipo: paymentInfo.service || paymentInfo.servicio?.tipo || reservation.servicio_tipo,
+          precio: paymentInfo.price || paymentInfo.servicio?.precio || reservation.servicio_precio,
+          categoria: paymentInfo.category || paymentInfo.servicio?.categoria || reservation.servicio_categoria
         },
         fecha: paymentInfo.fecha || reservation.fecha,
         hora: paymentInfo.hora || reservation.hora,
         tipo_reunion: paymentInfo.tipo_reunion || reservation.tipo_reunion,
         // Datos adicionales para debugging
-        price: paymentInfo.price || paymentInfo.servicio?.precio || reservation.precio
+        price: paymentInfo.price || paymentInfo.servicio?.precio || reservation.servicio_precio
       });
 
       setProcessingStatus('¡Proceso completado exitosamente!');
@@ -216,7 +216,7 @@ export default function PaymentSuccessPage() {
                   <div>
                     <p className="text-sm text-gray-500">Cliente</p>
                     <p className="font-semibold text-gray-900">
-                      {paymentData?.reservation?.nombre || paymentData?.cliente?.nombre || 'Cliente'}
+                      {paymentData?.reservation?.cliente_nombre || paymentData?.cliente?.nombre || 'Cliente'}
                     </p>
                   </div>
                 </div>
@@ -228,7 +228,7 @@ export default function PaymentSuccessPage() {
                   <div>
                     <p className="text-sm text-gray-500">Email</p>
                     <p className="font-semibold text-gray-900">
-                      {paymentData?.reservation?.email || paymentData?.cliente?.email || 'No especificado'}
+                      {paymentData?.reservation?.cliente_email || paymentData?.cliente?.email || 'No especificado'}
                     </p>
                   </div>
                 </div>
@@ -240,7 +240,7 @@ export default function PaymentSuccessPage() {
                   <div>
                     <p className="text-sm text-gray-500">Teléfono</p>
                     <p className="font-semibold text-gray-900">
-                      {paymentData?.reservation?.telefono || paymentData?.cliente?.telefono || 'No especificado'}
+                      {paymentData?.reservation?.cliente_telefono || paymentData?.cliente?.telefono || 'No especificado'}
                     </p>
                   </div>
                 </div>
@@ -279,7 +279,7 @@ export default function PaymentSuccessPage() {
                   <div>
                     <p className="text-sm text-gray-500">Servicio</p>
                     <p className="font-semibold text-gray-900">
-                      {paymentData?.reservation?.servicio || paymentData?.servicio?.tipo || 'Consulta Legal'}
+                      {paymentData?.reservation?.servicio_tipo || paymentData?.servicio?.tipo || 'Consulta Legal'}
                     </p>
                   </div>
                 </div>
@@ -291,11 +291,24 @@ export default function PaymentSuccessPage() {
                 <span className="text-lg font-semibold text-gray-900">Total pagado</span>
                 <span className="text-2xl font-bold text-green-600">
                   ${(() => {
-                    const precio = paymentData?.reservation?.precio || paymentData?.servicio?.precio || paymentData?.price;
+                    // Prioridad: precio numérico guardado, luego precio de reserva, luego fallback
+                    const precio = paymentData?.price || 
+                                 paymentData?.reservation?.servicio_precio || 
+                                 paymentData?.servicio?.precio;
+                    
                     if (precio) {
-                      const precioNum = typeof precio === 'string' ? parseInt(precio.replace(/[^\d]/g, '')) : precio;
-                      return precioNum > 0 ? precioNum.toLocaleString('es-CL') : '35.000';
+                      // Si es string, limpiar y convertir a número
+                      const precioNum = typeof precio === 'string' 
+                        ? parseInt(precio.replace(/[^\d]/g, '')) 
+                        : Number(precio);
+                      
+                      // Si el precio es válido y mayor a 0, mostrarlo
+                      if (precioNum > 0) {
+                        return precioNum.toLocaleString('es-CL');
+                      }
                     }
+                    
+                    // Fallback: precio por defecto
                     return '35.000';
                   })()}
                 </span>

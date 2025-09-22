@@ -3,6 +3,25 @@ import { sendBookingEmailsDirect } from './emailService';
 
 export interface Reservation {
   id: string;
+  cliente_nombre: string;
+  cliente_rut: string;
+  cliente_email: string;
+  cliente_telefono: string;
+  fecha: string;
+  hora: string;
+  descripcion: string;
+  created_at?: string;
+  servicio_tipo?: string;
+  servicio_precio?: string;
+  servicio_categoria?: string;
+  tipo_reunion?: string;
+  estado?: 'pendiente' | 'confirmada' | 'completada' | 'cancelada';
+  webhook_sent?: boolean;
+}
+
+// Interfaz para la estructura real de la tabla reservas en Supabase
+export interface ReservaTable {
+  id: string;
   nombre: string;
   rut: string;
   email: string;
@@ -10,13 +29,16 @@ export interface Reservation {
   fecha: string;
   hora: string;
   descripcion: string;
-  created_at?: string;
-  servicio?: string;
-  precio?: string;
-  categoria?: string;
-  tipo_reunion?: string;
-  estado?: 'pendiente' | 'confirmada' | 'completada' | 'cancelada';
-  webhook_sent?: boolean;
+  created_at: string;
+  updated_at: string;
+  user_id: string;
+  servicio: string;
+  precio: string;
+  categoria: string;
+  tipo_reunion: string;
+  estado: 'pendiente' | 'confirmada' | 'completada' | 'cancelada';
+  webhook_sent: boolean;
+  recordatorio_enviado: boolean;
 }
 
 export interface TimeSlot {
@@ -36,21 +58,54 @@ const MAKE_WEBHOOK_URL = import.meta.env.VITE_MAKE_WEBHOOK_URL || 'https://hook.
 // Función para crear una nueva reserva con integración Make
 export async function createReservation(reservationData: Omit<Reservation, 'id' | 'created_at'>): Promise<Reservation> {
   try {
+    // Mapear los datos a la estructura real de la tabla reservas
+    const reservaData = {
+      nombre: reservationData.cliente_nombre,
+      rut: reservationData.cliente_rut,
+      email: reservationData.cliente_email,
+      telefono: reservationData.cliente_telefono,
+      fecha: reservationData.fecha,
+      hora: reservationData.hora,
+      descripcion: reservationData.descripcion,
+      servicio: reservationData.servicio_tipo || 'Consulta General',
+      precio: reservationData.servicio_precio || '35000',
+      categoria: reservationData.servicio_categoria || 'General',
+      tipo_reunion: reservationData.tipo_reunion || 'online',
+      estado: 'pendiente' as const,
+      webhook_sent: false,
+      recordatorio_enviado: false,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      user_id: 'anonymous'
+    };
+
     // Crear la reserva en Supabase
     const { data, error } = await supabase
       .from('reservas')
-      .insert([{
-        ...reservationData,
-        estado: 'pendiente',
-        webhook_sent: false,
-        created_at: new Date().toISOString()
-      }])
+      .insert([reservaData])
       .select()
       .single();
 
     if (error) throw error;
 
-    const newReservation = data as Reservation;
+    // Convertir de ReservaTable a Reservation
+    const newReservation: Reservation = {
+      id: data.id,
+      cliente_nombre: data.nombre,
+      cliente_rut: data.rut,
+      cliente_email: data.email,
+      cliente_telefono: data.telefono,
+      fecha: data.fecha,
+      hora: data.hora,
+      descripcion: data.descripcion,
+      created_at: data.created_at,
+      servicio_tipo: data.servicio,
+      servicio_precio: data.precio,
+      servicio_categoria: data.categoria,
+      tipo_reunion: data.tipo_reunion,
+      estado: data.estado,
+      webhook_sent: data.webhook_sent
+    };
 
     // Enviar datos a Make para procesamiento de emails
     await sendToMakeWebhook(newReservation, 'nueva_reserva');
@@ -93,13 +148,13 @@ export async function confirmReservation(reservationId: string): Promise<{ succe
     // Enviar emails directamente via Resend
     const emailResult = await sendBookingEmailsDirect({
       id: reservation.id,
-      cliente_nombre: reservation.cliente_nombre,
-      cliente_email: reservation.cliente_email,
-      cliente_telefono: reservation.cliente_telefono,
-      cliente_rut: reservation.cliente_rut,
-      servicio_tipo: reservation.servicio_tipo,
-      servicio_precio: reservation.servicio_precio,
-      servicio_descripcion: reservation.servicio_descripcion,
+      cliente_nombre: reservation.nombre,
+      cliente_email: reservation.email,
+      cliente_telefono: reservation.telefono,
+      cliente_rut: reservation.rut,
+      servicio_tipo: reservation.servicio,
+      servicio_precio: reservation.precio,
+      servicio_descripcion: reservation.descripcion,
       fecha: reservation.fecha,
       hora: reservation.hora,
       tipo_reunion: reservation.tipo_reunion
@@ -132,13 +187,13 @@ export async function sendToMakeWebhook(reservation: Reservation, tipo: 'nueva_r
     // Formato que espera Make.com según las instrucciones
     const webhookData = {
       cliente: {
-        nombre: reservation.nombre,
-        email: reservation.email,
-        telefono: reservation.telefono
+        nombre: reservation.cliente_nombre,
+        email: reservation.cliente_email,
+        telefono: reservation.cliente_telefono
       },
       servicio: {
-        nombre: reservation.servicio || 'Consulta Legal',
-        precio: reservation.precio ? parseInt(reservation.precio) : 0,
+        nombre: reservation.servicio_tipo || 'Consulta Legal',
+        precio: reservation.servicio_precio ? parseInt(reservation.servicio_precio) : 0,
         duracion: 60 // duración en minutos
       },
       cita: {
@@ -211,7 +266,25 @@ export async function getReservationsByDate(fecha: string): Promise<Reservation[
     .eq('fecha', fecha);
   
   if (error) throw error;
-  return data || [];
+  
+  // Convertir de ReservaTable[] a Reservation[]
+  return (data || []).map((reserva: ReservaTable): Reservation => ({
+    id: reserva.id,
+    cliente_nombre: reserva.nombre,
+    cliente_rut: reserva.rut,
+    cliente_email: reserva.email,
+    cliente_telefono: reserva.telefono,
+    fecha: reserva.fecha,
+    hora: reserva.hora,
+    descripcion: reserva.descripcion,
+    created_at: reserva.created_at,
+    servicio_tipo: reserva.servicio,
+    servicio_precio: reserva.precio,
+    servicio_categoria: reserva.categoria,
+    tipo_reunion: reserva.tipo_reunion,
+    estado: reserva.estado,
+    webhook_sent: reserva.webhook_sent
+  }));
 }
 
 // Función para verificar si un horario está disponible
@@ -244,7 +317,25 @@ export async function getAllReservations(): Promise<Reservation[]> {
     .order('created_at', { ascending: false });
   
   if (error) throw error;
-  return data || [];
+  
+  // Convertir de ReservaTable[] a Reservation[]
+  return (data || []).map((reserva: ReservaTable): Reservation => ({
+    id: reserva.id,
+    cliente_nombre: reserva.nombre,
+    cliente_rut: reserva.rut,
+    cliente_email: reserva.email,
+    cliente_telefono: reserva.telefono,
+    fecha: reserva.fecha,
+    hora: reserva.hora,
+    descripcion: reserva.descripcion,
+    created_at: reserva.created_at,
+    servicio_tipo: reserva.servicio,
+    servicio_precio: reserva.precio,
+    servicio_categoria: reserva.categoria,
+    tipo_reunion: reserva.tipo_reunion,
+    estado: reserva.estado,
+    webhook_sent: reserva.webhook_sent
+  }));
 }
 
 // Función para programar recordatorios automáticos
@@ -265,14 +356,33 @@ export async function scheduleReminders(): Promise<void> {
     if (error) throw error;
 
     // Enviar recordatorio para cada cita
-    for (const reservation of reservations || []) {
+    for (const reserva of reservations || []) {
+      // Convertir ReservaTable a Reservation
+      const reservation: Reservation = {
+        id: reserva.id,
+        cliente_nombre: reserva.nombre,
+        cliente_rut: reserva.rut,
+        cliente_email: reserva.email,
+        cliente_telefono: reserva.telefono,
+        fecha: reserva.fecha,
+        hora: reserva.hora,
+        descripcion: reserva.descripcion,
+        created_at: reserva.created_at,
+        servicio_tipo: reserva.servicio,
+        servicio_precio: reserva.precio,
+        servicio_categoria: reserva.categoria,
+        tipo_reunion: reserva.tipo_reunion,
+        estado: reserva.estado,
+        webhook_sent: reserva.webhook_sent
+      };
+      
       await sendToMakeWebhook(reservation, 'recordatorio');
       
       // Marcar recordatorio como enviado
       await supabase
         .from('reservas')
         .update({ recordatorio_enviado: true })
-        .eq('id', reservation.id);
+        .eq('id', reserva.id);
     }
 
     console.log(`Recordatorios programados para ${reservations?.length || 0} citas`);

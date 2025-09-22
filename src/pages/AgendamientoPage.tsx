@@ -593,19 +593,30 @@ export default function AgendamientoPage() {
                           return;
                         }
 
+                          // Calcular el precio numérico real
+                          let precioNumerico;
+                          if (isAdminValido) {
+                            precioNumerico = precioAdmin;
+                          } else if (isConvenioValido) {
+                            precioNumerico = Math.round(precioConConvenio);
+                          } else {
+                            precioNumerico = precioOriginal;
+                          }
+
                           const paymentData = {
                             ...formData,
                             service: service.name,
-                          price: precioFinal,
-                          originalPrice: (service as any).price,
+                            price: precioNumerico, // Guardar como número
+                            priceFormatted: precioFinal, // Guardar también el formateado para mostrar
+                            originalPrice: (service as any).price,
                             category: service.category,
                             fecha: selectedDate,
                             hora: selectedTime,
                             tipo_reunion: selectedMeetingType,
                             descripcion: formData.descripcion,
-                          codigoConvenio: formData.codigoConvenio,
-                          descuentoConvenio: isConvenioValido,
-                          porcentajeDescuento: isConvenioValido ? '80%' : ((service as any).discount || null),
+                            codigoConvenio: formData.codigoConvenio,
+                            descuentoConvenio: isConvenioValido,
+                            porcentajeDescuento: isConvenioValido ? '80%' : ((service as any).discount || null),
                             id: Date.now().toString()
                           };
                           
