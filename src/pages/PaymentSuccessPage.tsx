@@ -47,29 +47,21 @@ export default function PaymentSuccessPage() {
       const paymentInfo = JSON.parse(storedData);
       console.log('📋 Datos de pago almacenados:', paymentInfo);
 
-      // Si no hay datos suficientes, usar datos por defecto
-      if (!paymentInfo.cliente && !paymentInfo.name) {
-        console.warn('⚠️ Datos de cliente incompletos, usando datos por defecto');
-      }
-
       // Crear reserva en la base de datos
       setProcessingStatus('Guardando reserva en la base de datos...');
       
-      // Extraer datos de manera más robusta
-      const clienteData = paymentInfo.cliente || {};
-      const serviceData = paymentInfo.servicio || {};
-      
+      // Extraer datos de manera más robusta - estructura correcta desde AgendamientoPage
       const reservationData = {
-        nombre: clienteData.nombre || paymentInfo.name || 'Cliente',
-        rut: clienteData.rut || paymentInfo.rut || 'No especificado',
-        email: clienteData.email || paymentInfo.email || 'No especificado',
-        telefono: clienteData.telefono || paymentInfo.phone || 'No especificado',
-        fecha: paymentInfo.fecha || paymentInfo.date || new Date().toISOString().split('T')[0],
-        hora: paymentInfo.hora || paymentInfo.time || '10:00',
-        descripcion: `Consulta ${paymentInfo.service || serviceData.tipo || 'General'} - Pago confirmado via MercadoPago`,
-        servicio: paymentInfo.service || serviceData.tipo || 'Consulta General',
-        precio: paymentInfo.price || serviceData.precio || '35000',
-        categoria: paymentInfo.category || serviceData.categoria || 'General',
+        nombre: paymentInfo.nombre || 'Cliente',
+        rut: paymentInfo.rut || 'No especificado',
+        email: paymentInfo.email || 'No especificado',
+        telefono: paymentInfo.telefono || 'No especificado',
+        fecha: paymentInfo.fecha || new Date().toISOString().split('T')[0],
+        hora: paymentInfo.hora || '10:00',
+        descripcion: `Consulta ${paymentInfo.service || 'General'} - Pago confirmado via MercadoPago`,
+        servicio: paymentInfo.service || 'Consulta General',
+        precio: paymentInfo.price || '35000',
+        categoria: paymentInfo.category || 'General',
         tipo_reunion: paymentInfo.tipo_reunion || 'online',
         estado: 'confirmada' as const,
         webhook_sent: false
@@ -104,12 +96,25 @@ export default function PaymentSuccessPage() {
       const emailResult = await sendBookingEmailsMake(emailData);
       console.log('📧 Resultado de emails Make:', emailResult);
 
-      // Actualizar estado
+      // Actualizar estado con los datos correctos
       setPaymentData({
-        ...paymentInfo,
         reservation,
         mercadopagoData,
-        emailResult
+        emailResult,
+        // Datos del cliente para mostrar en la UI
+        cliente: {
+          nombre: paymentInfo.nombre,
+          email: paymentInfo.email,
+          telefono: paymentInfo.telefono
+        },
+        servicio: {
+          tipo: paymentInfo.service,
+          precio: paymentInfo.price,
+          categoria: paymentInfo.category
+        },
+        fecha: paymentInfo.fecha,
+        hora: paymentInfo.hora,
+        tipo_reunion: paymentInfo.tipo_reunion
       });
 
       setProcessingStatus('¡Proceso completado exitosamente!');
@@ -202,7 +207,7 @@ export default function PaymentSuccessPage() {
                   <div>
                     <p className="text-sm text-gray-500">Cliente</p>
                     <p className="font-semibold text-gray-900">
-                      {paymentData?.reservation?.nombre || 'Cliente'}
+                      {paymentData?.reservation?.nombre || paymentData?.cliente?.nombre || 'Cliente'}
                     </p>
                   </div>
                 </div>
@@ -214,7 +219,7 @@ export default function PaymentSuccessPage() {
                   <div>
                     <p className="text-sm text-gray-500">Email</p>
                     <p className="font-semibold text-gray-900">
-                      {paymentData?.reservation?.email || 'No especificado'}
+                      {paymentData?.reservation?.email || paymentData?.cliente?.email || 'No especificado'}
                     </p>
                   </div>
                 </div>
@@ -226,7 +231,7 @@ export default function PaymentSuccessPage() {
                   <div>
                     <p className="text-sm text-gray-500">Teléfono</p>
                     <p className="font-semibold text-gray-900">
-                      {paymentData?.reservation?.telefono || 'No especificado'}
+                      {paymentData?.reservation?.telefono || paymentData?.cliente?.telefono || 'No especificado'}
                     </p>
                   </div>
                 </div>
@@ -240,7 +245,8 @@ export default function PaymentSuccessPage() {
                   <div>
                     <p className="text-sm text-gray-500">Fecha</p>
                     <p className="font-semibold text-gray-900">
-                      {paymentData?.reservation?.fecha ? new Date(paymentData.reservation.fecha).toLocaleDateString('es-CL') : 'No especificada'}
+                      {paymentData?.reservation?.fecha ? new Date(paymentData.reservation.fecha).toLocaleDateString('es-CL') : 
+                       paymentData?.fecha ? new Date(paymentData.fecha).toLocaleDateString('es-CL') : 'No especificada'}
                     </p>
                   </div>
                 </div>
@@ -252,7 +258,7 @@ export default function PaymentSuccessPage() {
                   <div>
                     <p className="text-sm text-gray-500">Hora</p>
                     <p className="font-semibold text-gray-900">
-                      {paymentData?.reservation?.hora || '10:00'} hrs
+                      {paymentData?.reservation?.hora || paymentData?.hora || '10:00'} hrs
                     </p>
                   </div>
                 </div>
@@ -264,7 +270,7 @@ export default function PaymentSuccessPage() {
                   <div>
                     <p className="text-sm text-gray-500">Servicio</p>
                     <p className="font-semibold text-gray-900">
-                      {paymentData?.reservation?.servicio || 'Consulta Legal'}
+                      {paymentData?.reservation?.servicio || paymentData?.servicio?.tipo || 'Consulta Legal'}
                     </p>
                   </div>
                 </div>
@@ -275,7 +281,8 @@ export default function PaymentSuccessPage() {
               <div className="flex items-center justify-between">
                 <span className="text-lg font-semibold text-gray-900">Total pagado</span>
                 <span className="text-2xl font-bold text-green-600">
-                  ${paymentData?.reservation?.precio ? Number(paymentData.reservation.precio).toLocaleString('es-CL') : '0'}
+                  ${paymentData?.reservation?.precio ? Number(paymentData.reservation.precio).toLocaleString('es-CL') : 
+                    paymentData?.servicio?.precio ? Number(paymentData.servicio.precio).toLocaleString('es-CL') : '0'}
                 </span>
               </div>
             </div>
