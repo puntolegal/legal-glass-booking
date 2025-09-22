@@ -23,7 +23,7 @@ BEGIN
     -- Get project configuration
     -- Note: In production, these values should be configured in Supabase environment variables
     project_ref := 'qrgelocijmwnxcckxbdg'; -- Replace with real project_ref
-    edge_function_url := 'https://' || project_ref || '.supabase.co/functions/v1/send-booking-emails';
+    edge_function_url := 'https://' || project_ref || '.supabase.co/functions/v1/clever-action';
     admin_token := 'puntolegal-admin-token-2025'; -- Secret token for authorization
     
     -- Log for debugging
@@ -90,7 +90,7 @@ BEGIN
   
   -- Configure URLs
   project_ref := 'qrgelocijmwnxcckxbdg';
-  edge_function_url := 'https://' || project_ref || '.supabase.co/functions/v1/send-booking-emails';
+  edge_function_url := 'https://' || project_ref || '.supabase.co/functions/v1/clever-action';
   admin_token := 'puntolegal-admin-token-2025';
   
   -- Make HTTP call

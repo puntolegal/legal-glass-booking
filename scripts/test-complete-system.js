@@ -55,7 +55,7 @@ console.log('3. Probar sistema completo\n');
 
 console.log('🚀 COMANDO DE PRUEBA:');
 console.log('=====================');
-console.log('curl -X POST https://qrgelocijmwnxcckxbdg.supabase.co/functions/v1/send-booking-emails \\');
+console.log('curl -X POST https://qrgelocijmwnxcckxbdg.supabase.co/functions/v1/clever-action \\');
 console.log('  -H "Content-Type: application/json" \\');
 console.log('  -H "X-Admin-Token: puntolegal-admin-token-2025" \\');
 console.log('  -d \'{"booking_id": "' + testReservation.id + '"}\'\n');

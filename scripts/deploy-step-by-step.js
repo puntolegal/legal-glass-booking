@@ -38,7 +38,7 @@ console.log('📋 PASO 4: PROBAR EL SISTEMA');
 console.log('=============================');
 console.log('Ejecuta este comando para probar:');
 console.log('');
-console.log('curl -X POST https://qrgelocijmwnxcckxbdg.supabase.co/functions/v1/send-booking-emails \\');
+console.log('curl -X POST https://qrgelocijmwnxcckxbdg.supabase.co/functions/v1/clever-action \\');
 console.log('  -H "Content-Type: application/json" \\');
 console.log('  -H "X-Admin-Token: puntolegal-admin-token-2025" \\');
 console.log('  -d \'{"booking_id": "test-manual-1758502031417"}\'\n');
