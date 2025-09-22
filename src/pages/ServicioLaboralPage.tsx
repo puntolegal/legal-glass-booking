@@ -68,7 +68,7 @@ const testimonials = [
 
 const stats = [
   { number: '1000+', label: 'Casos laborales resueltos' },
-  { number: '95%', label: 'Casos ganados' },
+  { number: '100%', label: 'Confidencialidad' },
   { number: '48h', label: 'Respuesta garantizada' },
   { number: '98%', label: 'Clientes satisfechos' }
 ]

@@ -55,7 +55,7 @@ const testimonials = [
 ]
 
 const stats = [
-  { number: '95%', label: 'Casos exitosos' },
+  { number: '100%', label: 'Confidencialidad' },
   { number: '500+', label: 'Clientes defendidos' },
   { number: '24h', label: 'Respuesta en urgencias' },
   { number: '15+', label: 'Años de experiencia' }

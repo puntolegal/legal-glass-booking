@@ -73,7 +73,7 @@ const ServicioTributarioPage: React.FC = () => {
   const stats = [
     { value: "$50M+", label: "Ahorrados en impuestos" },
     { value: "500+", label: "Empresas asesoradas" },
-    { value: "95%", label: "Casos ganados ante SII" },
+    { value: "100%", label: "Confidencialidad" },
     { value: "24h", label: "Respuesta urgente" }
   ];
 

@@ -389,7 +389,7 @@ export default function ServicioCivilPage() {
                   title: 'Embargo y Remate',
                   description: 'Ejecución forzada de bienes del deudor',
                   features: ['Embargo de bienes', 'Remate público', 'Liquidación', 'Pago efectivo'],
-                  success: '95% de recuperación'
+                  success: '100% Confidencialidad'
                 }
               ].map((process, index) => (
                 <motion.div
