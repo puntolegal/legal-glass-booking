@@ -120,10 +120,11 @@ export default function AgendamientoPage() {
   const precioOriginal = parseFloat((service as any).price?.replace(/\./g, '') || '0');
   
   let precioFinal;
+  let precioConConvenio = 0;
   if (isAdminValido) {
     precioFinal = precioAdmin.toLocaleString('es-CL');
   } else if (isConvenioValido) {
-    const precioConConvenio = precioOriginal * (1 - descuentoConvenio);
+    precioConConvenio = precioOriginal * (1 - descuentoConvenio);
     precioFinal = Math.round(precioConConvenio).toLocaleString('es-CL');
   } else {
     precioFinal = precioOriginal.toLocaleString('es-CL');
@@ -383,13 +384,15 @@ export default function AgendamientoPage() {
                           value={formData.codigoConvenio}
                           onChange={(e) => setFormData({...formData, codigoConvenio: e.target.value})}
                           className={`w-full px-4 py-4 border rounded-xl focus:ring-2 outline-none transition-all text-gray-900 dark:text-gray-100 text-base ${
-                            isConvenioValido 
+                            isAdminValido
+                              ? 'bg-purple-50 dark:bg-purple-900/20 border-purple-300 dark:border-purple-700 focus:border-purple-500 focus:ring-purple-500/20'
+                              : isConvenioValido 
                               ? 'bg-green-50 dark:bg-green-900/20 border-green-300 dark:border-green-700 focus:border-green-500 focus:ring-green-500/20' 
                               : 'bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600 focus:border-blue-500 focus:ring-blue-500/20'
                           }`}
                           placeholder="Código especial"
                         />
-                        {isConvenioValido && (
+                        {isConvenioValido && !isAdminValido && (
                           <motion.div 
                             initial={{ opacity: 0, y: -10 }}
                             animate={{ opacity: 1, y: 0 }}
@@ -397,6 +400,16 @@ export default function AgendamientoPage() {
                           >
                             <CheckCircle className="w-4 h-4" />
                             <span className="font-medium">Código válido - Descuento del 80% aplicado</span>
+                          </motion.div>
+                        )}
+                        {isAdminValido && (
+                          <motion.div 
+                            initial={{ opacity: 0, y: -10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="mt-3 flex items-center gap-2 text-sm text-purple-600 dark:text-purple-400"
+                          >
+                            <CheckCircle className="w-4 h-4" />
+                            <span className="font-medium">Código admin válido - Precio especial $1.000 aplicado</span>
                           </motion.div>
                         )}
                     </div>
