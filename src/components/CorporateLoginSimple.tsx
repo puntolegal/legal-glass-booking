@@ -41,18 +41,44 @@ export default function CorporateLoginSimple({ onClose, onLoginSuccess }: Corpor
 
     try {
       if (isLogin) {
-        // Iniciar sesión con Supabase
-        const { data, error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
-
-        if (error) {
-          throw new Error(error.message);
+        // Verificar credenciales de demostración primero
+        if (email === 'admin@miempresa.cl' && password === 'demo123') {
+          // Usuario de demostración - crear objeto de usuario simulado
+          const demoUser = {
+            id: 'demo-user-123',
+            email: 'admin@miempresa.cl',
+            user_metadata: {
+              role: 'corporate',
+              empresa: 'Mi Empresa Demo',
+              access_level: 'admin'
+            },
+            app_metadata: {
+              provider: 'demo'
+            }
+          };
+          
+          setSuccess('Inicio de sesión exitoso (Modo Demostración)');
+          onLoginSuccess(demoUser);
+          return;
         }
 
-        setSuccess('Inicio de sesión exitoso');
-        onLoginSuccess(data.user);
+        // Intentar login con Supabase para otros usuarios
+        try {
+          const { data, error } = await supabase.auth.signInWithPassword({
+            email,
+            password,
+          });
+
+          if (error) {
+            throw new Error(error.message);
+          }
+
+          setSuccess('Inicio de sesión exitoso');
+          onLoginSuccess(data.user);
+        } catch (supabaseError: any) {
+          // Si falla Supabase, mostrar error genérico
+          throw new Error('Credenciales inválidas. Usa las credenciales de demostración o verifica tu cuenta.');
+        }
       } else {
         // Registro con Supabase
         const { data, error } = await supabase.auth.signUp({
@@ -80,7 +106,7 @@ export default function CorporateLoginSimple({ onClose, onLoginSuccess }: Corpor
   };
 
   const quickLoginDemo = () => {
-    setEmail('admin@puntolegal.cl');
+    setEmail('admin@miempresa.cl');
     setPassword('demo123');
   };
 
