@@ -52,16 +52,16 @@ export default function PaymentSuccessPage() {
       
       // Extraer datos de manera más robusta - estructura correcta desde AgendamientoPage
       const reservationData = {
-        nombre: paymentInfo.nombre || 'Cliente',
-        rut: paymentInfo.rut || 'No especificado',
-        email: paymentInfo.email || 'No especificado',
-        telefono: paymentInfo.telefono || 'No especificado',
+        nombre: paymentInfo.nombre || paymentInfo.cliente?.nombre || 'Cliente',
+        rut: paymentInfo.rut || paymentInfo.cliente?.rut || 'No especificado',
+        email: paymentInfo.email || paymentInfo.cliente?.email || 'No especificado',
+        telefono: paymentInfo.telefono || paymentInfo.cliente?.telefono || 'No especificado',
         fecha: paymentInfo.fecha || new Date().toISOString().split('T')[0],
         hora: paymentInfo.hora || '10:00',
-        descripcion: `Consulta ${paymentInfo.service || 'General'} - Pago confirmado via MercadoPago`,
-        servicio: paymentInfo.service || 'Consulta General',
-        precio: paymentInfo.price || '35000',
-        categoria: paymentInfo.category || 'General',
+        descripcion: `Consulta ${paymentInfo.service || paymentInfo.servicio?.tipo || 'General'} - Pago confirmado via MercadoPago`,
+        servicio: paymentInfo.service || paymentInfo.servicio?.tipo || 'Consulta General',
+        precio: paymentInfo.price || paymentInfo.servicio?.precio || '35000',
+        categoria: paymentInfo.category || paymentInfo.servicio?.categoria || 'General',
         tipo_reunion: paymentInfo.tipo_reunion || 'online',
         estado: 'confirmada' as const,
         webhook_sent: false
@@ -110,18 +110,20 @@ export default function PaymentSuccessPage() {
         emailResult,
         // Datos del cliente para mostrar en la UI
         cliente: {
-          nombre: paymentInfo.nombre,
-          email: paymentInfo.email,
-          telefono: paymentInfo.telefono
+          nombre: paymentInfo.nombre || paymentInfo.cliente?.nombre || reservation.nombre,
+          email: paymentInfo.email || paymentInfo.cliente?.email || reservation.email,
+          telefono: paymentInfo.telefono || paymentInfo.cliente?.telefono || reservation.telefono
         },
         servicio: {
-          tipo: paymentInfo.service,
-          precio: paymentInfo.price,
-          categoria: paymentInfo.category
+          tipo: paymentInfo.service || paymentInfo.servicio?.tipo || reservation.servicio,
+          precio: paymentInfo.price || paymentInfo.servicio?.precio || reservation.precio,
+          categoria: paymentInfo.category || paymentInfo.servicio?.categoria || reservation.categoria
         },
-        fecha: paymentInfo.fecha,
-        hora: paymentInfo.hora,
-        tipo_reunion: paymentInfo.tipo_reunion
+        fecha: paymentInfo.fecha || reservation.fecha,
+        hora: paymentInfo.hora || reservation.hora,
+        tipo_reunion: paymentInfo.tipo_reunion || reservation.tipo_reunion,
+        // Datos adicionales para debugging
+        price: paymentInfo.price || paymentInfo.servicio?.precio || reservation.precio
       });
 
       setProcessingStatus('¡Proceso completado exitosamente!');
@@ -288,8 +290,14 @@ export default function PaymentSuccessPage() {
               <div className="flex items-center justify-between">
                 <span className="text-lg font-semibold text-gray-900">Total pagado</span>
                 <span className="text-2xl font-bold text-green-600">
-                  ${paymentData?.reservation?.precio ? Number(paymentData.reservation.precio).toLocaleString('es-CL') : 
-                    paymentData?.servicio?.precio ? Number(paymentData.servicio.precio).toLocaleString('es-CL') : '0'}
+                  ${(() => {
+                    const precio = paymentData?.reservation?.precio || paymentData?.servicio?.precio || paymentData?.price;
+                    if (precio) {
+                      const precioNum = typeof precio === 'string' ? parseInt(precio.replace(/[^\d]/g, '')) : precio;
+                      return precioNum > 0 ? precioNum.toLocaleString('es-CL') : '35.000';
+                    }
+                    return '35.000';
+                  })()}
                 </span>
               </div>
             </div>
