@@ -1,11 +1,11 @@
--- Migración para trigger de envío automático de emails
--- Fecha: 2025-01-13
--- Descripción: Crea trigger que envía emails automáticamente cuando se crea o actualiza una reserva con estado 'confirmada'
+-- Migration for automatic email sending trigger
+-- Date: 2025-01-13
+-- Description: Creates trigger that sends emails automatically when a reservation is created or updated with 'confirmada' status
 
--- Habilitar extensión pg_net si no está habilitada
+-- Enable pg_net extension if not enabled
 CREATE EXTENSION IF NOT EXISTS pg_net;
 
--- Crear función para notificar envío de emails
+-- Create function to notify email sending
 CREATE OR REPLACE FUNCTION public.notify_email_on_paid()
 RETURNS TRIGGER 
 LANGUAGE plpgsql 
@@ -17,19 +17,19 @@ DECLARE
   edge_function_url text;
   admin_token text;
 BEGIN
-  -- Solo procesar si el estado es 'confirmada' y es una inserción o actualización
+  -- Only process if status is 'confirmada' and it's an insert or update
   IF NEW.estado = 'confirmada' AND (TG_OP = 'INSERT' OR (TG_OP = 'UPDATE' AND OLD.estado IS DISTINCT FROM NEW.estado)) THEN
     
-    -- Obtener configuración del proyecto
-    -- Nota: En producción, estos valores deben configurarse en las variables de entorno de Supabase
-    project_ref := 'qrgelocijmwnxcckxbdg'; -- Reemplazar con el project_ref real
+    -- Get project configuration
+    -- Note: In production, these values should be configured in Supabase environment variables
+    project_ref := 'qrgelocijmwnxcckxbdg'; -- Replace with real project_ref
     edge_function_url := 'https://' || project_ref || '.supabase.co/functions/v1/send-booking-emails';
-    admin_token := 'puntolegal-admin-token-2025'; -- Token secreto para autorización
+    admin_token := 'puntolegal-admin-token-2025'; -- Secret token for authorization
     
-    -- Log para debugging
-    RAISE LOG 'Enviando notificación de email para reserva ID: %', NEW.id;
+    -- Log for debugging
+    RAISE LOG 'Sending email notification for reservation ID: %', NEW.id;
     
-    -- Hacer llamada HTTP a la Edge Function
+    -- Make HTTP call to Edge Function
     SELECT net.http_post(
       url := edge_function_url,
       headers := jsonb_build_object(
@@ -39,14 +39,14 @@ BEGIN
       body := jsonb_build_object('booking_id', NEW.id)::text
     ) INTO resp;
     
-    -- Log del resultado
-    RAISE LOG 'Respuesta de Edge Function: %', resp;
+    -- Log the result
+    RAISE LOG 'Edge Function response: %', resp;
     
-    -- Verificar si la respuesta fue exitosa
+    -- Check if response was successful
     IF resp->>'status_code' = '200' THEN
-      RAISE LOG 'Email enviado exitosamente para reserva ID: %', NEW.id;
+      RAISE LOG 'Email sent successfully for reservation ID: %', NEW.id;
     ELSE
-      RAISE WARNING 'Error enviando email para reserva ID: %. Respuesta: %', NEW.id, resp;
+      RAISE WARNING 'Error sending email for reservation ID: %. Response: %', NEW.id, resp;
     END IF;
     
   END IF;
@@ -55,7 +55,7 @@ BEGIN
 END;
 $$;
 
--- Crear trigger para envío automático de emails
+-- Create trigger for automatic email sending
 DROP TRIGGER IF EXISTS trg_notify_email_on_paid ON public.reservas;
 
 CREATE TRIGGER trg_notify_email_on_paid
@@ -64,11 +64,11 @@ CREATE TRIGGER trg_notify_email_on_paid
   WHEN (NEW.estado = 'confirmada')
   EXECUTE FUNCTION public.notify_email_on_paid();
 
--- Comentarios para documentación
-COMMENT ON FUNCTION public.notify_email_on_paid() IS 'Función que envía emails automáticamente cuando una reserva cambia a estado confirmada';
-COMMENT ON TRIGGER trg_notify_email_on_paid ON public.reservas IS 'Trigger que ejecuta el envío de emails cuando se crea o actualiza una reserva confirmada';
+-- Documentation comments
+COMMENT ON FUNCTION public.notify_email_on_paid() IS 'Function that sends emails automatically when a reservation changes to confirmed status';
+COMMENT ON TRIGGER trg_notify_email_on_paid ON public.reservas IS 'Trigger that executes email sending when a confirmed reservation is created or updated';
 
--- Crear función de prueba para testing manual
+-- Create test function for manual testing
 CREATE OR REPLACE FUNCTION public.test_email_trigger(reserva_id uuid)
 RETURNS jsonb
 LANGUAGE plpgsql
@@ -81,19 +81,19 @@ DECLARE
   edge_function_url text;
   admin_token text;
 BEGIN
-  -- Obtener la reserva
+  -- Get the reservation
   SELECT * INTO reserva_record FROM public.reservas WHERE id = reserva_id;
   
   IF NOT FOUND THEN
-    RETURN jsonb_build_object('error', 'Reserva no encontrada', 'id', reserva_id);
+    RETURN jsonb_build_object('error', 'Reservation not found', 'id', reserva_id);
   END IF;
   
-  -- Configurar URLs
+  -- Configure URLs
   project_ref := 'qrgelocijmwnxcckxbdg';
   edge_function_url := 'https://' || project_ref || '.supabase.co/functions/v1/send-booking-emails';
   admin_token := 'puntolegal-admin-token-2025';
   
-  -- Hacer llamada HTTP
+  -- Make HTTP call
   SELECT net.http_post(
     url := edge_function_url,
     headers := jsonb_build_object(
@@ -111,9 +111,9 @@ BEGIN
 END;
 $$;
 
-COMMENT ON FUNCTION public.test_email_trigger(uuid) IS 'Función de prueba para enviar emails manualmente usando una reserva existente';
+COMMENT ON FUNCTION public.test_email_trigger(uuid) IS 'Test function to send emails manually using an existing reservation';
 
--- Crear vista para monitorear reservas con emails enviados
+-- Create view to monitor reservations with emails sent
 CREATE OR REPLACE VIEW public.reservas_with_email_status AS
 SELECT 
   r.*,
@@ -126,9 +126,9 @@ SELECT
 FROM public.reservas r
 ORDER BY r.created_at DESC;
 
-COMMENT ON VIEW public.reservas_with_email_status IS 'Vista para monitorear el estado de envío de emails de las reservas';
+COMMENT ON VIEW public.reservas_with_email_status IS 'View to monitor email sending status of reservations';
 
--- Crear función para obtener estadísticas de emails
+-- Create function to get email statistics
 CREATE OR REPLACE FUNCTION public.get_email_stats()
 RETURNS jsonb
 LANGUAGE plpgsql
@@ -159,20 +159,20 @@ BEGIN
 END;
 $$;
 
-COMMENT ON FUNCTION public.get_email_stats() IS 'Función para obtener estadísticas de reservas y emails enviados';
+COMMENT ON FUNCTION public.get_email_stats() IS 'Function to get reservation and email sending statistics';
 
--- Configurar permisos
+-- Configure permissions
 GRANT EXECUTE ON FUNCTION public.notify_email_on_paid() TO authenticated;
 GRANT EXECUTE ON FUNCTION public.test_email_trigger(uuid) TO authenticated;
 GRANT EXECUTE ON FUNCTION public.get_email_stats() TO authenticated;
 GRANT SELECT ON public.reservas_with_email_status TO authenticated;
 
--- Log de finalización
+-- Completion log
 DO $$
 BEGIN
-  RAISE LOG 'Migración de trigger de emails completada exitosamente';
-  RAISE LOG 'Trigger creado: trg_notify_email_on_paid';
-  RAISE LOG 'Función de prueba: test_email_trigger(uuid)';
-  RAISE LOG 'Vista de monitoreo: reservas_with_email_status';
-  RAISE LOG 'Función de estadísticas: get_email_stats()';
+  RAISE LOG 'Email trigger migration completed successfully';
+  RAISE LOG 'Trigger created: trg_notify_email_on_paid';
+  RAISE LOG 'Test function: test_email_trigger(uuid)';
+  RAISE LOG 'Monitoring view: reservas_with_email_status';
+  RAISE LOG 'Statistics function: get_email_stats()';
 END $$;
