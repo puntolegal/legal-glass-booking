@@ -22,10 +22,10 @@ export interface Reservation {
 // Interfaz para la estructura real de la tabla reservas en Supabase
 export interface ReservaTable {
   id: string;
-  nombre: string;
-  rut: string;
-  email: string;
-  telefono: string;
+  cliente_nombre: string;
+  cliente_rut: string;
+  cliente_email: string;
+  cliente_telefono: string;
   fecha: string;
   hora: string;
   descripcion: string;
@@ -60,10 +60,10 @@ export async function createReservation(reservationData: Omit<Reservation, 'id' 
   try {
     // Mapear los datos a la estructura real de la tabla reservas
     const reservaData = {
-      nombre: reservationData.cliente_nombre,
-      rut: reservationData.cliente_rut,
-      email: reservationData.cliente_email,
-      telefono: reservationData.cliente_telefono,
+      cliente_nombre: reservationData.cliente_nombre,
+      cliente_rut: reservationData.cliente_rut,
+      cliente_email: reservationData.cliente_email,
+      cliente_telefono: reservationData.cliente_telefono,
       fecha: reservationData.fecha,
       hora: reservationData.hora,
       descripcion: reservationData.descripcion,
@@ -91,10 +91,10 @@ export async function createReservation(reservationData: Omit<Reservation, 'id' 
     // Convertir de ReservaTable a Reservation
     const newReservation: Reservation = {
       id: data.id,
-      cliente_nombre: data.nombre,
-      cliente_rut: data.rut,
-      cliente_email: data.email,
-      cliente_telefono: data.telefono,
+      cliente_nombre: data.cliente_nombre,
+      cliente_rut: data.cliente_rut,
+      cliente_email: data.cliente_email,
+      cliente_telefono: data.cliente_telefono,
       fecha: data.fecha,
       hora: data.hora,
       descripcion: data.descripcion,
@@ -148,10 +148,10 @@ export async function confirmReservation(reservationId: string): Promise<{ succe
     // Enviar emails directamente via Resend
     const emailResult = await sendBookingEmailsDirect({
       id: reservation.id,
-      cliente_nombre: reservation.nombre,
-      cliente_email: reservation.email,
-      cliente_telefono: reservation.telefono,
-      cliente_rut: reservation.rut,
+      cliente_nombre: reservation.cliente_nombre,
+      cliente_email: reservation.cliente_email,
+      cliente_telefono: reservation.cliente_telefono,
+      cliente_rut: reservation.cliente_rut,
       servicio_tipo: reservation.servicio,
       servicio_precio: reservation.precio,
       servicio_descripcion: reservation.descripcion,
@@ -270,10 +270,10 @@ export async function getReservationsByDate(fecha: string): Promise<Reservation[
   // Convertir de ReservaTable[] a Reservation[]
   return (data || []).map((reserva: ReservaTable): Reservation => ({
     id: reserva.id,
-    cliente_nombre: reserva.nombre,
-    cliente_rut: reserva.rut,
-    cliente_email: reserva.email,
-    cliente_telefono: reserva.telefono,
+    cliente_nombre: reserva.cliente_nombre,
+    cliente_rut: reserva.cliente_rut,
+    cliente_email: reserva.cliente_email,
+    cliente_telefono: reserva.cliente_telefono,
     fecha: reserva.fecha,
     hora: reserva.hora,
     descripcion: reserva.descripcion,
@@ -321,10 +321,10 @@ export async function getAllReservations(): Promise<Reservation[]> {
   // Convertir de ReservaTable[] a Reservation[]
   return (data || []).map((reserva: ReservaTable): Reservation => ({
     id: reserva.id,
-    cliente_nombre: reserva.nombre,
-    cliente_rut: reserva.rut,
-    cliente_email: reserva.email,
-    cliente_telefono: reserva.telefono,
+    cliente_nombre: reserva.cliente_nombre,
+    cliente_rut: reserva.cliente_rut,
+    cliente_email: reserva.cliente_email,
+    cliente_telefono: reserva.cliente_telefono,
     fecha: reserva.fecha,
     hora: reserva.hora,
     descripcion: reserva.descripcion,
