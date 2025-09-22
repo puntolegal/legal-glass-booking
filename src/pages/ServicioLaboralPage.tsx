@@ -342,6 +342,7 @@ export default function ServicioLaboralPage() {
               <CorporateLoginSimple
                 onClose={handleCloseLogin}
                 onLoginSuccess={handleLoginSuccess}
+                isModal={true}
               />
             </motion.div>
           </div>

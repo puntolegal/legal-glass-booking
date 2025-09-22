@@ -770,6 +770,7 @@ export default function ServicioCorporativoPage() {
             <CorporateLoginSimple
               onClose={() => setShowLogin(false)}
               onLoginSuccess={handleLoginSuccess}
+              isModal={true}
             />
           </motion.div>
         </div>

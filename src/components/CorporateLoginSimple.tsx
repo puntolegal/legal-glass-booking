@@ -6,9 +6,10 @@ import { supabase } from '@/integrations/supabase/client';
 interface CorporateLoginProps {
   onClose: () => void;
   onLoginSuccess: (user: any) => void;
+  isModal?: boolean; // Nueva prop para indicar si es un modal
 }
 
-export default function CorporateLoginSimple({ onClose, onLoginSuccess }: CorporateLoginProps) {
+export default function CorporateLoginSimple({ onClose, onLoginSuccess, isModal = false }: CorporateLoginProps) {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -110,20 +111,13 @@ export default function CorporateLoginSimple({ onClose, onLoginSuccess }: Corpor
     setPassword('demo123');
   };
 
-  return (
+  const modalContent = (
     <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-      onClick={(e) => e.target === e.currentTarget && onClose()}
+      initial={{ scale: 0.9, opacity: 0 }}
+      animate={{ scale: 1, opacity: 1 }}
+      exit={{ scale: 0.9, opacity: 0 }}
+      className="bg-white rounded-2xl max-w-md w-full max-h-[90vh] overflow-y-auto shadow-2xl"
     >
-      <motion.div
-        initial={{ scale: 0.9, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        exit={{ scale: 0.9, opacity: 0 }}
-        className="bg-white rounded-2xl max-w-md w-full max-h-[90vh] overflow-y-auto shadow-2xl"
-      >
         {/* Header */}
         <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-6 rounded-t-2xl relative">
           <button
@@ -289,6 +283,23 @@ export default function CorporateLoginSimple({ onClose, onLoginSuccess }: Corpor
           </div>
         </div>
       </motion.div>
+  );
+
+  // Si es modal, solo retornar el contenido
+  if (isModal) {
+    return modalContent;
+  }
+
+  // Si no es modal, retornar con posicionamiento fijo
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+      onClick={(e) => e.target === e.currentTarget && onClose()}
+    >
+      {modalContent}
     </motion.div>
   );
 }
