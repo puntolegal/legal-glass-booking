@@ -36,7 +36,7 @@ export interface Reserva {
   cliente_rut?: string;
   servicio_tipo: string;
   servicio_precio: string;
-  servicio_descripcion?: string;
+  descripcion?: string;
   fecha: string;
   hora: string;
   pago_metodo: string;
@@ -130,7 +130,7 @@ export const createBooking = async (bookingData: BookingData): Promise<{ success
       cliente_rut: bookingData.cliente.rut,
       servicio_tipo: bookingData.servicio.tipo,
       servicio_precio: bookingData.servicio.precio,
-      servicio_descripcion: bookingData.servicio.descripcion,
+      descripcion: bookingData.servicio.descripcion,
       fecha: bookingData.servicio.fecha,
       hora: bookingData.servicio.hora,
       pago_metodo: bookingData.pago?.metodo || 'pendiente',
@@ -191,7 +191,7 @@ const createOfflineReserva = (bookingData: BookingData): { success: boolean; res
       cliente_rut: bookingData.cliente.rut,
       servicio_tipo: bookingData.servicio.tipo,
       servicio_precio: bookingData.servicio.precio,
-      servicio_descripcion: bookingData.servicio.descripcion,
+      descripcion: bookingData.servicio.descripcion,
       fecha: bookingData.servicio.fecha,
       hora: bookingData.servicio.hora,
       pago_metodo: bookingData.pago?.metodo || 'pendiente',
@@ -287,7 +287,7 @@ const sendPaymentConfirmationEmail = async (reserva: Reserva) => {
       servicio: {
         tipo: reserva.servicio_tipo,
         precio: reserva.servicio_precio,
-        descripcion: reserva.servicio_descripcion,
+        descripcion: reserva.descripcion,
         fecha: reserva.fecha,
         hora: reserva.hora
       },
