@@ -105,16 +105,7 @@ const AccessibilityPanel: React.FC = () => {
   }, []);
 
   if (!isOpen) {
-    return (
-      <Button
-        onClick={() => setIsOpen(true)}
-        className="fixed bottom-20 right-4 z-30 w-12 h-12 rounded-full bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-white shadow-lg shadow-primary/30 hover:shadow-primary/50 transition-all duration-300 hover:scale-110 backdrop-blur-xl border border-white/20"
-        size="icon"
-        aria-label="Abrir panel de accesibilidad"
-      >
-        <Accessibility className="w-5 h-5" />
-      </Button>
-    );
+    return null; // Ocultar botón flotante ya que está integrado en el dock
   }
 
   return (

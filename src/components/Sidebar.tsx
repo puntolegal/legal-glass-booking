@@ -441,32 +441,22 @@ export default function Sidebar() {
         />
       )}
 
-      {/* Botón flotante para abrir sidebar - móvil y web */}
+      {/* Botón flotante para abrir sidebar - solo web */}
       <AnimatePresence>
-        {!isOpen && (
+        {!isOpen && !isMobile && (
           <motion.button
             initial={{ scale: 0, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0, opacity: 0 }}
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
-            className={`fixed z-[100] rounded-full bg-gradient-to-r from-primary to-primary/80 text-white shadow-2xl backdrop-blur-xl border border-white/20 hover:shadow-3xl transition-all duration-300 flex items-center justify-center ${
-              isMobile 
-                ? 'bottom-4 left-4 p-3 sm:p-4 min-w-[48px] min-h-[48px]' 
-                : 'bottom-6 left-6 p-4 w-14 h-14'
-            }`}
+            className="fixed z-[100] rounded-full bg-gradient-to-r from-primary to-primary/80 text-white shadow-2xl backdrop-blur-xl border border-white/20 hover:shadow-3xl transition-all duration-300 flex items-center justify-center bottom-6 left-6 p-4 w-14 h-14"
             onClick={() => toggleSidebar()}
             transition={{ duration: 0.3, type: "spring", stiffness: 300 }}
             aria-label="Abrir menú lateral"
             data-sidebar-toggle
-            style={{ 
-              position: 'fixed',
-              zIndex: 100,
-              bottom: isMobile ? '1rem' : '1.5rem',
-              left: isMobile ? '1rem' : '1.5rem'
-            }}
           >
-            <MenuIcon className={isMobile ? "w-5 h-5 sm:w-6 sm:h-6" : "w-6 h-6"} />
+            <MenuIcon className="w-6 h-6" />
           </motion.button>
         )}
       </AnimatePresence>

@@ -129,7 +129,7 @@ export const PremiumMobileDock: React.FC<PremiumMobileDockProps> = ({ className 
               damping: 25,
               opacity: { duration: 0.3 }
             }}
-            className={`lg:hidden fixed bottom-4 left-1/2 transform -translate-x-1/2 z-50 ${className}`}
+            className={`lg:hidden fixed bottom-4 left-4 right-4 z-50 ${className}`}
           >
             {/* Dock Container - Glassmorphism Premium */}
             <div className="relative">
@@ -137,7 +137,7 @@ export const PremiumMobileDock: React.FC<PremiumMobileDockProps> = ({ className 
               <div className="absolute inset-0 bg-gradient-to-r from-orange-500/10 via-orange-500/15 to-orange-500/10 rounded-3xl blur-2xl" />
               
               {/* Main Dock - Reorganizado horizontalmente */}
-              <div className="relative bg-white/90 dark:bg-gray-900/90 backdrop-blur-3xl border border-white/30 dark:border-gray-700/40 rounded-3xl px-4 py-3 shadow-2xl shadow-black/20">
+              <div className="relative bg-white/90 dark:bg-gray-900/90 backdrop-blur-3xl border border-white/30 dark:border-gray-700/40 rounded-3xl px-3 py-2 shadow-2xl shadow-black/20">
                 <div className="flex items-center justify-between gap-2">
                   {/* Dock principal - 4 botones */}
                   <div className="flex items-center gap-0.5">
