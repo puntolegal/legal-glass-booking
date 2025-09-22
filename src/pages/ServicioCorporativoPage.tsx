@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { Building2, FileText, Users, TrendingUp, Shield, Globe, CheckCircle, Star, Clock, Award, LogIn, BarChart3, Calendar, AlertTriangle } from 'lucide-react'
+import { Building2, FileText, Users, TrendingUp, Shield, Globe, CheckCircle, Star, Clock, Award, LogIn, BarChart3, Calendar, AlertTriangle, X } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useState } from 'react'
 import SEO from '../components/SEO'
@@ -748,12 +748,31 @@ export default function ServicioCorporativoPage() {
         </MobileLayout>
       </div>
 
-      {/* Login Modal */}
+      {/* Login Modal - Posicionamiento fijo para móvil */}
       {showLogin && (
-        <CorporateLoginSimple
-          onClose={() => setShowLogin(false)}
-          onLoginSuccess={handleLoginSuccess}
-        />
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.9, y: 20 }}
+            transition={{ duration: 0.3, type: "spring", stiffness: 300 }}
+            className="relative w-full max-w-md max-h-[90vh] overflow-y-auto"
+          >
+            {/* Botón de cerrar */}
+            <button
+              onClick={() => setShowLogin(false)}
+              className="absolute top-4 right-4 z-10 w-8 h-8 rounded-full bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm flex items-center justify-center shadow-lg hover:bg-white dark:hover:bg-gray-700 transition-colors"
+            >
+              <X className="w-4 h-4 text-gray-600 dark:text-gray-300" />
+            </button>
+
+            {/* Contenido del modal */}
+            <CorporateLoginSimple
+              onClose={() => setShowLogin(false)}
+              onLoginSuccess={handleLoginSuccess}
+            />
+          </motion.div>
+        </div>
       )}
     </>
   );
