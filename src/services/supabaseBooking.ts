@@ -45,7 +45,7 @@ export interface Reserva {
   pago_monto?: number;
   estado: 'pendiente' | 'confirmada' | 'completada' | 'cancelada';
   notas?: string;
-  motivo_consulta?: string;
+  descripcion?: string;
   email_enviado: boolean;
   recordatorio_enviado: boolean;
   created_at: string;
@@ -138,7 +138,7 @@ export const createBooking = async (bookingData: BookingData): Promise<{ success
       pago_id: bookingData.pago?.id,
       pago_monto: bookingData.pago?.monto,
       notas: bookingData.notas,
-      motivo_consulta: bookingData.motivoConsulta,
+      descripcion: bookingData.motivoConsulta,
       estado: 'pendiente' as const
     };
 
@@ -201,7 +201,7 @@ const createOfflineReserva = (bookingData: BookingData): { success: boolean; res
       pago_monto: bookingData.pago?.monto,
       estado: 'pendiente',
       notas: bookingData.notas,
-      motivo_consulta: bookingData.motivoConsulta,
+      descripcion: bookingData.motivoConsulta,
       email_enviado: false,
       recordatorio_enviado: false,
       created_at: new Date().toISOString(),
@@ -300,7 +300,7 @@ const sendPaymentConfirmationEmail = async (reserva: Reserva) => {
         monto: reserva.pago_monto
       },
       notas: reserva.notas,
-      motivoConsulta: reserva.motivo_consulta
+      motivoConsulta: reserva.descripcion
     };
 
     const { error } = await supabase.functions.invoke('send-booking-email', {

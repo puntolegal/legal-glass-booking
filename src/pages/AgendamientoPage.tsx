@@ -719,7 +719,7 @@ export default function AgendamientoPage() {
                         boxShadow: `0 8px 25px ${serviceColor}30`
                       }}
                     >
-                      {precioFinal === '0' || precioConConvenio === 0 ? 'Confirmar Reserva Gratis' : 'Proceder al Pago'}
+                      {precioFinal === '0' || precioConConvenio === 0 ? 'Confirmar Reserva' : 'Proceder al Pago'}
                       </button>
                     </div>
                   </motion.div>
