@@ -75,6 +75,13 @@ export default function PaymentSuccessPage() {
       
       const confirmationResult = await confirmReservation(reservation.id);
       console.log('✅ Reserva confirmada:', confirmationResult);
+      
+      if (!confirmationResult.success) {
+        console.warn('⚠️ Error confirmando reserva:', confirmationResult.error);
+        setProcessingStatus('Reserva creada pero error enviando emails');
+      } else {
+        setProcessingStatus('Reserva confirmada y emails enviados');
+      }
 
       // También enviar via Make como backup
       setProcessingStatus('Enviando emails de confirmación adicionales...');

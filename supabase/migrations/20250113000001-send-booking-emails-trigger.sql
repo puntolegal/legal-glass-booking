@@ -5,6 +5,14 @@
 -- Enable pg_net extension if not enabled
 CREATE EXTENSION IF NOT EXISTS pg_net;
 
+-- Check if pg_net is available
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_extension WHERE extname = 'pg_net') THEN
+    RAISE WARNING 'pg_net extension not available. Email trigger will not work.';
+  END IF;
+END $$;
+
 -- Create function to notify email sending
 CREATE OR REPLACE FUNCTION public.notify_email_on_paid()
 RETURNS TRIGGER 
