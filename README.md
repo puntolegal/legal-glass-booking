@@ -1,179 +1,183 @@
-# Punto Legal - Plataforma de Servicios Jurídicos
+# Supabase CLI
 
-Plataforma moderna de servicios legales con sistema de reservas, pagos integrados y notificaciones automáticas.
+[![Coverage Status](https://coveralls.io/repos/github/supabase/cli/badge.svg?branch=main)](https://coveralls.io/github/supabase/cli?branch=main) [![Bitbucket Pipelines](https://img.shields.io/bitbucket/pipelines/supabase-cli/setup-cli/master?style=flat-square&label=Bitbucket%20Canary)](https://bitbucket.org/supabase-cli/setup-cli/pipelines) [![Gitlab Pipeline Status](https://img.shields.io/gitlab/pipeline-status/sweatybridge%2Fsetup-cli?label=Gitlab%20Canary)
+](https://gitlab.com/sweatybridge/setup-cli/-/pipelines)
 
-## 🚀 Estado Actual del Proyecto
+[Supabase](https://supabase.io) is an open source Firebase alternative. We're building the features of Firebase using enterprise-grade open source tools.
 
-**Última actualización:** 25 de Enero 2025  
-**Versión:** 2.1.0  
-**Estado:** Productivo ✅
+This repository contains all the functionality for Supabase CLI.
 
-### ✨ Características Implementadas
+- [x] Running Supabase locally
+- [x] Managing database migrations
+- [x] Creating and deploying Supabase Functions
+- [x] Generating types directly from your database schema
+- [x] Making authenticated HTTP requests to [Management API](https://supabase.com/docs/reference/api/introduction)
 
-#### 💳 Sistema de Pagos Integrado
-- Transferencia electrónica con datos bancarios reales
-- Integración con Transbank (simulada en desarrollo)
-- Botón de copiar todos los datos bancarios
-- Envío automático de comprobante por WhatsApp
-- Flujo de pago optimizado y profesional
+## Getting started
 
-#### 🔔 Sistema de Notificaciones Automáticas
-- **Supabase Edge Functions** para envío automático de emails
-- **Resend API** como proveedor de email principal
-- **Triggers SQL** para envío automático al confirmar reservas
-- **Sistema de fallback** con Make.com
-- Templates de email HTML profesionales
-- Envío dual: cliente + administrador
-- Logs detallados para monitoreo
+### Install the CLI
 
-#### 📄 Páginas Legales
-- Política de Privacidad (`/privacy-policy`)
-- Términos de Servicio (`/terms-of-service`)
-- Cumplimiento legal para Make.com
+Available via [NPM](https://www.npmjs.com) as dev dependency. To install:
 
-#### 🗄️ Base de Datos
-- Migración completa de Supabase
-- Sistema de reservas optimizado
-- Tracking de notificaciones
-- Gestión de pagos
-
-#### 🎨 UI/UX
-- Diseño glassmórfico moderno
-- Modo oscuro/claro
-- Responsive design
-- Accesibilidad mejorada
-
-### 🔧 Tecnologías
-
-- **Frontend:** React + TypeScript + Vite
-- **Styling:** Tailwind CSS + Shadcn/ui
-- **Base de Datos:** Supabase PostgreSQL
-- **Edge Functions:** Supabase (Deno)
-- **Email Provider:** Resend API
-- **Notificaciones:** Make.com (backup)
-- **Pagos:** MercadoPago Checkout Pro
-- **Animaciones:** Framer Motion
-- **Deploy:** GitHub Pages Ready
-
-## 📧 Sistema de Emails Automático
-
-### Arquitectura
-El sistema utiliza **Supabase Edge Functions** con **Resend API** para envío automático de emails:
-
-```
-Pago Exitoso → confirmReservation() → Trigger SQL → Edge Function → Resend API
-     ↓
-Frontend Fallback → Edge Function (si trigger falla)
-```
-
-### Componentes Implementados
-
-#### 1. Edge Function (`send-booking-emails`)
-- **Ubicación:** `supabase/functions/send-booking-emails/index.ts`
-- **Función:** Envía emails de confirmación al cliente y notificación al admin
-- **Proveedor:** Resend API
-- **Seguridad:** Validación de token `X-Admin-Token`
-
-#### 2. Trigger SQL (`trg_notify_email_on_paid`)
-- **Ubicación:** `supabase/migrations/20250113000001-send-booking-emails-trigger.sql`
-- **Función:** Detecta cambios de estado a `confirmada` y llama a Edge Function
-- **Extensión:** `pg_net` para llamadas HTTP
-
-#### 3. Frontend Fallback
-- **Función:** `sendBookingEmailsSupabase()` en `reservationService.ts`
-- **Propósito:** Envío manual si el trigger falla
-- **Integración:** Llamada desde `PaymentSuccessPage`
-
-### Configuración Requerida
-
-#### Variables de Entorno en Supabase Dashboard:
 ```bash
-RESEND_API_KEY=re_gvt6L3ER_5JiDjxtbkT1UpYowirF24DFW
-MAIL_FROM=Punto Legal <puntolegalelgolf@gmail.com>
-ADMIN_EMAIL=puntolegalelgolf@gmail.com
-SUPABASE_URL=https://qrgelocijmwnxcckxbdg.supabase.co
-SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFyZ2Vsb2Npam13bnhjY2t4YmRnIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NzgwMjQyOSwiZXhwIjoyMDczMzc4NDI5fQ.eKvVrXiuz39_JP9lydQI6gxyrYX2tLQWIJzlI4lqnYg
-EDGE_ADMIN_TOKEN=puntolegal-admin-token-2025
+npm i supabase --save-dev
 ```
 
-#### Pasos de Configuración:
-1. **Crear cuenta en Resend:** [resend.com](https://resend.com)
-2. **Obtener API Key** y configurar en Supabase Secrets
-3. **Verificar dominio** en Resend para emails `from`
-4. **Desplegar Edge Function:** `supabase functions deploy send-booking-emails`
-5. **Ejecutar migración:** `supabase db push`
+To install the beta release channel:
 
-### Testing
-
-#### Prueba Manual de Edge Function:
 ```bash
-curl -X POST https://qrgelocijmwnxcckxbdg.supabase.co/functions/v1/send-booking-emails \
-  -H "Content-Type: application/json" \
-  -H "X-Admin-Token: puntolegal-admin-token-2025" \
-  -d '{"booking_id": "test-reservation-id"}'
+npm i supabase@beta --save-dev
 ```
 
-#### Prueba de Trigger SQL:
-```sql
--- Crear reserva de prueba
-INSERT INTO public.reservas (nombre, email, fecha, hora, servicio, precio, estado) 
-VALUES ('Test User', 'test@ejemplo.com', '2024-01-15', '10:00', 'Consulta General', '35000', 'confirmada');
+When installing with yarn 4, you need to disable experimental fetch with the following nodejs config.
 
--- Verificar envío
-SELECT * FROM public.reservas_with_email_status;
+```
+NODE_OPTIONS=--no-experimental-fetch yarn add supabase
 ```
 
-### Monitoreo
+> **Note**
+For Bun versions below v1.0.17, you must add `supabase` as a [trusted dependency](https://bun.sh/guides/install/trusted) before running `bun add -D supabase`.
 
-#### 1. Logs de Edge Function
-- Supabase Dashboard → Functions → send-booking-emails → Logs
+<details>
+  <summary><b>macOS</b></summary>
 
-#### 2. Dashboard de Resend
-- Verificar entrega de emails en [resend.com](https://resend.com)
+  Available via [Homebrew](https://brew.sh). To install:
 
-#### 3. Base de Datos
-```sql
--- Estado de emails
-SELECT * FROM public.reservas_with_email_status;
+  ```sh
+  brew install supabase/tap/supabase
+  ```
 
--- Estadísticas
-SELECT * FROM public.get_email_stats();
+  To install the beta release channel:
+  
+  ```sh
+  brew install supabase/tap/supabase-beta
+  brew link --overwrite supabase-beta
+  ```
+  
+  To upgrade:
 
--- Prueba manual
-SELECT public.test_email_trigger('reservation-id');
+  ```sh
+  brew upgrade supabase
+  ```
+</details>
+
+<details>
+  <summary><b>Windows</b></summary>
+
+  Available via [Scoop](https://scoop.sh). To install:
+
+  ```powershell
+  scoop bucket add supabase https://github.com/supabase/scoop-bucket.git
+  scoop install supabase
+  ```
+
+  To upgrade:
+
+  ```powershell
+  scoop update supabase
+  ```
+</details>
+
+<details>
+  <summary><b>Linux</b></summary>
+
+  Available via [Homebrew](https://brew.sh) and Linux packages.
+
+  #### via Homebrew
+
+  To install:
+
+  ```sh
+  brew install supabase/tap/supabase
+  ```
+
+  To upgrade:
+
+  ```sh
+  brew upgrade supabase
+  ```
+
+  #### via Linux packages
+
+  Linux packages are provided in [Releases](https://github.com/supabase/cli/releases). To install, download the `.apk`/`.deb`/`.rpm`/`.pkg.tar.zst` file depending on your package manager and run the respective commands.
+
+  ```sh
+  sudo apk add --allow-untrusted <...>.apk
+  ```
+
+  ```sh
+  sudo dpkg -i <...>.deb
+  ```
+
+  ```sh
+  sudo rpm -i <...>.rpm
+  ```
+
+  ```sh
+  sudo pacman -U <...>.pkg.tar.zst
+  ```
+</details>
+
+<details>
+  <summary><b>Other Platforms</b></summary>
+
+  You can also install the CLI via [go modules](https://go.dev/ref/mod#go-install) without the help of package managers.
+
+  ```sh
+  go install github.com/supabase/cli@latest
+  ```
+
+  Add a symlink to the binary in `$PATH` for easier access:
+
+  ```sh
+  ln -s "$(go env GOPATH)/bin/cli" /usr/bin/supabase
+  ```
+
+  This works on other non-standard Linux distros.
+</details>
+
+<details>
+  <summary><b>Community Maintained Packages</b></summary>
+
+  Available via [pkgx](https://pkgx.sh/). Package script [here](https://github.com/pkgxdev/pantry/blob/main/projects/supabase.com/cli/package.yml).
+  To install in your working directory:
+
+  ```bash
+  pkgx install supabase
+  ```
+
+  Available via [Nixpkgs](https://nixos.org/). Package script [here](https://github.com/NixOS/nixpkgs/blob/master/pkgs/development/tools/supabase-cli/default.nix).
+</details>
+
+### Run the CLI
+
+```bash
+supabase bootstrap
 ```
 
-### Troubleshooting
+Or using npx:
 
-| Error | Solución |
-|-------|----------|
-| `RESEND_API_KEY no configurado` | Verificar variable en Supabase Secrets |
-| `Reserva no encontrada` | Verificar tabla `reservas` y `booking_id` |
-| `La reserva no tiene email` | Verificar columna `email` |
-| `Resend error 401` | Verificar API key válida |
-| `Resend error 422` | Verificar email `from` verificado |
+```bash
+npx supabase bootstrap
+```
 
-### Archivos de Configuración
+The bootstrap command will guide you through the process of setting up a Supabase project using one of the [starter](https://github.com/supabase-community/supabase-samples/blob/main/samples.json) templates.
 
-- **Edge Function:** `supabase/functions/send-booking-emails/index.ts`
-- **Migración SQL:** `supabase/migrations/20250113000001-send-booking-emails-trigger.sql`
-- **Frontend Service:** `src/services/reservationService.ts`
-- **Configuración:** `SUPABASE_EMAIL_CONFIG.md`
-- **Script de Prueba:** `scripts/test-supabase-email-system.js`
+## Docs
 
-### 🌐 URLs
+Command & config reference can be found [here](https://supabase.com/docs/reference/cli/about).
 
-- **Repositorio:** https://github.com/puntolegal/legal-glass-booking
-- **Local:** http://localhost:8083/
-- **Documentación:** Ver archivos `.md` en el repositorio
+## Breaking changes
 
-### 📋 Próximos Pasos
+We follow semantic versioning for changes that directly impact CLI commands, flags, and configurations.
 
-1. Integración real con Transbank
-2. Activar MercadoPago y Bitcoin
-3. Deploy a producción en puntolegal.online
-4. Testing completo del sistema de pagos
+However, due to dependencies on other service images, we cannot guarantee that schema migrations, seed.sql, and generated types will always work for the same CLI major version. If you need such guarantees, we encourage you to pin a specific version of CLI in package.json.
 
----
+## Developing
 
-**Desarrollado con ❤️ para Punto Legal**
+To run from source:
+
+```sh
+# Go >= 1.22
+go run . help
+```
