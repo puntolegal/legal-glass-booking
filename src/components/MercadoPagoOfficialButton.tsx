@@ -73,9 +73,9 @@ const MercadoPagoOfficialButton: React.FC<MercadoPagoOfficialButtonProps> = ({
       // Crear reserva en la base de datos primero
       console.log('💾 Creando reserva en la base de datos...');
       const reservationData = {
-        cliente_nombre: paymentData.payer.name,
+        cliente_nombre: paymentData.payer.name || 'Cliente',
         cliente_rut: paymentData.metadata?.client_rut || 'No especificado',
-        cliente_email: paymentData.payer.email,
+        cliente_email: paymentData.payer.email || 'cliente@ejemplo.com',
         cliente_telefono: paymentData.payer.phone || 'No especificado',
         fecha: paymentData.metadata?.appointment_date || new Date().toISOString().split('T')[0],
         hora: paymentData.metadata?.appointment_time || '10:00',
