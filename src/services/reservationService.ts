@@ -34,7 +34,7 @@ export interface ReservaTable {
   user_id: string;
   servicio: string;
   precio: string;
-  categoria: string;
+  servicio_categoria: string;
   tipo_reunion: string;
   estado: 'pendiente' | 'confirmada' | 'completada' | 'cancelada';
   webhook_sent: boolean;
@@ -69,7 +69,7 @@ export async function createReservation(reservationData: Omit<Reservation, 'id' 
       descripcion: reservationData.descripcion,
       servicio: reservationData.servicio_tipo || 'Consulta General',
       precio: reservationData.servicio_precio || '35000',
-      categoria: reservationData.servicio_categoria || 'General',
+      servicio_categoria: reservationData.servicio_categoria || 'General',
       tipo_reunion: reservationData.tipo_reunion || 'online',
       estado: 'pendiente' as const,
       webhook_sent: false,
@@ -101,7 +101,7 @@ export async function createReservation(reservationData: Omit<Reservation, 'id' 
       created_at: data.created_at,
       servicio_tipo: data.servicio,
       servicio_precio: data.precio,
-      servicio_categoria: data.categoria,
+      servicio_categoria: data.servicio_categoria,
       tipo_reunion: data.tipo_reunion,
       estado: data.estado,
       webhook_sent: data.webhook_sent
@@ -280,7 +280,7 @@ export async function getReservationsByDate(fecha: string): Promise<Reservation[
     created_at: reserva.created_at,
     servicio_tipo: reserva.servicio,
     servicio_precio: reserva.precio,
-    servicio_categoria: reserva.categoria,
+    servicio_categoria: reserva.servicio_categoria,
     tipo_reunion: reserva.tipo_reunion,
     estado: reserva.estado,
     webhook_sent: reserva.webhook_sent
@@ -331,7 +331,7 @@ export async function getAllReservations(): Promise<Reservation[]> {
     created_at: reserva.created_at,
     servicio_tipo: reserva.servicio,
     servicio_precio: reserva.precio,
-    servicio_categoria: reserva.categoria,
+    servicio_categoria: reserva.servicio_categoria,
     tipo_reunion: reserva.tipo_reunion,
     estado: reserva.estado,
     webhook_sent: reserva.webhook_sent
@@ -370,7 +370,7 @@ export async function scheduleReminders(): Promise<void> {
         created_at: reserva.created_at,
         servicio_tipo: reserva.servicio,
         servicio_precio: reserva.precio,
-        servicio_categoria: reserva.categoria,
+        servicio_categoria: reserva.servicio_categoria,
         tipo_reunion: reserva.tipo_reunion,
         estado: reserva.estado,
         webhook_sent: reserva.webhook_sent
