@@ -251,7 +251,9 @@ export default function MercadoPagoPaymentPage() {
                 {isMobile ? (
                   <MobileMercadoPagoButton
                     paymentData={{
-                      amount: parseInt(paymentData.price.replace(/\./g, '')),
+                      amount: typeof paymentData.price === 'string' 
+                        ? parseInt(paymentData.price.replace(/\./g, '')) 
+                        : paymentData.price,
                       description: `${paymentData.service} - Punto Legal`,
                       payer: {
                         name: paymentData.cliente?.nombre || paymentData.name,
@@ -277,7 +279,9 @@ export default function MercadoPagoPaymentPage() {
                 ) : (
                   <MercadoPagoOfficialButton
                     paymentData={{
-                      amount: parseInt(paymentData.price.replace(/\./g, '')),
+                      amount: typeof paymentData.price === 'string' 
+                        ? parseInt(paymentData.price.replace(/\./g, '')) 
+                        : paymentData.price,
                       description: `${paymentData.service} - Punto Legal`,
                       payer: {
                         name: paymentData.cliente?.nombre || paymentData.name,
