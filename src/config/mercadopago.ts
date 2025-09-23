@@ -8,11 +8,11 @@ export const MERCADOPAGO_CONFIG = {
   locale: 'es-CL',
   currency: 'CLP',
   
-  // URLs de retorno (actualizadas para puerto 8081)
+  // URLs de retorno (configuradas para puerto 8080)
   urls: {
-    success: `http://localhost:8081/payment-success`,
-    failure: `http://localhost:8081/payment-failure`,
-    pending: `http://localhost:8081/payment-pending`
+    success: `http://localhost:8080/payment-success`,
+    failure: `http://localhost:8080/payment-failure`,
+    pending: `http://localhost:8080/payment-pending`
   },
   
   // Configuración de la empresa

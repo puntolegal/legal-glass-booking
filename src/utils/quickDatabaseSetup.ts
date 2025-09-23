@@ -1,6 +1,42 @@
 import { supabase } from '@/integrations/supabase/client';
 import { NOTIFICATION_CONFIG } from '@/config/notifications';
 import type { Reserva } from '@/services/supabaseBooking';
+import { addDaysLocalYmd, toLocalYmd } from '@/lib/dates';
+
+// Función para crear la tabla reservas si no existe
+export async function createReservasTableIfNotExists(): Promise<{success: boolean; message: string}> {
+  try {
+    console.log('🔍 Verificando si la tabla reservas existe...');
+    
+    // Intentar hacer una consulta simple a la tabla reservas
+    const { data, error } = await supabase
+      .from('reservas')
+      .select('id')
+      .limit(1);
+    
+    if (error && error.code === 'PGRST205') {
+      // Tabla no existe
+      console.log('📝 La tabla reservas no existe, necesita ser creada manualmente');
+      return { 
+        success: false, 
+        message: 'La tabla reservas no existe. Ejecuta el script CREATE_TABLE_RESERVAS.sql en el SQL Editor de Supabase: https://supabase.com/dashboard/project/qrgelocijmwnxcckxbdg/sql' 
+      };
+    } else if (error) {
+      console.warn('⚠️ Error verificando tabla:', error.message);
+      return { success: false, message: `Error verificando tabla: ${error.message}` };
+    } else {
+      console.log('✅ La tabla reservas existe y es accesible');
+      return { success: true, message: 'Tabla reservas existe y es accesible' };
+    }
+    
+  } catch (error) {
+    console.error('❌ Error verificando tabla reservas:', error);
+    return { 
+      success: false, 
+      message: `Error inesperado: ${error instanceof Error ? error.message : 'Error desconocido'}` 
+    };
+  }
+}
 
 // Función para configurar rápidamente el sistema básico
 export async function quickDatabaseSetup(): Promise<{success: boolean; message: string; details: Array<Record<string, unknown>>}> {
@@ -9,6 +45,18 @@ export async function quickDatabaseSetup(): Promise<{success: boolean; message: 
 
   try {
     console.log('🚀 Iniciando configuración rápida de la base de datos...');
+
+    // 0. Crear tabla reservas si no existe
+    console.log('0. Verificando/creando tabla reservas...');
+    const tableResult = await createReservasTableIfNotExists();
+    results.push({ 
+      step: 'Tabla reservas', 
+      success: tableResult.success, 
+      message: tableResult.message 
+    });
+    if (!tableResult.success) {
+      allSuccess = false;
+    }
 
     // 1. Verificar conexión básica
     console.log('1. Verificando conexión...');
@@ -28,36 +76,36 @@ export async function quickDatabaseSetup(): Promise<{success: boolean; message: 
     console.log('2. Creando reservas de prueba...');
     const reservasPrueba = [
       {
-        cliente_nombre: 'Juan Pérez Test',
-        cliente_rut: '12345678-9',
-        cliente_email: 'juan.test@puntolegal.cl',
-        cliente_telefono: '+56912345678',
-        servicio_tipo: 'Consulta laboral de prueba',
-        servicio_precio: '35000',
-        servicio_categoria: 'Laboral',
-        fecha: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+        nombre: 'Juan Pérez Test',
+        rut: '12345678-9',
+        email: 'juan.test@puntolegal.cl',
+        telefono: '+56912345678',
+        servicio: 'Consulta laboral de prueba',
+        precio: '35000',
+        categoria: 'Laboral',
+        fecha: addDaysLocalYmd(1),
         hora: '15:00',
         descripcion: 'Consulta laboral de prueba - sistema de notificaciones',
         tipo_reunion: 'online',
-        estado: 'pendiente',
-        pago_metodo: 'pendiente',
-        pago_estado: 'pendiente'
+        estado: 'pendiente' as const,
+        recordatorio_enviado: false,
+        webhook_sent: false
       },
       {
-        cliente_nombre: 'María González Test',
-        cliente_rut: '98765432-1',
-        cliente_email: 'maria.test@puntolegal.cl',
-        cliente_telefono: '+56987654321',
-        servicio_tipo: 'Constitución de sociedad (demo)',
-        servicio_precio: '50000',
-        servicio_categoria: 'Corporativo',
-        fecha: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+        nombre: 'María González Test',
+        rut: '98765432-1',
+        email: 'maria.test@puntolegal.cl',
+        telefono: '+56987654321',
+        servicio: 'Constitución de sociedad (demo)',
+        precio: '50000',
+        categoria: 'Corporativo',
+        fecha: addDaysLocalYmd(2),
         hora: '10:30',
         descripcion: 'Constitución de sociedad de prueba',
         tipo_reunion: 'presencial',
-        estado: 'pendiente',
-        pago_metodo: 'pendiente',
-        pago_estado: 'pendiente'
+        estado: 'pendiente' as const,
+        recordatorio_enviado: false,
+        webhook_sent: false
       }
     ];
 
@@ -69,13 +117,13 @@ export async function quickDatabaseSetup(): Promise<{success: boolean; message: 
       if (reservaError) {
         console.warn('Error creando reserva de prueba:', reservaError);
         results.push({
-          step: `Reserva ${reserva.cliente_nombre}`,
+          step: `Reserva ${reserva.nombre}`,
           success: false,
           error: reservaError.message
         });
       } else {
         results.push({
-          step: `Reserva ${reserva.cliente_nombre}`,
+          step: `Reserva ${reserva.nombre}`,
           success: true,
           message: 'Reserva creada'
         });
@@ -84,9 +132,9 @@ export async function quickDatabaseSetup(): Promise<{success: boolean; message: 
 
     // 3. Verificar datos existentes
     console.log('3. Verificando datos...');
-    const { data: reservasCount, error: countError } = await supabase
+    const { count: reservasCount, error: countError } = await supabase
       .from('reservas')
-      .select('id', { count: 'exact', head: true });
+      .select('*', { count: 'exact', head: true });
     
     if (countError) {
       results.push({ step: 'Conteo reservas', success: false, error: countError.message });
@@ -95,7 +143,7 @@ export async function quickDatabaseSetup(): Promise<{success: boolean; message: 
       results.push({ 
         step: 'Conteo reservas', 
         success: true, 
-        message: `${reservasCount?.length || 0} reservas en total` 
+        message: `${reservasCount || 0} reservas en total` 
       });
     }
 
@@ -114,7 +162,7 @@ export async function quickDatabaseSetup(): Promise<{success: boolean; message: 
         servicio_tipo: 'Consulta Demo',
         servicio_precio: '45000',
         servicio_categoria: 'Testing',
-        fecha: ahora.toISOString().split('T')[0],
+        fecha: toLocalYmd(ahora),
         hora: '15:00',
         descripcion: 'Generada por quickDatabaseSetup para validar Resend.',
         pago_metodo: 'pendiente',
@@ -124,7 +172,7 @@ export async function quickDatabaseSetup(): Promise<{success: boolean; message: 
         tipo_reunion: 'online',
         external_reference: null,
         preference_id: null,
-        estado: 'pendiente',
+        estado: 'pendiente' as const,
         email_enviado: false,
         recordatorio_enviado: false,
         created_at: ahora.toISOString(),
@@ -212,7 +260,7 @@ export async function testEmailDelivery(): Promise<{success: boolean, message: s
 }
 
 // Función para limpiar datos de prueba
-export async function cleanupTestData(): Promise<{success: boolean, message: string}> {
+export async function cleanupTestDataQuick(): Promise<{success: boolean, message: string}> {
   try {
     const { error } = await supabase
       .from('reservas')
@@ -269,8 +317,9 @@ if (typeof window !== 'undefined') {
     quickSetup: typeof quickDatabaseSetup;
     getStats: typeof getBasicStats;
     testEmails: typeof testEmailDelivery;
-    cleanup: typeof cleanupTestData;
+    cleanup: typeof cleanupTestDataQuick;
     getStatus: typeof getSystemStatus;
+    createTable: typeof createReservasTableIfNotExists;
   };
 
   const globalWindow = window as typeof window & { PuntoLegalDebug?: PuntoLegalDebugHelpers };
@@ -279,8 +328,9 @@ if (typeof window !== 'undefined') {
     quickSetup: quickDatabaseSetup,
     getStats: getBasicStats,
     testEmails: testEmailDelivery,
-    cleanup: cleanupTestData,
-    getStatus: getSystemStatus
+    cleanup: cleanupTestDataQuick,
+    getStatus: getSystemStatus,
+    createTable: createReservasTableIfNotExists
   };
 
   console.log('🛠️ Funciones de debug disponibles:');
@@ -289,4 +339,5 @@ if (typeof window !== 'undefined') {
   console.log('• PuntoLegalDebug.testEmails() - Probar envío de emails');
   console.log('• PuntoLegalDebug.getStatus() - Estado del sistema');
   console.log('• PuntoLegalDebug.cleanup() - Limpiar datos de prueba');
+  console.log('• PuntoLegalDebug.createTable() - Crear tabla reservas');
 }

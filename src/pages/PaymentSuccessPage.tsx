@@ -7,6 +7,7 @@ import { sendRealBookingEmails, type BookingEmailData, type EmailResult } from '
 import { findReservaByCriteria, updatePaymentStatus, type Reserva } from '../services/supabaseBooking';
 import type { PendingPaymentData } from '@/types/payments';
 import { ensurePriceFormatted, parsePendingPaymentData } from '@/utils/paymentData';
+import { getPaymentInfo } from '@/services/mercadopagoBackend';
 
 interface PaymentSuccessState {
   reservation: Reserva;
@@ -77,7 +78,7 @@ export default function PaymentSuccessPage() {
       console.log('💳 Datos de MercadoPago:', mercadopagoData);
       console.log('🌐 URL completa:', window.location.href);
 
-      const normalizedStatus = (mercadopagoData.status || mercadopagoData.collection_status || '').toLowerCase();
+      let normalizedStatus = (mercadopagoData.status || mercadopagoData.collection_status || '').toLowerCase();
       const paymentIdFromUrl =
         mercadopagoData.payment_id ||
         mercadopagoData.collection_id ||
@@ -111,23 +112,48 @@ export default function PaymentSuccessPage() {
         .forEach(value => candidateReservationIds.add(value));
 
       let reserva: Reserva | undefined;
+      let mpPayment: any | null = null;
 
       const fallbackEmail = pendingPayment?.email;
 
+      // Si tenemos payment_id, consultar la API (o mock) para obtener datos confiables
+      if (paymentIdFromUrl) {
+        setProcessingStatus('Consultando estado del pago en MercadoPago...');
+        try {
+          mpPayment = await getPaymentInfo(String(paymentIdFromUrl));
+          if (mpPayment?.status) {
+            normalizedStatus = String(mpPayment.status).toLowerCase();
+          }
+        } catch (e) {
+          console.warn('⚠️ No se pudo obtener info del pago desde MercadoPago:', e);
+        }
+      }
+
+      // Intentar primero por preference_id si viene en el retorno
+      if (!reserva && mercadopagoData.preference_id) {
+        setProcessingStatus('Buscando reserva por preference_id...');
+        const result = await findReservaByCriteria({ preferenceId: mercadopagoData.preference_id });
+        if (result.success && result.reserva) {
+          reserva = result.reserva;
+        }
+      }
+
+      // Luego intentar por external_reference si está presente
+      if (!reserva && mercadopagoData.external_reference) {
+        setProcessingStatus('Buscando reserva por external_reference...');
+        const result = await findReservaByCriteria({ externalReference: mercadopagoData.external_reference });
+        if (result.success && result.reserva) {
+          reserva = result.reserva;
+        }
+      }
+
+      // Finalmente, probar por IDs candidatos (localStorage, etc.)
       for (const candidateId of candidateReservationIds) {
         setProcessingStatus(`Verificando reserva ${candidateId}...`);
         const result = await findReservaByCriteria({ reservationId: candidateId });
         if (result.success && result.reserva) {
           reserva = result.reserva;
           break;
-        }
-      }
-
-      if (!reserva && mercadopagoData.external_reference) {
-        setProcessingStatus('Buscando reserva por referencia externa...');
-        const result = await findReservaByCriteria({ externalReference: mercadopagoData.external_reference });
-        if (result.success && result.reserva) {
-          reserva = result.reserva;
         }
       }
 
@@ -164,6 +190,7 @@ export default function PaymentSuccessPage() {
       };
 
       const paymentAmount =
+        (mpPayment && parseAmount(mpPayment.transaction_amount)) ??
         parseAmount(pendingPayment?.price) ??
         parseAmount(pendingPayment?.priceFormatted) ??
         parseAmount(reserva.servicio_precio) ??
@@ -184,11 +211,11 @@ export default function PaymentSuccessPage() {
       const updateResult = await updatePaymentStatus(reserva.id, {
         estado: normalizedStatus || mercadopagoData.status || 'pending',
         id: paymentIdFromUrl || undefined,
-        metodo: mercadopagoData.payment_type || reserva.pago_metodo || 'mercadopago',
-        tipo: mercadopagoData.payment_type || undefined,
+        metodo: (mpPayment?.payment_method_id || mercadopagoData.payment_type || reserva.pago_metodo || 'mercadopago') as string,
+        tipo: (mpPayment?.payment_type_id || mercadopagoData.payment_type || undefined) as string,
         monto: paymentAmount,
-        externalReference: mercadopagoData.external_reference || reserva.id,
-        preferenceId: mercadopagoData.preference_id || undefined
+        externalReference: (mpPayment?.external_reference || mercadopagoData.external_reference || reserva.external_reference || reserva.id) as string,
+        preferenceId: (mpPayment?.preference_id || mpPayment?.order?.id || mercadopagoData.preference_id || reserva.preference_id || undefined) as string
       });
 
       if (!updateResult.success) {

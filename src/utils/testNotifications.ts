@@ -1,13 +1,13 @@
 import { supabase } from '@/integrations/supabase/client';
 import { notificationService } from '@/services/notificationService';
+import { addDaysLocalYmd, toLocalYmd } from '@/lib/dates';
 
 // Función para probar la conexión básica con Supabase
 export async function testSupabaseConnection(): Promise<{success: boolean, message: string}> {
   try {
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('reservas')
-      .select('count(*)')
-      .limit(1);
+      .select('*', { head: true, count: 'exact' });
     
     if (error) {
       return {
@@ -16,10 +16,7 @@ export async function testSupabaseConnection(): Promise<{success: boolean, messa
       };
     }
     
-    return {
-      success: true,
-      message: '✅ Conexión con Supabase exitosa'
-    };
+    return { success: true, message: '✅ Conexión con Supabase exitosa' };
   } catch (error) {
     return {
       success: false,
@@ -98,7 +95,7 @@ export async function createTestReservation(): Promise<{success: boolean, messag
       servicio_tipo: 'Consulta de Prueba',
       servicio_precio: '50000',
       servicio_categoria: 'testing',
-      fecha: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      fecha: addDaysLocalYmd(1),
       hora: '15:00',
       descripcion: 'Reserva de prueba para sistema de notificaciones',
       tipo_reunion: 'presencial'
@@ -266,8 +263,8 @@ export async function getSystemStats(): Promise<{
   reservasManana: number
 }> {
   try {
-    const hoy = new Date().toISOString().split('T')[0];
-    const manana = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+    const hoy = toLocalYmd(new Date());
+    const manana = addDaysLocalYmd(1);
     
     const [
       { count: totalReservas },

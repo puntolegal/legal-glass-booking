@@ -2,6 +2,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { NOTIFICATION_CONFIG, type NotificationType } from '@/config/notifications';
 import { sendBookingEmailsDirect, sendResendEmail } from '@/services/emailService';
 import type { Reserva } from './supabaseBooking';
+import { addDaysLocalYmd } from '@/lib/dates';
 
 interface NotificationStats {
   total: number;
@@ -353,9 +354,7 @@ class NotificationService {
   }
 
   async programarRecordatoriosDiarios(): Promise<{ enviados: number; errores: number }> {
-    const objetivo = new Date();
-    objetivo.setDate(objetivo.getDate() + 1);
-    const fechaObjetivo = objetivo.toISOString().split('T')[0];
+    const fechaObjetivo = addDaysLocalYmd(1); // mañana en America/Santiago
 
     const { data, error } = await supabase
       .from('reservas')

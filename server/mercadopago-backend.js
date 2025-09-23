@@ -131,3 +131,30 @@ app.listen(PORT, () => {
 });
 
 module.exports = app;
+// Endpoint para consultar un pago específico de forma segura (server-side)
+app.get('/payment/:id', async (req, res) => {
+  const { id } = req.params;
+  if (!id) {
+    return res.status(400).json({ success: false, error: 'payment id requerido' });
+  }
+  try {
+    if (!MERCADOPAGO_ACCESS_TOKEN) {
+      return res.status(500).json({ success: false, error: 'Access token no configurado' });
+    }
+    const response = await fetch(`https://api.mercadopago.com/v1/payments/${id}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${MERCADOPAGO_ACCESS_TOKEN}`,
+        'Content-Type': 'application/json'
+      }
+    });
+    if (!response.ok) {
+      const txt = await response.text();
+      return res.status(response.status).json({ success: false, error: txt });
+    }
+    const data = await response.json();
+    res.json({ success: true, payment: data });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err?.message || 'error desconocido' });
+  }
+});

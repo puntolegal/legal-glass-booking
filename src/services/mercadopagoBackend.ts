@@ -187,10 +187,30 @@ export const getPaymentInfo = async (paymentId: string) => {
   try {
     console.log('🔍 Obteniendo información del pago:', paymentId);
 
+    // 0) Intentar via backend local (si está disponible) para no exponer token
+    try {
+      const ctrl = typeof AbortController !== 'undefined' ? new AbortController() : undefined;
+      const t = setTimeout(() => ctrl?.abort(), 2500);
+      const localRes = await fetch(`http://localhost:3001/payment/${paymentId}`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+        signal: ctrl?.signal
+      } as RequestInit);
+      clearTimeout(t);
+      if (localRes.ok) {
+        const payload = await localRes.json();
+        if (payload?.success && payload?.payment) {
+          return payload.payment;
+        }
+      }
+    } catch (e) {
+      console.log('ℹ️ Backend local no disponible para /payment, usando fallback');
+    }
+
     const accessToken =
       MERCADOPAGO_CONFIG.accessToken ||
-      (typeof process !== 'undefined' ? process.env.MERCADOPAGO_ACCESS_TOKEN : '') ||
-      (typeof process !== 'undefined' ? process.env.VITE_MERCADOPAGO_ACCESS_TOKEN : '');
+      (typeof process !== 'undefined' ? (process as any).env?.MERCADOPAGO_ACCESS_TOKEN : '') ||
+      (typeof process !== 'undefined' ? (process as any).env?.VITE_MERCADOPAGO_ACCESS_TOKEN : '');
 
     if (!accessToken) {
       console.warn('⚠️ Access token de MercadoPago no configurado, utilizando datos simulados.');

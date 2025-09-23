@@ -4,6 +4,33 @@
 import { supabase } from '@/integrations/supabase/client';
 import { sendRealBookingEmails, type BookingEmailData } from './realEmailService';
 
+// Función para mapear datos de la base de datos a la interfaz Reserva
+const mapDatabaseToReserva = (data: any): Reserva => ({
+  id: data.id,
+  cliente_nombre: data.cliente_nombre,
+  cliente_email: data.cliente_email,
+  cliente_telefono: data.cliente_telefono,
+  cliente_rut: data.cliente_rut,
+  servicio_tipo: data.servicio_tipo || '',
+  servicio_precio: data.servicio_precio || '0',
+  servicio_categoria: data.servicio_categoria,
+  fecha: data.fecha,
+  hora: data.hora,
+  descripcion: data.descripcion,
+  pago_metodo: data.pago_metodo,
+  pago_estado: data.pago_estado,
+  pago_id: data.pago_id,
+  pago_monto: data.pago_monto,
+  tipo_reunion: data.tipo_reunion,
+  external_reference: data.external_reference,
+  preference_id: data.preference_id,
+  estado: data.estado,
+  email_enviado: data.email_enviado || false,
+  recordatorio_enviado: data.recordatorio_enviado || false,
+  created_at: data.created_at || new Date().toISOString(),
+  updated_at: data.updated_at || new Date().toISOString()
+});
+
 export interface BookingData {
   cliente: {
     nombre: string;
@@ -139,9 +166,15 @@ export const createBooking = async (bookingData: BookingData): Promise<{ success
   try {
     console.log('📦 Creando reserva...', bookingData);
 
+    // Validar y limpiar email
+    const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+    const emailValido = emailRegex.test(bookingData.cliente.email) 
+      ? bookingData.cliente.email 
+      : `cliente-${Date.now()}@puntolegal.cl`;
+
     const reservaData = {
       cliente_nombre: bookingData.cliente.nombre,
-      cliente_email: bookingData.cliente.email,
+      cliente_email: emailValido,
       cliente_telefono: bookingData.cliente.telefono,
       cliente_rut: bookingData.cliente.rut || 'No especificado',
       servicio_tipo: bookingData.servicio.tipo,
@@ -155,7 +188,7 @@ export const createBooking = async (bookingData: BookingData): Promise<{ success
         bookingData.motivoConsulta ||
         bookingData.notas ||
         bookingData.servicio.descripcion ||
-        null,
+        'Consulta legal',
       pago_metodo: bookingData.pago?.metodo || 'pendiente',
       pago_estado: bookingData.pago?.estado || 'pendiente',
       pago_id: bookingData.pago?.id ?? null,
@@ -185,7 +218,7 @@ export const createBooking = async (bookingData: BookingData): Promise<{ success
     
     return {
       success: true,
-      reserva: reserva as Reserva
+      reserva: mapDatabaseToReserva(reserva)
     };
 
   } catch (error) {
@@ -299,7 +332,7 @@ export const updatePaymentStatus = async (
       };
     }
 
-    const currentReservation = existingReservation as Reserva;
+    const currentReservation = mapDatabaseToReserva(existingReservation);
     const previousStatus = (currentReservation.pago_estado || '').toLowerCase();
     const normalizedEstado = (paymentData.estado || '').toLowerCase() || 'pending';
 
@@ -308,31 +341,11 @@ export const updatePaymentStatus = async (
       pago_id: paymentData.id ?? currentReservation.pago_id ?? null,
       pago_metodo: paymentData.metodo || paymentData.tipo || currentReservation.pago_metodo || 'mercadopago',
       pago_monto: paymentData.monto ?? currentReservation.pago_monto ?? null,
+      preference_id: paymentData.preferenceId ?? currentReservation.preference_id ?? null,
+      external_reference: paymentData.externalReference ?? currentReservation.external_reference ?? null,
       estado: mapPaymentStatusToReservaEstado(normalizedEstado, currentReservation.estado),
       updated_at: new Date().toISOString()
     };
-
-    const metadataLineParts: string[] = [];
-    if (paymentData.externalReference) {
-      metadataLineParts.push(`MP Ref: ${paymentData.externalReference}`);
-    }
-    if (paymentData.id) {
-      metadataLineParts.push(`Payment ID: ${paymentData.id}`);
-    }
-    if (paymentData.preferenceId) {
-      metadataLineParts.push(`Preference: ${paymentData.preferenceId}`);
-    }
-
-    if (metadataLineParts.length > 0) {
-      const metadataLine = metadataLineParts.join(' | ');
-      const currentDescription = currentReservation.descripcion || '';
-
-      if (!currentDescription.includes(metadataLineParts[0])) {
-        updates.descripcion = currentDescription
-          ? `${currentDescription}\n${metadataLine}`
-          : metadataLine;
-      }
-    }
 
     const { data, error } = await supabase
       .from('reservas')
@@ -346,7 +359,7 @@ export const updatePaymentStatus = async (
       throw error;
     }
 
-    const updatedReservation = data as Reserva;
+    const updatedReservation = mapDatabaseToReserva(data);
     const shouldSendEmail = normalizedEstado === 'approved' && previousStatus !== 'approved';
 
     if (shouldSendEmail) {
@@ -448,7 +461,7 @@ export const getReservas = async (filtros?: {
 
     return {
       success: true,
-      reservas: reservas as Reserva[]
+      reservas: reservas.map(mapDatabaseToReserva)
     };
 
   } catch (error) {
@@ -466,6 +479,7 @@ export const findReservaByCriteria = async (criteria: {
   email?: string;
   pagoId?: string;
   externalReference?: string;
+  preferenceId?: string;
 }): Promise<{ success: boolean; reserva?: Reserva; error?: string }> => {
   try {
     let query = supabase.from('reservas').select('*');
@@ -474,15 +488,11 @@ export const findReservaByCriteria = async (criteria: {
       query = query.eq('id', criteria.reservationId);
     } else if (criteria.pagoId) {
       query = query.eq('pago_id', criteria.pagoId);
+    } else if (criteria.preferenceId) {
+      query = query.eq('preference_id', criteria.preferenceId);
     } else if (criteria.externalReference) {
-      // Buscar por referencia externa en descripcion o ID
-      query = query.or(
-        [
-          `id.eq.${criteria.externalReference}`,
-          `descripcion.ilike.%${criteria.externalReference}%`,
-          `pago_id.eq.${criteria.externalReference}`
-        ].join(',')
-      );
+      // Buscar por columna dedicada external_reference
+      query = query.eq('external_reference', criteria.externalReference);
     } else if (criteria.email) {
       query = query.eq('cliente_email', criteria.email);
     }
@@ -496,7 +506,7 @@ export const findReservaByCriteria = async (criteria: {
 
     return {
       success: true,
-      reserva: reservas?.[0] as Reserva
+      reserva: reservas?.[0] ? mapDatabaseToReserva(reservas[0]) : undefined
     };
 
   } catch (error) {

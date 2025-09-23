@@ -103,11 +103,8 @@ const MercadoPagoOfficialButton: React.FC<MercadoPagoOfficialButtonProps> = ({
         cliente_telefono: paymentData.payer.phone || 'No especificado',
         fecha: getMetadataString('appointment_date', new Date().toISOString().split('T')[0]),
         hora: getMetadataString('appointment_time', '10:00'),
-        descripcion: `Consulta ${paymentData.description} - Pago pendiente`,
         servicio_tipo: getMetadataString('service_name', 'Consulta General'),
         servicio_precio: paymentData.amount.toString(),
-        servicio_categoria: getMetadataString('service_category', 'General'),
-        tipo_reunion: getMetadataString('meeting_type', 'online'),
         estado: 'pendiente' as const
       };
 
@@ -146,50 +143,53 @@ const MercadoPagoOfficialButton: React.FC<MercadoPagoOfficialButtonProps> = ({
       localStorage.setItem('paymentData', JSON.stringify(paymentDataForStorage));
       console.log('💾 Datos guardados en localStorage para PaymentSuccessPage');
 
-      // Llamar al backend oficial con el ID de la reserva
-      const response = await fetch('http://localhost:3001/create-preference', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          paymentData: {
-            service: paymentData.description,
-            price: paymentData.amount,
-            name: paymentData.payer.name,
-            email: paymentData.payer.email,
-            phone: paymentData.payer.phone || '',
-            date: getMetadataString('appointment_date', new Date().toISOString().split('T')[0]),
-            time: getMetadataString('appointment_time', '10:00'),
-            description: paymentData.description,
-            external_reference: reservation.id // Usar el ID de la reserva como external_reference
+      // Usar la función de Supabase directamente
+      const { createCheckoutPreference } = await import('@/services/mercadopagoBackend');
+      
+      const preferenceData = {
+        items: [{
+          title: `${paymentData.description} - Punto Legal`,
+          quantity: 1,
+          unit_price: paymentData.amount,
+          currency_id: 'CLP'
+        }],
+        payer: {
+          name: paymentData.payer.name,
+          email: paymentData.payer.email,
+          phone: {
+            number: paymentData.payer.phone || ''
           }
-        })
-      });
+        },
+        back_urls: {
+          success: `${window.location.origin}/payment-success?source=mercadopago`,
+          failure: `${window.location.origin}/payment-failure?source=mercadopago`,
+          pending: `${window.location.origin}/payment-pending?source=mercadopago`
+        },
+        auto_return: 'approved' as const,
+        external_reference: reservation.id,
+        notification_url: `${window.location.origin}/api/mercadopago/webhook`,
+        metadata: {
+          reservation_id: reservation.id,
+          service_name: getMetadataString('service_name', paymentData.description),
+          appointment_date: getMetadataString('appointment_date', new Date().toISOString().split('T')[0]),
+          appointment_time: getMetadataString('appointment_time', '10:00'),
+          meeting_type: getMetadataString('meeting_type', 'online')
+        }
+      };
       
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => null);
-        throw new Error(errorData?.error || `Error ${response.status}`);
-      }
-      
-      const result = await response.json();
-
-      if (!result.success) {
-        throw new Error(result.error || 'Error creando preferencia');
-      }
-
-      console.log('✅ Preferencia oficial creada:', result.preference_id);
+      const result = await createCheckoutPreference(preferenceData);
+      console.log('✅ Preferencia oficial creada:', result.id);
       
       const storedPaymentData: PendingPaymentData = {
         ...paymentDataForStorage,
-        preferenceId: result.preference_id ?? null
+        preferenceId: result.id ?? null
       };
       localStorage.setItem('paymentData', JSON.stringify(storedPaymentData));
 
       // Guardar datos del pago
       localStorage.setItem('pendingPayment', JSON.stringify({
         ...paymentData,
-        preferenceId: result.preference_id,
+        preferenceId: result.id,
         timestamp: Date.now(),
         method: 'mercadopago_official'
       }));

@@ -35,15 +35,15 @@ export const HORARIOS_DISPONIBLES = [
   '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00'
 ];
 
-const mapToReservation = (data: Partial<Reservation>): Reservation => ({
+const mapToReservation = (data: any): Reservation => ({
   id: data.id ?? '',
-  cliente_nombre: data.cliente_nombre ?? '',
-  cliente_email: data.cliente_email ?? '',
-  cliente_telefono: data.cliente_telefono ?? '',
-  cliente_rut: data.cliente_rut ?? null,
-  servicio_tipo: data.servicio_tipo ?? '',
-  servicio_precio: data.servicio_precio ?? '0',
-  servicio_categoria: data.servicio_categoria ?? null,
+  cliente_nombre: data.nombre ?? '',
+  cliente_email: data.email ?? '',
+  cliente_telefono: data.telefono ?? '',
+  cliente_rut: data.rut ?? null,
+  servicio_tipo: data.servicio ?? '',
+  servicio_precio: data.precio ?? '0',
+  servicio_categoria: data.categoria ?? null,
   fecha: data.fecha ?? new Date().toISOString().split('T')[0],
   hora: data.hora ?? '10:00',
   descripcion: data.descripcion ?? null,
@@ -66,26 +66,20 @@ export async function createReservation(reservationData: ReservationInput): Prom
     const timestamp = new Date().toISOString();
 
     const payload = {
-      cliente_nombre: reservationData.cliente_nombre,
-      cliente_email: reservationData.cliente_email,
-      cliente_telefono: reservationData.cliente_telefono,
-      cliente_rut: reservationData.cliente_rut || 'No especificado',
-      servicio_tipo: reservationData.servicio_tipo,
-      servicio_precio: reservationData.servicio_precio,
-      servicio_categoria: reservationData.servicio_categoria || null,
+      nombre: reservationData.cliente_nombre,
+      email: reservationData.cliente_email,
+      telefono: reservationData.cliente_telefono,
+      rut: reservationData.cliente_rut || 'No especificado',
+      servicio: reservationData.servicio_tipo,
+      precio: reservationData.servicio_precio.toString(),
       fecha: reservationData.fecha,
       hora: reservationData.hora,
-      descripcion: reservationData.descripcion || null,
-      tipo_reunion: reservationData.tipo_reunion || null,
-      pago_metodo: reservationData.pago_metodo || 'pendiente',
-      pago_estado: reservationData.pago_estado || 'pendiente',
-      pago_id: reservationData.pago_id ?? null,
-      pago_monto: reservationData.pago_monto ?? null,
-      external_reference: reservationData.external_reference ?? null,
-      preference_id: reservationData.preference_id ?? null,
+      descripcion: `Consulta ${reservationData.servicio_tipo} - Pago pendiente`,
+      categoria: reservationData.servicio_categoria || 'General',
+      tipo_reunion: reservationData.tipo_reunion || 'online',
       estado: reservationData.estado || 'pendiente',
-      email_enviado: false,
       recordatorio_enviado: false,
+      webhook_sent: false,
       created_at: timestamp,
       updated_at: timestamp
     };

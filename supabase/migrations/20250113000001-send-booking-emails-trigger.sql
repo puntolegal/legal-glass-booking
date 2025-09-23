@@ -1,6 +1,6 @@
 -- Migration for automatic email sending trigger
 -- Date: 2025-01-13
--- Description: Creates trigger that sends emails automatically when a reservation is created or updated with 'confirmada' status
+-- Description: Creates trigger that can notify when a payment is approved (safe defaults, no hardcoded secrets)
 
 -- Enable pg_net extension if not enabled
 CREATE EXTENSION IF NOT EXISTS pg_net;
@@ -25,16 +25,21 @@ DECLARE
   edge_function_url text;
   admin_token text;
 BEGIN
-  -- Only process if status is 'confirmada' and it's an insert or update
-  IF NEW.estado = 'confirmada' AND (TG_OP = 'INSERT' OR (TG_OP = 'UPDATE' AND OLD.estado IS DISTINCT FROM NEW.estado)) THEN
+  -- Only process if MercadoPago payment is approved
+  IF NEW.pago_estado = 'approved' AND (TG_OP = 'INSERT' OR (TG_OP = 'UPDATE' AND COALESCE(OLD.pago_estado,'') IS DISTINCT FROM COALESCE(NEW.pago_estado,''))) THEN
     
-    -- Get project configuration
-    -- Note: In production, these values should be configured in Supabase environment variables
-    project_ref := 'qrgelocijmwnxcckxbdg'; -- Replace with real project_ref
-    edge_function_url := 'https://' || project_ref || '.supabase.co/functions/v1/clever-action';
-    admin_token := 'puntolegal-admin-token-2025'; -- Secret token for authorization
+    -- Read configuration from custom settings if present
+    -- Set these via: ALTER DATABASE ... SET app.edge_function_url = 'https://...';
+    project_ref := current_setting('app.project_ref', true);
+    edge_function_url := current_setting('app.edge_function_url', true);
+    admin_token := current_setting('app.admin_token', true);
     
-    -- Log for debugging
+    -- If no configuration is present, skip safely
+    IF edge_function_url IS NULL OR edge_function_url = '' THEN
+      RAISE WARNING 'notify_email_on_paid: edge_function_url not configured; skipping HTTP call.';
+      RETURN NEW;
+    END IF;
+    
     RAISE LOG 'Sending email notification for reservation ID: %', NEW.id;
     
     -- Make HTTP call to Edge Function
@@ -42,7 +47,7 @@ BEGIN
       url := edge_function_url,
       headers := jsonb_build_object(
         'Content-Type', 'application/json',
-        'X-Admin-Token', admin_token
+        'X-Admin-Token', COALESCE(admin_token, '')
       ),
       body := jsonb_build_object('booking_id', NEW.id)::text
     ) INTO resp;
@@ -67,13 +72,13 @@ $$;
 DROP TRIGGER IF EXISTS trg_notify_email_on_paid ON public.reservas;
 
 CREATE TRIGGER trg_notify_email_on_paid
-  AFTER INSERT OR UPDATE OF estado ON public.reservas
+  AFTER INSERT OR UPDATE OF pago_estado ON public.reservas
   FOR EACH ROW
-  WHEN (NEW.estado = 'confirmada')
+  WHEN (NEW.pago_estado = 'approved')
   EXECUTE FUNCTION public.notify_email_on_paid();
 
 -- Documentation comments
-COMMENT ON FUNCTION public.notify_email_on_paid() IS 'Function that sends emails automatically when a reservation changes to confirmed status';
+COMMENT ON FUNCTION public.notify_email_on_paid() IS 'Function that can notify via HTTP when a payment changes to approved status';
 COMMENT ON TRIGGER trg_notify_email_on_paid ON public.reservas IS 'Trigger that executes email sending when a confirmed reservation is created or updated';
 
 -- Create test function for manual testing
@@ -96,10 +101,18 @@ BEGIN
     RETURN jsonb_build_object('error', 'Reservation not found', 'id', reserva_id);
   END IF;
   
-  -- Configure URLs
-  project_ref := 'qrgelocijmwnxcckxbdg';
-  edge_function_url := 'https://' || project_ref || '.supabase.co/functions/v1/clever-action';
-  admin_token := 'puntolegal-admin-token-2025';
+  -- Read configuration from settings, fallback to NULLs
+  project_ref := current_setting('app.project_ref', true);
+  edge_function_url := current_setting('app.edge_function_url', true);
+  admin_token := current_setting('app.admin_token', true);
+
+  IF edge_function_url IS NULL OR edge_function_url = '' THEN
+    RETURN jsonb_build_object(
+      'warning', 'edge_function_url not configured; skipping HTTP call',
+      'reserva_id', reserva_id,
+      'reserva_estado', reserva_record.estado
+    );
+  END IF;
   
   -- Make HTTP call
   SELECT net.http_post(
@@ -179,7 +192,7 @@ GRANT SELECT ON public.reservas_with_email_status TO authenticated;
 DO $$
 BEGIN
   RAISE LOG 'Email trigger migration completed successfully';
-  RAISE LOG 'Trigger created: trg_notify_email_on_paid';
+  RAISE LOG 'Trigger created: trg_notify_email_on_paid (fires on pago_estado = approved)';
   RAISE LOG 'Test function: test_email_trigger(uuid)';
   RAISE LOG 'Monitoring view: reservas_with_email_status';
   RAISE LOG 'Statistics function: get_email_stats()';
