@@ -76,8 +76,8 @@ export const simulatePaymentVerification = async (paymentId: string) => {
 // Para desarrollo: usar credenciales de test que funcionen
 export const getTestCredentials = () => {
   return {
-    publicKey: import.meta.env.VITE_MERCADOPAGO_PUBLIC_KEY || 'APP_USR-a7d7e95c-653a-43bf-8a4d-2ab7b2ea30d3',
-    accessToken: 'TEST-ACCESS-TOKEN' // No exponer el real
+    publicKey: import.meta.env.VITE_MERCADOPAGO_PUBLIC_KEY || '',
+    accessToken: import.meta.env.VITE_MERCADOPAGO_ACCESS_TOKEN || 'TEST-ACCESS-TOKEN'
   };
 };
 

@@ -5,9 +5,46 @@ import { CheckCircle, Calendar, Clock, User, Mail, Phone, ArrowRight, Home, Cred
 import SEO from '../components/SEO';
 import { sendRealBookingEmails, type BookingEmailData, type EmailResult } from '@/services/realEmailService';
 import { findReservaByCriteria, updatePaymentStatus, type Reserva } from '../services/supabaseBooking';
+import type { PendingPaymentData } from '@/types/payments';
+import { ensurePriceFormatted, parsePendingPaymentData } from '@/utils/paymentData';
+
+interface PaymentSuccessState {
+  reservation: Reserva;
+  mercadopagoData: Record<string, unknown>;
+  emailResult: EmailResult | null;
+  cliente: {
+    nombre: string;
+    email: string;
+    telefono: string;
+  };
+  servicio: {
+    tipo: string;
+    precio: number | string | null;
+    categoria: string | null;
+  };
+  fecha: string;
+  hora: string;
+  tipo_reunion?: string | null;
+  price: number | string | null | undefined;
+  priceFormatted: string;
+}
+
+const extractStringFromEmailResult = (result: EmailResult | null, keys: string[]): string | undefined => {
+  if (!result) {
+    return undefined;
+  }
+  const bag = result as Record<string, unknown>;
+  for (const key of keys) {
+    const value = bag[key];
+    if (typeof value === 'string' && value.trim().length > 0) {
+      return value;
+    }
+  }
+  return undefined;
+};
 
 export default function PaymentSuccessPage() {
-  const [paymentData, setPaymentData] = useState<any>(null);
+  const [paymentData, setPaymentData] = useState<PaymentSuccessState | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isProcessing, setIsProcessing] = useState(false);
   const [processingStatus, setProcessingStatus] = useState<string>('');
@@ -51,21 +88,21 @@ export default function PaymentSuccessPage() {
       const storedReservationId = localStorage.getItem('currentReservationId');
       const storedExternalReference = localStorage.getItem('currentExternalReference');
 
-      let paymentInfo: any = null;
+      let pendingPayment: PendingPaymentData | null = null;
       if (storedData) {
         try {
-          paymentInfo = JSON.parse(storedData);
+          pendingPayment = parsePendingPaymentData(storedData);
         } catch (parseError) {
           console.warn('⚠️ No se pudo parsear paymentData desde localStorage:', parseError);
         }
       }
 
-      console.log('📋 Datos de pago almacenados:', paymentInfo);
+      console.log('📋 Datos de pago almacenados:', pendingPayment);
 
       const candidateReservationIds = new Set<string>();
       [
-        paymentInfo?.reservationId,
-        paymentInfo?.id,
+        pendingPayment?.reservationId,
+        pendingPayment?.id,
         storedReservationId,
         storedExternalReference,
         mercadopagoData.external_reference
@@ -75,7 +112,7 @@ export default function PaymentSuccessPage() {
 
       let reserva: Reserva | undefined;
 
-      const fallbackEmail = paymentInfo?.email || paymentInfo?.cliente?.email;
+      const fallbackEmail = pendingPayment?.email;
 
       for (const candidateId of candidateReservationIds) {
         setProcessingStatus(`Verificando reserva ${candidateId}...`);
@@ -114,29 +151,39 @@ export default function PaymentSuccessPage() {
         throw new Error('No se encontró la reserva asociada al pago. Contacta a soporte con el comprobante.');
       }
 
-      const parseAmount = (value: any): number | undefined => {
+      const parseAmount = (value: unknown): number | undefined => {
         if (value === null || value === undefined) return undefined;
         if (typeof value === 'number' && !Number.isNaN(value)) return value;
         if (typeof value === 'string') {
           const cleaned = value.replace(/[^0-9]/g, '');
           if (!cleaned) return undefined;
-          const parsed = parseInt(cleaned, 10);
+          const parsed = Number(cleaned);
           return Number.isNaN(parsed) ? undefined : parsed;
         }
         return undefined;
       };
 
       const paymentAmount =
-        parseAmount(paymentInfo?.price) ??
-        parseAmount(paymentInfo?.servicio?.precio) ??
+        parseAmount(pendingPayment?.price) ??
+        parseAmount(pendingPayment?.priceFormatted) ??
         parseAmount(reserva.servicio_precio) ??
         (typeof reserva.pago_monto === 'number' ? reserva.pago_monto : undefined);
+
+      const currencyFormatter = new Intl.NumberFormat('es-CL');
+      const fallbackReservationAmount = parseAmount(reserva.servicio_precio);
+      const formattedAmount = paymentAmount !== undefined
+        ? currencyFormatter.format(paymentAmount)
+        : pendingPayment
+          ? ensurePriceFormatted(pendingPayment)
+          : fallbackReservationAmount !== undefined
+            ? currencyFormatter.format(fallbackReservationAmount)
+            : '—';
 
       setProcessingStatus('Actualizando estado del pago en la base de datos...');
 
       const updateResult = await updatePaymentStatus(reserva.id, {
         estado: normalizedStatus || mercadopagoData.status || 'pending',
-        id: paymentIdFromUrl || paymentInfo?.payment_id || undefined,
+        id: paymentIdFromUrl || undefined,
         metodo: mercadopagoData.payment_type || reserva.pago_metodo || 'mercadopago',
         tipo: mercadopagoData.payment_type || undefined,
         monto: paymentAmount,
@@ -167,14 +214,14 @@ export default function PaymentSuccessPage() {
             cliente_nombre: updatedReservation.cliente_nombre,
             cliente_email: updatedReservation.cliente_email,
             cliente_telefono: updatedReservation.cliente_telefono,
-            servicio_tipo: updatedReservation.servicio_tipo || paymentInfo?.service || 'Consulta General',
+            servicio_tipo: updatedReservation.servicio_tipo || pendingPayment?.service || 'Consulta General',
             servicio_precio:
               typeof updatedReservation.servicio_precio === 'string'
                 ? updatedReservation.servicio_precio
                 : paymentAmount?.toString() || '35000',
             fecha: updatedReservation.fecha,
             hora: updatedReservation.hora,
-            tipo_reunion: updatedReservation.tipo_reunion || paymentInfo?.tipo_reunion,
+            tipo_reunion: updatedReservation.tipo_reunion || pendingPayment?.tipo_reunion,
             descripcion: updatedReservation.descripcion || undefined,
             pago_metodo: 'MercadoPago',
             pago_estado: 'aprobado',
@@ -199,28 +246,27 @@ export default function PaymentSuccessPage() {
         },
         emailResult,
         cliente: {
-          nombre: paymentInfo?.nombre || paymentInfo?.cliente?.nombre || updatedReservation.cliente_nombre || 'Cliente',
-          email: paymentInfo?.email || paymentInfo?.cliente?.email || updatedReservation.cliente_email || 'No especificado',
-          telefono: paymentInfo?.telefono || paymentInfo?.cliente?.telefono || updatedReservation.cliente_telefono || 'No especificado'
+          nombre: pendingPayment?.nombre || updatedReservation.cliente_nombre || 'Cliente',
+          email: pendingPayment?.email || updatedReservation.cliente_email || 'No especificado',
+          telefono: pendingPayment?.telefono || updatedReservation.cliente_telefono || 'No especificado'
         },
         servicio: {
-          tipo: paymentInfo?.service || paymentInfo?.servicio?.tipo || updatedReservation.servicio_tipo || 'Consulta General',
+          tipo: pendingPayment?.service || updatedReservation.servicio_tipo || 'Consulta General',
           precio:
             paymentAmount ??
-            paymentInfo?.price ??
-            paymentInfo?.servicio?.precio ??
+            pendingPayment?.price ??
             updatedReservation.servicio_precio ??
             '35000',
-          categoria: paymentInfo?.category || paymentInfo?.servicio?.categoria || 'General'
+          categoria: pendingPayment?.category || updatedReservation.servicio_categoria || 'General'
         },
-        fecha: paymentInfo?.fecha || updatedReservation.fecha,
-        hora: paymentInfo?.hora || updatedReservation.hora,
-        tipo_reunion: paymentInfo?.tipo_reunion || updatedReservation.tipo_reunion,
+        fecha: pendingPayment?.fecha || updatedReservation.fecha,
+        hora: pendingPayment?.hora || updatedReservation.hora,
+        tipo_reunion: pendingPayment?.tipo_reunion || updatedReservation.tipo_reunion,
         price:
           paymentAmount ??
-          paymentInfo?.price ??
-          paymentInfo?.servicio?.precio ??
-          updatedReservation.servicio_precio
+          pendingPayment?.price ??
+          updatedReservation.servicio_precio,
+        priceFormatted: formattedAmount
       });
 
       localStorage.removeItem('paymentData');
@@ -240,6 +286,9 @@ export default function PaymentSuccessPage() {
       setIsLoading(false);
     }
   };
+
+  const trackingCode = extractStringFromEmailResult(paymentData?.emailResult ?? null, ['trackingCode', 'tracking_code']);
+  const googleMeetLink = extractStringFromEmailResult(paymentData?.emailResult ?? null, ['googleMeetLink', 'google_meet_link']);
 
   const isPaymentApproved = paymentData?.mercadopagoData?.status === 'approved';
   const headerTitle = isPaymentApproved ? '¡Pago confirmado!' : 'Pago registrado';
@@ -407,27 +456,7 @@ export default function PaymentSuccessPage() {
               <div className="flex items-center justify-between">
                 <span className="text-lg font-semibold text-gray-900">Total pagado</span>
                 <span className="text-2xl font-bold text-green-600">
-                  ${(() => {
-                    // Prioridad: precio numérico guardado, luego precio de reserva, luego fallback
-                    const precio = paymentData?.price || 
-                                 paymentData?.reservation?.servicio_precio || 
-                                 paymentData?.servicio?.precio;
-                    
-                    if (precio) {
-                      // Si es string, limpiar y convertir a número
-                      const precioNum = typeof precio === 'string' 
-                        ? parseInt(precio.replace(/[^\d]/g, '')) 
-                        : Number(precio);
-                      
-                      // Si el precio es válido y mayor a 0, mostrarlo
-                      if (precioNum > 0) {
-                        return precioNum.toLocaleString('es-CL');
-                      }
-                    }
-                    
-                    // Fallback: precio por defecto
-                    return '35.000';
-                  })()}
+                  ${paymentData?.priceFormatted ?? 'Confirmado'}
                 </span>
               </div>
             </div>
@@ -464,21 +493,21 @@ export default function PaymentSuccessPage() {
                   <p className="text-sm text-blue-700">
                     <strong>Estado:</strong> {paymentData.reservation.estado}
                   </p>
-                  {paymentData.emailResult?.tracking_code && (
+                  {trackingCode && (
                     <p className="text-sm text-blue-700">
-                      <strong>Código de Seguimiento:</strong> {paymentData.emailResult.tracking_code}
+                      <strong>Código de Seguimiento:</strong> {trackingCode}
                     </p>
                   )}
-                  {paymentData.emailResult?.google_meet_link && (
+                  {googleMeetLink && (
                     <p className="text-sm text-blue-700">
                       <strong>Link de Google Meet:</strong> 
                       <a 
-                        href={paymentData.emailResult.google_meet_link} 
+                        href={googleMeetLink} 
                         target="_blank" 
                         rel="noopener noreferrer"
                         className="text-blue-600 hover:text-blue-800 underline ml-1"
                       >
-                        {paymentData.emailResult.google_meet_link}
+                        {googleMeetLink}
                       </a>
                     </p>
                   )}

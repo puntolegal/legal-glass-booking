@@ -14,8 +14,8 @@ export interface MercadoPagoPreferenceData {
 
 // Credenciales oficiales de producción
 export const MERCADOPAGO_CREDENTIALS = {
-  publicKey: 'APP_USR-e02e0cc8-f3aa-422e-b0df-87b6ce44f3f8',
-  accessToken: 'APP_USR-57706641806639-091313-aa2444bdca1b521ca4540fb1fc1c2dcb-2683873567'
+  publicKey: import.meta.env.VITE_MERCADOPAGO_PUBLIC_KEY || '',
+  accessToken: import.meta.env.VITE_MERCADOPAGO_ACCESS_TOKEN || ''
 };
 
 // Crear preferencia siguiendo la documentación oficial exacta

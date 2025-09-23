@@ -27,6 +27,7 @@ import ServiceIcon from '../components/ServiceIcon';
 import { createBookingWithEmails, type BookingData } from '@/services/supabaseBooking';
 import { createOfflineBookingWithEmail, type OfflineBookingData } from '@/services/offlineBooking';
 import { sendRealBookingEmails, type BookingEmailData } from '@/services/realEmailService';
+import type { PendingPaymentData } from '@/types/payments';
 import { checkSupabaseConnection } from '@/integrations/supabase/client';
 import SupabaseStatusIndicator from '@/components/SupabaseStatusIndicator';
 
@@ -603,21 +604,32 @@ export default function AgendamientoPage() {
                             precioNumerico = precioOriginal;
                           }
 
-                          const paymentData = {
-                            ...formData,
+                          const originalPriceValue = typeof (service as any).price === 'number'
+                            ? (service as any).price
+                            : Number((service as any).price) || null;
+
+                          const paymentData: PendingPaymentData = {
+                            id: Date.now().toString(),
+                            nombre: formData.nombre,
+                            email: formData.email,
+                            telefono: formData.telefono,
                             service: service.name,
-                            price: precioNumerico, // Guardar como número
-                            priceFormatted: precioFinal, // Guardar también el formateado para mostrar
-                            originalPrice: (service as any).price,
                             category: service.category,
+                            description: formData.descripcion,
+                            price: precioNumerico,
+                            priceFormatted: precioFinal,
+                            originalPrice: originalPriceValue,
                             fecha: selectedDate,
                             hora: selectedTime,
                             tipo_reunion: selectedMeetingType,
-                            descripcion: formData.descripcion,
-                            codigoConvenio: formData.codigoConvenio,
+                            codigoConvenio: formData.codigoConvenio || null,
                             descuentoConvenio: isConvenioValido,
-                            porcentajeDescuento: isConvenioValido ? '80%' : ((service as any).discount || null),
-                            id: Date.now().toString()
+                            porcentajeDescuento: isConvenioValido
+                              ? '80%'
+                              : ((service as any).discount || null),
+                            method: null,
+                            preferenceId: null,
+                            timestamp: Date.now()
                           };
                           
                         // Si el precio final es 0, crear reserva directamente

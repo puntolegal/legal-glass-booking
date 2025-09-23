@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { CreditCard, ExternalLink, Shield, Lock, CheckCircle, Server, AlertTriangle } from 'lucide-react';
 import { createReservation } from '../services/reservationService';
+import type { PendingPaymentData } from '@/types/payments';
 
 interface PaymentData {
   amount: number;
@@ -11,12 +12,12 @@ interface PaymentData {
     email: string;
     phone?: string;
   };
-  metadata?: any;
+  metadata?: Record<string, unknown>;
 }
 
 interface MercadoPagoOfficialButtonProps {
   paymentData: PaymentData;
-  onSuccess?: (payment: any) => void;
+  onSuccess?: (payment: Record<string, unknown>) => void;
   onError?: (error: string) => void;
 }
 
@@ -27,6 +28,29 @@ const MercadoPagoOfficialButton: React.FC<MercadoPagoOfficialButtonProps> = ({
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [backendStatus, setBackendStatus] = useState<'checking' | 'available' | 'unavailable'>('checking');
+  const metadata = (paymentData.metadata ?? {}) as Record<string, unknown>;
+
+  const getMetadataString = (key: string, fallback?: string) => {
+    const value = metadata[key];
+    return typeof value === 'string' ? value : fallback;
+  };
+
+  const getMetadataBoolean = (key: string, fallback = false) => {
+    const value = metadata[key];
+    return typeof value === 'boolean' ? value : fallback;
+  };
+
+  const getMetadataNumber = (key: string): number | null => {
+    const value = metadata[key];
+    if (typeof value === 'number') {
+      return value;
+    }
+    if (typeof value === 'string') {
+      const numeric = Number(value.replace(/[^0-9]/g, ''));
+      return Number.isNaN(numeric) ? null : numeric;
+    }
+    return null;
+  };
 
   // Verificar estado del backend al montar el componente
   React.useEffect(() => {
@@ -74,16 +98,16 @@ const MercadoPagoOfficialButton: React.FC<MercadoPagoOfficialButtonProps> = ({
       console.log('💾 Creando reserva en la base de datos...');
       const reservationData = {
         cliente_nombre: paymentData.payer.name || 'Cliente',
-        cliente_rut: paymentData.metadata?.client_rut || 'No especificado',
+        cliente_rut: getMetadataString('client_rut', 'No especificado'),
         cliente_email: paymentData.payer.email || 'cliente@ejemplo.com',
         cliente_telefono: paymentData.payer.phone || 'No especificado',
-        fecha: paymentData.metadata?.appointment_date || new Date().toISOString().split('T')[0],
-        hora: paymentData.metadata?.appointment_time || '10:00',
+        fecha: getMetadataString('appointment_date', new Date().toISOString().split('T')[0]),
+        hora: getMetadataString('appointment_time', '10:00'),
         descripcion: `Consulta ${paymentData.description} - Pago pendiente`,
-        servicio_tipo: paymentData.metadata?.service_name || 'Consulta General',
+        servicio_tipo: getMetadataString('service_name', 'Consulta General'),
         servicio_precio: paymentData.amount.toString(),
-        servicio_categoria: paymentData.metadata?.service_category || 'General',
-        tipo_reunion: paymentData.metadata?.meeting_type || 'online',
+        servicio_categoria: getMetadataString('service_category', 'General'),
+        tipo_reunion: getMetadataString('meeting_type', 'online'),
         estado: 'pendiente' as const
       };
 
@@ -95,24 +119,28 @@ const MercadoPagoOfficialButton: React.FC<MercadoPagoOfficialButtonProps> = ({
       localStorage.setItem('currentExternalReference', reservation.id);
 
       // Guardar datos en localStorage para PaymentSuccessPage
-      const paymentDataForStorage = {
-        nombre: paymentData.payer.name,
-        email: paymentData.payer.email,
-        telefono: paymentData.payer.phone || 'No especificado',
-        service: paymentData.metadata?.service_name || 'Consulta General',
-        price: paymentData.amount,
-        category: paymentData.metadata?.service_category || 'General',
-        fecha: paymentData.metadata?.appointment_date || new Date().toISOString().split('T')[0],
-        hora: paymentData.metadata?.appointment_time || '10:00',
-        tipo_reunion: paymentData.metadata?.meeting_type || 'online',
-        descripcion: paymentData.description,
-        codigoConvenio: paymentData.metadata?.codigo_convenio || null,
-        descuentoConvenio: paymentData.metadata?.descuento_convenio || false,
-        originalPrice: paymentData.metadata?.precio_original || null,
-        porcentajeDescuento: paymentData.metadata?.porcentaje_descuento || null,
+      const paymentDataForStorage: PendingPaymentData = {
         id: reservation.id,
         reservationId: reservation.id,
-        external_reference: reservation.id
+        external_reference: reservation.id,
+        nombre: paymentData.payer.name || 'Cliente',
+        email: paymentData.payer.email || 'cliente@ejemplo.com',
+        telefono: paymentData.payer.phone || 'No especificado',
+        service: getMetadataString('service_name', paymentData.description) || paymentData.description || 'Consulta General',
+        category: getMetadataString('service_category', 'General') || 'General',
+        description: paymentData.description,
+        price: paymentData.amount,
+        priceFormatted: new Intl.NumberFormat('es-CL').format(paymentData.amount),
+        originalPrice: getMetadataNumber('precio_original'),
+        fecha: getMetadataString('appointment_date', new Date().toISOString().split('T')[0])!,
+        hora: getMetadataString('appointment_time', '10:00')!,
+        tipo_reunion: getMetadataString('meeting_type', 'online') || 'online',
+        codigoConvenio: getMetadataString('codigo_convenio') || null,
+        descuentoConvenio: getMetadataBoolean('descuento_convenio'),
+        porcentajeDescuento: getMetadataString('porcentaje_descuento') || null,
+        method: 'mercadopago_official',
+        preferenceId: null,
+        timestamp: Date.now()
       };
 
       localStorage.setItem('paymentData', JSON.stringify(paymentDataForStorage));
@@ -131,8 +159,8 @@ const MercadoPagoOfficialButton: React.FC<MercadoPagoOfficialButtonProps> = ({
             name: paymentData.payer.name,
             email: paymentData.payer.email,
             phone: paymentData.payer.phone || '',
-            date: paymentData.metadata?.appointment_date || new Date().toISOString().split('T')[0],
-            time: paymentData.metadata?.appointment_time || '10:00',
+            date: getMetadataString('appointment_date', new Date().toISOString().split('T')[0]),
+            time: getMetadataString('appointment_time', '10:00'),
             description: paymentData.description,
             external_reference: reservation.id // Usar el ID de la reserva como external_reference
           }
@@ -145,13 +173,19 @@ const MercadoPagoOfficialButton: React.FC<MercadoPagoOfficialButtonProps> = ({
       }
       
       const result = await response.json();
-      
+
       if (!result.success) {
         throw new Error(result.error || 'Error creando preferencia');
       }
-      
+
       console.log('✅ Preferencia oficial creada:', result.preference_id);
       
+      const storedPaymentData: PendingPaymentData = {
+        ...paymentDataForStorage,
+        preferenceId: result.preference_id ?? null
+      };
+      localStorage.setItem('paymentData', JSON.stringify(storedPaymentData));
+
       // Guardar datos del pago
       localStorage.setItem('pendingPayment', JSON.stringify({
         ...paymentData,

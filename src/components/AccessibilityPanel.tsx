@@ -141,7 +141,7 @@ const AccessibilityPanel: React.FC = () => {
           </div>
         </CardHeader>
         
-        <CardContent className="px-6 pb-6 space-y-4">
+        <CardContent className="px-6 pb-6 space-y-3">
           {/* Modo Oscuro */}
           <div className="flex items-center justify-between p-4 rounded-2xl bg-gray-50 dark:bg-gray-800/50 hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors">
             <div className="flex items-center gap-4">
@@ -166,7 +166,7 @@ const AccessibilityPanel: React.FC = () => {
               checked={isDarkMode}
               onCheckedChange={toggleDarkMode}
               aria-label={`Cambiar a modo ${isDarkMode ? 'claro' : 'oscuro'}`}
-              className="data-[state=checked]:bg-primary"
+              className="data-[state=checked]:bg-blue-600 data-[state=unchecked]:bg-gray-300 dark:data-[state=unchecked]:bg-gray-600"
             />
           </div>
 
@@ -190,7 +190,7 @@ const AccessibilityPanel: React.FC = () => {
               checked={highContrast}
               onCheckedChange={toggleHighContrast}
               aria-label="Activar alto contraste"
-              className="data-[state=checked]:bg-primary"
+              className="data-[state=checked]:bg-blue-600 data-[state=unchecked]:bg-gray-300 dark:data-[state=unchecked]:bg-gray-600"
             />
           </div>
 
@@ -205,17 +205,17 @@ const AccessibilityPanel: React.FC = () => {
                 <p className="text-sm text-gray-500 dark:text-gray-400">Ajustar tamaño del texto</p>
               </div>
             </div>
-            <div className="flex gap-3">
+            <div className="grid grid-cols-3 gap-2">
               {fontSizeOptions.map((option) => (
                 <Button
                   key={option.value}
-                  variant={fontSize === option.value ? 'default' : 'outline'}
+                  variant="outline"
                   size="sm"
                   onClick={() => handleFontSizeChange(option.value)}
-                  className={`flex-1 h-12 rounded-xl font-medium transition-all ${
+                  className={`h-11 rounded-lg font-medium transition-all duration-200 ${
                     fontSize === option.value
-                      ? 'bg-primary text-white border-primary shadow-lg shadow-primary/20'
-                      : 'border-primary/30 text-primary hover:bg-primary/10 hover:border-primary/50'
+                      ? 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white border-blue-600 shadow-lg shadow-blue-500/25 scale-105'
+                      : 'border-gray-200 dark:border-gray-600 bg-white/50 dark:bg-gray-800/50 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:border-gray-300 dark:hover:border-gray-500'
                   }`}
                 >
                   {option.label}
@@ -244,7 +244,7 @@ const AccessibilityPanel: React.FC = () => {
               checked={reducedMotion}
               onCheckedChange={toggleReducedMotion}
               aria-label="Activar movimiento reducido"
-              className="data-[state=checked]:bg-primary"
+              className="data-[state=checked]:bg-blue-600 data-[state=unchecked]:bg-gray-300 dark:data-[state=unchecked]:bg-gray-600"
             />
           </div>
 
@@ -268,7 +268,7 @@ const AccessibilityPanel: React.FC = () => {
               checked={focusVisible}
               onCheckedChange={toggleFocusVisible}
               aria-label="Activar focus visible"
-              className="data-[state=checked]:bg-primary"
+              className="data-[state=checked]:bg-blue-600 data-[state=unchecked]:bg-gray-300 dark:data-[state=unchecked]:bg-gray-600"
             />
           </div>
 
@@ -287,11 +287,11 @@ const AccessibilityPanel: React.FC = () => {
                 localStorage.setItem('theme', 'light');
               }}
               variant="outline"
-              className="w-full h-14 rounded-xl border-primary/30 text-primary hover:bg-primary/10 hover:border-primary/50 font-semibold text-base transition-all"
+              className="w-full h-14 rounded-xl border-gray-200 dark:border-gray-600 bg-white/50 dark:bg-gray-800/50 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:border-gray-300 dark:hover:border-gray-500 font-semibold text-base transition-all duration-200 hover:shadow-lg"
             >
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                  <Settings className="w-4 h-4" />
+              <div className="flex items-center justify-center gap-3">
+                <div className="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
+                  <Settings className="w-4 h-4 text-gray-600 dark:text-gray-400" />
                 </div>
                 Restablecer Configuración
               </div>

@@ -25,7 +25,7 @@ export const createDirectPreference = async (paymentData: PaymentData): Promise<
     }
     
     // Configurar MercadoPago con credenciales de prueba
-    const mp = new window.MercadoPago(import.meta.env.VITE_MERCADOPAGO_PUBLIC_KEY || 'APP_USR-a7d7e95c-653a-43bf-8a4d-2ab7b2ea30d3')
+    const mp = new window.MercadoPago(import.meta.env.VITE_MERCADOPAGO_PUBLIC_KEY || '')
     
     // Datos de la preferencia
     const preferenceData = {

@@ -6,10 +6,11 @@ import SEO from '../components/SEO';
 import MercadoPagoOfficialButton from '../components/MercadoPagoOfficialButton';
 import MobileMercadoPagoButton from '../components/MobileMercadoPagoButton';
 import ServiceIcon from '../components/ServiceIcon';
-import { PaymentData } from '../services/mercadopagoEdgeFunction';
+import type { PendingPaymentData } from '@/types/payments';
+import { ensurePriceFormatted, parsePendingPaymentData } from '@/utils/paymentData';
 
 export default function MercadoPagoPaymentPage() {
-  const [paymentData, setPaymentData] = useState<any>(null);
+  const [paymentData, setPaymentData] = useState<PendingPaymentData | null>(null);
   const [paymentError, setPaymentError] = useState<string>('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -32,9 +33,15 @@ export default function MercadoPagoPaymentPage() {
     // Recuperar datos del localStorage
     const data = localStorage.getItem('paymentData');
     if (data) {
-      const parsedData = JSON.parse(data);
-      setPaymentData(parsedData);
-      console.log('💳 Datos de pago cargados:', parsedData);
+      try {
+        const parsedData = parsePendingPaymentData(data);
+        setPaymentData(parsedData);
+        console.log('💳 Datos de pago cargados:', parsedData);
+      } catch (error) {
+        console.error('Error parseando paymentData en MercadoPagoPaymentPage:', error);
+        localStorage.removeItem('paymentData');
+        window.location.href = '/agendamiento';
+      }
     } else {
       // Si no hay datos, redirigir al agendamiento
       window.location.href = '/agendamiento';
@@ -54,7 +61,7 @@ export default function MercadoPagoPaymentPage() {
   };
 
   // Manejar pago exitoso
-  const handlePaymentSuccess = async (paymentResponse: any) => {
+  const handlePaymentSuccess = async (paymentResponse: Record<string, unknown>) => {
     try {
       console.log('✅ Pago exitoso con MercadoPago:', paymentResponse);
       
@@ -62,9 +69,15 @@ export default function MercadoPagoPaymentPage() {
       const paymentInfo = {
         ...paymentData,
         paymentMethod: 'mercadopago',
-        paymentId: paymentResponse.id,
-        paymentStatus: paymentResponse.status,
-        transactionAmount: paymentResponse.transaction_amount,
+        paymentId:
+          typeof paymentResponse.id === 'string' || typeof paymentResponse.id === 'number'
+            ? paymentResponse.id
+            : undefined,
+        paymentStatus: typeof paymentResponse.status === 'string' ? paymentResponse.status : undefined,
+        transactionAmount:
+          typeof paymentResponse.transaction_amount === 'number'
+            ? paymentResponse.transaction_amount
+            : undefined,
         paymentDate: new Date().toISOString()
       };
 
@@ -98,6 +111,12 @@ export default function MercadoPagoPaymentPage() {
       </div>
     );
   }
+
+  const amountValue = Math.max(0, Math.round(paymentData.price));
+  const formattedPrice = ensurePriceFormatted(paymentData);
+  const customerName = paymentData.nombre;
+  const customerEmail = paymentData.email;
+  const customerPhone = paymentData.telefono;
 
   return (
     <>
@@ -221,9 +240,7 @@ export default function MercadoPagoPaymentPage() {
                       <span className="text-lg font-semibold text-gray-900">Total</span>
                       <div className="text-right">
                         <span className="text-2xl font-bold text-blue-600">
-                          ${typeof paymentData.price === 'string' && !paymentData.price.includes('.') && paymentData.price.length >= 4 
-                            ? parseInt(paymentData.price).toLocaleString('es-CL') 
-                            : paymentData.price}
+                          ${formattedPrice}
                         </span>
                         {paymentData.descuentoConvenio && (
                           <div className="text-xs text-green-600 font-medium">Con descuento de convenio</div>
@@ -251,22 +268,21 @@ export default function MercadoPagoPaymentPage() {
                 {isMobile ? (
                   <MobileMercadoPagoButton
                     paymentData={{
-                      amount: typeof paymentData.price === 'string' 
-                        ? parseInt(paymentData.price.replace(/\./g, '')) 
-                        : paymentData.price,
+                      amount: amountValue,
                       description: `${paymentData.service} - Punto Legal`,
                       payer: {
-                        name: paymentData.cliente?.nombre || paymentData.name,
-                        email: paymentData.cliente?.email || paymentData.email,
-                        phone: paymentData.cliente?.telefono || paymentData.phone
+                        name: customerName,
+                        email: customerEmail,
+                        phone: customerPhone
                       },
                       metadata: {
                         reservation_id: paymentData.id,
                         service_name: paymentData.service,
                         appointment_date: paymentData.fecha || paymentData.date,
                         appointment_time: paymentData.hora || paymentData.time,
-                        client_name: paymentData.cliente?.nombre || paymentData.name,
-                        client_email: paymentData.cliente?.email || paymentData.email,
+                        client_name: customerName,
+                        client_email: customerEmail,
+                        client_phone: customerPhone,
                         codigo_convenio: paymentData.codigoConvenio || null,
                         descuento_convenio: paymentData.descuentoConvenio || false,
                         precio_original: paymentData.originalPrice || null,
@@ -279,22 +295,21 @@ export default function MercadoPagoPaymentPage() {
                 ) : (
                   <MercadoPagoOfficialButton
                     paymentData={{
-                      amount: typeof paymentData.price === 'string' 
-                        ? parseInt(paymentData.price.replace(/\./g, '')) 
-                        : paymentData.price,
+                      amount: amountValue,
                       description: `${paymentData.service} - Punto Legal`,
                       payer: {
-                        name: paymentData.cliente?.nombre || paymentData.name,
-                        email: paymentData.cliente?.email || paymentData.email,
-                        phone: paymentData.cliente?.telefono || paymentData.phone
+                        name: customerName,
+                        email: customerEmail,
+                        phone: customerPhone
                       },
                       metadata: {
                         reservation_id: paymentData.id,
                         service_name: paymentData.service,
                         appointment_date: paymentData.fecha || paymentData.date,
                         appointment_time: paymentData.hora || paymentData.time,
-                        client_name: paymentData.cliente?.nombre || paymentData.name,
-                        client_email: paymentData.cliente?.email || paymentData.email,
+                        client_name: customerName,
+                        client_email: customerEmail,
+                        client_phone: customerPhone,
                         codigo_convenio: paymentData.codigoConvenio || null,
                         descuento_convenio: paymentData.descuentoConvenio || false,
                         precio_original: paymentData.originalPrice || null,

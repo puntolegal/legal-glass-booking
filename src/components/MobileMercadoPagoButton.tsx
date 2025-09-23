@@ -81,7 +81,7 @@ const MobileMercadoPagoButton: React.FC<MobileMercadoPagoButtonProps> = ({
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer APP_USR-57706641806639-091313-aa2444bdca1b521ca4540fb1fc1c2dcb-2683873567'
+          'Authorization': `Bearer ${import.meta.env.VITE_MERCADOPAGO_ACCESS_TOKEN || ''}`
         },
         body: JSON.stringify(preferenceData)
       });

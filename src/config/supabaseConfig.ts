@@ -3,11 +3,11 @@
  * Si las credenciales no coinciden o no hay conexión, usa modo offline
  */
 
-// Credenciales correctas del mismo proyecto
+// Credenciales desde variables de entorno
 export const SUPABASE_CREDENTIALS = {
-  URL: 'https://qrgelocijmwnxcckxbdg.supabase.co',
-  PUBLISHABLE_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFyZ2Vsb2Npam13bnhjY2t4YmRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc4MDI0MjksImV4cCI6MjA3MzM3ODQyOX0.0q_3bb8bKR8VVZZAK_hYvhvLSTaU1ioQzmO5fKALjbI',
-  PROJECT_REF: 'qrgelocijmwnxcckxbdg'
+  URL: import.meta.env.VITE_SUPABASE_URL || '',
+  PUBLISHABLE_KEY: import.meta.env.VITE_SUPABASE_ANON_KEY || '',
+  PROJECT_REF: import.meta.env.VITE_SUPABASE_PROJECT_REF || ''
 };
 
 // Verificar si las credenciales son válidas

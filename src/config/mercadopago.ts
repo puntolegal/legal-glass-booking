@@ -1,8 +1,8 @@
 // Configuración oficial de MercadoPago - Punto Legal
 export const MERCADOPAGO_CONFIG = {
   // Credenciales oficiales de PRODUCCIÓN - Mercado Pago Punto Legal
-  publicKey: import.meta.env.VITE_MERCADOPAGO_PUBLIC_KEY || 'APP_USR-e02e0cc8-f3aa-422e-b0df-87b6ce44f3f8',
-  accessToken: import.meta.env.MERCADOPAGO_ACCESS_TOKEN || 'APP_USR-57706641806639-091313-aa2444bdca1b521ca4540fb1fc1c2dcb-2683873567',
+  publicKey: import.meta.env.VITE_MERCADOPAGO_PUBLIC_KEY || '',
+  accessToken: import.meta.env.VITE_MERCADOPAGO_ACCESS_TOKEN || '',
   
   // Configuración regional
   locale: 'es-CL',
