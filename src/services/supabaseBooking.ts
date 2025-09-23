@@ -7,25 +7,25 @@ import { sendRealBookingEmails, type BookingEmailData } from './realEmailService
 // Función para mapear datos de la base de datos a la interfaz Reserva
 const mapDatabaseToReserva = (data: any): Reserva => ({
   id: data.id,
-  cliente_nombre: data.cliente_nombre,
-  cliente_email: data.cliente_email,
-  cliente_telefono: data.cliente_telefono,
-  cliente_rut: data.cliente_rut,
-  servicio_tipo: data.servicio_tipo || '',
-  servicio_precio: data.servicio_precio || '0',
-  servicio_categoria: data.servicio_categoria,
+  cliente_nombre: data.nombre,
+  cliente_email: data.email,
+  cliente_telefono: data.telefono,
+  cliente_rut: data.rut,
+  servicio_tipo: data.servicio || '',
+  servicio_precio: data.precio || '0',
+  servicio_categoria: null, // No existe en la tabla actual
   fecha: data.fecha,
   hora: data.hora,
   descripcion: data.descripcion,
-  pago_metodo: data.pago_metodo,
-  pago_estado: data.pago_estado,
-  pago_id: data.pago_id,
-  pago_monto: data.pago_monto,
+  pago_metodo: null, // No existe en la tabla actual
+  pago_estado: null, // No existe en la tabla actual
+  pago_id: null, // No existe en la tabla actual
+  pago_monto: null, // No existe en la tabla actual
   tipo_reunion: data.tipo_reunion,
-  external_reference: data.external_reference,
-  preference_id: data.preference_id,
+  external_reference: null, // No existe en la tabla actual
+  preference_id: null, // No existe en la tabla actual
   estado: data.estado,
-  email_enviado: data.email_enviado || false,
+  email_enviado: false, // No existe en la tabla actual
   recordatorio_enviado: data.recordatorio_enviado || false,
   created_at: data.created_at || new Date().toISOString(),
   updated_at: data.updated_at || new Date().toISOString()
@@ -173,13 +173,12 @@ export const createBooking = async (bookingData: BookingData): Promise<{ success
       : `cliente-${Date.now()}@puntolegal.cl`;
 
     const reservaData = {
-      cliente_nombre: bookingData.cliente.nombre,
-      cliente_email: emailValido,
-      cliente_telefono: bookingData.cliente.telefono,
-      cliente_rut: bookingData.cliente.rut || 'No especificado',
-      servicio_tipo: bookingData.servicio.tipo,
-      servicio_precio: bookingData.servicio.precio,
-      servicio_categoria: bookingData.servicio.categoria || null,
+      nombre: bookingData.cliente.nombre,
+      email: emailValido,
+      telefono: bookingData.cliente.telefono,
+      rut: bookingData.cliente.rut || 'No especificado',
+      servicio: bookingData.servicio.tipo,
+      precio: bookingData.servicio.precio,
       tipo_reunion: bookingData.servicio.tipoReunion || null,
       fecha: bookingData.servicio.fecha,
       hora: bookingData.servicio.hora,
@@ -189,10 +188,7 @@ export const createBooking = async (bookingData: BookingData): Promise<{ success
         bookingData.notas ||
         bookingData.servicio.descripcion ||
         'Consulta legal',
-      pago_metodo: bookingData.pago?.metodo || 'pendiente',
-      pago_estado: bookingData.pago?.estado || 'pendiente',
-      pago_id: bookingData.pago?.id ?? null,
-      pago_monto: bookingData.pago?.monto ?? null,
+      // Campos de pago removidos - no existen en la tabla actual
       estado: 'pendiente' as const
     };
 

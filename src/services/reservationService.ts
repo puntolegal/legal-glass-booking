@@ -75,7 +75,6 @@ export async function createReservation(reservationData: ReservationInput): Prom
       fecha: reservationData.fecha,
       hora: reservationData.hora,
       descripcion: `Consulta ${reservationData.servicio_tipo} - Pago pendiente`,
-      categoria: reservationData.servicio_categoria || 'General',
       tipo_reunion: reservationData.tipo_reunion || 'online',
       estado: reservationData.estado || 'pendiente',
       recordatorio_enviado: false,

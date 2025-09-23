@@ -94,6 +94,28 @@ export const createCheckoutPreference = async (preferenceData: CreatePreferenceR
       statement_descriptor: 'PUNTO LEGAL'
     };
 
+    // Debug: Verificar URLs de retorno
+    console.log('🔍 URLs de retorno recibidas:', preferenceData.back_urls);
+    console.log('🔍 URLs de retorno individuales:', {
+      success: preferenceData.back_urls.success,
+      failure: preferenceData.back_urls.failure,
+      pending: preferenceData.back_urls.pending
+    });
+    
+    // Validar que las URLs estén definidas
+    if (!preferenceData.back_urls || !preferenceData.back_urls.success) {
+      console.error('❌ back_urls o back_urls.success no está definido:', preferenceData.back_urls);
+      throw new Error('back_urls.success no está definido');
+    }
+    if (!preferenceData.back_urls.failure) {
+      console.error('❌ back_urls.failure no está definido');
+      throw new Error('back_urls.failure no está definido');
+    }
+    if (!preferenceData.back_urls.pending) {
+      console.error('❌ back_urls.pending no está definido');
+      throw new Error('back_urls.pending no está definido');
+    }
+    
     // Llamada real a la API de MercadoPago
     console.log('🔑 Usando token de acceso:', MERCADOPAGO_CONFIG.accessToken ? 'Configurado' : 'No configurado');
     

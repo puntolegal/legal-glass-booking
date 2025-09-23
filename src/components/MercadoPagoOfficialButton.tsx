@@ -154,6 +154,21 @@ const MercadoPagoOfficialButton: React.FC<MercadoPagoOfficialButtonProps> = ({
       // Usar la función de Supabase directamente
       const { createCheckoutPreference } = await import('@/services/mercadopagoBackend');
       
+      // Debug: Verificar URLs de retorno
+      const baseUrl = window.location.origin;
+      console.log('🔍 Debug URLs de retorno:');
+      console.log('window.location.origin:', baseUrl);
+      console.log('window.location.href:', window.location.href);
+      
+      // Usar URLs absolutas válidas para MercadoPago
+      const backUrls = {
+        success: `https://puntolegal.online/payment-success?source=mercadopago`,
+        failure: `https://puntolegal.online/payment-failure?source=mercadopago`,
+        pending: `https://puntolegal.online/payment-pending?source=mercadopago`
+      };
+      
+      console.log('back_urls configuradas:', backUrls);
+
       const preferenceData = {
         items: [{
           title: `${paymentData.description} - Punto Legal`,
@@ -168,14 +183,10 @@ const MercadoPagoOfficialButton: React.FC<MercadoPagoOfficialButtonProps> = ({
             number: paymentData.payer.phone || ''
           }
         },
-        back_urls: {
-          success: `${window.location.origin}/payment-success?source=mercadopago`,
-          failure: `${window.location.origin}/payment-failure?source=mercadopago`,
-          pending: `${window.location.origin}/payment-pending?source=mercadopago`
-        },
+        back_urls: backUrls,
         auto_return: 'approved' as const,
         external_reference: reservation.id,
-        notification_url: `${window.location.origin}/api/mercadopago/webhook`,
+        notification_url: `https://puntolegal.online/api/mercadopago/webhook`,
         metadata: {
           reservation_id: reservation.id,
           service_name: getMetadataString('service_name', paymentData.description),
@@ -184,6 +195,9 @@ const MercadoPagoOfficialButton: React.FC<MercadoPagoOfficialButtonProps> = ({
           meeting_type: getMetadataString('meeting_type', 'online')
         }
       };
+      
+      console.log('🚀 Llamando a createCheckoutPreference con:', preferenceData);
+      console.log('🔍 back_urls en preferenceData:', preferenceData.back_urls);
       
       const result = await createCheckoutPreference(preferenceData);
       console.log('✅ Preferencia oficial creada:', result.id);
