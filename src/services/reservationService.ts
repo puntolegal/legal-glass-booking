@@ -162,7 +162,7 @@ export async function confirmReservation(reservationId: string): Promise<{ succe
       cliente_rut: reservation.cliente_rut || 'No especificado',
       servicio_tipo: reservation.servicio_tipo || 'Consulta General',
       servicio_precio: reservation.servicio_precio || '35000',
-      servicio_descripcion: reservation.descripcion || 'Consulta legal',
+      descripcion: reservation.descripcion || 'Consulta legal',
       fecha: reservation.fecha,
       hora: reservation.hora,
       tipo_reunion: reservation.tipo_reunion || 'online'

@@ -23,7 +23,7 @@ interface BookingData {
   fecha: string;
   hora: string;
   tipo_reunion: string;
-  servicio_descripcion?: string;
+  descripcion?: string;
   cliente_rut?: string;
 }
 
@@ -185,7 +185,7 @@ export async function sendBookingEmailsDirect(booking: BookingData): Promise<{
               <p><strong>Hora:</strong> ${booking.hora}</p>
               <p><strong>Tipo:</strong> ${booking.tipo_reunion === 'online' ? 'Videollamada' : 'Presencial'}</p>
               <p><strong>Precio:</strong> $${parseInt(booking.servicio_precio).toLocaleString('es-CL')}</p>
-              <p><strong>Descripción:</strong> ${booking.servicio_descripcion || 'No especificada'}</p>
+              <p><strong>Descripción:</strong> ${booking.descripcion || 'No especificada'}</p>
             </div>
 
             <div class="info-box">
