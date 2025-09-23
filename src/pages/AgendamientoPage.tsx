@@ -208,6 +208,7 @@ export default function AgendamientoPage() {
         description={`Agenda tu consulta de ${service.name} con nuestros expertos. Precio: $${(service as any).price}. Respuesta rápida garantizada.`}
       />
       
+      
       {/* Premium iOS Background */}
       <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
         
