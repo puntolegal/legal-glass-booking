@@ -13,7 +13,6 @@ import ErrorBoundary from '@/components/ErrorBoundary';
 import PageTransition from '@/components/PageTransition';
 import AccessibilityPanel from '@/components/AccessibilityPanel';
 import { MobileLayout } from '@/components/MobileLayout';
-import EnvTest from '@/components/EnvTest';
 import { useLocation } from 'react-router-dom';
 
 // Pages
@@ -86,7 +85,6 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           <Header />
           <main className="flex-1">
             <PageTransition>
-              <EnvTest />
               {children}
             </PageTransition>
           </main>
@@ -98,7 +96,6 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       <div className="lg:hidden">
         <MobileLayout>
           <PageTransition>
-            <EnvTest />
             {children}
           </PageTransition>
         </MobileLayout>
