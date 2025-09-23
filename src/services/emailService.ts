@@ -175,7 +175,6 @@ export async function sendBookingEmailsDirect(booking: BookingData): Promise<{
               <p><strong>Nombre:</strong> ${booking.cliente_nombre}</p>
               <p><strong>Email:</strong> ${booking.cliente_email}</p>
               <p><strong>Teléfono:</strong> ${booking.cliente_telefono}</p>
-              <p><strong>RUT:</strong> ${booking.cliente_rut || 'No especificado'}</p>
             </div>
 
             <div class="info-box">
