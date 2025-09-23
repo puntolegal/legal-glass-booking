@@ -155,10 +155,12 @@ const MercadoPagoOfficialButton: React.FC<MercadoPagoOfficialButtonProps> = ({
       const { createCheckoutPreference } = await import('@/services/mercadopagoBackend');
       
       // Debug: Verificar URLs de retorno
-      const baseUrl = window.location.origin;
-      console.log('🔍 Debug URLs de retorno:');
-      console.log('window.location.origin:', baseUrl);
+      console.log('🔍 INICIO DEBUG - Verificando entorno:');
+      console.log('window.location.origin:', window.location.origin);
       console.log('window.location.href:', window.location.href);
+      console.log('NODE_ENV:', import.meta.env.MODE);
+      
+      const baseUrl = window.location.origin;
       
       // Usar URLs absolutas válidas para MercadoPago
       const backUrls = {
