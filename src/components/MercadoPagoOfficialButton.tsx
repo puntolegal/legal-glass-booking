@@ -91,6 +91,28 @@ const MercadoPagoOfficialButton: React.FC<MercadoPagoOfficialButtonProps> = ({
       const reservation = await createReservation(reservationData);
       console.log('✅ Reserva creada:', reservation.id);
 
+      // Guardar datos en localStorage para PaymentSuccessPage
+      const paymentDataForStorage = {
+        nombre: paymentData.payer.name,
+        email: paymentData.payer.email,
+        telefono: paymentData.payer.phone || 'No especificado',
+        service: paymentData.metadata?.service_name || 'Consulta General',
+        price: paymentData.amount,
+        category: paymentData.metadata?.service_category || 'General',
+        fecha: paymentData.metadata?.appointment_date || new Date().toISOString().split('T')[0],
+        hora: paymentData.metadata?.appointment_time || '10:00',
+        tipo_reunion: paymentData.metadata?.meeting_type || 'online',
+        descripcion: paymentData.description,
+        codigoConvenio: paymentData.metadata?.codigo_convenio || null,
+        descuentoConvenio: paymentData.metadata?.descuento_convenio || false,
+        originalPrice: paymentData.metadata?.precio_original || null,
+        porcentajeDescuento: paymentData.metadata?.porcentaje_descuento || null,
+        id: paymentData.metadata?.reservation_id || Date.now().toString()
+      };
+
+      localStorage.setItem('paymentData', JSON.stringify(paymentDataForStorage));
+      console.log('💾 Datos guardados en localStorage para PaymentSuccessPage');
+
       // Llamar al backend oficial con el ID de la reserva
       const response = await fetch('http://localhost:3001/create-preference', {
         method: 'POST',
