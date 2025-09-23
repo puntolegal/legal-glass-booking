@@ -94,8 +94,9 @@ export const createCheckoutPreference = async (preferenceData: CreatePreferenceR
       statement_descriptor: 'PUNTO LEGAL'
     };
 
-    // En producción, esta sería la llamada real:
-    /*
+    // Llamada real a la API de MercadoPago
+    console.log('🔑 Usando token de acceso:', MERCADOPAGO_CONFIG.accessToken ? 'Configurado' : 'No configurado');
+    
     const response = await fetch('https://api.mercadopago.com/checkout/preferences', {
       method: 'POST',
       headers: {
@@ -105,40 +106,16 @@ export const createCheckoutPreference = async (preferenceData: CreatePreferenceR
       body: JSON.stringify(preference)
     });
     
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error('❌ Error de MercadoPago:', errorData);
+      throw new Error(`MercadoPago API Error: ${errorData.message || response.statusText}`);
+    }
+    
     const preferenceResponse = await response.json();
-    */
+    console.log('✅ Preferencia creada exitosamente:', preferenceResponse.id);
     
-    // Por ahora, simular respuesta oficial
-    const mockPreference = {
-      // ID único según formato oficial
-      id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}-${Math.random().toString(36).substr(2, 9)}-${Math.random().toString(36).substr(2, 9)}-${Math.random().toString(36).substr(2, 12)}`,
-      
-      collector_id: 2685419265,
-      operation_type: 'regular_payment',
-      
-      // URLs de checkout según documentación
-      init_point: `https://www.mercadopago.com.cl/checkout/v1/redirect?pref_id=${Date.now()}`,
-      sandbox_init_point: `https://sandbox.mercadopago.com.cl/checkout/v1/redirect?pref_id=${Date.now()}`,
-      
-      // Datos de la preferencia
-      ...preference,
-      
-      // Metadatos del sistema
-      date_created: new Date().toISOString(),
-      last_updated: new Date().toISOString(),
-      status: 'active'
-    };
-
-    // Simular delay de red real
-    await new Promise(resolve => setTimeout(resolve, 800));
-
-    console.log('✅ Preferencia creada según estándares oficiales:', {
-      id: mockPreference.id,
-      init_point: mockPreference.init_point,
-      items: mockPreference.items
-    });
-    
-    return mockPreference;
+    return preferenceResponse;
 
   } catch (error) {
     console.error('❌ Error creando preferencia:', error);

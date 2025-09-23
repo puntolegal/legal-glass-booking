@@ -37,17 +37,16 @@ const MobileMercadoPagoButton: React.FC<MobileMercadoPagoButtonProps> = ({
       console.log('🚀 Iniciando pago móvil...');
       console.log('📋 Datos del pago:', paymentData);
       
-      // Crear preferencia directamente usando la API de MercadoPago
+      // Usar el backend de Supabase para crear la preferencia
+      const { createCheckoutPreference } = await import('@/services/mercadopagoBackend');
+      
       const preferenceData = {
-        items: [
-          {
-            title: `${paymentData.description} - Punto Legal`,
-            description: `Consulta legal agendada`,
-            quantity: 1,
-            unit_price: paymentData.amount,
-            currency_id: 'CLP'
-          }
-        ],
+        items: [{
+          title: `${paymentData.description} - Punto Legal`,
+          quantity: 1,
+          unit_price: paymentData.amount,
+          currency_id: 'CLP'
+        }],
         payer: {
           name: paymentData.payer.name,
           email: paymentData.payer.email,
@@ -56,12 +55,13 @@ const MobileMercadoPagoButton: React.FC<MobileMercadoPagoButtonProps> = ({
           }
         },
         back_urls: {
-          success: `https://puntolegal.online/payment-success?source=mercadopago`,
-          failure: `https://puntolegal.online/payment-failure?source=mercadopago`,
-          pending: `https://puntolegal.online/payment-pending?source=mercadopago`
+          success: `${window.location.origin}/payment-success?source=mercadopago`,
+          failure: `${window.location.origin}/payment-failure?source=mercadopago`,
+          pending: `${window.location.origin}/payment-pending?source=mercadopago`
         },
+        auto_return: 'approved' as const,
         external_reference: `PL-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-        notification_url: `https://puntolegal.online/api/mercadopago/webhook`,
+        notification_url: `${window.location.origin}/api/mercadopago/webhook`,
         metadata: {
           client_name: paymentData.payer.name,
           client_email: paymentData.payer.email,
@@ -70,28 +70,11 @@ const MobileMercadoPagoButton: React.FC<MobileMercadoPagoButtonProps> = ({
           appointment_time: paymentData.metadata?.appointment_time || '10:00',
           source: 'punto-legal-mobile',
           integration_type: 'mobile_direct'
-        },
-        statement_descriptor: 'PUNTO LEGAL'
+        }
       };
 
-      console.log('📤 Creando preferencia directamente...');
-
-      // Usar la API de MercadoPago directamente desde el frontend
-      const response = await fetch('https://api.mercadopago.com/checkout/preferences', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${import.meta.env.VITE_MERCADOPAGO_ACCESS_TOKEN || ''}`
-        },
-        body: JSON.stringify(preferenceData)
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || `Error ${response.status}`);
-      }
-
-      const result = await response.json();
+      console.log('📤 Creando preferencia con backend Supabase...');
+      const result = await createCheckoutPreference(preferenceData);
       console.log('✅ Preferencia creada:', result.id);
 
       // Guardar datos del pago
@@ -104,7 +87,11 @@ const MobileMercadoPagoButton: React.FC<MobileMercadoPagoButtonProps> = ({
 
       // Redirigir al Checkout Pro
       console.log('🚀 Redirigiendo a MercadoPago...');
-      window.location.href = result.init_point;
+      if (result.init_point) {
+        window.location.href = result.init_point;
+      } else {
+        throw new Error('No se recibió init_point de MercadoPago');
+      }
 
     } catch (error) {
       console.error('❌ Error en pago móvil:', error);

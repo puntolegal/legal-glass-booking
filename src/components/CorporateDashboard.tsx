@@ -165,32 +165,33 @@ export default function CorporateDashboard({ user, onLogout }: CorporateDashboar
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50">
       {/* Header */}
-      <div className="bg-gradient-to-r from-amber-600 to-orange-600 text-white p-6">
+      <div className="bg-gradient-to-r from-amber-600 to-orange-600 text-white p-4 sm:p-6">
         <div className="container mx-auto">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
-                {isAdmin ? <Crown className="w-6 h-6" /> : <Building2 className="w-6 h-6" />}
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="flex items-center gap-3 sm:gap-4">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                {isAdmin ? <Crown className="w-5 h-5 sm:w-6 sm:h-6" /> : <Building2 className="w-5 h-5 sm:w-6 sm:h-6" />}
               </div>
-              <div>
-                <h1 className="text-2xl font-bold">
+              <div className="min-w-0 flex-1">
+                <h1 className="text-lg sm:text-2xl font-bold truncate">
                   {isAdmin ? 'Panel Administrativo' : 'Panel Corporativo'}
                 </h1>
-                <p className="text-white/80">{user?.email}</p>
+                <p className="text-white/80 text-sm sm:text-base truncate">{user?.email}</p>
                 {isAdmin && (
                   <div className="flex items-center gap-2 mt-1">
-                    <Crown className="w-4 h-4 text-amber-300" />
-                    <span className="text-sm text-amber-300 font-medium">Administrador</span>
+                    <Crown className="w-3 h-3 sm:w-4 sm:h-4 text-amber-300 flex-shrink-0" />
+                    <span className="text-xs sm:text-sm text-amber-300 font-medium">Administrador</span>
                   </div>
                 )}
               </div>
             </div>
             <button
               onClick={onLogout}
-              className="flex items-center gap-2 px-4 py-2 bg-white/20 rounded-xl hover:bg-white/30 transition-colors"
+              className="flex items-center gap-2 px-3 py-2 sm:px-4 sm:py-2 bg-white/20 rounded-xl hover:bg-white/30 transition-colors text-sm sm:text-base w-full sm:w-auto justify-center"
             >
               <LogOut className="w-4 h-4" />
-              Cerrar Sesión
+              <span className="hidden sm:inline">Cerrar Sesión</span>
+              <span className="sm:hidden">Salir</span>
             </button>
           </div>
         </div>
@@ -198,46 +199,49 @@ export default function CorporateDashboard({ user, onLogout }: CorporateDashboar
 
       {/* Navigation */}
       <div className="bg-white border-b">
-        <div className="container mx-auto px-6">
-          <nav className="flex space-x-8">
-            {[
-              { id: 'overview', label: 'Resumen', icon: BarChart3 },
-              { id: 'cases', label: 'Causas', icon: FileText },
-              { id: 'hearings', label: 'Comparendos', icon: Calendar },
-              { id: 'projections', label: 'Proyecciones', icon: TrendingUp },
-              ...(isAdmin ? [
-                { id: 'admin', label: 'Administración', icon: Crown },
-                { id: 'analytics', label: 'Analytics', icon: Activity }
-              ] : []),
-              { id: 'settings', label: 'Configuración', icon: Settings }
-            ].map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 py-4 px-2 border-b-2 font-medium transition-colors ${
-                  activeTab === tab.id
-                    ? 'border-amber-500 text-amber-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700'
-                }`}
-              >
-                <tab.icon className="w-4 h-4" />
-                {tab.label}
-              </button>
-            ))}
+        <div className="container mx-auto px-4 sm:px-6">
+          <nav className="flex overflow-x-auto scrollbar-hide">
+            <div className="flex space-x-2 sm:space-x-8 min-w-max">
+              {[
+                { id: 'overview', label: 'Resumen', icon: BarChart3, shortLabel: 'Resumen' },
+                { id: 'cases', label: 'Causas', icon: FileText, shortLabel: 'Causas' },
+                { id: 'hearings', label: 'Comparendos', icon: Calendar, shortLabel: 'Audiencias' },
+                { id: 'projections', label: 'Proyecciones', icon: TrendingUp, shortLabel: 'Proyecciones' },
+                ...(isAdmin ? [
+                  { id: 'admin', label: 'Administración', icon: Crown, shortLabel: 'Admin' },
+                  { id: 'analytics', label: 'Analytics', icon: Activity, shortLabel: 'Analytics' }
+                ] : []),
+                { id: 'settings', label: 'Configuración', icon: Settings, shortLabel: 'Config' }
+              ].map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`flex items-center gap-1 sm:gap-2 py-3 sm:py-4 px-2 sm:px-4 border-b-2 font-medium transition-colors whitespace-nowrap text-sm sm:text-base ${
+                    activeTab === tab.id
+                      ? 'border-amber-500 text-amber-600'
+                      : 'border-transparent text-gray-500 hover:text-gray-700'
+                  }`}
+                >
+                  <tab.icon className="w-4 h-4 flex-shrink-0" />
+                  <span className="hidden sm:inline">{tab.label}</span>
+                  <span className="sm:hidden">{tab.shortLabel}</span>
+                </button>
+              ))}
+            </div>
           </nav>
         </div>
       </div>
 
       {/* Content */}
-      <div className="container mx-auto px-6 py-8">
+      <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8">
         {activeTab === 'overview' && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="space-y-8"
+            className="space-y-6 sm:space-y-8"
           >
             {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
               {[
                 { label: 'Total Causas', value: stats.total, icon: FileText, color: 'blue' },
                 { label: 'Pendientes', value: stats.pending, icon: Clock, color: 'yellow' },
@@ -249,15 +253,15 @@ export default function CorporateDashboard({ user, onLogout }: CorporateDashboar
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1 }}
-                  className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100"
+                  className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg border border-gray-100"
                 >
                   <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-gray-500 text-sm">{stat.label}</p>
-                      <p className="text-3xl font-bold text-gray-900">{stat.value}</p>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-gray-500 text-xs sm:text-sm truncate">{stat.label}</p>
+                      <p className="text-2xl sm:text-3xl font-bold text-gray-900">{stat.value}</p>
                     </div>
-                    <div className={`w-12 h-12 bg-${stat.color}-100 rounded-xl flex items-center justify-center`}>
-                      <stat.icon className={`w-6 h-6 text-${stat.color}-600`} />
+                    <div className={`w-8 h-8 sm:w-12 sm:h-12 bg-${stat.color}-100 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0`}>
+                      <stat.icon className={`w-4 h-4 sm:w-6 sm:h-6 text-${stat.color}-600`} />
                     </div>
                   </div>
                 </motion.div>
@@ -265,38 +269,40 @@ export default function CorporateDashboard({ user, onLogout }: CorporateDashboar
             </div>
 
             {/* Quick Actions */}
-            <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
-              <h3 className="text-xl font-bold mb-4">Acciones Rápidas</h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <button className="flex items-center gap-3 p-4 bg-amber-50 border border-amber-200 rounded-xl hover:bg-amber-100 transition-colors">
-                  <Plus className="w-5 h-5 text-amber-600" />
-                  <span className="font-medium">Nueva Causa</span>
+            <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg border border-gray-100">
+              <h3 className="text-lg sm:text-xl font-bold mb-4">Acciones Rápidas</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+                <button className="flex items-center gap-2 sm:gap-3 p-3 sm:p-4 bg-amber-50 border border-amber-200 rounded-xl hover:bg-amber-100 transition-colors">
+                  <Plus className="w-4 h-4 sm:w-5 sm:h-5 text-amber-600 flex-shrink-0" />
+                  <span className="font-medium text-sm sm:text-base">Nueva Causa</span>
                 </button>
-                <button className="flex items-center gap-3 p-4 bg-blue-50 border border-blue-200 rounded-xl hover:bg-blue-100 transition-colors">
-                  <Calendar className="w-5 h-5 text-blue-600" />
-                  <span className="font-medium">Agendar Comparendo</span>
+                <button className="flex items-center gap-2 sm:gap-3 p-3 sm:p-4 bg-blue-50 border border-blue-200 rounded-xl hover:bg-blue-100 transition-colors">
+                  <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 flex-shrink-0" />
+                  <span className="font-medium text-sm sm:text-base">Agendar Comparendo</span>
                 </button>
-                <button className="flex items-center gap-3 p-4 bg-green-50 border border-green-200 rounded-xl hover:bg-green-100 transition-colors">
-                  <TrendingUp className="w-5 h-5 text-green-600" />
-                  <span className="font-medium">Ver Proyecciones</span>
+                <button className="flex items-center gap-2 sm:gap-3 p-3 sm:p-4 bg-green-50 border border-green-200 rounded-xl hover:bg-green-100 transition-colors">
+                  <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-green-600 flex-shrink-0" />
+                  <span className="font-medium text-sm sm:text-base">Ver Proyecciones</span>
                 </button>
               </div>
             </div>
 
             {/* Recent Cases */}
-            <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
-              <h3 className="text-xl font-bold mb-4">Causas Recientes</h3>
-              <div className="space-y-4">
+            <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg border border-gray-100">
+              <h3 className="text-lg sm:text-xl font-bold mb-4">Causas Recientes</h3>
+              <div className="space-y-3 sm:space-y-4">
                 {cases.slice(0, 3).map((case_) => (
-                  <div key={case_.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
-                    <div className="flex items-center gap-4">
-                      {getTypeIcon(case_.type)}
-                      <div>
-                        <h4 className="font-medium">{case_.title}</h4>
-                        <p className="text-sm text-gray-500">{case_.created_at}</p>
+                  <div key={case_.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-3 sm:p-4 bg-gray-50 rounded-xl gap-3">
+                    <div className="flex items-center gap-3 sm:gap-4 min-w-0 flex-1">
+                      <div className="flex-shrink-0">
+                        {getTypeIcon(case_.type)}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <h4 className="font-medium text-sm sm:text-base truncate">{case_.title}</h4>
+                        <p className="text-xs sm:text-sm text-gray-500">{case_.created_at}</p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-wrap">
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(case_.status)}`}>
                         {case_.status.replace('_', ' ')}
                       </span>
