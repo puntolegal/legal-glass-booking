@@ -48,9 +48,27 @@ try {
   const buildCommand = 'npm run build';
   console.log(`Ejecutando: ${buildCommand}`);
   
-  execSync(buildCommand, { 
+  // Crear archivo .env.production para Vite
+  const envProductionPath = path.join(__dirname, '..', '.env.production');
+  const envProductionContent = Object.entries(config.variables)
+    .map(([key, value]) => `${key}=${value}`)
+    .join('\n');
+  
+  fs.writeFileSync(envProductionPath, envProductionContent);
+  console.log('✅ Archivo .env.production creado');
+
+  // Crear comando con variables de entorno
+  const envVars = Object.entries(config.variables)
+    .map(([key, value]) => `${key}="${value}"`)
+    .join(' ');
+  
+  const buildCommandWithEnv = `${envVars} ${buildCommand}`;
+  console.log('🔧 Comando de build con variables:', buildCommandWithEnv.substring(0, 100) + '...');
+
+  execSync(buildCommandWithEnv, { 
     stdio: 'inherit',
     cwd: path.join(__dirname, '..'),
+    shell: true,
     env: {
       ...process.env,
       ...config.variables,
@@ -166,9 +184,12 @@ ${Object.entries(config.urls).map(([key, value]) => `${key}: ${value}`).join('\n
   fs.writeFileSync(instructionsPath, deployInstructions);
   console.log('✅ Instrucciones de deploy creadas');
 
-  // Limpiar archivo temporal
+  // Limpiar archivos temporales
   fs.unlinkSync(envPath);
-  console.log('🧹 Archivo temporal eliminado');
+  if (fs.existsSync(envProductionPath)) {
+    fs.unlinkSync(envProductionPath);
+  }
+  console.log('🧹 Archivos temporales eliminados');
   
   console.log('\n🎉 ¡PREPARACIÓN PARA IONOS COMPLETA!');
   console.log('📁 Archivos listos en: dist/');
@@ -178,9 +199,12 @@ ${Object.entries(config.urls).map(([key, value]) => `${key}: ${value}`).join('\n
 } catch (error) {
   console.error('❌ Error durante la preparación:', error.message);
   
-  // Limpiar archivo temporal en caso de error
+  // Limpiar archivos temporales en caso de error
   if (fs.existsSync(envPath)) {
     fs.unlinkSync(envPath);
+  }
+  if (fs.existsSync(envProductionPath)) {
+    fs.unlinkSync(envProductionPath);
   }
   
   process.exit(1);
