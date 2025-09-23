@@ -146,18 +146,26 @@ export async function confirmReservation(reservationId: string): Promise<{ succe
     }
 
     // Enviar emails directamente via Resend
-    const emailResult = await sendBookingEmailsDirect({
+    console.log('📧 Datos para email:', {
       id: reservation.id,
       cliente_nombre: reservation.cliente_nombre,
       cliente_email: reservation.cliente_email,
-      cliente_telefono: reservation.cliente_telefono,
-      cliente_rut: reservation.cliente_rut,
       servicio_tipo: reservation.servicio_tipo,
-      servicio_precio: reservation.servicio_precio,
-      servicio_descripcion: reservation.descripcion,
+      servicio_precio: reservation.servicio_precio
+    });
+
+    const emailResult = await sendBookingEmailsDirect({
+      id: reservation.id,
+      cliente_nombre: reservation.cliente_nombre || 'Cliente',
+      cliente_email: reservation.cliente_email || 'cliente@ejemplo.com',
+      cliente_telefono: reservation.cliente_telefono || 'No especificado',
+      cliente_rut: reservation.cliente_rut || 'No especificado',
+      servicio_tipo: reservation.servicio_tipo || 'Consulta General',
+      servicio_precio: reservation.servicio_precio || '35000',
+      servicio_descripcion: reservation.descripcion || 'Consulta legal',
       fecha: reservation.fecha,
       hora: reservation.hora,
-      tipo_reunion: reservation.tipo_reunion
+      tipo_reunion: reservation.tipo_reunion || 'online'
     });
 
     if (!emailResult.success) {

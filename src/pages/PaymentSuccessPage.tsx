@@ -52,10 +52,10 @@ export default function PaymentSuccessPage() {
       
       // Extraer datos de manera más robusta - estructura correcta desde AgendamientoPage
       const reservationData = {
-        cliente_nombre: paymentInfo.nombre || paymentInfo.cliente?.nombre || 'Cliente',
-        cliente_rut: paymentInfo.rut || paymentInfo.cliente?.rut || 'No especificado',
-        cliente_email: paymentInfo.email || paymentInfo.cliente?.email || 'No especificado',
-        cliente_telefono: paymentInfo.telefono || paymentInfo.cliente?.telefono || 'No especificado',
+        cliente_nombre: paymentInfo.nombre || 'Cliente',
+        cliente_rut: paymentInfo.rut || 'No especificado',
+        cliente_email: paymentInfo.email || 'No especificado',
+        cliente_telefono: paymentInfo.telefono || 'No especificado',
         fecha: paymentInfo.fecha || new Date().toISOString().split('T')[0],
         hora: paymentInfo.hora || '10:00',
         descripcion: `Consulta ${paymentInfo.service || paymentInfo.servicio?.tipo || 'General'} - Pago confirmado via MercadoPago`,
@@ -110,9 +110,9 @@ export default function PaymentSuccessPage() {
         emailResult,
         // Datos del cliente para mostrar en la UI
         cliente: {
-          nombre: paymentInfo.nombre || paymentInfo.cliente?.nombre || reservation.cliente_nombre,
-          email: paymentInfo.email || paymentInfo.cliente?.email || reservation.cliente_email,
-          telefono: paymentInfo.telefono || paymentInfo.cliente?.telefono || reservation.cliente_telefono
+          nombre: paymentInfo.nombre || reservation.cliente_nombre || 'Cliente',
+          email: paymentInfo.email || reservation.cliente_email || 'No especificado',
+          telefono: paymentInfo.telefono || reservation.cliente_telefono || 'No especificado'
         },
         servicio: {
           tipo: paymentInfo.service || paymentInfo.servicio?.tipo || reservation.servicio_tipo,
