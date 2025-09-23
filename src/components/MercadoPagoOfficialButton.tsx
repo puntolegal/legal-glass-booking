@@ -60,26 +60,34 @@ const MercadoPagoOfficialButton: React.FC<MercadoPagoOfficialButtonProps> = ({
   const checkBackendStatus = async () => {
     try {
       setBackendStatus('checking');
-      const response = await fetch('http://localhost:3001/health', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        // Agregar timeout
-        signal: AbortSignal.timeout(5000)
-      });
       
-      if (response.ok) {
-        const data = await response.json();
-        setBackendStatus('available');
-        console.log('✅ Backend MercadoPago disponible:', data);
-      } else {
+      // Verificar que las credenciales de MercadoPago estén configuradas
+      const accessToken = import.meta.env.VITE_MERCADOPAGO_ACCESS_TOKEN;
+      const publicKey = import.meta.env.VITE_MERCADOPAGO_PUBLIC_KEY;
+      
+      if (!accessToken || !publicKey) {
         setBackendStatus('unavailable');
-        console.log('⚠️ Backend respondió con error:', response.status);
+        console.log('⚠️ Credenciales de MercadoPago no configuradas');
+        return;
+      }
+      
+      // Verificar conectividad con Supabase (nuestro backend)
+      const { supabase } = await import('@/integrations/supabase/client');
+      const { data, error } = await supabase
+        .from('reservas')
+        .select('id')
+        .limit(1);
+      
+      if (error) {
+        setBackendStatus('unavailable');
+        console.log('⚠️ Error conectando con Supabase:', error.message);
+      } else {
+        setBackendStatus('available');
+        console.log('✅ Backend Supabase disponible para MercadoPago');
       }
     } catch (error) {
       setBackendStatus('unavailable');
-      console.log('⚠️ Backend MercadoPago no disponible:', error.message);
+      console.log('⚠️ Error verificando backend:', error.message);
     }
   };
 
