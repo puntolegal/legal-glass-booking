@@ -18,6 +18,7 @@ export default function PaymentSuccessPage() {
 
   const processPaymentSuccess = async () => {
     try {
+      console.log('🚀 INICIANDO PaymentSuccessPage - processPaymentSuccess');
       setIsProcessing(true);
       setProcessingStatus('Procesando datos del pago...');
 
@@ -37,6 +38,7 @@ export default function PaymentSuccessPage() {
       };
 
       console.log('💳 Datos de MercadoPago:', mercadopagoData);
+      console.log('🌐 URL completa:', window.location.href);
 
       // Recuperar datos del pago desde localStorage
       const storedData = localStorage.getItem('paymentData');
@@ -74,24 +76,30 @@ export default function PaymentSuccessPage() {
         webhook_sent: false
       };
 
+      console.log('📝 Datos de reserva a crear:', reservationData);
+      console.log('🔄 Llamando a createReservation...');
+      
       const reservation = await createReservation(reservationData);
-      console.log('✅ Reserva creada:', reservation);
+      console.log('✅ Reserva creada exitosamente:', reservation);
 
       // Confirmar la reserva y enviar emails automáticamente
       setProcessingStatus('Confirmando reserva y enviando emails...');
+      console.log('🔄 Llamando a confirmReservation con ID:', reservation.id);
       
       const confirmationResult = await confirmReservation(reservation.id);
-      console.log('✅ Reserva confirmada:', confirmationResult);
+      console.log('✅ Resultado de confirmación:', confirmationResult);
       
       if (!confirmationResult.success) {
         console.warn('⚠️ Error confirmando reserva:', confirmationResult.error);
         setProcessingStatus('Reserva creada pero error enviando emails');
       } else {
+        console.log('✅ Reserva confirmada y emails enviados exitosamente');
         setProcessingStatus('Reserva confirmada y emails enviados');
       }
 
       // También enviar via Make como backup
       setProcessingStatus('Enviando emails de confirmación adicionales...');
+      console.log('🔄 Enviando emails adicionales via Make...');
       
       const emailData = {
         id: reservation.id,
@@ -107,6 +115,7 @@ export default function PaymentSuccessPage() {
         created_at: reservation.created_at || new Date().toISOString()
       };
 
+      console.log('📧 Datos para emails Make:', emailData);
       const emailResult = await sendBookingEmailsMake(emailData);
       console.log('📧 Resultado de emails Make:', emailResult);
 
@@ -136,9 +145,13 @@ export default function PaymentSuccessPage() {
       setProcessingStatus('¡Proceso completado exitosamente!');
 
     } catch (error) {
-      console.error('❌ Error procesando pago exitoso:', error);
+      console.error('❌ ERROR CRÍTICO en PaymentSuccessPage:', error);
+      console.error('❌ Stack trace:', error instanceof Error ? error.stack : 'No stack trace');
+      console.error('❌ Tipo de error:', typeof error);
+      console.error('❌ Mensaje:', error instanceof Error ? error.message : String(error));
       setProcessingStatus(`Error: ${error instanceof Error ? error.message : 'Error desconocido'}`);
     } finally {
+      console.log('🏁 Finalizando processPaymentSuccess');
       setIsProcessing(false);
       setIsLoading(false);
     }
@@ -215,11 +228,11 @@ export default function PaymentSuccessPage() {
             </h2>
             
             <div className="grid md:grid-cols-2 gap-6">
-              <div className="space-y-4">
+                <div className="space-y-4">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
                     <User className="w-5 h-5 text-green-600" />
-                  </div>
+                    </div>
                   <div>
                     <p className="text-sm text-gray-500">Cliente</p>
                     <p className="font-semibold text-gray-900">
@@ -231,20 +244,20 @@ export default function PaymentSuccessPage() {
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
                     <Mail className="w-5 h-5 text-green-600" />
-                  </div>
-                  <div>
+                    </div>
+                    <div>
                     <p className="text-sm text-gray-500">Email</p>
                     <p className="font-semibold text-gray-900">
                       {paymentData?.reservation?.cliente_email || paymentData?.cliente?.email || 'No especificado'}
-                    </p>
+                      </p>
+                    </div>
                   </div>
-                </div>
-                
+                  
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
                     <Phone className="w-5 h-5 text-green-600" />
-                  </div>
-                  <div>
+                    </div>
+                    <div>
                     <p className="text-sm text-gray-500">Teléfono</p>
                     <p className="font-semibold text-gray-900">
                       {paymentData?.reservation?.cliente_telefono || paymentData?.cliente?.telefono || 'No especificado'}
@@ -263,20 +276,20 @@ export default function PaymentSuccessPage() {
                     <p className="font-semibold text-gray-900">
                       {paymentData?.reservation?.fecha ? new Date(paymentData.reservation.fecha).toLocaleDateString('es-CL') : 
                        paymentData?.fecha ? new Date(paymentData.fecha).toLocaleDateString('es-CL') : 'No especificada'}
-                    </p>
+                      </p>
+                    </div>
                   </div>
-                </div>
-                
+                  
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
                     <Clock className="w-5 h-5 text-green-600" />
-                  </div>
-                  <div>
+                    </div>
+                    <div>
                     <p className="text-sm text-gray-500">Hora</p>
                     <p className="font-semibold text-gray-900">
                       {paymentData?.reservation?.hora || paymentData?.hora || '10:00'} hrs
-                    </p>
-                  </div>
+                      </p>
+                    </div>
                 </div>
                 
                 <div className="flex items-center gap-3">
@@ -333,7 +346,7 @@ export default function PaymentSuccessPage() {
             <h3 className="text-lg font-semibold text-blue-900 mb-3">
               📧 Estado de confirmación
             </h3>
-            <div className="space-y-3">
+                <div className="space-y-3">
               <div className="flex items-center gap-2">
                 <CheckCircle className="w-5 h-5 text-green-500" />
                 <span className="text-blue-800">Reserva guardada en la base de datos</span>
