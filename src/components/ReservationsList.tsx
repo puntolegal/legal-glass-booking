@@ -48,7 +48,7 @@ const ReservationsList = () => {
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                     <div>
-                      <p><strong>RUT:</strong> {reservation.rut}</p>
+                      <p><strong>RUT:</strong> {reservation.rut || 'No especificado'}</p>
                       <p><strong>Email:</strong> {reservation.email}</p>
                       <p><strong>Teléfono:</strong> {reservation.telefono}</p>
                     </div>

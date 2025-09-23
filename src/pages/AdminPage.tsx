@@ -336,7 +336,7 @@ const AdminPage = () => {
                     {reservations.map((reservation) => (
                       <TableRow key={reservation.id}>
                         <TableCell className="font-medium">{reservation.nombre}</TableCell>
-                        <TableCell>{reservation.rut}</TableCell>
+                        <TableCell>{reservation.rut || 'No especificado'}</TableCell>
                         <TableCell>{reservation.email}</TableCell>
                         <TableCell>{reservation.telefono}</TableCell>
                         <TableCell>{new Date(reservation.fecha).toLocaleDateString('es-CL')}</TableCell>

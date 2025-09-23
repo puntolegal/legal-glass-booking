@@ -369,7 +369,7 @@ export async function scheduleReminders(): Promise<void> {
       const reservation: Reservation = {
         id: reserva.id,
         cliente_nombre: reserva.nombre,
-        cliente_rut: reserva.rut,
+        cliente_rut: reserva.cliente_rut || 'No especificado',
         cliente_email: reserva.email,
         cliente_telefono: reserva.telefono,
         fecha: reserva.fecha,
