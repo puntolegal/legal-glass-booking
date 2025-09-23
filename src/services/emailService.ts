@@ -27,7 +27,7 @@ interface BookingData {
   cliente_rut?: string;
 }
 
-async function sendEmail(emailData: EmailData): Promise<{ success: boolean; id?: string; error?: string }> {
+export async function sendResendEmail(emailData: EmailData): Promise<{ success: boolean; id?: string; error?: string }> {
   try {
     const response = await fetch('https://api.resend.com/emails', {
       method: 'POST',
@@ -209,7 +209,7 @@ export async function sendBookingEmailsDirect(booking: BookingData): Promise<{
     `;
 
     // Enviar email al cliente
-    const clientEmailResult = await sendEmail({
+    const clientEmailResult = await sendResendEmail({
       to: booking.cliente_email,
       subject: `✅ Consulta Legal Confirmada - ${trackingCode}`,
       html: clientEmailHtml
@@ -220,7 +220,7 @@ export async function sendBookingEmailsDirect(booking: BookingData): Promise<{
     }
 
     // Enviar email al admin
-    const adminEmailResult = await sendEmail({
+    const adminEmailResult = await sendResendEmail({
       to: ADMIN_EMAIL,
       subject: `📋 Nueva Consulta Legal - ${trackingCode} - ${booking.cliente_nombre}`,
       html: adminEmailHtml

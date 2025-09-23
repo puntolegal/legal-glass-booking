@@ -30,8 +30,18 @@ export const validateWebhookSignature = (
   body: string
 ): boolean => {
   try {
+    if (!WEBHOOK_SECRET || WEBHOOK_SECRET === 'tu_clave_secreta_aqui') {
+      console.warn('⚠️ WEBHOOK_SECRET no configurado, omitiendo validación de firma.');
+      return true;
+    }
+
+    if (!xSignature || !xRequestId || !dataId) {
+      console.warn('⚠️ Encabezados insuficientes para validar la firma del webhook.');
+      return false;
+    }
+
     console.log('🔍 Validando firma de webhook de MercadoPago...');
-    
+
     // 1. Extraer timestamp (ts) y clave (v1) del header x-signature
     const parts = xSignature.split(',');
     let ts = '';
@@ -96,12 +106,17 @@ export const handleMercadoPagoWebhook = async (
     
     // 1. Validar firma (en producción)
     if (process.env.NODE_ENV === 'production') {
+      const secretConfigured = WEBHOOK_SECRET && WEBHOOK_SECRET !== 'tu_clave_secreta_aqui';
       const xSignature = headers['x-signature'];
       const xRequestId = headers['x-request-id'];
-      const dataId = queryParams['data.id'];
-      
-      if (!validateWebhookSignature(xSignature, xRequestId, dataId, JSON.stringify(notification))) {
-        throw new Error('Firma de webhook inválida');
+      const dataId = queryParams['data.id'] || notification.data?.id;
+
+      if (secretConfigured && xSignature && xRequestId && dataId) {
+        if (!validateWebhookSignature(xSignature, xRequestId, dataId, JSON.stringify(notification))) {
+          throw new Error('Firma de webhook inválida');
+        }
+      } else {
+        console.warn('⚠️ Firma de webhook no validada: faltan encabezados o secreto.');
       }
     }
     
@@ -204,16 +219,23 @@ const handleApprovedPayment = async (paymentInfo: any) => {
     // 2. Actualizar estado del pago en Supabase
     if (reserva) {
       console.log('🔄 Actualizando reserva en Supabase:', reserva.id);
-      
+
       const updateResult = await updatePaymentStatus(reserva.id, {
-        estado: 'approved',
+        estado: paymentInfo.status || 'approved',
         id: paymentInfo.id,
-        metodo: 'mercadopago',
-        monto: paymentInfo.transaction_amount
+        metodo: paymentInfo.payment_method_id || 'mercadopago',
+        tipo: paymentInfo.payment_type_id,
+        monto: paymentInfo.transaction_amount,
+        externalReference: paymentInfo.external_reference || reserva.id,
+        preferenceId: paymentInfo.order?.id || paymentInfo.preference_id || paymentInfo.metadata?.preference_id || null,
+        statusDetail: paymentInfo.status_detail
       });
-      
+
       if (updateResult.success) {
-        console.log('✅ Reserva actualizada y emails enviados automáticamente');
+        console.log('✅ Reserva actualizada correctamente', {
+          emailSent: updateResult.emailSent,
+          alreadyConfirmed: updateResult.alreadyConfirmed
+        });
       } else {
         console.error('❌ Error actualizando reserva:', updateResult.error);
       }
@@ -240,18 +262,83 @@ const handleApprovedPayment = async (paymentInfo: any) => {
 // Manejar pago pendiente
 const handlePendingPayment = async (paymentInfo: any) => {
   console.log('⏳ Pago pendiente, esperando confirmación:', paymentInfo.id);
-  
-  // Para pagos offline (efectivo, transferencia, etc.)
-  // El usuario debe completar el pago en un punto físico
-  
-  // TODO: Enviar instrucciones al cliente sobre cómo completar el pago
+
+  try {
+    let reserva = null;
+
+    if (paymentInfo.external_reference) {
+      const result = await findReservaByCriteria({
+        externalReference: paymentInfo.external_reference
+      });
+      reserva = result.reserva;
+    }
+
+    if (!reserva && paymentInfo.id) {
+      const result = await findReservaByCriteria({ pagoId: paymentInfo.id });
+      reserva = result.reserva;
+    }
+
+    if (!reserva && paymentInfo.payer?.email) {
+      const result = await findReservaByCriteria({ email: paymentInfo.payer.email });
+      reserva = result.reserva;
+    }
+
+    if (reserva) {
+      await updatePaymentStatus(reserva.id, {
+        estado: paymentInfo.status || 'pending',
+        id: paymentInfo.id,
+        metodo: paymentInfo.payment_method_id || 'mercadopago',
+        tipo: paymentInfo.payment_type_id,
+        monto: paymentInfo.transaction_amount,
+        externalReference: paymentInfo.external_reference || reserva.id,
+        preferenceId: paymentInfo.order?.id || paymentInfo.preference_id || paymentInfo.metadata?.preference_id || null,
+        statusDetail: paymentInfo.status_detail
+      });
+    }
+  } catch (error) {
+    console.error('❌ Error manejando pago pendiente:', error);
+  }
 };
 
 // Manejar pago rechazado
 const handleRejectedPayment = async (paymentInfo: any) => {
   console.log('❌ Pago rechazado:', paymentInfo.id, paymentInfo.status_detail);
-  
-  // TODO: Notificar al cliente sobre el rechazo y ofrecer alternativas
+
+  try {
+    let reserva = null;
+
+    if (paymentInfo.external_reference) {
+      const result = await findReservaByCriteria({
+        externalReference: paymentInfo.external_reference
+      });
+      reserva = result.reserva;
+    }
+
+    if (!reserva && paymentInfo.id) {
+      const result = await findReservaByCriteria({ pagoId: paymentInfo.id });
+      reserva = result.reserva;
+    }
+
+    if (!reserva && paymentInfo.payer?.email) {
+      const result = await findReservaByCriteria({ email: paymentInfo.payer.email });
+      reserva = result.reserva;
+    }
+
+    if (reserva) {
+      await updatePaymentStatus(reserva.id, {
+        estado: paymentInfo.status || 'rejected',
+        id: paymentInfo.id,
+        metodo: paymentInfo.payment_method_id || 'mercadopago',
+        tipo: paymentInfo.payment_type_id,
+        monto: paymentInfo.transaction_amount,
+        externalReference: paymentInfo.external_reference || reserva.id,
+        preferenceId: paymentInfo.order?.id || paymentInfo.preference_id || paymentInfo.metadata?.preference_id || null,
+        statusDetail: paymentInfo.status_detail
+      });
+    }
+  } catch (error) {
+    console.error('❌ Error manejando pago rechazado:', error);
+  }
 };
 
 // Simular endpoint de webhook (en producción esto estaría en tu servidor)

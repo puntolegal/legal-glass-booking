@@ -1,10 +1,8 @@
 import { supabase } from '@/integrations/supabase/client';
-import { NOTIFICATION_CONFIG } from '@/config/notifications';
-import type { Reserva } from '@/services/supabaseBooking';
 
 // Función para configurar rápidamente el sistema básico
-export async function quickDatabaseSetup(): Promise<{success: boolean; message: string; details: Array<Record<string, unknown>>}> {
-  const results: Array<Record<string, unknown>> = [];
+export async function quickDatabaseSetup(): Promise<{success: boolean, message: string, details: any[]}> {
+  const results: any[] = [];
   let allSuccess = true;
 
   try {
@@ -28,36 +26,22 @@ export async function quickDatabaseSetup(): Promise<{success: boolean; message: 
     console.log('2. Creando reservas de prueba...');
     const reservasPrueba = [
       {
-        cliente_nombre: 'Juan Pérez Test',
-        cliente_rut: '12345678-9',
-        cliente_email: 'juan.test@puntolegal.cl',
-        cliente_telefono: '+56912345678',
-        servicio_tipo: 'Consulta laboral de prueba',
-        servicio_precio: '35000',
-        servicio_categoria: 'Laboral',
+        nombre: 'Juan Pérez Test',
+        rut: '12345678-9',
+        email: 'juan.test@puntolegal.cl',
+        telefono: '+56912345678',
         fecha: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0],
         hora: '15:00',
-        descripcion: 'Consulta laboral de prueba - sistema de notificaciones',
-        tipo_reunion: 'online',
-        estado: 'pendiente',
-        pago_metodo: 'pendiente',
-        pago_estado: 'pendiente'
+        descripcion: 'Consulta laboral de prueba - sistema de notificaciones'
       },
       {
-        cliente_nombre: 'María González Test',
-        cliente_rut: '98765432-1',
-        cliente_email: 'maria.test@puntolegal.cl',
-        cliente_telefono: '+56987654321',
-        servicio_tipo: 'Constitución de sociedad (demo)',
-        servicio_precio: '50000',
-        servicio_categoria: 'Corporativo',
+        nombre: 'María González Test',
+        rut: '98765432-1',
+        email: 'maria.test@puntolegal.cl',
+        telefono: '+56987654321',
         fecha: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
         hora: '10:30',
-        descripcion: 'Constitución de sociedad de prueba',
-        tipo_reunion: 'presencial',
-        estado: 'pendiente',
-        pago_metodo: 'pendiente',
-        pago_estado: 'pendiente'
+        descripcion: 'Constitución de sociedad de prueba'
       }
     ];
 
@@ -68,16 +52,16 @@ export async function quickDatabaseSetup(): Promise<{success: boolean; message: 
       
       if (reservaError) {
         console.warn('Error creando reserva de prueba:', reservaError);
-        results.push({
-          step: `Reserva ${reserva.cliente_nombre}`,
-          success: false,
-          error: reservaError.message
+        results.push({ 
+          step: `Reserva ${reserva.nombre}`, 
+          success: false, 
+          error: reservaError.message 
         });
       } else {
-        results.push({
-          step: `Reserva ${reserva.cliente_nombre}`,
-          success: true,
-          message: 'Reserva creada'
+        results.push({ 
+          step: `Reserva ${reserva.nombre}`, 
+          success: true, 
+          message: 'Reserva creada' 
         });
       }
     }
@@ -103,48 +87,33 @@ export async function quickDatabaseSetup(): Promise<{success: boolean; message: 
     console.log('4. Probando sistema de notificaciones básico...');
     try {
       const { notificationService } = await import('@/services/notificationService');
-
-      const ahora = new Date();
-      const reservaPruebaNoti: Reserva = {
-        id: `demo-${ahora.getTime()}`,
-        cliente_nombre: 'Cliente Prueba Notificación',
-        cliente_email: NOTIFICATION_CONFIG.email.testRecipient || 'test@puntolegal.online',
-        cliente_telefono: '+56912345678',
-        cliente_rut: '11.111.111-1',
-        servicio_tipo: 'Consulta Demo',
-        servicio_precio: '45000',
-        servicio_categoria: 'Testing',
-        fecha: ahora.toISOString().split('T')[0],
+      
+      // Crear datos de prueba para notificación
+      const reservaPruebaNoti = {
+        id: 'test-' + Date.now(),
+        nombre: 'Test Notificación',
+        email: 'test@puntolegal.cl',
+        telefono: '+56912345678',
+        fecha: new Date().toISOString().split('T')[0],
         hora: '15:00',
-        descripcion: 'Generada por quickDatabaseSetup para validar Resend.',
-        pago_metodo: 'pendiente',
-        pago_estado: 'pendiente',
-        pago_id: null,
-        pago_monto: null,
-        tipo_reunion: 'online',
-        external_reference: null,
-        preference_id: null,
-        estado: 'pendiente',
-        email_enviado: false,
-        recordatorio_enviado: false,
-        created_at: ahora.toISOString(),
-        updated_at: ahora.toISOString()
+        servicio: 'Consulta General',
+        precio: '50000',
+        categoria: 'testing'
       };
 
+      // Intentar enviar notificación (fallará sin Make configurado, pero probará la lógica)
       const resultadoNoti = await notificationService.enviarConfirmacionReserva(reservaPruebaNoti);
-
-      results.push({
-        step: 'Prueba notificación',
-        success: resultadoNoti,
-        message: resultadoNoti
-          ? 'Notificación enviada correctamente via Resend'
-          : 'No se pudo enviar la notificación de prueba'
+      
+      results.push({ 
+        step: 'Prueba notificación', 
+        success: true, 
+        message: `Notificación ${resultadoNoti ? 'enviada' : 'falló (normal sin Make)'}` 
       });
     } catch (notiError) {
-      results.push({
-        step: 'Prueba notificación',
-        success: false,
-        error: notiError instanceof Error ? notiError.message : 'Error desconocido'
+      results.push({ 
+        step: 'Prueba notificación', 
+        success: false, 
+        error: notiError.message 
       });
     }
 
@@ -198,15 +167,48 @@ export async function getBasicStats(): Promise<{
   }
 }
 
-// Función para probar el canal de emails
-export async function testEmailDelivery(): Promise<{success: boolean, message: string}> {
+// Función para probar webhook simplificado
+export async function testBasicWebhook(): Promise<{success: boolean, message: string}> {
   try {
-    const { notificationService } = await import('@/services/notificationService');
-    return await notificationService.probarConexion();
+    const webhookUrl = import.meta.env.VITE_MAKE_WEBHOOK_URL || 'https://hook.eu2.make.com/YOUR_WEBHOOK_ID';
+    
+    if (webhookUrl.includes('YOUR_WEBHOOK_ID')) {
+      return {
+        success: false,
+        message: '❌ Webhook URL no configurada. Agrega VITE_MAKE_WEBHOOK_URL a tu .env'
+      };
+    }
+
+    const testData = {
+      tipo_evento: 'test',
+      timestamp: new Date().toISOString(),
+      test: true,
+      mensaje: 'Prueba desde Punto Legal'
+    };
+
+    const response = await fetch(webhookUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(testData)
+    });
+
+    if (response.ok) {
+      return {
+        success: true,
+        message: '✅ Webhook respondió correctamente'
+      };
+    } else {
+      return {
+        success: false,
+        message: `❌ Webhook falló: ${response.status} ${response.statusText}`
+      };
+    }
   } catch (error) {
     return {
       success: false,
-      message: `❌ Error probando envío de emails: ${error instanceof Error ? error.message : 'Desconocido'}`
+      message: `❌ Error de red: ${error.message}`
     };
   }
 }
@@ -241,23 +243,23 @@ export async function cleanupTestData(): Promise<{success: boolean, message: str
 // Función para mostrar el estado del sistema
 export async function getSystemStatus(): Promise<{
   database: boolean,
-  emails: boolean,
+  webhook: boolean,
   reservas: number,
   message: string
 }> {
   const basicStats = await getBasicStats();
-  const emailTest = await testEmailDelivery();
+  const webhookTest = await testBasicWebhook();
 
   const message = `
 🗄️ Base de datos: ${basicStats.functioning ? '✅ Funcionando' : '❌ Error'}
-📧 Emails: ${emailTest.success ? '✅ Funcionando' : '❌ Error'}
+📧 Webhook: ${webhookTest.success ? '✅ Configurado' : '❌ Sin configurar'}
 📋 Reservas: ${basicStats.reservas}
 👥 Perfiles: ${basicStats.profiles}
   `.trim();
 
   return {
     database: basicStats.functioning,
-    emails: emailTest.success,
+    webhook: webhookTest.success,
     reservas: basicStats.reservas,
     message
   };
@@ -265,28 +267,18 @@ export async function getSystemStatus(): Promise<{
 
 // Exponer funciones globalmente para fácil acceso desde consola
 if (typeof window !== 'undefined') {
-  type PuntoLegalDebugHelpers = {
-    quickSetup: typeof quickDatabaseSetup;
-    getStats: typeof getBasicStats;
-    testEmails: typeof testEmailDelivery;
-    cleanup: typeof cleanupTestData;
-    getStatus: typeof getSystemStatus;
-  };
-
-  const globalWindow = window as typeof window & { PuntoLegalDebug?: PuntoLegalDebugHelpers };
-
-  globalWindow.PuntoLegalDebug = {
+  (window as any).PuntoLegalDebug = {
     quickSetup: quickDatabaseSetup,
     getStats: getBasicStats,
-    testEmails: testEmailDelivery,
+    testWebhook: testBasicWebhook,
     cleanup: cleanupTestData,
     getStatus: getSystemStatus
   };
-
+  
   console.log('🛠️ Funciones de debug disponibles:');
   console.log('• PuntoLegalDebug.quickSetup() - Configuración rápida');
   console.log('• PuntoLegalDebug.getStats() - Estadísticas básicas');
-  console.log('• PuntoLegalDebug.testEmails() - Probar envío de emails');
+  console.log('• PuntoLegalDebug.testWebhook() - Probar webhook');
   console.log('• PuntoLegalDebug.getStatus() - Estado del sistema');
   console.log('• PuntoLegalDebug.cleanup() - Limpiar datos de prueba');
-}
+} 

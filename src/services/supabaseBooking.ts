@@ -17,6 +17,8 @@ export interface BookingData {
     descripcion?: string;
     fecha: string;
     hora: string;
+    categoria?: string;
+    tipoReunion?: string;
   };
   pago?: {
     metodo: string;
@@ -26,6 +28,7 @@ export interface BookingData {
   };
   descripcion?: string;
   motivoConsulta?: string;
+  notas?: string;
 }
 
 export interface Reserva {
@@ -33,23 +36,36 @@ export interface Reserva {
   cliente_nombre: string;
   cliente_email: string;
   cliente_telefono: string;
-  cliente_rut: string;
+  cliente_rut: string | null;
   servicio_tipo: string;
-  servicio_precio: string;
-  descripcion?: string;
+  servicio_precio: string | number;
+  servicio_categoria?: string | null;
   fecha: string;
   hora: string;
-  pago_metodo: string;
-  pago_estado: string;
-  pago_id?: string;
-  pago_monto?: number;
+  descripcion?: string | null;
+  pago_metodo: string | null;
+  pago_estado: string | null;
+  pago_id?: string | null;
+  pago_monto?: number | null;
+  tipo_reunion?: string | null;
+  external_reference?: string | null;
+  preference_id?: string | null;
   estado: 'pendiente' | 'confirmada' | 'completada' | 'cancelada';
-  descripcion?: string;
-  descripcion?: string;
   email_enviado: boolean;
   recordatorio_enviado: boolean;
   created_at: string;
   updated_at: string;
+}
+
+export interface PaymentStatusUpdate {
+  estado: string;
+  id?: string | null;
+  metodo?: string | null;
+  monto?: number | null;
+  tipo?: string | null;
+  externalReference?: string | null;
+  preferenceId?: string | null;
+  statusDetail?: string | null;
 }
 
 // Crear nueva reserva y enviar emails automáticamente
@@ -127,17 +143,23 @@ export const createBooking = async (bookingData: BookingData): Promise<{ success
       cliente_nombre: bookingData.cliente.nombre,
       cliente_email: bookingData.cliente.email,
       cliente_telefono: bookingData.cliente.telefono,
-      cliente_rut: 'No especificado', // RUT no se captura en el formulario
+      cliente_rut: bookingData.cliente.rut || 'No especificado',
       servicio_tipo: bookingData.servicio.tipo,
       servicio_precio: bookingData.servicio.precio,
-      descripcion: bookingData.servicio.descripcion,
+      servicio_categoria: bookingData.servicio.categoria || null,
+      tipo_reunion: bookingData.servicio.tipoReunion || null,
       fecha: bookingData.servicio.fecha,
       hora: bookingData.servicio.hora,
+      descripcion:
+        bookingData.descripcion ||
+        bookingData.motivoConsulta ||
+        bookingData.notas ||
+        bookingData.servicio.descripcion ||
+        null,
       pago_metodo: bookingData.pago?.metodo || 'pendiente',
       pago_estado: bookingData.pago?.estado || 'pendiente',
-      pago_id: bookingData.pago?.id,
-      pago_monto: bookingData.pago?.monto,
-      descripcion: bookingData.notas || bookingData.motivoConsulta,
+      pago_id: bookingData.pago?.id ?? null,
+      pago_monto: bookingData.pago?.monto ?? null,
       estado: 'pendiente' as const
     };
 
@@ -188,18 +210,24 @@ const createOfflineReserva = (bookingData: BookingData): { success: boolean; res
       cliente_nombre: bookingData.cliente.nombre,
       cliente_email: bookingData.cliente.email,
       cliente_telefono: bookingData.cliente.telefono,
-      cliente_rut: 'No especificado', // RUT no se captura en el formulario
+      cliente_rut: bookingData.cliente.rut || 'No especificado',
       servicio_tipo: bookingData.servicio.tipo,
       servicio_precio: bookingData.servicio.precio,
-      descripcion: bookingData.servicio.descripcion,
+      servicio_categoria: bookingData.servicio.categoria || null,
+      tipo_reunion: bookingData.servicio.tipoReunion || null,
       fecha: bookingData.servicio.fecha,
       hora: bookingData.servicio.hora,
       pago_metodo: bookingData.pago?.metodo || 'pendiente',
       pago_estado: bookingData.pago?.estado || 'pendiente',
       pago_id: bookingData.pago?.id,
       pago_monto: bookingData.pago?.monto,
+      descripcion:
+        bookingData.descripcion ||
+        bookingData.motivoConsulta ||
+        bookingData.notas ||
+        bookingData.servicio.descripcion ||
+        null,
       estado: 'pendiente',
-      descripcion: bookingData.notas || bookingData.motivoConsulta,
       email_enviado: false,
       recordatorio_enviado: false,
       created_at: new Date().toISOString(),
@@ -227,24 +255,88 @@ const createOfflineReserva = (bookingData: BookingData): { success: boolean; res
   }
 };
 
+const mapPaymentStatusToReservaEstado = (
+  status: string,
+  currentEstado?: Reserva['estado']
+): Reserva['estado'] => {
+  switch (status) {
+    case 'approved':
+    case 'authorized':
+      return 'confirmada';
+    case 'pending':
+    case 'in_process':
+    case 'in_mediation':
+      return 'pendiente';
+    case 'rejected':
+    case 'cancelled':
+    case 'refunded':
+    case 'charged_back':
+      return 'cancelada';
+    default:
+      return currentEstado || 'pendiente';
+  }
+};
+
 // Actualizar estado de pago cuando MercadoPago confirma
 export const updatePaymentStatus = async (
-  reservaId: string, 
-  paymentData: { estado: string; id?: string; metodo?: string; monto?: number }
-): Promise<{ success: boolean; error?: string }> => {
+  reservaId: string,
+  paymentData: PaymentStatusUpdate
+): Promise<{ success: boolean; reserva?: Reserva; emailSent?: boolean; alreadyConfirmed?: boolean; error?: string }> => {
   try {
     console.log('💳 Actualizando estado de pago...', { reservaId, paymentData });
 
+    const { data: existingReservation, error: fetchError } = await supabase
+      .from('reservas')
+      .select('*')
+      .eq('id', reservaId)
+      .single();
+
+    if (fetchError || !existingReservation) {
+      console.error('❌ Error obteniendo reserva para actualizar pago:', fetchError);
+      return {
+        success: false,
+        error: fetchError?.message || 'Reserva no encontrada'
+      };
+    }
+
+    const currentReservation = existingReservation as Reserva;
+    const previousStatus = (currentReservation.pago_estado || '').toLowerCase();
+    const normalizedEstado = (paymentData.estado || '').toLowerCase() || 'pending';
+
+    const updates: Record<string, unknown> = {
+      pago_estado: normalizedEstado,
+      pago_id: paymentData.id ?? currentReservation.pago_id ?? null,
+      pago_metodo: paymentData.metodo || paymentData.tipo || currentReservation.pago_metodo || 'mercadopago',
+      pago_monto: paymentData.monto ?? currentReservation.pago_monto ?? null,
+      estado: mapPaymentStatusToReservaEstado(normalizedEstado, currentReservation.estado),
+      updated_at: new Date().toISOString()
+    };
+
+    const metadataLineParts: string[] = [];
+    if (paymentData.externalReference) {
+      metadataLineParts.push(`MP Ref: ${paymentData.externalReference}`);
+    }
+    if (paymentData.id) {
+      metadataLineParts.push(`Payment ID: ${paymentData.id}`);
+    }
+    if (paymentData.preferenceId) {
+      metadataLineParts.push(`Preference: ${paymentData.preferenceId}`);
+    }
+
+    if (metadataLineParts.length > 0) {
+      const metadataLine = metadataLineParts.join(' | ');
+      const currentDescription = currentReservation.descripcion || '';
+
+      if (!currentDescription.includes(metadataLineParts[0])) {
+        updates.descripcion = currentDescription
+          ? `${currentDescription}\n${metadataLine}`
+          : metadataLine;
+      }
+    }
+
     const { data, error } = await supabase
       .from('reservas')
-      .update({
-        pago_estado: paymentData.estado,
-        pago_id: paymentData.id,
-        pago_metodo: paymentData.metodo || 'mercadopago',
-        pago_monto: paymentData.monto,
-        estado: paymentData.estado === 'approved' ? 'confirmada' : 'pendiente',
-        updated_at: new Date().toISOString()
-      })
+      .update(updates)
       .eq('id', reservaId)
       .select()
       .single();
@@ -254,14 +346,19 @@ export const updatePaymentStatus = async (
       throw error;
     }
 
-    console.log('✅ Estado de pago actualizado:', data);
-    
-    // Si el pago fue aprobado, enviar email de confirmación
-    if (paymentData.estado === 'approved') {
-      await sendPaymentConfirmationEmail(data);
+    const updatedReservation = data as Reserva;
+    const shouldSendEmail = normalizedEstado === 'approved' && previousStatus !== 'approved';
+
+    if (shouldSendEmail) {
+      await sendPaymentConfirmationEmail(updatedReservation);
     }
-    
-    return { success: true };
+
+    return {
+      success: true,
+      reserva: updatedReservation,
+      emailSent: shouldSendEmail,
+      alreadyConfirmed: previousStatus === 'approved' || currentReservation.estado === 'confirmada'
+    };
 
   } catch (error) {
     console.error('❌ Error actualizando estado de pago:', error);
@@ -277,45 +374,36 @@ const sendPaymentConfirmationEmail = async (reserva: Reserva) => {
   try {
     console.log('📧 Enviando email de confirmación de pago...');
 
-    const bookingData: BookingData = {
-      cliente: {
-        nombre: reserva.cliente_nombre,
-        email: reserva.cliente_email,
-        telefono: reserva.cliente_telefono,
-        rut: reserva.cliente_rut
-      },
-      servicio: {
-        tipo: reserva.servicio_tipo,
-        precio: reserva.servicio_precio,
-        descripcion: reserva.descripcion,
-        fecha: reserva.fecha,
-        hora: reserva.hora
-      },
-      pago: {
-        metodo: reserva.pago_metodo,
-        estado: reserva.pago_estado,
-        id: reserva.pago_id,
-        monto: reserva.pago_monto
-      },
-      notas: reserva.descripcion,
-      motivoConsulta: reserva.descripcion
+    const emailData: BookingEmailData = {
+      id: reserva.id,
+      cliente_nombre: reserva.cliente_nombre,
+      cliente_email: reserva.cliente_email,
+      cliente_telefono: reserva.cliente_telefono,
+      servicio_tipo: reserva.servicio_tipo,
+      servicio_precio: String(reserva.servicio_precio ?? ''),
+      fecha: reserva.fecha,
+      hora: reserva.hora,
+      tipo_reunion: reserva.tipo_reunion || undefined,
+      descripcion: reserva.descripcion || undefined,
+      pago_metodo: reserva.pago_metodo || undefined,
+      pago_estado: reserva.pago_estado || undefined,
+      created_at: reserva.created_at
     };
 
-    const { error } = await supabase.functions.invoke('send-booking-email', {
-      body: { bookingData }
-    });
+    const emailResult = await sendRealBookingEmails(emailData);
 
-    if (error) {
-      console.error('❌ Error enviando email de confirmación:', error);
-    } else {
-      console.log('✅ Email de confirmación enviado');
-      
-      // Marcar email como enviado
-      await supabase
-        .from('reservas')
-        .update({ email_enviado: true })
-        .eq('id', reserva.id);
+    if (!emailResult.success) {
+      console.error('❌ Error enviando email de confirmación:', emailResult.error);
+      return;
     }
+
+    console.log('✅ Email de confirmación enviado');
+    
+    // Marcar email como enviado
+    await supabase
+      .from('reservas')
+      .update({ email_enviado: true })
+      .eq('id', reserva.id);
 
   } catch (error) {
     console.error('❌ Error en confirmación de pago:', error);
@@ -374,6 +462,7 @@ export const getReservas = async (filtros?: {
 
 // Buscar reserva por email o ID de pago
 export const findReservaByCriteria = async (criteria: {
+  reservationId?: string;
   email?: string;
   pagoId?: string;
   externalReference?: string;
@@ -381,13 +470,21 @@ export const findReservaByCriteria = async (criteria: {
   try {
     let query = supabase.from('reservas').select('*');
 
-    if (criteria.email) {
-      query = query.eq('cliente_email', criteria.email);
+    if (criteria.reservationId) {
+      query = query.eq('id', criteria.reservationId);
     } else if (criteria.pagoId) {
       query = query.eq('pago_id', criteria.pagoId);
     } else if (criteria.externalReference) {
       // Buscar por referencia externa en descripcion o ID
-      query = query.or(`id.eq.${criteria.externalReference},descripcion.ilike.%${criteria.externalReference}%`);
+      query = query.or(
+        [
+          `id.eq.${criteria.externalReference}`,
+          `descripcion.ilike.%${criteria.externalReference}%`,
+          `pago_id.eq.${criteria.externalReference}`
+        ].join(',')
+      );
+    } else if (criteria.email) {
+      query = query.eq('cliente_email', criteria.email);
     }
 
     const { data: reservas, error } = await query.order('created_at', { ascending: false }).limit(1);

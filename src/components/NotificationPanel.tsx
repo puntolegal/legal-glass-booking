@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { notificationService } from '@/services/notificationService';
 import { NOTIFICATION_CONFIG } from '@/config/notifications';
+import type { Reserva } from '@/services/supabaseBooking';
 import { runFullTestSuite } from '@/utils/testNotifications';
 
 interface NotificationStats {
@@ -106,35 +107,57 @@ export default function NotificationPanel() {
     }
   };
 
-  const testearWebhook = async () => {
+  const probarConexionEmails = async () => {
     try {
       setLoading(true);
-      mostrarMensaje('success', '⏳ Probando conexión con Make...');
-      
-      // Crear datos de prueba
-      const reservaPrueba = {
-        id: 'test-' + Date.now(),
-        nombre: 'Prueba Sistema',
-        email: 'test@puntolegal.cl',
-        telefono: '+56912345678',
-        fecha: new Date().toISOString().split('T')[0],
-        hora: '15:00',
-        servicio: 'Consulta General',
-        precio: '50000',
-        categoria: 'general'
+      const resultado = await notificationService.probarConexion();
+      mostrarMensaje(resultado.success ? 'success' : 'error', resultado.message);
+    } catch (error) {
+      console.error('Error probando conexión de emails:', error);
+      mostrarMensaje('error', 'Error probando conexión con Resend');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const enviarConfirmacionDemo = async () => {
+    try {
+      setLoading(true);
+      const ahora = new Date();
+      const reservaPrueba: Reserva = {
+        id: `demo-${ahora.getTime()}`,
+        cliente_nombre: 'Cliente de Prueba',
+        cliente_email: NOTIFICATION_CONFIG.email.testRecipient || 'test@puntolegal.online',
+        cliente_telefono: '+56912345678',
+        cliente_rut: '11.111.111-1',
+        servicio_tipo: 'Consulta Legal Demo',
+        servicio_precio: '50000',
+        servicio_categoria: 'demo',
+        fecha: ahora.toISOString().split('T')[0],
+        hora: '10:00',
+        descripcion: 'Reserva generada para validar el flujo de notificaciones.',
+        pago_metodo: 'pendiente',
+        pago_estado: 'pendiente',
+        pago_id: null,
+        pago_monto: null,
+        tipo_reunion: 'online',
+        external_reference: null,
+        preference_id: null,
+        estado: 'pendiente',
+        email_enviado: false,
+        recordatorio_enviado: false,
+        created_at: ahora.toISOString(),
+        updated_at: ahora.toISOString()
       };
 
       const exito = await notificationService.enviarConfirmacionReserva(reservaPrueba);
-      
-      if (exito) {
-        mostrarMensaje('success', '✅ Webhook de prueba enviado exitosamente');
-      } else {
-        mostrarMensaje('error', '❌ Error enviando webhook de prueba');
-      }
-      
+      mostrarMensaje(
+        exito ? 'success' : 'error',
+        exito ? '✅ Confirmación enviada correctamente (demo)' : '❌ Error enviando confirmación de prueba'
+      );
     } catch (error) {
-      console.error('Error probando webhook:', error);
-      mostrarMensaje('error', 'Error probando conexión con Make');
+      console.error('Error enviando confirmación de prueba:', error);
+      mostrarMensaje('error', 'Error enviando confirmación de prueba');
     } finally {
       setLoading(false);
     }
@@ -281,22 +304,36 @@ export default function NotificationPanel() {
             <CardHeader>
               <CardTitle>Estado del Sistema</CardTitle>
               <CardDescription>
-                Información sobre la configuración actual de Make
+                Información sobre la configuración actual de Resend y notificaciones
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-sm font-medium">Webhook URL</span>
-                <Badge variant={NOTIFICATION_CONFIG.makeWebhookUrl.includes('YOUR_WEBHOOK_ID') ? 'destructive' : 'default'}>
-                  {NOTIFICATION_CONFIG.makeWebhookUrl.includes('YOUR_WEBHOOK_ID') ? 'No configurado' : 'Configurado'}
+                <span className="text-sm font-medium">Remitente principal</span>
+                <Badge variant={NOTIFICATION_CONFIG.email.sender ? 'default' : 'destructive'}>
+                  {NOTIFICATION_CONFIG.email.sender ? 'Configurado' : 'Falta configurar'}
                 </Badge>
               </div>
-              
+
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium">Recordatorios Automáticos</span>
                 <Badge variant={recordatoriosActivos ? 'default' : 'secondary'}>
                   {recordatoriosActivos ? 'Activos' : 'Pausados'}
                 </Badge>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium">Email administrador</span>
+                <span className="text-sm text-muted-foreground">
+                  {NOTIFICATION_CONFIG.email.admin}
+                </span>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium">Casilla de pruebas</span>
+                <span className="text-sm text-muted-foreground">
+                  {NOTIFICATION_CONFIG.email.testRecipient || 'No definida'}
+                </span>
               </div>
               
               <div className="flex items-center justify-between">
@@ -356,20 +393,40 @@ export default function NotificationPanel() {
 
             <Card>
               <CardHeader>
-                <CardTitle>Probar Webhook</CardTitle>
+                <CardTitle>Probar Conexión de Emails</CardTitle>
                 <CardDescription>
-                  Envía una notificación de prueba a Make
+                  Envía un correo de prueba usando Resend
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <Button 
-                  onClick={testearWebhook}
+                  onClick={probarConexionEmails}
                   disabled={loading}
                   variant="secondary"
                   className="w-full"
                 >
                   <Play className="w-4 h-4 mr-2" />
-                  Probar Conexión
+                  Enviar Email de Prueba
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Confirmación Demo</CardTitle>
+                <CardDescription>
+                  Envía la plantilla completa de confirmación a la casilla de pruebas
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button 
+                  onClick={enviarConfirmacionDemo}
+                  disabled={loading}
+                  variant="outline"
+                  className="w-full"
+                >
+                  <Mail className="w-4 h-4 mr-2" />
+                  Enviar Confirmación Demo
                 </Button>
               </CardContent>
             </Card>
@@ -428,21 +485,35 @@ export default function NotificationPanel() {
         <TabsContent value="configuracion" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Configuración de Make</CardTitle>
+              <CardTitle>Configuración de Emails</CardTitle>
               <CardDescription>
-                Ajustes para la integración con Make.com
+                Ajustes para el envío automático vía Resend
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <label className="text-sm font-medium">Webhook URL</label>
+                <label className="text-sm font-medium">Remitente</label>
                 <div className="p-3 bg-muted rounded text-sm font-mono break-all">
-                  {NOTIFICATION_CONFIG.makeWebhookUrl}
+                  {NOTIFICATION_CONFIG.email.sender}
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Email administrador</label>
+                <div className="p-3 bg-muted rounded text-sm font-mono break-all">
+                  {NOTIFICATION_CONFIG.email.admin}
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Dirección de pruebas</label>
+                <div className="p-3 bg-muted rounded text-sm font-mono break-all">
+                  {NOTIFICATION_CONFIG.email.testRecipient || 'No definida'}
                 </div>
               </div>
               
               <div className="space-y-2">
-                <label className="text-sm font-medium">Empresa</label>
+                <label className="text-sm font-medium">Datos de la empresa</label>
                 <div className="p-3 bg-muted rounded text-sm space-y-1">
                   <div><strong>Nombre:</strong> {NOTIFICATION_CONFIG.empresa.nombre}</div>
                   <div><strong>Email:</strong> {NOTIFICATION_CONFIG.empresa.email}</div>
@@ -454,7 +525,7 @@ export default function NotificationPanel() {
               <Alert>
                 <Settings className="h-4 w-4" />
                 <AlertDescription>
-                  Para cambiar estos valores, modifica las variables de entorno en tu archivo .env
+                  Para cambiar estos valores, actualiza las variables de entorno asociadas a Resend en tu archivo .env
                 </AlertDescription>
               </Alert>
             </CardContent>

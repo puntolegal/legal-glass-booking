@@ -84,12 +84,15 @@ const MercadoPagoOfficialButton: React.FC<MercadoPagoOfficialButtonProps> = ({
         servicio_precio: paymentData.amount.toString(),
         servicio_categoria: paymentData.metadata?.service_category || 'General',
         tipo_reunion: paymentData.metadata?.meeting_type || 'online',
-        estado: 'pendiente' as const,
-        webhook_sent: false
+        estado: 'pendiente' as const
       };
 
       const reservation = await createReservation(reservationData);
       console.log('✅ Reserva creada:', reservation.id);
+
+      // Persistir identificadores clave para recuperar la reserva al volver de Mercado Pago
+      localStorage.setItem('currentReservationId', reservation.id);
+      localStorage.setItem('currentExternalReference', reservation.id);
 
       // Guardar datos en localStorage para PaymentSuccessPage
       const paymentDataForStorage = {
@@ -107,7 +110,9 @@ const MercadoPagoOfficialButton: React.FC<MercadoPagoOfficialButtonProps> = ({
         descuentoConvenio: paymentData.metadata?.descuento_convenio || false,
         originalPrice: paymentData.metadata?.precio_original || null,
         porcentajeDescuento: paymentData.metadata?.porcentaje_descuento || null,
-        id: paymentData.metadata?.reservation_id || Date.now().toString()
+        id: reservation.id,
+        reservationId: reservation.id,
+        external_reference: reservation.id
       };
 
       localStorage.setItem('paymentData', JSON.stringify(paymentDataForStorage));

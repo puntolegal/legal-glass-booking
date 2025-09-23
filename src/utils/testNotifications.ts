@@ -29,12 +29,12 @@ export async function testSupabaseConnection(): Promise<{success: boolean, messa
 }
 
 // Función para verificar que las tablas necesarias existen
-export async function testDatabaseTables(): Promise<{success: boolean, message: string, details?: any}> {
+export async function testDatabaseTables(): Promise<{success: boolean; message: string; details?: Record<string, unknown>}> {
   try {
     // Probar tabla reservas con nuevas columnas
     const { data: reservas, error: reservasError } = await supabase
       .from('reservas')
-      .select('id, nombre, servicio, precio, categoria, estado, recordatorio_enviado, webhook_sent')
+      .select('id, cliente_nombre, servicio_tipo, servicio_precio, servicio_categoria, estado, recordatorio_enviado, email_enviado')
       .limit(1);
     
     if (reservasError) {
@@ -91,16 +91,16 @@ export async function testDatabaseTables(): Promise<{success: boolean, message: 
 export async function createTestReservation(): Promise<{success: boolean, message: string, reservaId?: string}> {
   try {
     const testData = {
-      nombre: 'Test Usuario',
-      rut: '12345678-9',
-      email: 'test@puntolegal.cl',
-      telefono: '+56912345678',
-      fecha: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0], // Mañana
+      cliente_nombre: 'Test Usuario',
+      cliente_rut: '12345678-9',
+      cliente_email: 'test@puntolegal.cl',
+      cliente_telefono: '+56912345678',
+      servicio_tipo: 'Consulta de Prueba',
+      servicio_precio: '50000',
+      servicio_categoria: 'testing',
+      fecha: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0],
       hora: '15:00',
       descripcion: 'Reserva de prueba para sistema de notificaciones',
-      servicio: 'Consulta de Prueba',
-      precio: '50000',
-      categoria: 'testing',
       tipo_reunion: 'presencial'
     };
     
@@ -110,7 +110,9 @@ export async function createTestReservation(): Promise<{success: boolean, messag
         ...testData,
         estado: 'confirmada',
         recordatorio_enviado: false,
-        webhook_sent: false
+        email_enviado: false,
+        pago_estado: 'pending',
+        pago_metodo: 'pendiente'
       }])
       .select()
       .single();
@@ -181,7 +183,7 @@ export async function cleanupTestData(): Promise<{success: boolean, message: str
     const { error: reservasError } = await supabase
       .from('reservas')
       .delete()
-      .like('email', '%test%')
+      .like('cliente_email', '%test%')
       .or('descripcion.ilike.%prueba%');
     
     if (reservasError) {
@@ -212,11 +214,11 @@ export async function cleanupTestData(): Promise<{success: boolean, message: str
 
 // Función para ejecutar suite completa de pruebas
 export async function runFullTestSuite(): Promise<{
-  connection: any,
-  tables: any,
-  reservation: any,
-  notification?: any,
-  cleanup: any
+  connection: Awaited<ReturnType<typeof testSupabaseConnection>>;
+  tables: Awaited<ReturnType<typeof testDatabaseTables>>;
+  reservation: Awaited<ReturnType<typeof createTestReservation>>;
+  notification?: Awaited<ReturnType<typeof testNotificationSend>> | null;
+  cleanup: Awaited<ReturnType<typeof cleanupTestData>>;
 }> {
   console.log('🧪 Iniciando suite de pruebas del sistema de notificaciones...');
   

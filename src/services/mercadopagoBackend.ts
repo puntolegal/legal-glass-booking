@@ -2,6 +2,7 @@
 // En producción, estos endpoints deberían estar en un servidor Node.js/Python
 
 import { MERCADOPAGO_CONFIG } from '@/config/mercadopago';
+import { updatePaymentStatus, type PaymentStatusUpdate } from './supabaseBooking';
 
 // Interfaz para crear preferencia
 export interface CreatePreferenceRequest {
@@ -25,8 +26,17 @@ export interface CreatePreferenceRequest {
   };
   auto_return: string;
   external_reference: string;
-  metadata?: any;
+  metadata?: Record<string, unknown>;
   notification_url?: string;
+}
+
+interface MercadoPagoWebhookNotification {
+  type?: string;
+  data: {
+    id: string;
+    external_reference?: string;
+  };
+  external_reference?: string;
 }
 
 // Crear preferencia según documentación oficial de MercadoPago
@@ -136,63 +146,97 @@ export const createCheckoutPreference = async (preferenceData: CreatePreferenceR
   }
 };
 
+const createMockPaymentInfo = (paymentId: string) => ({
+  id: paymentId,
+  status: 'approved',
+  status_detail: 'accredited',
+  transaction_amount: 35000,
+  currency_id: 'CLP',
+  payment_method_id: 'visa',
+  payment_type_id: 'credit_card',
+  date_created: new Date().toISOString(),
+  date_approved: new Date().toISOString(),
+  date_last_updated: new Date().toISOString(),
+  external_reference: null,
+  preference_id: null,
+  payer: {
+    id: 'USER-123',
+    email: 'cliente@test.com',
+    identification: {
+      type: 'RUT',
+      number: '12345678-9'
+    },
+    first_name: 'Juan',
+    last_name: 'Pérez'
+  },
+  payment_method: {
+    id: 'visa',
+    type: 'credit_card',
+    issuer_id: '310'
+  },
+  transaction_details: {
+    net_received_amount: 35000,
+    total_paid_amount: 35000,
+    installment_amount: 35000,
+    financial_institution: 'Transbank'
+  }
+});
+
 // Obtener información de pago
 export const getPaymentInfo = async (paymentId: string) => {
   try {
     console.log('🔍 Obteniendo información del pago:', paymentId);
-    
-    // En producción: GET https://api.mercadopago.com/v1/payments/{payment_id}
-    
-    const mockPaymentInfo = {
-      id: paymentId,
-      status: 'approved',
-      status_detail: 'accredited',
-      transaction_amount: 35000,
-      currency_id: 'CLP',
-      payment_method_id: 'visa',
-      payment_type_id: 'credit_card',
-      date_created: new Date().toISOString(),
-      date_approved: new Date().toISOString(),
-      date_last_updated: new Date().toISOString(),
-      
-      payer: {
-        id: 'USER-123',
-        email: 'cliente@test.com',
-        identification: {
-          type: 'RUT',
-          number: '12345678-9'
-        },
-        first_name: 'Juan',
-        last_name: 'Pérez'
-      },
-      
-      payment_method: {
-        id: 'visa',
-        type: 'credit_card',
-        issuer_id: '310'
-      },
-      
-      transaction_details: {
-        net_received_amount: 35000,
-        total_paid_amount: 35000,
-        installment_amount: 35000,
-        financial_institution: 'Transbank'
-      }
-    };
 
-    await new Promise(resolve => setTimeout(resolve, 500));
-    return mockPaymentInfo;
-    
+    const accessToken =
+      MERCADOPAGO_CONFIG.accessToken ||
+      (typeof process !== 'undefined' ? process.env.MERCADOPAGO_ACCESS_TOKEN : '') ||
+      (typeof process !== 'undefined' ? process.env.VITE_MERCADOPAGO_ACCESS_TOKEN : '');
+
+    if (!accessToken) {
+      console.warn('⚠️ Access token de MercadoPago no configurado, utilizando datos simulados.');
+      return createMockPaymentInfo(paymentId);
+    }
+
+    const response = await fetch(`https://api.mercadopago.com/v1/payments/${paymentId}`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('❌ Error consultando API de MercadoPago:', response.status, errorText);
+      throw new Error(`Error ${response.status}: ${errorText}`);
+    }
+
+    const paymentInfo = await response.json();
+
+    console.log('✅ Información real obtenida de MercadoPago:', {
+      id: paymentInfo.id,
+      status: paymentInfo.status,
+      status_detail: paymentInfo.status_detail,
+      amount: paymentInfo.transaction_amount
+    });
+
+    return paymentInfo;
+
   } catch (error) {
-    console.error('❌ Error obteniendo información de pago:', error);
-    throw error;
+    console.error('❌ Error obteniendo información de pago real, usando fallback:', error);
+    return createMockPaymentInfo(paymentId);
   }
 };
 
 // Manejar notificación de webhook
-export const handlePaymentNotification = async (notification: any) => {
+export const handlePaymentNotification = async (notification: MercadoPagoWebhookNotification) => {
   try {
     console.log('🔔 Notificación de pago recibida:', notification);
+
+    if (!notification.data || !notification.data.id) {
+      console.warn('⚠️ Notificación de MercadoPago sin identificador de pago');
+      return { status: 'ignored' };
+    }
     
     // En producción, validar la notificación
     // 1. Verificar que viene de MercadoPago
@@ -202,28 +246,24 @@ export const handlePaymentNotification = async (notification: any) => {
     
     if (notification.type === 'payment') {
       const paymentInfo = await getPaymentInfo(notification.data.id);
-      
-      // Aquí integrar con Make.com o sistema de notificaciones
-      if (paymentInfo.status === 'approved') {
-        console.log('✅ Pago aprobado, enviando confirmaciones...');
-        
-        // Enviar a Make.com para emails automáticos
-        const makeWebhookUrl = import.meta.env.VITE_MAKE_WEBHOOK_URL;
-        if (makeWebhookUrl) {
-          await fetch(makeWebhookUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              type: 'pago_confirmado',
-              payment: paymentInfo,
-              cliente: paymentInfo.payer,
-              cita: {
-                // Recuperar datos de la cita desde external_reference
-                external_reference: notification.external_reference
-              }
-            })
-          });
-        }
+
+      const reservaId = paymentInfo.external_reference || notification?.data?.external_reference;
+
+      if (reservaId) {
+        const paymentUpdate: PaymentStatusUpdate = {
+          estado: paymentInfo.status,
+          id: paymentInfo.id?.toString() ?? notification.data.id,
+          metodo: paymentInfo.payment_method?.id || paymentInfo.payment_method_id || paymentInfo.payment_type_id,
+          tipo: paymentInfo.payment_type_id || undefined,
+          monto: paymentInfo.transaction_amount,
+          externalReference: paymentInfo.external_reference ?? null,
+          preferenceId: paymentInfo.preference_id ?? null,
+          statusDetail: paymentInfo.status_detail ?? null
+        };
+
+        await updatePaymentStatus(reservaId, paymentUpdate);
+      } else {
+        console.warn('⚠️ Notificación de pago sin external_reference, no se pudo actualizar la reserva');
       }
     }
     

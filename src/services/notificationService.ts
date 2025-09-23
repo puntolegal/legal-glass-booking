@@ -1,9 +1,160 @@
 import { supabase } from '@/integrations/supabase/client';
-import { NOTIFICATION_CONFIG, generateMakePayload, MakeWebhookData } from '@/config/notifications';
+import { NOTIFICATION_CONFIG, type NotificationType } from '@/config/notifications';
+import { sendBookingEmailsDirect, sendResendEmail } from '@/services/emailService';
+import type { Reserva } from './supabaseBooking';
 
-export class NotificationService {
+interface NotificationStats {
+  total: number;
+  enviadas: number;
+  fallidas: number;
+  pendientes: number;
+  ultimaEjecucion?: string;
+}
+
+interface NotificacionRow {
+  id: string;
+  reserva_id: string;
+  tipo: NotificationType;
+  estado: 'pendiente' | 'enviado' | 'fallido';
+  intentos: number;
+  fecha_envio: string | null;
+  ultimo_error: string | null;
+  webhook_response?: unknown;
+  created_at?: string;
+}
+
+interface PagoData {
+  monto: number;
+  metodo?: string;
+  id?: string;
+  fecha?: string;
+}
+
+const mapReserva = (data: Partial<Reserva>): Reserva => ({
+  id: data.id ?? '',
+  cliente_nombre: data.cliente_nombre ?? '',
+  cliente_email: data.cliente_email ?? '',
+  cliente_telefono: data.cliente_telefono ?? '',
+  cliente_rut: data.cliente_rut ?? null,
+  servicio_tipo: data.servicio_tipo ?? '',
+  servicio_precio: data.servicio_precio ?? '0',
+  servicio_categoria: data.servicio_categoria ?? null,
+  fecha: data.fecha ?? new Date().toISOString().split('T')[0],
+  hora: data.hora ?? '10:00',
+  descripcion: data.descripcion ?? null,
+  pago_metodo: data.pago_metodo ?? null,
+  pago_estado: data.pago_estado ?? null,
+  pago_id: data.pago_id ?? null,
+  pago_monto: data.pago_monto ?? null,
+  tipo_reunion: data.tipo_reunion ?? null,
+  external_reference: data.external_reference ?? null,
+  preference_id: data.preference_id ?? null,
+  estado: data.estado ?? 'pendiente',
+  email_enviado: data.email_enviado ?? false,
+  recordatorio_enviado: data.recordatorio_enviado ?? false,
+  created_at: data.created_at ?? new Date().toISOString(),
+  updated_at: data.updated_at ?? new Date().toISOString()
+});
+
+const formatDate = (fecha: string, hora?: string) => {
+  const date = hora ? new Date(`${fecha}T${hora}`) : new Date(fecha);
+  return date.toLocaleString('es-CL', { timeZone: 'America/Santiago' });
+};
+
+const buildReminderEmail = (reserva: Reserva, destinatario: 'cliente' | 'admin'): string => {
+  const saludo = destinatario === 'cliente'
+    ? `Hola ${reserva.cliente_nombre},`
+    : 'Hola equipo Punto Legal,';
+
+  const introduccion = destinatario === 'cliente'
+    ? 'Queremos recordarte tu consulta jurídica agendada para mañana.'
+    : `Recordatorio automático de la consulta de ${reserva.cliente_nombre}.`;
+
+  return `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <meta charset="utf-8" />
+        <style>
+          body { font-family: Arial, sans-serif; color: #1f2933; line-height: 1.6; }
+          .container { max-width: 600px; margin: 0 auto; padding: 24px; background: #f8fafc; border-radius: 12px; }
+          .header { text-align: center; padding-bottom: 16px; border-bottom: 1px solid #d9e2ec; }
+          .header h1 { margin: 0; color: #334155; }
+          .info { background: #fff; padding: 16px; border-radius: 10px; margin-top: 24px; border: 1px solid #d9e2ec; }
+          .info p { margin: 6px 0; }
+          .footer { margin-top: 24px; font-size: 13px; color: #52606d; text-align: center; }
+          .button { display: inline-block; padding: 12px 24px; background: #2563eb; color: #fff; border-radius: 999px; text-decoration: none; margin-top: 16px; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>🔔 Recordatorio de Consulta</h1>
+            <p>${NOTIFICATION_CONFIG.empresa.nombre}</p>
+          </div>
+          <p>${saludo}</p>
+          <p>${introduccion}</p>
+          <div class="info">
+            <p><strong>Servicio:</strong> ${reserva.servicio_tipo}</p>
+            <p><strong>Fecha:</strong> ${formatDate(reserva.fecha, reserva.hora)}</p>
+            <p><strong>Modalidad:</strong> ${reserva.tipo_reunion === 'presencial' ? 'Presencial' : 'Online'}</p>
+            <p><strong>Precio:</strong> $${Number(reserva.servicio_precio || 0).toLocaleString('es-CL')}</p>
+            ${reserva.descripcion ? `<p><strong>Detalle:</strong> ${reserva.descripcion}</p>` : ''}
+          </div>
+          ${destinatario === 'cliente'
+            ? `<a class="button" href="https://puntolegal.online" target="_blank" rel="noreferrer">Ver detalles</a>`
+            : ''}
+          <p class="footer">${NOTIFICATION_CONFIG.empresa.email} · ${NOTIFICATION_CONFIG.empresa.telefono}</p>
+        </div>
+      </body>
+    </html>
+  `;
+};
+
+const buildReceiptEmail = (reserva: Reserva, pago: PagoData): string => `
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <meta charset="utf-8" />
+      <style>
+        body { font-family: Arial, sans-serif; background: #f9fafb; color: #111827; }
+        .container { max-width: 640px; margin: 0 auto; padding: 32px; background: #ffffff; border-radius: 16px; }
+        h1 { color: #16a34a; }
+        .section { margin-top: 24px; }
+        .section h2 { font-size: 18px; margin-bottom: 12px; }
+        .row { display: flex; justify-content: space-between; margin: 6px 0; }
+        .footer { margin-top: 32px; font-size: 12px; color: #6b7280; text-align: center; }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <h1>✅ Pago confirmado</h1>
+        <p>Hola ${reserva.cliente_nombre},</p>
+        <p>Hemos registrado tu pago correctamente. A continuación encontrarás el detalle de tu comprobante:</p>
+        <div class="section">
+          <h2>Detalle de la consulta</h2>
+          <div class="row"><span>Servicio</span><span>${reserva.servicio_tipo}</span></div>
+          <div class="row"><span>Fecha</span><span>${formatDate(reserva.fecha, reserva.hora)}</span></div>
+          <div class="row"><span>Modalidad</span><span>${reserva.tipo_reunion === 'presencial' ? 'Presencial' : 'Online'}</span></div>
+        </div>
+        <div class="section">
+          <h2>Detalle de pago</h2>
+          <div class="row"><span>Monto</span><span>$${Number(pago.monto).toLocaleString('es-CL')}</span></div>
+          ${pago.metodo ? `<div class="row"><span>Método</span><span>${pago.metodo}</span></div>` : ''}
+          ${pago.id ? `<div class="row"><span>ID de transacción</span><span>${pago.id}</span></div>` : ''}
+          ${pago.fecha ? `<div class="row"><span>Fecha de pago</span><span>${formatDate(pago.fecha)}</span></div>` : ''}
+        </div>
+        <div class="footer">
+          ${NOTIFICATION_CONFIG.empresa.nombre} · ${NOTIFICATION_CONFIG.empresa.email} · ${NOTIFICATION_CONFIG.empresa.telefono}
+        </div>
+      </div>
+    </body>
+  </html>
+`;
+
+class NotificationService {
   private static instance: NotificationService;
-  
+
   static getInstance(): NotificationService {
     if (!NotificationService.instance) {
       NotificationService.instance = new NotificationService();
@@ -11,342 +162,308 @@ export class NotificationService {
     return NotificationService.instance;
   }
 
-  // Enviar webhook a Make con reintentos automáticos
-  async sendWebhookToMake(payload: MakeWebhookData, maxRetries = 3): Promise<boolean> {
-    let lastError: Error | null = null;
-    
-    for (let intento = 1; intento <= maxRetries; intento++) {
-      try {
-        console.log(`Enviando webhook a Make (intento ${intento}/${maxRetries}):`, payload.tipo_evento);
-        
-        const response = await fetch(NOTIFICATION_CONFIG.makeWebhookUrl, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'User-Agent': 'PuntoLegal-WebhookSender/1.0'
-          },
-          body: JSON.stringify(payload)
-        });
+  async obtenerEstadisticas(): Promise<NotificationStats> {
+    const { data, error } = await supabase
+      .from('notificaciones')
+      .select('estado, fecha_envio')
+      .order('created_at', { ascending: false });
 
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
-
-        const responseData = await response.json().catch(() => ({}));
-        
-        console.log(`✅ Webhook enviado exitosamente para reserva ${payload.reserva.id}`);
-        
-        // Registrar éxito
-        await this.registrarNotificacion(
-          payload.reserva.id,
-          payload.tipo_evento,
-          'enviado',
-          intento,
-          null,
-          responseData
-        );
-        
-        return true;
-      } catch (error) {
-        lastError = error as Error;
-        console.error(`❌ Error en intento ${intento}:`, lastError.message);
-        
-        if (intento === maxRetries) {
-          // Registrar fallo final
-          await this.registrarNotificacion(
-            payload.reserva.id,
-            payload.tipo_evento,
-            'fallido',
-            intento,
-            lastError.message
-          );
-        } else {
-          // Esperar antes del siguiente intento (exponential backoff)
-          await new Promise(resolve => setTimeout(resolve, Math.pow(2, intento) * 1000));
-        }
-      }
+    if (error) {
+      console.error('Error obteniendo estadísticas:', error);
+      throw error;
     }
-    
-    return false;
+
+    const total = data?.length ?? 0;
+    const enviadas = data?.filter((item) => item.estado === 'enviado').length ?? 0;
+    const fallidas = data?.filter((item) => item.estado === 'fallido').length ?? 0;
+    const pendientes = data?.filter((item) => item.estado === 'pendiente').length ?? 0;
+    const ultimaEjecucion = data?.find((item) => item.estado === 'enviado' && item.fecha_envio)?.fecha_envio ?? undefined;
+
+    return { total, enviadas, fallidas, pendientes, ultimaEjecucion };
   }
 
-  // Registrar notificación en la base de datos
   private async registrarNotificacion(
     reservaId: string,
-    tipo: string,
+    tipo: NotificationType,
     estado: 'pendiente' | 'enviado' | 'fallido',
     intentos: number,
     error?: string | null,
-    respuesta?: any
+    respuesta?: unknown
   ): Promise<void> {
-    try {
-      await supabase
-        .from('notificaciones')
-        .insert([{
-          reserva_id: reservaId,
-          tipo,
-          estado,
-          intentos,
-          fecha_envio: estado === 'enviado' ? new Date().toISOString() : null,
-          ultimo_error: error,
-          webhook_response: respuesta
-        }]);
-    } catch (error) {
-      console.error('Error registrando notificación:', error);
+    const payload = {
+      reserva_id: reservaId,
+      tipo,
+      estado,
+      intentos,
+      fecha_envio: estado === 'enviado' ? new Date().toISOString() : null,
+      ultimo_error: error ?? null,
+      webhook_response: respuesta ?? null
+    };
+
+    const { error: insertError } = await supabase
+      .from('notificaciones')
+      .insert([payload]);
+
+    if (insertError) {
+      console.error('Error registrando notificación:', insertError);
     }
   }
 
-  // Verificar notificaciones pendientes
-  async verificarNotificacionesPendientes(): Promise<any[]> {
-    try {
-      const { data, error } = await supabase
-        .from('notificaciones')
-        .select('*')
-        .eq('estado', 'fallido')
-        .lt('intentos', 3)
-        .order('created_at', { ascending: false });
+  private async resolverReserva(reserva: Reserva | string): Promise<Reserva | null> {
+    if (typeof reserva !== 'string') {
+      return reserva;
+    }
 
-      if (error) throw error;
-      return data || [];
-    } catch (error) {
-      console.error('Error verificando notificaciones pendientes:', error);
+    const { data, error } = await supabase
+      .from('reservas')
+      .select('*')
+      .eq('id', reserva)
+      .single();
+
+    if (error || !data) {
+      console.error('Reserva no encontrada para notificación:', error);
+      return null;
+    }
+
+    return mapReserva(data);
+  }
+
+  async enviarConfirmacionReserva(reservaEntrada: Reserva | string): Promise<boolean> {
+    const reserva = await this.resolverReserva(reservaEntrada);
+    if (!reserva) {
+      return false;
+    }
+
+    const emailResult = await sendBookingEmailsDirect({
+      id: reserva.id,
+      cliente_nombre: reserva.cliente_nombre,
+      cliente_email: reserva.cliente_email,
+      cliente_telefono: reserva.cliente_telefono,
+      cliente_rut: reserva.cliente_rut || 'No especificado',
+      servicio_tipo: reserva.servicio_tipo,
+      servicio_precio: String(reserva.servicio_precio ?? ''),
+      fecha: reserva.fecha,
+      hora: reserva.hora,
+      tipo_reunion: reserva.tipo_reunion || 'online',
+      descripcion: reserva.descripcion || undefined
+    });
+
+    if (emailResult.success) {
+      await this.registrarNotificacion(reserva.id, 'confirmacion_cliente', 'enviado', 1, null, emailResult.clientEmail);
+      await this.registrarNotificacion(reserva.id, 'confirmacion_admin', 'enviado', 1, null, emailResult.adminEmail);
+
+      await supabase
+        .from('reservas')
+        .update({ email_enviado: true, updated_at: new Date().toISOString() })
+        .eq('id', reserva.id);
+
+      return true;
+    }
+
+    await this.registrarNotificacion(reserva.id, 'confirmacion_cliente', 'fallido', 1, emailResult.error ?? 'Error enviando confirmación');
+    return false;
+  }
+
+  async enviarRecordatorio(reservaEntrada: Reserva | string): Promise<boolean> {
+    const reserva = await this.resolverReserva(reservaEntrada);
+    if (!reserva) {
+      return false;
+    }
+
+    const emailCliente = await sendResendEmail({
+      to: reserva.cliente_email,
+      subject: NOTIFICATION_CONFIG.recordatorio.asunto,
+      html: buildReminderEmail(reserva, 'cliente')
+    });
+
+    const emailAdmin = await sendResendEmail({
+      to: NOTIFICATION_CONFIG.email.admin,
+      subject: `🔔 Recordatorio agendado - ${reserva.cliente_nombre}`,
+      html: buildReminderEmail(reserva, 'admin')
+    });
+
+    const exito = emailCliente.success && emailAdmin.success;
+
+    await this.registrarNotificacion(
+      reserva.id,
+      'recordatorio_cliente',
+      emailCliente.success ? 'enviado' : 'fallido',
+      1,
+      emailCliente.error,
+      emailCliente
+    );
+
+    await this.registrarNotificacion(
+      reserva.id,
+      'recordatorio_admin',
+      emailAdmin.success ? 'enviado' : 'fallido',
+      1,
+      emailAdmin.error,
+      emailAdmin
+    );
+
+    if (exito) {
+      await supabase
+        .from('reservas')
+        .update({ recordatorio_enviado: true, updated_at: new Date().toISOString() })
+        .eq('id', reserva.id);
+    }
+
+    return exito;
+  }
+
+  async enviarComprobante(reservaEntrada: Reserva | string, pago: PagoData): Promise<boolean> {
+    const reserva = await this.resolverReserva(reservaEntrada);
+    if (!reserva) {
+      return false;
+    }
+
+    const emailClient = await sendResendEmail({
+      to: reserva.cliente_email,
+      subject: NOTIFICATION_CONFIG.comprobante.asunto,
+      html: buildReceiptEmail(reserva, pago)
+    });
+
+    await this.registrarNotificacion(
+      reserva.id,
+      'comprobante_pago',
+      emailClient.success ? 'enviado' : 'fallido',
+      1,
+      emailClient.error,
+      emailClient
+    );
+
+    return emailClient.success;
+  }
+
+  async verificarNotificacionesPendientes(): Promise<NotificacionRow[]> {
+    const { data, error } = await supabase
+      .from('notificaciones')
+      .select('*')
+      .eq('estado', 'fallido')
+      .lt('intentos', 3)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Error buscando notificaciones pendientes:', error);
       return [];
     }
+
+    return (data || []) as NotificacionRow[];
   }
 
-  // Enviar confirmación de nueva reserva (incluye Google Calendar y notificación al abogado)
-  async enviarConfirmacionReserva(reserva: any): Promise<boolean> {
-    try {
-      // 1. Enviar confirmación al cliente
-      const payloadCliente = generateMakePayload(reserva, 'nueva_reserva');
-      const exitoCliente = await this.sendWebhookToMake(payloadCliente);
-      
-      // 2. Enviar notificación al abogado
-      const payloadAbogado = generateMakePayload(reserva, 'notificacion_abogado');
-      const exitoAbogado = await this.sendWebhookToMake(payloadAbogado);
-      
-      console.log(`Confirmación cliente: ${exitoCliente ? '✅' : '❌'}, Abogado: ${exitoAbogado ? '✅' : '❌'}`);
-      
-      return exitoCliente && exitoAbogado;
-    } catch (error) {
-      console.error('Error enviando confirmación de reserva:', error);
-      return false;
-    }
-  }
+  async programarRecordatoriosDiarios(): Promise<{ enviados: number; errores: number }> {
+    const objetivo = new Date();
+    objetivo.setDate(objetivo.getDate() + 1);
+    const fechaObjetivo = objetivo.toISOString().split('T')[0];
 
-  // Enviar recordatorio (incluye Google Meet)
-  async enviarRecordatorio(reserva: any): Promise<boolean> {
-    try {
-      // 1. Enviar recordatorio al cliente
-      const payloadCliente = generateMakePayload(reserva, 'recordatorio');
-      const exitoCliente = await this.sendWebhookToMake(payloadCliente);
-      
-      // 2. Enviar recordatorio al abogado
-      const payloadAbogado = generateMakePayload(reserva, 'recordatorio_abogado');
-      const exitoAbogado = await this.sendWebhookToMake(payloadAbogado);
-      
-      console.log(`Recordatorio cliente: ${exitoCliente ? '✅' : '❌'}, Abogado: ${exitoAbogado ? '✅' : '❌'}`);
-      
-      return exitoCliente && exitoAbogado;
-    } catch (error) {
-      console.error('Error enviando recordatorio:', error);
-      return false;
-    }
-  }
+    const { data, error } = await supabase
+      .from('reservas')
+      .select('*')
+      .eq('fecha', fechaObjetivo)
+      .in('estado', ['pendiente', 'confirmada'])
+      .eq('recordatorio_enviado', false);
 
-  // Enviar comprobante de pago
-  async enviarComprobante(reserva: any, pagoData: any): Promise<boolean> {
-    const payload = generateMakePayload(reserva, 'comprobante', pagoData);
-    return await this.sendWebhookToMake(payload);
-  }
-
-  // Programar recordatorios automáticos para mañana
-  async programarRecordatoriosDiarios(): Promise<{enviados: number, errores: number}> {
-    try {
-      const mañana = new Date();
-      mañana.setDate(mañana.getDate() + 1);
-      mañana.setHours(0, 0, 0, 0);
-      
-      const mañanaStr = mañana.toISOString().split('T')[0];
-      
-      console.log(`🔄 Programando recordatorios para: ${mañanaStr}`);
-
-      // Obtener citas de mañana que necesitan recordatorio
-      const { data: reservas, error } = await supabase
-        .from('reservas')
-        .select('*')
-        .eq('fecha', mañanaStr)
-        .in('estado', ['pendiente', 'confirmada'])
-        .is('recordatorio_enviado', false);
-
-      if (error) {
-        console.error('Error obteniendo reservas:', error);
-        return { enviados: 0, errores: 1 };
-      }
-
-      if (!reservas || reservas.length === 0) {
-        console.log('📭 No hay citas para mañana que requieran recordatorio');
-        return { enviados: 0, errores: 0 };
-      }
-
-      let enviados = 0;
-      let errores = 0;
-
-      // Procesar cada reserva
-      for (const reserva of reservas) {
-        try {
-          console.log(`📧 Enviando recordatorio para: ${reserva.nombre} - ${reserva.hora}`);
-          
-          const exito = await this.enviarRecordatorio(reserva);
-          
-          if (exito) {
-            // Marcar como recordatorio enviado
-            await supabase
-              .from('reservas')
-              .update({ 
-                recordatorio_enviado: true,
-                updated_at: new Date().toISOString()
-              })
-              .eq('id', reserva.id);
-            
-            enviados++;
-            console.log(`✅ Recordatorio enviado a: ${reserva.email}`);
-          } else {
-            errores++;
-            console.log(`❌ Error enviando recordatorio a: ${reserva.email}`);
-          }
-          
-          // Pequeña pausa entre envíos
-          await new Promise(resolve => setTimeout(resolve, 500));
-          
-        } catch (error) {
-          console.error(`Error procesando reserva ${reserva.id}:`, error);
-          errores++;
-        }
-      }
-
-      console.log(`✨ Proceso completado: ${enviados} enviados, ${errores} errores`);
-      return { enviados, errores };
-      
-    } catch (error) {
-      console.error('Error en programarRecordatoriosDiarios:', error);
+    if (error) {
+      console.error('Error obteniendo reservas para recordatorio:', error);
       return { enviados: 0, errores: 1 };
     }
+
+    if (!data || data.length === 0) {
+      return { enviados: 0, errores: 0 };
+    }
+
+    let enviados = 0;
+    let errores = 0;
+
+    for (const row of data) {
+      const reserva = mapReserva(row);
+      try {
+        const exito = await this.enviarRecordatorio(reserva);
+        if (exito) {
+          enviados += 1;
+        } else {
+          errores += 1;
+        }
+      } catch (errorEnvio) {
+        console.error('Error enviando recordatorio:', errorEnvio);
+        errores += 1;
+      }
+    }
+
+    return { enviados, errores };
   }
 
-  // Reenviar notificaciones fallidas
-  async reenviarNotificacionesFallidas(): Promise<{procesadas: number, exitosas: number}> {
+  async reenviarNotificacionesFallidas(): Promise<{ procesadas: number; exitosas: number }> {
     const pendientes = await this.verificarNotificacionesPendientes();
     let procesadas = 0;
     let exitosas = 0;
 
     for (const notificacion of pendientes) {
       try {
-        // Obtener datos de la reserva
-        const { data: reserva, error } = await supabase
-          .from('reservas')
-          .select('*')
-          .eq('id', notificacion.reserva_id)
-          .single();
-
-        if (error || !reserva) {
-          console.error(`Reserva no encontrada: ${notificacion.reserva_id}`);
+        const reserva = await this.resolverReserva(notificacion.reserva_id);
+        if (!reserva) {
+          procesadas += 1;
           continue;
         }
 
-        // Reenviar según el tipo
         let exito = false;
         switch (notificacion.tipo) {
-          case 'nueva_reserva':
+          case 'confirmacion_cliente':
+          case 'confirmacion_admin':
             exito = await this.enviarConfirmacionReserva(reserva);
             break;
-          case 'recordatorio':
+          case 'recordatorio_cliente':
+          case 'recordatorio_admin':
             exito = await this.enviarRecordatorio(reserva);
             break;
-          case 'notificacion_abogado':
-            const payloadAbogado = generateMakePayload(reserva, 'notificacion_abogado');
-            exito = await this.sendWebhookToMake(payloadAbogado);
-            break;
-          case 'recordatorio_abogado':
-            const payloadRecordatorioAbogado = generateMakePayload(reserva, 'recordatorio_abogado');
-            exito = await this.sendWebhookToMake(payloadRecordatorioAbogado);
-            break;
-          case 'comprobante':
-            // Necesitaríamos datos de pago adicionales
+          case 'comprobante_pago':
+            if (reserva.pago_monto) {
+              exito = await this.enviarComprobante(reserva, {
+                monto: reserva.pago_monto,
+                metodo: reserva.pago_metodo ?? undefined,
+                id: reserva.pago_id ?? undefined
+              });
+            }
             break;
         }
 
         if (exito) {
-          exitosas++;
+          exitosas += 1;
         }
-        procesadas++;
-
+        procesadas += 1;
       } catch (error) {
-        console.error(`Error reenviando notificación ${notificacion.id}:`, error);
-        procesadas++;
+        console.error('Error reenviando notificación:', error);
+        procesadas += 1;
       }
     }
 
     return { procesadas, exitosas };
   }
 
-  // Probar conexión con Make
-  async probarConexion(): Promise<{success: boolean, message: string}> {
+  async probarConexion(): Promise<{ success: boolean; message: string }> {
     try {
-      const testPayload = {
-        tipo_evento: 'test',
-        timestamp: new Date().toISOString(),
-        empresa: NOTIFICATION_CONFIG.empresa,
-        reserva: {
-          id: 'test-' + Date.now(),
-          nombre: 'Test Usuario',
-          email: 'test@puntolegal.cl',
-          telefono: '+56912345678',
-          fecha: new Date().toISOString().split('T')[0],
-          hora: '15:00',
-          servicio: 'Test Service',
-          precio: '50000',
-          categoria: 'test'
-        },
-        configuracion: {
-          enviar_recordatorio: false,
-          enviar_comprobante: false,
-          crear_calendar_event: false,
-          crear_meet_link: false,
-          notificar_abogado: false,
-          idioma: 'es',
-          zona_horaria: 'America/Santiago'
-        }
-      };
-
-      const response = await fetch(NOTIFICATION_CONFIG.makeWebhookUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'User-Agent': 'PuntoLegal-WebhookSender/1.0'
-        },
-        body: JSON.stringify(testPayload)
+      const testResult = await sendResendEmail({
+        to: NOTIFICATION_CONFIG.email.testRecipient || NOTIFICATION_CONFIG.email.admin,
+        subject: '🔧 Test de conexión - Sistema de Notificaciones',
+        html: '<p>Prueba automática del sistema de notificaciones de Punto Legal.</p>'
       });
 
-      if (response.ok) {
-        return {
-          success: true,
-          message: '✅ Conexión exitosa con Make.com'
-        };
-      } else {
-        return {
-          success: false,
-          message: `❌ Error HTTP ${response.status}: ${response.statusText}`
-        };
+      if (testResult.success) {
+        return { success: true, message: '✅ Conexión exitosa con Resend (email de prueba enviado)' };
       }
+
+      return {
+        success: false,
+        message: `❌ Error enviando email de prueba: ${testResult.error || 'Desconocido'}`
+      };
     } catch (error) {
       return {
         success: false,
-        message: `❌ Error de conexión: ${error.message}`
+        message: `❌ Error de conexión: ${error instanceof Error ? error.message : 'Desconocido'}`
       };
     }
   }
 }
 
-// Instancia singleton
-export const notificationService = NotificationService.getInstance(); 
+export const notificationService = NotificationService.getInstance();

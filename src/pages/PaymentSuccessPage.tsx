@@ -3,8 +3,8 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { CheckCircle, Calendar, Clock, User, Mail, Phone, ArrowRight, Home, CreditCard } from 'lucide-react';
 import SEO from '../components/SEO';
-import { createReservation, confirmReservation } from '../services/reservationService';
-import { sendBookingEmailsMake } from '../services/makeEmailService';
+import { sendRealBookingEmails, type BookingEmailData, type EmailResult } from '@/services/realEmailService';
+import { findReservaByCriteria, updatePaymentStatus, type Reserva } from '../services/supabaseBooking';
 
 export default function PaymentSuccessPage() {
   const [paymentData, setPaymentData] = useState<any>(null);
@@ -22,7 +22,6 @@ export default function PaymentSuccessPage() {
       setIsProcessing(true);
       setProcessingStatus('Procesando datos del pago...');
 
-      // Extraer parámetros de la URL
       const urlParams = new URLSearchParams(window.location.search);
       const mercadopagoData = {
         collection_id: urlParams.get('collection_id'),
@@ -34,115 +33,200 @@ export default function PaymentSuccessPage() {
         merchant_order_id: urlParams.get('merchant_order_id'),
         preference_id: urlParams.get('preference_id'),
         site_id: urlParams.get('site_id'),
-        processing_mode: urlParams.get('processing_mode')
+        processing_mode: urlParams.get('processing_mode'),
+        source: urlParams.get('source')
       };
 
       console.log('💳 Datos de MercadoPago:', mercadopagoData);
       console.log('🌐 URL completa:', window.location.href);
 
-      // Recuperar datos del pago desde localStorage
+      const normalizedStatus = (mercadopagoData.status || mercadopagoData.collection_status || '').toLowerCase();
+      const paymentIdFromUrl =
+        mercadopagoData.payment_id ||
+        mercadopagoData.collection_id ||
+        mercadopagoData.merchant_order_id ||
+        undefined;
+
       const storedData = localStorage.getItem('paymentData');
-      if (!storedData) {
-        throw new Error('No se encontraron datos de pago');
+      const storedReservationId = localStorage.getItem('currentReservationId');
+      const storedExternalReference = localStorage.getItem('currentExternalReference');
+
+      let paymentInfo: any = null;
+      if (storedData) {
+        try {
+          paymentInfo = JSON.parse(storedData);
+        } catch (parseError) {
+          console.warn('⚠️ No se pudo parsear paymentData desde localStorage:', parseError);
+        }
       }
 
-      const paymentInfo = JSON.parse(storedData);
       console.log('📋 Datos de pago almacenados:', paymentInfo);
-      console.log('🔍 Campos específicos:', {
-        nombre: paymentInfo.nombre,
-        email: paymentInfo.email,
-        telefono: paymentInfo.telefono,
-        service: paymentInfo.service,
-        price: paymentInfo.price
+
+      const candidateReservationIds = new Set<string>();
+      [
+        paymentInfo?.reservationId,
+        paymentInfo?.id,
+        storedReservationId,
+        storedExternalReference,
+        mercadopagoData.external_reference
+      ]
+        .filter((value): value is string => typeof value === 'string' && value.trim().length > 0)
+        .forEach(value => candidateReservationIds.add(value));
+
+      let reserva: Reserva | undefined;
+
+      const fallbackEmail = paymentInfo?.email || paymentInfo?.cliente?.email;
+
+      for (const candidateId of candidateReservationIds) {
+        setProcessingStatus(`Verificando reserva ${candidateId}...`);
+        const result = await findReservaByCriteria({ reservationId: candidateId });
+        if (result.success && result.reserva) {
+          reserva = result.reserva;
+          break;
+        }
+      }
+
+      if (!reserva && mercadopagoData.external_reference) {
+        setProcessingStatus('Buscando reserva por referencia externa...');
+        const result = await findReservaByCriteria({ externalReference: mercadopagoData.external_reference });
+        if (result.success && result.reserva) {
+          reserva = result.reserva;
+        }
+      }
+
+      if (!reserva && paymentIdFromUrl) {
+        setProcessingStatus('Buscando reserva por ID de pago...');
+        const result = await findReservaByCriteria({ pagoId: paymentIdFromUrl });
+        if (result.success && result.reserva) {
+          reserva = result.reserva;
+        }
+      }
+
+      if (!reserva && fallbackEmail) {
+        setProcessingStatus('Buscando reserva por email...');
+        const result = await findReservaByCriteria({ email: fallbackEmail });
+        if (result.success && result.reserva) {
+          reserva = result.reserva;
+        }
+      }
+
+      if (!reserva) {
+        throw new Error('No se encontró la reserva asociada al pago. Contacta a soporte con el comprobante.');
+      }
+
+      const parseAmount = (value: any): number | undefined => {
+        if (value === null || value === undefined) return undefined;
+        if (typeof value === 'number' && !Number.isNaN(value)) return value;
+        if (typeof value === 'string') {
+          const cleaned = value.replace(/[^0-9]/g, '');
+          if (!cleaned) return undefined;
+          const parsed = parseInt(cleaned, 10);
+          return Number.isNaN(parsed) ? undefined : parsed;
+        }
+        return undefined;
+      };
+
+      const paymentAmount =
+        parseAmount(paymentInfo?.price) ??
+        parseAmount(paymentInfo?.servicio?.precio) ??
+        parseAmount(reserva.servicio_precio) ??
+        (typeof reserva.pago_monto === 'number' ? reserva.pago_monto : undefined);
+
+      setProcessingStatus('Actualizando estado del pago en la base de datos...');
+
+      const updateResult = await updatePaymentStatus(reserva.id, {
+        estado: normalizedStatus || mercadopagoData.status || 'pending',
+        id: paymentIdFromUrl || paymentInfo?.payment_id || undefined,
+        metodo: mercadopagoData.payment_type || reserva.pago_metodo || 'mercadopago',
+        tipo: mercadopagoData.payment_type || undefined,
+        monto: paymentAmount,
+        externalReference: mercadopagoData.external_reference || reserva.id,
+        preferenceId: mercadopagoData.preference_id || undefined
       });
 
-      // Crear reserva en la base de datos
-      setProcessingStatus('Guardando reserva en la base de datos...');
-      
-      // Extraer datos de manera más robusta - estructura correcta desde AgendamientoPage
-      const reservationData = {
-        cliente_nombre: paymentInfo.nombre || 'Cliente',
-        cliente_rut: 'No especificado', // RUT no se captura en el formulario
-        cliente_email: paymentInfo.email || 'No especificado',
-        cliente_telefono: paymentInfo.telefono || 'No especificado',
-        fecha: paymentInfo.fecha || new Date().toISOString().split('T')[0],
-        hora: paymentInfo.hora || '10:00',
-        descripcion: `Consulta ${paymentInfo.service || paymentInfo.servicio?.tipo || 'General'} - Pago confirmado via MercadoPago`,
-        servicio_tipo: paymentInfo.service || paymentInfo.servicio?.tipo || 'Consulta General',
-        servicio_precio: paymentInfo.price || paymentInfo.servicio?.precio || '35000',
-        servicio_categoria: paymentInfo.category || paymentInfo.servicio?.categoria || 'General',
-        tipo_reunion: paymentInfo.tipo_reunion || 'online',
-        estado: 'confirmada' as const,
-        webhook_sent: false
-      };
-
-      console.log('📝 Datos de reserva a crear:', reservationData);
-      console.log('🔄 Llamando a createReservation...');
-      
-      const reservation = await createReservation(reservationData);
-      console.log('✅ Reserva creada exitosamente:', reservation);
-
-      // Confirmar la reserva y enviar emails automáticamente
-      setProcessingStatus('Confirmando reserva y enviando emails...');
-      console.log('🔄 Llamando a confirmReservation con ID:', reservation.id);
-      
-      const confirmationResult = await confirmReservation(reservation.id);
-      console.log('✅ Resultado de confirmación:', confirmationResult);
-      
-      if (!confirmationResult.success) {
-        console.warn('⚠️ Error confirmando reserva:', confirmationResult.error);
-        setProcessingStatus('Reserva creada pero error enviando emails');
-      } else {
-        console.log('✅ Reserva confirmada y emails enviados exitosamente');
-        setProcessingStatus('Reserva confirmada y emails enviados');
+      if (!updateResult.success) {
+        throw new Error(updateResult.error || 'No se pudo actualizar el estado del pago.');
       }
 
-      // También enviar via Make como backup
-      setProcessingStatus('Enviando emails de confirmación adicionales...');
-      console.log('🔄 Enviando emails adicionales via Make...');
-      
-      const emailData = {
-        id: reservation.id,
-        cliente_nombre: reservation.cliente_nombre,
-        cliente_email: reservation.cliente_email,
-        cliente_telefono: reservation.cliente_telefono,
-        servicio_tipo: reservation.servicio_tipo || 'Consulta General',
-        servicio_precio: reservation.servicio_precio || '35000',
-        fecha: reservation.fecha,
-        hora: reservation.hora,
-        pago_metodo: 'MercadoPago',
-        pago_estado: mercadopagoData.status === 'approved' ? 'Aprobado' : 'Pendiente',
-        created_at: reservation.created_at || new Date().toISOString()
-      };
+      const updatedReservation = updateResult.reserva ?? reserva;
+      const isApproved = normalizedStatus === 'approved';
 
-      console.log('📧 Datos para emails Make:', emailData);
-      const emailResult = await sendBookingEmailsMake(emailData);
-      console.log('📧 Resultado de emails Make:', emailResult);
+      let emailResult: EmailResult | null = null;
 
-      // Actualizar estado con los datos correctos
+      if (isApproved) {
+        if (updateResult.emailSent) {
+          console.log('✅ Email de confirmación enviado desde flujo principal');
+          emailResult = {
+            success: true,
+            message: 'Confirmación enviada en flujo principal'
+          };
+        } else {
+          setProcessingStatus('Pago aprobado, enviando emails de respaldo...');
+          const emailData: BookingEmailData = {
+            id: updatedReservation.id,
+            cliente_nombre: updatedReservation.cliente_nombre,
+            cliente_email: updatedReservation.cliente_email,
+            cliente_telefono: updatedReservation.cliente_telefono,
+            servicio_tipo: updatedReservation.servicio_tipo || paymentInfo?.service || 'Consulta General',
+            servicio_precio:
+              typeof updatedReservation.servicio_precio === 'string'
+                ? updatedReservation.servicio_precio
+                : paymentAmount?.toString() || '35000',
+            fecha: updatedReservation.fecha,
+            hora: updatedReservation.hora,
+            tipo_reunion: updatedReservation.tipo_reunion || paymentInfo?.tipo_reunion,
+            descripcion: updatedReservation.descripcion || undefined,
+            pago_metodo: 'MercadoPago',
+            pago_estado: 'aprobado',
+            created_at: updatedReservation.created_at || new Date().toISOString()
+          };
+
+          console.log('📧 Enviando emails de respaldo via Resend:', emailData);
+          emailResult = await sendRealBookingEmails(emailData);
+        }
+        setProcessingStatus('¡Pago aprobado y reserva confirmada!');
+      } else {
+        setProcessingStatus('Pago registrado, pendiente de confirmación final por Mercado Pago.');
+      }
+
       setPaymentData({
-        reservation,
-        mercadopagoData,
+        reservation: updatedReservation,
+        mercadopagoData: {
+          ...mercadopagoData,
+          status: normalizedStatus || mercadopagoData.status,
+          payment_id: paymentIdFromUrl || mercadopagoData.payment_id,
+          collection_status: mercadopagoData.collection_status || normalizedStatus
+        },
         emailResult,
-        // Datos del cliente para mostrar en la UI
         cliente: {
-          nombre: paymentInfo.nombre || reservation.cliente_nombre || 'Cliente',
-          email: paymentInfo.email || reservation.cliente_email || 'No especificado',
-          telefono: paymentInfo.telefono || reservation.cliente_telefono || 'No especificado'
+          nombre: paymentInfo?.nombre || paymentInfo?.cliente?.nombre || updatedReservation.cliente_nombre || 'Cliente',
+          email: paymentInfo?.email || paymentInfo?.cliente?.email || updatedReservation.cliente_email || 'No especificado',
+          telefono: paymentInfo?.telefono || paymentInfo?.cliente?.telefono || updatedReservation.cliente_telefono || 'No especificado'
         },
         servicio: {
-          tipo: paymentInfo.service || paymentInfo.servicio?.tipo || reservation.servicio_tipo,
-          precio: paymentInfo.price || paymentInfo.servicio?.precio || reservation.servicio_precio,
-          categoria: paymentInfo.category || paymentInfo.servicio?.categoria || reservation.servicio_categoria
+          tipo: paymentInfo?.service || paymentInfo?.servicio?.tipo || updatedReservation.servicio_tipo || 'Consulta General',
+          precio:
+            paymentAmount ??
+            paymentInfo?.price ??
+            paymentInfo?.servicio?.precio ??
+            updatedReservation.servicio_precio ??
+            '35000',
+          categoria: paymentInfo?.category || paymentInfo?.servicio?.categoria || 'General'
         },
-        fecha: paymentInfo.fecha || reservation.fecha,
-        hora: paymentInfo.hora || reservation.hora,
-        tipo_reunion: paymentInfo.tipo_reunion || reservation.tipo_reunion,
-        // Datos adicionales para debugging
-        price: paymentInfo.price || paymentInfo.servicio?.precio || reservation.servicio_precio
+        fecha: paymentInfo?.fecha || updatedReservation.fecha,
+        hora: paymentInfo?.hora || updatedReservation.hora,
+        tipo_reunion: paymentInfo?.tipo_reunion || updatedReservation.tipo_reunion,
+        price:
+          paymentAmount ??
+          paymentInfo?.price ??
+          paymentInfo?.servicio?.precio ??
+          updatedReservation.servicio_precio
       });
 
-      setProcessingStatus('¡Proceso completado exitosamente!');
+      localStorage.removeItem('paymentData');
+      localStorage.removeItem('pendingPayment');
+      localStorage.removeItem('currentReservationId');
+      localStorage.removeItem('currentExternalReference');
 
     } catch (error) {
       console.error('❌ ERROR CRÍTICO en PaymentSuccessPage:', error);
@@ -156,6 +240,23 @@ export default function PaymentSuccessPage() {
       setIsLoading(false);
     }
   };
+
+  const isPaymentApproved = paymentData?.mercadopagoData?.status === 'approved';
+  const headerTitle = isPaymentApproved ? '¡Pago confirmado!' : 'Pago registrado';
+  const headerDescription = isPaymentApproved
+    ? 'Tu consulta legal ha sido confirmada y el pago procesado correctamente.'
+    : 'Hemos registrado tu pago y lo estamos verificando con Mercado Pago. Te avisaremos por email en cuanto se acredite.';
+  const visiblePaymentStatus = paymentData?.mercadopagoData?.status || paymentData?.mercadopagoData?.collection_status || 'pendiente';
+  const statusDictionary: Record<string, string> = {
+    approved: 'aprobado',
+    pending: 'pendiente',
+    in_process: 'en proceso',
+    in_mediation: 'en mediación',
+    authorized: 'autorizado',
+    rejected: 'rechazado',
+    cancelled: 'cancelado'
+  };
+  const readablePaymentStatus = statusDictionary[visiblePaymentStatus?.toLowerCase?.() ?? ''] || visiblePaymentStatus;
 
   if (isLoading) {
     return (
@@ -207,12 +308,8 @@ export default function PaymentSuccessPage() {
             <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
               <CheckCircle className="w-10 h-10 text-green-600" />
             </div>
-            <h1 className="text-4xl font-bold text-gray-900 mb-4">
-              ¡Pago Exitoso!
-            </h1>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Tu consulta legal ha sido confirmada y el pago procesado correctamente.
-            </p>
+            <h1 className="text-4xl font-bold text-gray-900 mb-4">{headerTitle}</h1>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">{headerDescription}</p>
           </motion.div>
 
           {/* Resumen de la consulta */}
@@ -407,7 +504,7 @@ export default function PaymentSuccessPage() {
                     <strong>ID de Pago:</strong> {paymentData.mercadopagoData.payment_id || 'N/A'}
                   </p>
                   <p className="text-gray-600">
-                    <strong>Estado:</strong> {paymentData.mercadopagoData.status || 'N/A'}
+                    <strong>Estado:</strong> {readablePaymentStatus || 'N/A'}
                   </p>
                   <p className="text-gray-600">
                     <strong>Método:</strong> {paymentData.mercadopagoData.payment_type || 'N/A'}
@@ -429,24 +526,45 @@ export default function PaymentSuccessPage() {
           )}
 
           {/* Información importante */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
-            className="bg-green-50 border border-green-200 rounded-xl p-6 mb-8"
-          >
-            <h3 className="text-lg font-semibold text-green-900 mb-3">
-              📧 Confirmación por email
-            </h3>
-            <p className="text-green-800 mb-4">
-              Hemos enviado un email de confirmación a tu dirección de correo con todos los detalles de tu consulta.
-            </p>
-            <div className="text-sm text-green-700 space-y-2">
-              <p>• Revisa tu bandeja de entrada y carpeta de spam</p>
-              <p>• Guarda este email como comprobante</p>
-              <p>• Si no recibes el email en 10 minutos, contáctanos</p>
-            </div>
-          </motion.div>
+          {isPaymentApproved ? (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+              className="bg-green-50 border border-green-200 rounded-xl p-6 mb-8"
+            >
+              <h3 className="text-lg font-semibold text-green-900 mb-3">
+                📧 Confirmación por email
+              </h3>
+              <p className="text-green-800 mb-4">
+                Hemos enviado un email de confirmación a tu dirección de correo con todos los detalles de tu consulta.
+              </p>
+              <div className="text-sm text-green-700 space-y-2">
+                <p>• Revisa tu bandeja de entrada y carpeta de spam</p>
+                <p>• Guarda este email como comprobante</p>
+                <p>• Si no recibes el email en 10 minutos, contáctanos</p>
+              </div>
+            </motion.div>
+          ) : (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+              className="bg-yellow-50 border border-yellow-200 rounded-xl p-6 mb-8"
+            >
+              <h3 className="text-lg font-semibold text-yellow-900 mb-3">
+                📬 Confirmación pendiente
+              </h3>
+              <p className="text-yellow-800 mb-4">
+                Tu pago se encuentra en estado <strong>{readablePaymentStatus}</strong>. Apenas Mercado Pago lo confirme te enviaremos un correo con todos los detalles.
+              </p>
+              <div className="text-sm text-yellow-700 space-y-2">
+                <p>• Puedes cerrar esta ventana con tranquilidad, guardaremos tu reserva automáticamente.</p>
+                <p>• Si el pago cambia a aprobado recibirás un email de confirmación y WhatsApp de respaldo.</p>
+                <p>• Ante cualquier duda escríbenos a <a href="mailto:contacto@puntolegal.online" className="underline">contacto@puntolegal.online</a>.</p>
+              </div>
+            </motion.div>
+          )}
 
           {/* Próximos pasos */}
           <motion.div
