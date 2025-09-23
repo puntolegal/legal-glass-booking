@@ -46,6 +46,13 @@ export default function PaymentSuccessPage() {
 
       const paymentInfo = JSON.parse(storedData);
       console.log('📋 Datos de pago almacenados:', paymentInfo);
+      console.log('🔍 Campos específicos:', {
+        nombre: paymentInfo.nombre,
+        email: paymentInfo.email,
+        telefono: paymentInfo.telefono,
+        service: paymentInfo.service,
+        price: paymentInfo.price
+      });
 
       // Crear reserva en la base de datos
       setProcessingStatus('Guardando reserva en la base de datos...');
@@ -53,7 +60,7 @@ export default function PaymentSuccessPage() {
       // Extraer datos de manera más robusta - estructura correcta desde AgendamientoPage
       const reservationData = {
         cliente_nombre: paymentInfo.nombre || 'Cliente',
-        cliente_rut: paymentInfo.rut || 'No especificado',
+        cliente_rut: 'No especificado', // RUT no se captura en el formulario
         cliente_email: paymentInfo.email || 'No especificado',
         cliente_telefono: paymentInfo.telefono || 'No especificado',
         fecha: paymentInfo.fecha || new Date().toISOString().split('T')[0],
