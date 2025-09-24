@@ -19,7 +19,7 @@ export async function createReservasTableIfNotExists(): Promise<{success: boolea
       console.log('📝 La tabla reservas no existe, necesita ser creada manualmente');
       return { 
         success: false, 
-        message: 'La tabla reservas no existe. Ejecuta el script CREATE_TABLE_RESERVAS.sql en el SQL Editor de Supabase' 
+        message: 'La tabla reservas no existe. Ejecuta el script CREATE_TABLE_RESERVAS.sql en el SQL Editor de Supabase: https://supabase.com/dashboard/project/qrgelocijmwnxcckxbdg/sql' 
       };
     } else if (error) {
       console.warn('⚠️ Error verificando tabla:', error.message);
