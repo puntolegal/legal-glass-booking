@@ -99,6 +99,9 @@ export default function PaymentSuccessPage() {
       }
 
       console.log('📋 Datos de pago almacenados:', pendingPayment);
+      console.log('🔍 storedData raw:', storedData);
+      console.log('🔍 storedReservationId:', storedReservationId);
+      console.log('🔍 storedExternalReference:', storedExternalReference);
 
       const candidateReservationIds = new Set<string>();
       [

@@ -150,6 +150,8 @@ const MercadoPagoOfficialButton: React.FC<MercadoPagoOfficialButtonProps> = ({
 
       localStorage.setItem('paymentData', JSON.stringify(paymentDataForStorage));
       console.log('💾 Datos guardados en localStorage para PaymentSuccessPage');
+      console.log('🔍 paymentDataForStorage:', paymentDataForStorage);
+      console.log('🔍 localStorage paymentData:', localStorage.getItem('paymentData'));
 
       // Usar la función de Supabase directamente
       const { createCheckoutPreference } = await import('@/services/mercadopagoBackend');
