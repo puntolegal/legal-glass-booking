@@ -7,13 +7,13 @@ import { sendRealBookingEmails, type BookingEmailData } from './realEmailService
 // Función para mapear datos de la base de datos a la interfaz Reserva
 const mapDatabaseToReserva = (data: any): Reserva => ({
   id: data.id,
-  cliente_nombre: data.nombre,
-  cliente_email: data.email,
-  cliente_telefono: data.telefono,
-  cliente_rut: data.rut,
-  servicio_tipo: data.servicio || '',
-  servicio_precio: data.precio || '0',
-  servicio_categoria: null, // No existe en la tabla actual
+  nombre: data.nombre,
+  email: data.email,
+  telefono: data.telefono,
+  rut: data.rut,
+  servicio: data.servicio || '',
+  precio: data.precio || '0',
+  categoria: null, // No existe en la tabla actual
   fecha: data.fecha,
   hora: data.hora,
   descripcion: data.descripcion,
@@ -60,13 +60,13 @@ export interface BookingData {
 
 export interface Reserva {
   id: string;
-  cliente_nombre: string;
-  cliente_email: string;
-  cliente_telefono: string;
-  cliente_rut: string | null;
-  servicio_tipo: string;
-  servicio_precio: string | number;
-  servicio_categoria?: string | null;
+  nombre: string;
+  email: string;
+  telefono: string;
+  rut: string | null;
+  servicio: string;
+  precio: string | number;
+  categoria?: string | null;
   fecha: string;
   hora: string;
   descripcion?: string | null;
@@ -115,11 +115,11 @@ export const createBookingWithEmails = async (bookingData: BookingData): Promise
     // 2. Preparar datos para el email
     const emailData: BookingEmailData = {
       id: reservaResult.reserva.id,
-      cliente_nombre: reservaResult.reserva.cliente_nombre,
-      cliente_email: reservaResult.reserva.cliente_email,
-      cliente_telefono: reservaResult.reserva.cliente_telefono,
-      servicio_tipo: reservaResult.reserva.servicio_tipo,
-      servicio_precio: reservaResult.reserva.servicio_precio,
+      nombre: reservaResult.reserva.nombre,
+      email: reservaResult.reserva.email,
+      telefono: reservaResult.reserva.telefono,
+      servicio: reservaResult.reserva.servicio,
+      precio: reservaResult.reserva.precio,
       fecha: reservaResult.reserva.fecha,
       hora: reservaResult.reserva.hora,
       pago_metodo: reservaResult.reserva.pago_metodo,
@@ -236,13 +236,13 @@ const createOfflineReserva = (bookingData: BookingData): { success: boolean; res
     
     const reservaOffline: Reserva = {
       id: offlineId,
-      cliente_nombre: bookingData.cliente.nombre,
-      cliente_email: bookingData.cliente.email,
-      cliente_telefono: bookingData.cliente.telefono,
-      cliente_rut: bookingData.cliente.rut || 'No especificado',
-      servicio_tipo: bookingData.servicio.tipo,
-      servicio_precio: bookingData.servicio.precio,
-      servicio_categoria: bookingData.servicio.categoria || null,
+      nombre: bookingData.cliente.nombre,
+      email: bookingData.cliente.email,
+      telefono: bookingData.cliente.telefono,
+      rut: bookingData.cliente.rut || 'No especificado',
+      servicio: bookingData.servicio.tipo,
+      precio: bookingData.servicio.precio,
+      categoria: bookingData.servicio.categoria || null,
       tipo_reunion: bookingData.servicio.tipoReunion || null,
       fecha: bookingData.servicio.fecha,
       hora: bookingData.servicio.hora,
@@ -385,11 +385,11 @@ const sendPaymentConfirmationEmail = async (reserva: Reserva) => {
 
     const emailData: BookingEmailData = {
       id: reserva.id,
-      cliente_nombre: reserva.cliente_nombre,
-      cliente_email: reserva.cliente_email,
-      cliente_telefono: reserva.cliente_telefono,
-      servicio_tipo: reserva.servicio_tipo,
-      servicio_precio: String(reserva.servicio_precio ?? ''),
+      nombre: reserva.nombre,
+      email: reserva.email,
+      telefono: reserva.telefono,
+      servicio: reserva.servicio,
+      precio: String(reserva.precio ?? ''),
       fecha: reserva.fecha,
       hora: reserva.hora,
       tipo_reunion: reserva.tipo_reunion || undefined,
@@ -490,7 +490,7 @@ export const findReservaByCriteria = async (criteria: {
       // Buscar por columna dedicada external_reference
       query = query.eq('external_reference', criteria.externalReference);
     } else if (criteria.email) {
-      query = query.eq('cliente_email', criteria.email);
+      query = query.eq('email', criteria.email);
     }
 
     const { data: reservas, error } = await query.order('created_at', { ascending: false }).limit(1);

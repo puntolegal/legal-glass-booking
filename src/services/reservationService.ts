@@ -5,13 +5,13 @@ import type { Reserva } from './supabaseBooking';
 export type Reservation = Reserva;
 
 export interface ReservationInput {
-  cliente_nombre: string;
-  cliente_email: string;
-  cliente_telefono: string;
-  cliente_rut?: string | null;
-  servicio_tipo: string;
-  servicio_precio: string | number;
-  servicio_categoria?: string | null;
+  nombre: string;
+  email: string;
+  telefono: string;
+  rut?: string | null;
+  servicio: string;
+  precio: string | number;
+  categoria?: string | null;
   fecha: string;
   hora: string;
   descripcion?: string | null;
@@ -37,13 +37,13 @@ export const HORARIOS_DISPONIBLES = [
 
 const mapToReservation = (data: any): Reservation => ({
   id: data.id ?? '',
-  cliente_nombre: data.nombre ?? '',
-  cliente_email: data.email ?? '',
-  cliente_telefono: data.telefono ?? '',
-  cliente_rut: data.rut ?? null,
-  servicio_tipo: data.servicio ?? '',
-  servicio_precio: data.precio ?? '0',
-  servicio_categoria: data.categoria ?? null,
+  nombre: data.nombre ?? '',
+  email: data.email ?? '',
+  telefono: data.telefono ?? '',
+  rut: data.rut ?? null,
+  servicio: data.servicio ?? '',
+  precio: data.precio ?? '0',
+  categoria: data.categoria ?? null,
   fecha: data.fecha ?? new Date().toISOString().split('T')[0],
   hora: data.hora ?? '10:00',
   descripcion: data.descripcion ?? null,
@@ -66,15 +66,15 @@ export async function createReservation(reservationData: ReservationInput): Prom
     const timestamp = new Date().toISOString();
 
     const payload = {
-      nombre: reservationData.cliente_nombre,
-      email: reservationData.cliente_email,
-      telefono: reservationData.cliente_telefono,
-      rut: reservationData.cliente_rut || 'No especificado',
-      servicio: reservationData.servicio_tipo,
-      precio: reservationData.servicio_precio.toString(),
+      nombre: reservationData.nombre,
+      email: reservationData.email,
+      telefono: reservationData.telefono,
+      rut: reservationData.rut || 'No especificado',
+      servicio: reservationData.servicio,
+      precio: reservationData.precio.toString(),
       fecha: reservationData.fecha,
       hora: reservationData.hora,
-      descripcion: `Consulta ${reservationData.servicio_tipo} - Pago pendiente`,
+      descripcion: `Consulta ${reservationData.servicio} - Pago pendiente`,
       tipo_reunion: reservationData.tipo_reunion || 'online',
       estado: reservationData.estado || 'pendiente',
       recordatorio_enviado: false,
@@ -132,12 +132,12 @@ export async function confirmReservation(reservationId: string): Promise<{ succe
 
     const emailResult = await sendBookingEmailsDirect({
       id: updatedReservation.id,
-      cliente_nombre: updatedReservation.cliente_nombre,
-      cliente_email: updatedReservation.cliente_email,
-      cliente_telefono: updatedReservation.cliente_telefono,
-      cliente_rut: updatedReservation.cliente_rut || 'No especificado',
-      servicio_tipo: updatedReservation.servicio_tipo,
-      servicio_precio: String(updatedReservation.servicio_precio ?? ''),
+      nombre: updatedReservation.nombre,
+      email: updatedReservation.email,
+      telefono: updatedReservation.telefono,
+      rut: updatedReservation.rut || 'No especificado',
+      servicio: updatedReservation.servicio,
+      precio: String(updatedReservation.precio ?? ''),
       fecha: updatedReservation.fecha,
       hora: updatedReservation.hora,
       tipo_reunion: updatedReservation.tipo_reunion || 'online',

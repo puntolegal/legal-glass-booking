@@ -31,7 +31,7 @@ export async function testDatabaseTables(): Promise<{success: boolean; message: 
     // Probar tabla reservas con nuevas columnas
     const { data: reservas, error: reservasError } = await supabase
       .from('reservas')
-      .select('id, cliente_nombre, servicio_tipo, servicio_precio, servicio_categoria, estado, recordatorio_enviado, email_enviado')
+      .select('id, nombre, servicio, precio, categoria, estado, recordatorio_enviado, email_enviado')
       .limit(1);
     
     if (reservasError) {
@@ -88,13 +88,13 @@ export async function testDatabaseTables(): Promise<{success: boolean; message: 
 export async function createTestReservation(): Promise<{success: boolean, message: string, reservaId?: string}> {
   try {
     const testData = {
-      cliente_nombre: 'Test Usuario',
-      cliente_rut: '12345678-9',
-      cliente_email: 'test@puntolegal.cl',
-      cliente_telefono: '+56912345678',
-      servicio_tipo: 'Consulta de Prueba',
-      servicio_precio: '50000',
-      servicio_categoria: 'testing',
+      nombre: 'Test Usuario',
+      rut: '12345678-9',
+      email: 'test@puntolegal.cl',
+      telefono: '+56912345678',
+      servicio: 'Consulta de Prueba',
+      precio: '50000',
+      categoria: 'testing',
       fecha: addDaysLocalYmd(1),
       hora: '15:00',
       descripcion: 'Reserva de prueba para sistema de notificaciones',
@@ -180,7 +180,7 @@ export async function cleanupTestData(): Promise<{success: boolean, message: str
     const { error: reservasError } = await supabase
       .from('reservas')
       .delete()
-      .like('cliente_email', '%test%')
+      .like('email', '%test%')
       .or('descripcion.ilike.%prueba%');
     
     if (reservasError) {

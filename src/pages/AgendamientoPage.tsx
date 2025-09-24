@@ -673,13 +673,13 @@ export default function AgendamientoPage() {
                             } else {
                               // Sistema offline
                               const offlineBookingData: Omit<OfflineBookingData, 'id' | 'created_at' | 'updated_at'> = {
-                                cliente_nombre: formData.nombre,
-                                cliente_email: formData.email,
-                                cliente_telefono: formData.telefono,
+                                nombre: formData.nombre,
+                                email: formData.email,
+                                telefono: formData.telefono,
                                 cliente_empresa: formData.empresa,
-                                servicio_tipo: service.name,
-                                servicio_precio: precioFinal,
-                                servicio_categoria: `${service.category}${isAdminValido ? ' - ADMIN $1.000' : isConvenioValido ? ' - CONVENIO 80% OFF' : ''}`,
+                                servicio: service.name,
+                                precio: precioFinal,
+                                categoria: `${service.category}${isAdminValido ? ' - ADMIN $1.000' : isConvenioValido ? ' - CONVENIO 80% OFF' : ''}`,
                                 fecha: selectedDate,
                                 hora: selectedTime,
                                 tipo_reunion: selectedMeetingType,
@@ -692,12 +692,12 @@ export default function AgendamientoPage() {
                               try {
                                 const emailData: BookingEmailData = {
                                   id: offlineResult.id,
-                                  cliente_nombre: offlineResult.cliente_nombre,
-                                  cliente_email: offlineResult.cliente_email,
-                                  cliente_telefono: offlineResult.cliente_telefono,
+                                  nombre: offlineResult.nombre,
+                                  email: offlineResult.email,
+                                  telefono: offlineResult.telefono,
                                   cliente_empresa: offlineResult.cliente_empresa,
-                                  servicio_tipo: offlineResult.servicio_tipo,
-                                  servicio_precio: offlineResult.servicio_precio,
+                                  servicio: offlineResult.servicio,
+                                  precio: offlineResult.precio,
                                   fecha: offlineResult.fecha,
                                   hora: offlineResult.hora,
                                   tipo_reunion: offlineResult.tipo_reunion,

@@ -15,16 +15,16 @@ interface EmailData {
 
 interface BookingData {
   id: string;
-  cliente_nombre: string;
-  cliente_email: string;
-  cliente_telefono: string;
-  servicio_tipo: string;
-  servicio_precio: string;
+  nombre: string;
+  email: string;
+  telefono: string;
+  servicio: string;
+  precio: string;
   fecha: string;
   hora: string;
   tipo_reunion: string;
   descripcion?: string;
-  cliente_rut?: string;
+  rut?: string;
 }
 
 export async function sendResendEmail(emailData: EmailData): Promise<{ success: boolean; id?: string; error?: string }> {
@@ -102,16 +102,16 @@ export async function sendBookingEmailsDirect(booking: BookingData): Promise<{
             <p>Tu consulta ha sido agendada exitosamente</p>
           </div>
           <div class="content">
-            <h2>Hola ${booking.cliente_nombre},</h2>
+            <h2>Hola ${booking.nombre},</h2>
             <p>Tu consulta legal ha sido confirmada y el pago procesado correctamente.</p>
             
             <div class="info-box">
               <h3>📋 Detalles de tu consulta:</h3>
-              <p><strong>Servicio:</strong> ${booking.servicio_tipo}</p>
+              <p><strong>Servicio:</strong> ${booking.servicio}</p>
               <p><strong>Fecha:</strong> ${booking.fecha}</p>
               <p><strong>Hora:</strong> ${booking.hora}</p>
               <p><strong>Tipo:</strong> ${booking.tipo_reunion === 'online' ? 'Videollamada' : 'Presencial'}</p>
-              <p><strong>Precio:</strong> $${parseInt(booking.servicio_precio).toLocaleString('es-CL')}</p>
+              <p><strong>Precio:</strong> $${parseInt(booking.precio).toLocaleString('es-CL')}</p>
             </div>
 
             <div class="info-box">
@@ -172,18 +172,18 @@ export async function sendBookingEmailsDirect(booking: BookingData): Promise<{
             
             <div class="info-box">
               <h3>👤 Datos del cliente:</h3>
-              <p><strong>Nombre:</strong> ${booking.cliente_nombre}</p>
-              <p><strong>Email:</strong> ${booking.cliente_email}</p>
-              <p><strong>Teléfono:</strong> ${booking.cliente_telefono}</p>
+              <p><strong>Nombre:</strong> ${booking.nombre}</p>
+              <p><strong>Email:</strong> ${booking.email}</p>
+              <p><strong>Teléfono:</strong> ${booking.telefono}</p>
             </div>
 
             <div class="info-box">
               <h3>📅 Detalles de la consulta:</h3>
-              <p><strong>Servicio:</strong> ${booking.servicio_tipo}</p>
+              <p><strong>Servicio:</strong> ${booking.servicio}</p>
               <p><strong>Fecha:</strong> ${booking.fecha}</p>
               <p><strong>Hora:</strong> ${booking.hora}</p>
               <p><strong>Tipo:</strong> ${booking.tipo_reunion === 'online' ? 'Videollamada' : 'Presencial'}</p>
-              <p><strong>Precio:</strong> $${parseInt(booking.servicio_precio).toLocaleString('es-CL')}</p>
+              <p><strong>Precio:</strong> $${parseInt(booking.precio).toLocaleString('es-CL')}</p>
               <p><strong>Descripción:</strong> ${booking.descripcion || 'No especificada'}</p>
             </div>
 
@@ -210,7 +210,7 @@ export async function sendBookingEmailsDirect(booking: BookingData): Promise<{
 
     // Enviar email al cliente
     const clientEmailResult = await sendResendEmail({
-      to: booking.cliente_email,
+      to: booking.email,
       subject: `✅ Consulta Legal Confirmada - ${trackingCode}`,
       html: clientEmailHtml
     });
@@ -222,7 +222,7 @@ export async function sendBookingEmailsDirect(booking: BookingData): Promise<{
     // Enviar email al admin
     const adminEmailResult = await sendResendEmail({
       to: ADMIN_EMAIL,
-      subject: `📋 Nueva Consulta Legal - ${trackingCode} - ${booking.cliente_nombre}`,
+      subject: `📋 Nueva Consulta Legal - ${trackingCode} - ${booking.nombre}`,
       html: adminEmailHtml
     });
 

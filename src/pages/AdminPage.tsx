@@ -323,10 +323,10 @@ const AdminPage = () => {
                   <TableBody>
                     {reservations.map((reservation) => (
                       <TableRow key={reservation.id}>
-                        <TableCell className="font-medium">{reservation.cliente_nombre}</TableCell>
-                        <TableCell>{reservation.cliente_rut || 'No especificado'}</TableCell>
-                        <TableCell>{reservation.cliente_email}</TableCell>
-                        <TableCell>{reservation.cliente_telefono}</TableCell>
+                        <TableCell className="font-medium">{reservation.nombre}</TableCell>
+                        <TableCell>{reservation.rut || 'No especificado'}</TableCell>
+                        <TableCell>{reservation.email}</TableCell>
+                        <TableCell>{reservation.telefono}</TableCell>
                         <TableCell>{new Date(reservation.fecha).toLocaleDateString('es-CL')}</TableCell>
                         <TableCell>{reservation.hora}</TableCell>
                         <TableCell className="max-w-xs truncate">{reservation.descripcion || '—'}</TableCell>

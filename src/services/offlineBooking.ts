@@ -5,13 +5,13 @@
 
 export interface OfflineBookingData {
   id: string;
-  cliente_nombre: string;
-  cliente_email: string;
-  cliente_telefono: string;
+  nombre: string;
+  email: string;
+  telefono: string;
   cliente_empresa?: string;
-  servicio_tipo: string;
-  servicio_precio: string;
-  servicio_categoria: string;
+  servicio: string;
+  precio: string;
+  categoria: string;
   fecha: string;
   hora: string;
   tipo_reunion: string;
@@ -151,8 +151,8 @@ export const getOfflineBookingStats = () => {
 export const simulateEmailSend = (booking: OfflineBookingData): Promise<boolean> => {
   return new Promise((resolve) => {
     console.log('📧 Simulando envío de email para reserva:', booking.id);
-    console.log('📧 Cliente:', booking.cliente_nombre, '(' + booking.cliente_email + ')');
-    console.log('📧 Servicio:', booking.servicio_tipo);
+    console.log('📧 Cliente:', booking.nombre, '(' + booking.email + ')');
+    console.log('📧 Servicio:', booking.servicio);
     console.log('📧 Fecha:', booking.fecha, 'a las', booking.hora);
     
     // Simular delay de envío
@@ -192,17 +192,17 @@ export const simulateAdminNotification = (booking: OfflineBookingData): Promise<
     console.log('');
     console.log('🔔 SIMULANDO EMAIL AL ADMINISTRADOR:');
     console.log('📧 Para: puntolegalelgolf@gmail.com');
-    console.log('📧 Asunto: 🔔 Nueva reserva - ' + booking.cliente_nombre);
+    console.log('📧 Asunto: 🔔 Nueva reserva - ' + booking.nombre);
     console.log('📧 Contenido:');
     console.log('   📋 NUEVA RESERVA REGISTRADA');
-    console.log('   👤 Cliente:', booking.cliente_nombre);
-    console.log('   📧 Email:', booking.cliente_email);
-    console.log('   📞 Teléfono:', booking.cliente_telefono);
+    console.log('   👤 Cliente:', booking.nombre);
+    console.log('   📧 Email:', booking.email);
+    console.log('   📞 Teléfono:', booking.telefono);
     if (booking.cliente_empresa) {
       console.log('   🏢 Empresa:', booking.cliente_empresa);
     }
-    console.log('   🛎️  Servicio:', booking.servicio_tipo);
-    console.log('   💰 Precio:', '$' + booking.servicio_precio);
+    console.log('   🛎️  Servicio:', booking.servicio);
+    console.log('   💰 Precio:', '$' + booking.precio);
     console.log('   📅 Fecha:', booking.fecha);
     console.log('   🕐 Hora:', booking.hora);
     console.log('   📍 Tipo:', booking.tipo_reunion);

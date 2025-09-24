@@ -5,12 +5,12 @@
 
 export interface BookingEmailData {
   id: string;
-  cliente_nombre: string;
-  cliente_email: string;
-  cliente_telefono: string;
+  nombre: string;
+  email: string;
+  telefono: string;
   cliente_empresa?: string;
-  servicio_tipo: string;
-  servicio_precio: string;
+  servicio: string;
+  precio: string;
   fecha: string;
   hora: string;
   tipo_reunion?: string;
@@ -233,7 +233,7 @@ const generateClientEmailHTML = (booking: BookingEmailData): string => {
         </div>
         
         <div class="content">
-            <p>Estimado/a <strong>${booking.cliente_nombre}</strong>,</p>
+            <p>Estimado/a <strong>${booking.nombre}</strong>,</p>
             
             <p>Nos complace confirmar que tu cita ha sido agendada correctamente. A continuación, encontrarás todos los detalles de tu consulta jurídica:</p>
             
@@ -241,7 +241,7 @@ const generateClientEmailHTML = (booking: BookingEmailData): string => {
                 <h3>📋 Detalles de tu Cita</h3>
                 <div class="info-row">
                     <span class="info-label">Servicio:</span>
-                    <span class="info-value highlight">${booking.servicio_tipo}</span>
+                    <span class="info-value highlight">${booking.servicio}</span>
                 </div>
                 <div class="info-row">
                     <span class="info-label">Fecha:</span>
@@ -264,7 +264,7 @@ const generateClientEmailHTML = (booking: BookingEmailData): string => {
                 ` : ''}
                 <div class="info-row">
                     <span class="info-label">Precio:</span>
-                    <span class="info-value"><strong>$${booking.servicio_precio}</strong></span>
+                    <span class="info-value"><strong>$${booking.precio}</strong></span>
                 </div>
                 <div class="info-row">
                     <span class="info-label">ID de Reserva:</span>
@@ -431,15 +431,15 @@ const generateAdminEmailHTML = (booking: BookingEmailData): string => {
                 <h3>👤 Información del Cliente</h3>
                 <div class="info-row">
                     <span class="info-label">Nombre Completo:</span>
-                    <span class="info-value"><strong>${booking.cliente_nombre}</strong></span>
+                    <span class="info-value"><strong>${booking.nombre}</strong></span>
                 </div>
                 <div class="info-row">
                     <span class="info-label">Email:</span>
-                    <span class="info-value">${booking.cliente_email}</span>
+                    <span class="info-value">${booking.email}</span>
                 </div>
                 <div class="info-row">
                     <span class="info-label">Teléfono:</span>
-                    <span class="info-value">${booking.cliente_telefono}</span>
+                    <span class="info-value">${booking.telefono}</span>
                 </div>
                 ${booking.cliente_empresa ? `
                 <div class="info-row">
@@ -453,7 +453,7 @@ const generateAdminEmailHTML = (booking: BookingEmailData): string => {
                 <h3>📅 Detalles de la Cita</h3>
                 <div class="info-row">
                     <span class="info-label">Servicio Solicitado:</span>
-                    <span class="info-value"><strong>${booking.servicio_tipo}</strong></span>
+                    <span class="info-value"><strong>${booking.servicio}</strong></span>
                 </div>
                 <div class="info-row">
                     <span class="info-label">Fecha:</span>
@@ -476,7 +476,7 @@ const generateAdminEmailHTML = (booking: BookingEmailData): string => {
                 ` : ''}
                 <div class="info-row">
                     <span class="info-label">Precio:</span>
-                    <span class="info-value"><strong>$${booking.servicio_precio}</strong></span>
+                    <span class="info-value"><strong>$${booking.precio}</strong></span>
                 </div>
                 <div class="info-row">
                     <span class="info-label">Estado de Pago:</span>
@@ -549,29 +549,29 @@ export const sendRealBookingEmails = async (bookingData: BookingEmailData): Prom
     // Mostrar información detallada en consola
     console.log('');
     console.log('📧 ========== ENVIANDO EMAIL AL CLIENTE ==========');
-    console.log('Para:', bookingData.cliente_email);
-    console.log('Asunto: ✅ Confirmación de tu cita - ' + bookingData.servicio_tipo + ' - Punto Legal');
+    console.log('Para:', bookingData.email);
+    console.log('Asunto: ✅ Confirmación de tu cita - ' + bookingData.servicio + ' - Punto Legal');
     console.log('Contenido: Plantilla HTML profesional generada');
     console.log('');
     
     console.log('📧 ========== ENVIANDO EMAIL AL ADMIN ==========');
     console.log('Para: puntolegalelgolf@gmail.com');
-    console.log('Asunto: 🔔 Nueva reserva - ' + bookingData.cliente_nombre + ' - ' + bookingData.servicio_tipo);
+    console.log('Asunto: 🔔 Nueva reserva - ' + bookingData.nombre + ' - ' + bookingData.servicio);
     console.log('Contenido: Notificación completa con todos los detalles');
     console.log('');
 
     // Enviar emails reales usando Resend API
     const clientResult = await sendEmailWithResend({
       from: 'Punto Legal <team@puntolegal.online>',
-      to: [bookingData.cliente_email],
-      subject: `✅ Confirmación de tu cita - ${bookingData.servicio_tipo} - Punto Legal`,
+      to: [bookingData.email],
+      subject: `✅ Confirmación de tu cita - ${bookingData.servicio} - Punto Legal`,
       html: clientHTML
     });
 
     const adminResult = await sendEmailWithResend({
       from: 'Punto Legal <team@puntolegal.online>',
       to: ['puntolegalelgolf@gmail.com'],
-      subject: `🔔 Nueva reserva - ${bookingData.cliente_nombre} - ${bookingData.servicio_tipo}`,
+      subject: `🔔 Nueva reserva - ${bookingData.nombre} - ${bookingData.servicio}`,
       html: adminHTML
     });
 

@@ -193,11 +193,11 @@ export default function PaymentSuccessPage() {
         (mpPayment && parseAmount(mpPayment.transaction_amount)) ??
         parseAmount(pendingPayment?.price) ??
         parseAmount(pendingPayment?.priceFormatted) ??
-        parseAmount(reserva.servicio_precio) ??
+        parseAmount(reserva.precio) ??
         (typeof reserva.pago_monto === 'number' ? reserva.pago_monto : undefined);
 
       const currencyFormatter = new Intl.NumberFormat('es-CL');
-      const fallbackReservationAmount = parseAmount(reserva.servicio_precio);
+      const fallbackReservationAmount = parseAmount(reserva.precio);
       const formattedAmount = paymentAmount !== undefined
         ? currencyFormatter.format(paymentAmount)
         : pendingPayment
@@ -238,13 +238,13 @@ export default function PaymentSuccessPage() {
           setProcessingStatus('Pago aprobado, enviando emails de respaldo...');
           const emailData: BookingEmailData = {
             id: updatedReservation.id,
-            cliente_nombre: updatedReservation.cliente_nombre,
-            cliente_email: updatedReservation.cliente_email,
-            cliente_telefono: updatedReservation.cliente_telefono,
-            servicio_tipo: updatedReservation.servicio_tipo || pendingPayment?.service || 'Consulta General',
-            servicio_precio:
-              typeof updatedReservation.servicio_precio === 'string'
-                ? updatedReservation.servicio_precio
+            nombre: updatedReservation.nombre,
+            email: updatedReservation.email,
+            telefono: updatedReservation.telefono,
+            servicio: updatedReservation.servicio || pendingPayment?.service || 'Consulta General',
+            precio:
+              typeof updatedReservation.precio === 'string'
+                ? updatedReservation.precio
                 : paymentAmount?.toString() || '35000',
             fecha: updatedReservation.fecha,
             hora: updatedReservation.hora,
@@ -273,18 +273,18 @@ export default function PaymentSuccessPage() {
         },
         emailResult,
         cliente: {
-          nombre: pendingPayment?.nombre || updatedReservation.cliente_nombre || 'Cliente',
-          email: pendingPayment?.email || updatedReservation.cliente_email || 'No especificado',
-          telefono: pendingPayment?.telefono || updatedReservation.cliente_telefono || 'No especificado'
+          nombre: pendingPayment?.nombre || updatedReservation.nombre || 'Cliente',
+          email: pendingPayment?.email || updatedReservation.email || 'No especificado',
+          telefono: pendingPayment?.telefono || updatedReservation.telefono || 'No especificado'
         },
         servicio: {
-          tipo: pendingPayment?.service || updatedReservation.servicio_tipo || 'Consulta General',
+          tipo: pendingPayment?.service || updatedReservation.servicio || 'Consulta General',
           precio:
             paymentAmount ??
             pendingPayment?.price ??
-            updatedReservation.servicio_precio ??
+            updatedReservation.precio ??
             '35000',
-          categoria: pendingPayment?.category || updatedReservation.servicio_categoria || 'General'
+          categoria: pendingPayment?.category || updatedReservation.categoria || 'General'
         },
         fecha: pendingPayment?.fecha || updatedReservation.fecha,
         hora: pendingPayment?.hora || updatedReservation.hora,
@@ -292,7 +292,7 @@ export default function PaymentSuccessPage() {
         price:
           paymentAmount ??
           pendingPayment?.price ??
-          updatedReservation.servicio_precio,
+          updatedReservation.precio,
         priceFormatted: formattedAmount
       });
 
@@ -409,7 +409,7 @@ export default function PaymentSuccessPage() {
                   <div>
                     <p className="text-sm text-gray-500">Cliente</p>
                     <p className="font-semibold text-gray-900">
-                      {paymentData?.reservation?.cliente_nombre || paymentData?.cliente?.nombre || 'Cliente'}
+                      {paymentData?.reservation?.nombre || paymentData?.cliente?.nombre || 'Cliente'}
                     </p>
                   </div>
                 </div>
@@ -421,7 +421,7 @@ export default function PaymentSuccessPage() {
                     <div>
                     <p className="text-sm text-gray-500">Email</p>
                     <p className="font-semibold text-gray-900">
-                      {paymentData?.reservation?.cliente_email || paymentData?.cliente?.email || 'No especificado'}
+                      {paymentData?.reservation?.email || paymentData?.cliente?.email || 'No especificado'}
                       </p>
                     </div>
                   </div>
@@ -433,7 +433,7 @@ export default function PaymentSuccessPage() {
                     <div>
                     <p className="text-sm text-gray-500">Teléfono</p>
                     <p className="font-semibold text-gray-900">
-                      {paymentData?.reservation?.cliente_telefono || paymentData?.cliente?.telefono || 'No especificado'}
+                      {paymentData?.reservation?.telefono || paymentData?.cliente?.telefono || 'No especificado'}
                     </p>
                   </div>
                 </div>
@@ -472,7 +472,7 @@ export default function PaymentSuccessPage() {
                   <div>
                     <p className="text-sm text-gray-500">Servicio</p>
                     <p className="font-semibold text-gray-900">
-                      {paymentData?.reservation?.servicio_tipo || paymentData?.servicio?.tipo || 'Consulta Legal'}
+                      {paymentData?.reservation?.servicio || paymentData?.servicio?.tipo || 'Consulta Legal'}
                     </p>
                   </div>
                 </div>

@@ -43,14 +43,14 @@ const ReservationsList = () => {
               <div className="flex items-start justify-between">
                 <div className="flex-1">
                   <div className="flex items-center gap-4 mb-3">
-                    <h3 className="text-lg font-semibold">{reservation.cliente_nombre}</h3>
+                    <h3 className="text-lg font-semibold">{reservation.nombre}</h3>
                   </div>
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                     <div>
-                      <p><strong>RUT:</strong> {reservation.cliente_rut || 'No especificado'}</p>
-                      <p><strong>Email:</strong> {reservation.cliente_email}</p>
-                      <p><strong>Teléfono:</strong> {reservation.cliente_telefono}</p>
+                      <p><strong>RUT:</strong> {reservation.rut || 'No especificado'}</p>
+                      <p><strong>Email:</strong> {reservation.email}</p>
+                      <p><strong>Teléfono:</strong> {reservation.telefono}</p>
                     </div>
                     <div>
                       <p><strong>Fecha:</strong> {new Date(reservation.fecha).toLocaleDateString('es-CL')}</p>

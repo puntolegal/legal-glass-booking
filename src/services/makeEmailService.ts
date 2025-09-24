@@ -6,11 +6,11 @@
 
 interface BookingEmailData {
   id: string;
-  cliente_nombre: string;
-  cliente_email: string;
-  cliente_telefono: string;
-  servicio_tipo: string;
-  servicio_precio: string;
+  nombre: string;
+  email: string;
+  telefono: string;
+  servicio: string;
+  precio: string;
   fecha: string;
   hora: string;
   pago_metodo: string;
@@ -55,15 +55,15 @@ export async function sendBookingEmailsMake(data: BookingEmailData): Promise<Mak
     const webhookData = {
       // Datos del cliente
       cliente: {
-        nombre: data.cliente_nombre,
-        email: data.cliente_email,
-        telefono: data.cliente_telefono
+        nombre: data.nombre,
+        email: data.email,
+        telefono: data.telefono
       },
       
       // Datos del servicio
       servicio: {
-        tipo: data.servicio_tipo,
-        precio: data.servicio_precio,
+        tipo: data.servicio,
+        precio: data.precio,
         fecha: data.fecha,
         hora: data.hora
       },
@@ -85,7 +85,7 @@ export async function sendBookingEmailsMake(data: BookingEmailData): Promise<Mak
       // Configuración de emails
       emails: {
         cliente: {
-          to: data.cliente_email,
+          to: data.email,
           subject: `✅ Confirmación de Consulta Legal - ${trackingCode}`,
           template: 'booking_confirmation_client'
         },
@@ -98,12 +98,12 @@ export async function sendBookingEmailsMake(data: BookingEmailData): Promise<Mak
       
       // Configuración de Google Calendar
       calendar: {
-        title: `Consulta Legal - ${data.cliente_nombre}`,
-        description: `Consulta de ${data.servicio_tipo} con ${data.cliente_nombre}`,
+        title: `Consulta Legal - ${data.nombre}`,
+        description: `Consulta de ${data.servicio} con ${data.nombre}`,
         start_date: `${data.fecha}T${data.hora}:00`,
         duration_minutes: 45,
         google_meet_link: googleMeetLink,
-        attendees: [data.cliente_email, 'puntolegalelgolf@gmail.com']
+        attendees: [data.email, 'puntolegalelgolf@gmail.com']
       }
     };
 
@@ -153,18 +153,18 @@ async function sendSimpleEmail(data: BookingEmailData): Promise<MakeEmailRespons
     
     // Email simple usando webhook.site como fallback
     const simpleData = {
-      to: data.cliente_email,
+      to: data.email,
       subject: `Confirmación de Consulta Legal - ${trackingCode}`,
       message: `
-        Hola ${data.cliente_nombre},
+        Hola ${data.nombre},
         
         Tu consulta legal ha sido confirmada exitosamente.
         
         Detalles:
-        - Servicio: ${data.servicio_tipo}
+        - Servicio: ${data.servicio}
         - Fecha: ${data.fecha}
         - Hora: ${data.hora}
-        - Precio: $${data.servicio_precio}
+        - Precio: $${data.precio}
         - Código de seguimiento: ${trackingCode}
         - Link de Google Meet: ${googleMeetLink}
         

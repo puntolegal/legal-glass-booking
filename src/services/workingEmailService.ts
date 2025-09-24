@@ -5,11 +5,11 @@
 
 export interface BookingEmailData {
   id: string;
-  cliente_nombre: string;
-  cliente_email: string;
-  cliente_telefono: string;
-  servicio_tipo: string;
-  servicio_precio: string;
+  nombre: string;
+  email: string;
+  telefono: string;
+  servicio: string;
+  precio: string;
   fecha: string;
   hora: string;
   pago_metodo?: string;
@@ -39,13 +39,13 @@ export const sendBookingEmailsWorking = async (bookingData: BookingEmailData): P
     // Crear payload completo
     const emailPayload = {
       // Datos del cliente
-      client_name: bookingData.cliente_nombre,
-      client_email: bookingData.cliente_email,
-      client_phone: bookingData.cliente_telefono,
+      client_name: bookingData.nombre,
+      client_email: bookingData.email,
+      client_phone: bookingData.telefono,
       
       // Datos del servicio
-      service_type: bookingData.servicio_tipo,
-      service_price: bookingData.servicio_precio,
+      service_type: bookingData.servicio,
+      service_price: bookingData.precio,
       appointment_date: formatDate(bookingData.fecha),
       appointment_time: bookingData.hora,
       reservation_id: bookingData.id,
@@ -65,9 +65,9 @@ export const sendBookingEmailsWorking = async (bookingData: BookingEmailData): P
       notification_type: 'booking_confirmation',
       
       // Contenido de los emails
-      client_email_subject: `✅ Confirmación de tu cita - ${bookingData.servicio_tipo}`,
+      client_email_subject: `✅ Confirmación de tu cita - ${bookingData.servicio}`,
       client_email_body: createClientEmailBody(bookingData),
-      admin_email_subject: `🔔 Nueva reserva - ${bookingData.cliente_nombre}`,
+      admin_email_subject: `🔔 Nueva reserva - ${bookingData.nombre}`,
       admin_email_body: createAdminEmailBody(bookingData)
     };
 
@@ -110,15 +110,15 @@ export const sendBookingEmailsWorking = async (bookingData: BookingEmailData): P
  */
 const createClientEmailBody = (bookingData: BookingEmailData): string => {
   return `
-Estimado/a ${bookingData.cliente_nombre},
+Estimado/a ${bookingData.nombre},
 
 ¡Nos complace confirmar que tu cita ha sido agendada exitosamente!
 
 📋 DETALLES DE TU CITA:
-• Servicio: ${bookingData.servicio_tipo}
+• Servicio: ${bookingData.servicio}
 • Fecha: ${formatDate(bookingData.fecha)}
 • Hora: ${bookingData.hora} hrs
-• Precio: $${bookingData.servicio_precio}
+• Precio: $${bookingData.precio}
 • ID de Reserva: ${bookingData.id}
 • Estado de Pago: ${bookingData.pago_estado || 'Aprobado'}
 • Método de Pago: ${bookingData.pago_metodo || 'MercadoPago'}
@@ -147,15 +147,15 @@ const createAdminEmailBody = (bookingData: BookingEmailData): string => {
 🔔 NUEVA RESERVA REGISTRADA
 
 👤 INFORMACIÓN DEL CLIENTE:
-• Nombre: ${bookingData.cliente_nombre}
-• Email: ${bookingData.cliente_email}
-• Teléfono: ${bookingData.cliente_telefono}
+• Nombre: ${bookingData.nombre}
+• Email: ${bookingData.email}
+• Teléfono: ${bookingData.telefono}
 
 📅 DETALLES DE LA CITA:
-• Servicio: ${bookingData.servicio_tipo}
+• Servicio: ${bookingData.servicio}
 • Fecha: ${formatDate(bookingData.fecha)}
 • Hora: ${bookingData.hora} hrs
-• Precio: $${bookingData.servicio_precio}
+• Precio: $${bookingData.precio}
 • Estado de Pago: ${bookingData.pago_estado || 'Aprobado'}
 • Método de Pago: ${bookingData.pago_metodo || 'MercadoPago'}
 
@@ -182,13 +182,13 @@ const simulateEmailFallback = (bookingData: BookingEmailData): EmailResult => {
   
   // Email al cliente
   console.log('📧 EMAIL AL CLIENTE:');
-  console.log(`Para: ${bookingData.cliente_email}`);
-  console.log(`Asunto: ✅ Confirmación de tu cita - ${bookingData.servicio_tipo}`);
+  console.log(`Para: ${bookingData.email}`);
+  console.log(`Asunto: ✅ Confirmación de tu cita - ${bookingData.servicio}`);
   console.log(`Contenido:`);
-  console.log(`  Estimado/a ${bookingData.cliente_nombre},`);
+  console.log(`  Estimado/a ${bookingData.nombre},`);
   console.log(`  Tu cita ha sido confirmada para el ${formatDate(bookingData.fecha)} a las ${bookingData.hora}.`);
-  console.log(`  Servicio: ${bookingData.servicio_tipo}`);
-  console.log(`  Precio: $${bookingData.servicio_precio}`);
+  console.log(`  Servicio: ${bookingData.servicio}`);
+  console.log(`  Precio: $${bookingData.precio}`);
   console.log(`  ID de Reserva: ${bookingData.id}`);
   console.log(`  Estado de Pago: ${bookingData.pago_estado || 'Aprobado'}`);
   console.log(`  Método de Pago: ${bookingData.pago_metodo || 'MercadoPago'}`);
@@ -197,14 +197,14 @@ const simulateEmailFallback = (bookingData: BookingEmailData): EmailResult => {
   // Email al admin
   console.log('📧 EMAIL AL ADMINISTRADOR:');
   console.log('Para: puntolegalelgolf@gmail.com');
-  console.log(`Asunto: 🔔 Nueva reserva - ${bookingData.cliente_nombre}`);
+  console.log(`Asunto: 🔔 Nueva reserva - ${bookingData.nombre}`);
   console.log(`Contenido:`);
   console.log(`  Nueva reserva registrada:`);
-  console.log(`  Cliente: ${bookingData.cliente_nombre} (${bookingData.cliente_email})`);
-  console.log(`  Teléfono: ${bookingData.cliente_telefono}`);
-  console.log(`  Servicio: ${bookingData.servicio_tipo}`);
+  console.log(`  Cliente: ${bookingData.nombre} (${bookingData.email})`);
+  console.log(`  Teléfono: ${bookingData.telefono}`);
+  console.log(`  Servicio: ${bookingData.servicio}`);
   console.log(`  Fecha: ${formatDate(bookingData.fecha)} a las ${bookingData.hora}`);
-  console.log(`  Precio: $${bookingData.servicio_precio}`);
+  console.log(`  Precio: $${bookingData.precio}`);
   console.log(`  Estado de Pago: ${bookingData.pago_estado || 'Aprobado'}`);
   console.log(`  Método de Pago: ${bookingData.pago_metodo || 'MercadoPago'}`);
   console.log(`  ID: ${bookingData.id}`);

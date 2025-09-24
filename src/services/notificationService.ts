@@ -33,13 +33,13 @@ interface PagoData {
 
 const mapReserva = (data: Partial<Reserva>): Reserva => ({
   id: data.id ?? '',
-  cliente_nombre: data.cliente_nombre ?? '',
-  cliente_email: data.cliente_email ?? '',
-  cliente_telefono: data.cliente_telefono ?? '',
-  cliente_rut: data.cliente_rut ?? null,
-  servicio_tipo: data.servicio_tipo ?? '',
-  servicio_precio: data.servicio_precio ?? '0',
-  servicio_categoria: data.servicio_categoria ?? null,
+  nombre: data.nombre ?? '',
+  email: data.email ?? '',
+  telefono: data.telefono ?? '',
+  rut: data.rut ?? null,
+  servicio: data.servicio ?? '',
+  precio: data.precio ?? '0',
+  categoria: data.categoria ?? null,
   fecha: data.fecha ?? new Date().toISOString().split('T')[0],
   hora: data.hora ?? '10:00',
   descripcion: data.descripcion ?? null,
@@ -64,12 +64,12 @@ const formatDate = (fecha: string, hora?: string) => {
 
 const buildReminderEmail = (reserva: Reserva, destinatario: 'cliente' | 'admin'): string => {
   const saludo = destinatario === 'cliente'
-    ? `Hola ${reserva.cliente_nombre},`
+    ? `Hola ${reserva.nombre},`
     : 'Hola equipo Punto Legal,';
 
   const introduccion = destinatario === 'cliente'
     ? 'Queremos recordarte tu consulta jurídica agendada para mañana.'
-    : `Recordatorio automático de la consulta de ${reserva.cliente_nombre}.`;
+    : `Recordatorio automático de la consulta de ${reserva.nombre}.`;
 
   return `
     <!DOCTYPE html>
@@ -96,10 +96,10 @@ const buildReminderEmail = (reserva: Reserva, destinatario: 'cliente' | 'admin')
           <p>${saludo}</p>
           <p>${introduccion}</p>
           <div class="info">
-            <p><strong>Servicio:</strong> ${reserva.servicio_tipo}</p>
+            <p><strong>Servicio:</strong> ${reserva.servicio}</p>
             <p><strong>Fecha:</strong> ${formatDate(reserva.fecha, reserva.hora)}</p>
             <p><strong>Modalidad:</strong> ${reserva.tipo_reunion === 'presencial' ? 'Presencial' : 'Online'}</p>
-            <p><strong>Precio:</strong> $${Number(reserva.servicio_precio || 0).toLocaleString('es-CL')}</p>
+            <p><strong>Precio:</strong> $${Number(reserva.precio || 0).toLocaleString('es-CL')}</p>
             ${reserva.descripcion ? `<p><strong>Detalle:</strong> ${reserva.descripcion}</p>` : ''}
           </div>
           ${destinatario === 'cliente'
@@ -130,11 +130,11 @@ const buildReceiptEmail = (reserva: Reserva, pago: PagoData): string => `
     <body>
       <div class="container">
         <h1>✅ Pago confirmado</h1>
-        <p>Hola ${reserva.cliente_nombre},</p>
+        <p>Hola ${reserva.nombre},</p>
         <p>Hemos registrado tu pago correctamente. A continuación encontrarás el detalle de tu comprobante:</p>
         <div class="section">
           <h2>Detalle de la consulta</h2>
-          <div class="row"><span>Servicio</span><span>${reserva.servicio_tipo}</span></div>
+          <div class="row"><span>Servicio</span><span>${reserva.servicio}</span></div>
           <div class="row"><span>Fecha</span><span>${formatDate(reserva.fecha, reserva.hora)}</span></div>
           <div class="row"><span>Modalidad</span><span>${reserva.tipo_reunion === 'presencial' ? 'Presencial' : 'Online'}</span></div>
         </div>
@@ -237,12 +237,12 @@ class NotificationService {
 
     const emailResult = await sendBookingEmailsDirect({
       id: reserva.id,
-      cliente_nombre: reserva.cliente_nombre,
-      cliente_email: reserva.cliente_email,
-      cliente_telefono: reserva.cliente_telefono,
-      cliente_rut: reserva.cliente_rut || 'No especificado',
-      servicio_tipo: reserva.servicio_tipo,
-      servicio_precio: String(reserva.servicio_precio ?? ''),
+      nombre: reserva.nombre,
+      email: reserva.email,
+      telefono: reserva.telefono,
+      rut: reserva.rut || 'No especificado',
+      servicio: reserva.servicio,
+      precio: String(reserva.precio ?? ''),
       fecha: reserva.fecha,
       hora: reserva.hora,
       tipo_reunion: reserva.tipo_reunion || 'online',
@@ -272,14 +272,14 @@ class NotificationService {
     }
 
     const emailCliente = await sendResendEmail({
-      to: reserva.cliente_email,
+      to: reserva.email,
       subject: NOTIFICATION_CONFIG.recordatorio.asunto,
       html: buildReminderEmail(reserva, 'cliente')
     });
 
     const emailAdmin = await sendResendEmail({
       to: NOTIFICATION_CONFIG.email.admin,
-      subject: `🔔 Recordatorio agendado - ${reserva.cliente_nombre}`,
+      subject: `🔔 Recordatorio agendado - ${reserva.nombre}`,
       html: buildReminderEmail(reserva, 'admin')
     });
 
@@ -320,7 +320,7 @@ class NotificationService {
     }
 
     const emailClient = await sendResendEmail({
-      to: reserva.cliente_email,
+      to: reserva.email,
       subject: NOTIFICATION_CONFIG.comprobante.asunto,
       html: buildReceiptEmail(reserva, pago)
     });
