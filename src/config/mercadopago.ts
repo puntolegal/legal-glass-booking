@@ -8,11 +8,11 @@ export const MERCADOPAGO_CONFIG = {
   locale: 'es-CL',
   currency: 'CLP',
   
-  // URLs de retorno (configuradas para puerto 8081)
+  // URLs de retorno (configuradas para Lovable)
   urls: {
-    success: `http://localhost:8081/payment-success`,
-    failure: `http://localhost:8081/payment-failure`,
-    pending: `http://localhost:8081/payment-pending`
+    success: `https://bbe51df4-7509-42ac-ab63-61efdbec6cab.lovableproject.com/payment-success`,
+    failure: `https://bbe51df4-7509-42ac-ab63-61efdbec6cab.lovableproject.com/payment-failure`,
+    pending: `https://bbe51df4-7509-42ac-ab63-61efdbec6cab.lovableproject.com/payment-pending`
   },
   
   // Configuración de la empresa
@@ -32,7 +32,7 @@ export const MERCADOPAGO_CONFIG = {
   
   // Configuración de notificaciones
   notifications: {
-    webhookUrl: `${window.location.origin}/api/mercadopago/webhook`
+    webhookUrl: `https://bbe51df4-7509-42ac-ab63-61efdbec6cab.lovableproject.com/.netlify/functions/mercadopago-webhook`
   }
 };
 
