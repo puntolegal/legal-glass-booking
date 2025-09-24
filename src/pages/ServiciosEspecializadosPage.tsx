@@ -1,3 +1,88 @@
+import React, { useState } from 'react';
+import { Scale, ScrollText, Users, Briefcase, Heart, Home } from 'lucide-react';
+import Header from '@/components/Header';
+import MobileLayout from '@/components/MobileLayout';
+import ServiceCard from '@/components/ServiceCard';
+import ReservationForm from '@/components/ReservationForm';
+import SEO from '@/components/SEO';
+
+const ServiciosEspecializadosPage = () => {
+  const [showForm, setShowForm] = useState(false);
+  const [selectedService, setSelectedService] = useState<any>(null);
+
+  const handleAgendarClick = (service: any) => {
+    setSelectedService(service);
+    setShowForm(true);
+  };
+
+  const handleCloseForm = () => {
+    setShowForm(false);
+    setSelectedService(null);
+  };
+
+  const specializedServices = [
+    {
+      title: "Derecho de Familia",
+      description: "Divorcios, pensiones alimenticias, tuición y violencia intrafamiliar con enfoque humano.",
+      price: "$25.000",
+      features: [
+        "Divorcios y separaciones",
+        "Pensiones alimenticias",
+        "Tuición de menores", 
+        "Violencia intrafamiliar",
+        "Mediación familiar"
+      ],
+      icon: <Heart className="w-6 h-6 text-primary" />,
+      badge: "POPULAR",
+      href: "/familia",
+      testimonials: [
+        {
+          name: "María González",
+          text: "Excelente atención en mi proceso de divorcio. Muy profesional y empática.",
+          rating: 5
+        },
+        {
+          name: "Carlos Pérez",
+          text: "Me ayudaron con la tuición de mi hija. Proceso rápido y efectivo.",
+          rating: 5
+        }
+      ],
+      blogPosts: [
+        {
+          title: "Divorcio en Chile: proceso y requisitos",
+          excerpt: "Guía completa sobre el proceso de divorcio en Chile...",
+          href: "/blog/divorcio-chile"
+        },
+        {
+          title: "Pensión alimenticia: cálculo y modificación",
+          excerpt: "Todo sobre pensiones alimenticias y cómo calcularlas...",
+          href: "/blog/pension-alimenticia"
+        }
+      ]
+    },
+    {
+      title: "Derecho Laboral",
+      description: "Despidos, finiquitos, acoso laboral y negociaciones colectivas con resultados comprobados.",
+      price: "$20.000",
+      features: [
+        "Despidos injustificados",
+        "Finiquitos y liquidaciones",
+        "Acoso laboral",
+        "Negociaciones colectivas",
+        "Accidentes del trabajo"
+      ],
+      icon: <Briefcase className="w-6 h-6 text-primary" />,
+      badge: "RECOMENDADO",
+      href: "/laboral",
+      testimonials: [
+        {
+          name: "Ana Rodríguez",
+          text: "Me ayudaron con un despido injustificado. Recuperé mis derechos completamente.",
+          rating: 5
+        },
+        {
+          name: "Pedro Morales",
+          text: "Excelente asesoría en negociación colectiva para nuestro sindicato.",
           rating: 5
         }
       ],
@@ -155,4 +240,4 @@
   );
 };
 
-export default ServiciosEspecializadosPage; 
+export default ServiciosEspecializadosPage;
