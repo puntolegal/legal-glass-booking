@@ -61,46 +61,9 @@ const mapToReservation = (data: any): Reservation => ({
   updated_at: data.updated_at ?? new Date().toISOString()
 });
 
-// Función para verificar duplicados
-const checkForDuplicateReservation = async (email: string, fecha: string, hora: string): Promise<boolean> => {
-  try {
-    // Normalizar la hora (solo horas, sin minutos)
-    const horaNormalizada = hora.split(':')[0] + ':00';
-    
-    const { data, error } = await supabase
-      .from('reservas')
-      .select('id')
-      .eq('email', email)
-      .eq('fecha', fecha)
-      .like('hora', `${horaNormalizada}%`)
-      .limit(1);
-
-    if (error) {
-      console.error('Error checking for duplicates:', error);
-      return false; // En caso de error, permitir crear la reserva
-    }
-
-    return data && data.length > 0;
-  } catch (error) {
-    console.error('Error checking for duplicates:', error);
-    return false;
-  }
-};
-
 export async function createReservation(reservationData: ReservationInput): Promise<Reservation> {
   try {
     const timestamp = new Date().toISOString();
-
-    // Verificar duplicados antes de crear la reserva
-    const isDuplicate = await checkForDuplicateReservation(
-      reservationData.email, 
-      reservationData.fecha, 
-      reservationData.hora
-    );
-
-    if (isDuplicate) {
-      throw new Error('Ya existe una reserva para este email, fecha y hora. Por favor, elige otro horario.');
-    }
 
     const payload = {
       nombre: reservationData.nombre,
