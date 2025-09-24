@@ -8,11 +8,11 @@ export const MERCADOPAGO_CONFIG = {
   locale: 'es-CL',
   currency: 'CLP',
   
-  // URLs de retorno (configuradas para puerto 8081)
+  // URLs de retorno (configuradas para producción)
   urls: {
-    success: `http://localhost:8081/payment-success`,
-    failure: `http://localhost:8081/payment-failure`,
-    pending: `http://localhost:8081/payment-pending`
+    success: `https://puntolegal.online/payment-success`,
+    failure: `https://puntolegal.online/payment-failure`,
+    pending: `https://puntolegal.online/payment-pending`
   },
   
   // Configuración de la empresa
@@ -32,7 +32,7 @@ export const MERCADOPAGO_CONFIG = {
   
   // Configuración de notificaciones
   notifications: {
-    webhookUrl: `${window.location.origin}/api/mercadopago/webhook`
+    webhookUrl: `https://puntolegal.online/.netlify/functions/mercadopago-webhook`
   }
 };
 
