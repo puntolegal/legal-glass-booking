@@ -118,6 +118,11 @@ export const createCheckoutPreference = async (preferenceData: CreatePreferenceR
     
     // Llamada real a la API de MercadoPago
     console.log('🔑 Usando token de acceso:', MERCADOPAGO_CONFIG.accessToken ? 'Configurado' : 'No configurado');
+    console.log('🔍 Token completo:', MERCADOPAGO_CONFIG.accessToken ? `${MERCADOPAGO_CONFIG.accessToken.substring(0, 20)}...` : 'No disponible');
+    
+    if (!MERCADOPAGO_CONFIG.accessToken) {
+      throw new Error('Token de acceso de MercadoPago no configurado');
+    }
     
     const response = await fetch('https://api.mercadopago.com/checkout/preferences', {
       method: 'POST',
