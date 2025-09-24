@@ -6,6 +6,26 @@ import { SUPABASE_CONFIG, getDiagnosticInfo } from '@/config/supabaseConfig';
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || SUPABASE_CONFIG.url;
 const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || SUPABASE_CONFIG.anonKey;
 
+// Validación crítica: Asegurar que siempre tengamos valores válidos
+if (!SUPABASE_URL) {
+  console.error('❌ ERROR CRÍTICO: SUPABASE_URL no está definido');
+  console.error('Variables de entorno disponibles:', {
+    VITE_SUPABASE_URL: import.meta.env.VITE_SUPABASE_URL,
+    SUPABASE_CONFIG_URL: SUPABASE_CONFIG.url
+  });
+  throw new Error('supabaseUrl is required');
+}
+
+if (!SUPABASE_PUBLISHABLE_KEY) {
+  console.error('❌ ERROR CRÍTICO: SUPABASE_PUBLISHABLE_KEY no está definido');
+  throw new Error('supabaseKey is required');
+}
+
+// Debug: Verificar valores
+console.log('🔍 SUPABASE_URL:', SUPABASE_URL);
+console.log('🔍 SUPABASE_CONFIG.url:', SUPABASE_CONFIG.url);
+console.log('🔍 VITE_SUPABASE_URL:', import.meta.env.VITE_SUPABASE_URL);
+
 // Mostrar información de diagnóstico en desarrollo
 if (import.meta.env.DEV) {
   const diagnostics = getDiagnosticInfo();
