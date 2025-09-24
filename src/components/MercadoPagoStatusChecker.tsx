@@ -27,8 +27,9 @@ export const MercadoPagoStatusChecker: React.FC<MercadoPagoStatusCheckerProps> =
       console.log('NODE_ENV:', import.meta.env.MODE);
       
       // Verificar que las credenciales de MercadoPago estén configuradas
-      const accessToken = import.meta.env.VITE_MERCADOPAGO_ACCESS_TOKEN;
-      const publicKey = import.meta.env.VITE_MERCADOPAGO_PUBLIC_KEY;
+      const { MERCADOPAGO_CONFIG } = await import('@/config/mercadopago');
+      const accessToken = MERCADOPAGO_CONFIG.accessToken;
+      const publicKey = MERCADOPAGO_CONFIG.publicKey;
       
       if (!accessToken || !publicKey) {
         setStatus('unavailable');

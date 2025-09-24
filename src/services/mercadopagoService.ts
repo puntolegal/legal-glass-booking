@@ -1,7 +1,8 @@
 import { loadMercadoPago } from '@mercadopago/sdk-js';
+import { MERCADOPAGO_CONFIG } from '@/config/mercadopago';
 
-// Configuración de MercadoPago
-const MP_PUBLIC_KEY = import.meta.env.VITE_MERCADOPAGO_PUBLIC_KEY;
+// Configuración de MercadoPago con fallback
+const MP_PUBLIC_KEY = MERCADOPAGO_CONFIG.publicKey;
 
 // Interfaz para los datos de pago
 export interface PaymentData {

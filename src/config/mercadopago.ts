@@ -1,8 +1,12 @@
 // Configuración oficial de MercadoPago - Punto Legal
+// Valores de fallback para producción
+const FALLBACK_PUBLIC_KEY = 'APP_USR-ebca3c36-af6d-4e88-ac94-5e984ce6bf5e';
+const FALLBACK_ACCESS_TOKEN = 'APP_USR-7407359076060108-092318-7fb22dd54bc0d3e4a42accab058e8a3e-229698947';
+
 export const MERCADOPAGO_CONFIG = {
   // Credenciales oficiales de PRODUCCIÓN - Mercado Pago Punto Legal
-  publicKey: import.meta.env.VITE_MERCADOPAGO_PUBLIC_KEY || '',
-  accessToken: import.meta.env.VITE_MERCADOPAGO_ACCESS_TOKEN || '',
+  publicKey: import.meta.env.VITE_MERCADOPAGO_PUBLIC_KEY || FALLBACK_PUBLIC_KEY,
+  accessToken: import.meta.env.VITE_MERCADOPAGO_ACCESS_TOKEN || FALLBACK_ACCESS_TOKEN,
   
   // Configuración regional
   locale: 'es-CL',
