@@ -1,8 +1,9 @@
 /**
- * Configuración de Supabase - Con fallback para desarrollo
+ * Configuración de Supabase - Solo variables de entorno
+ * No usar credenciales hardcodeadas para evitar conflictos
  */
 
-// Credenciales desde variables de entorno - SOLO variables de entorno
+// Credenciales SOLO desde variables de entorno
 export const SUPABASE_CREDENTIALS = {
   URL: import.meta.env.VITE_SUPABASE_URL,
   PUBLISHABLE_KEY: import.meta.env.VITE_SUPABASE_ANON_KEY,

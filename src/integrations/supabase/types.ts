@@ -7,72 +7,203 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instantiate createClient with right options
-  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
-  __InternalSupabase: {
-    PostgrestVersion: "13.0.5"
-  }
   public: {
     Tables: {
+      profiles: {
+        Row: {
+          created_at: string
+          email: string | null
+          id: string
+          nombre: string | null
+          telefono: string | null
+          updated_at: string
+          user_id: string
+          role: 'admin' | 'abogado' | 'cliente'
+          is_active: boolean
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          nombre?: string | null
+          telefono?: string | null
+          updated_at?: string
+          user_id: string
+          role?: 'admin' | 'abogado' | 'cliente'
+          is_active?: boolean
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          nombre?: string | null
+          telefono?: string | null
+          updated_at?: string
+          user_id?: string
+          role?: 'admin' | 'abogado' | 'cliente'
+          is_active?: boolean
+        }
+        Relationships: []
+      }
       reservas: {
         Row: {
           created_at: string | null
-          descripcion: string | null
+          descripcion: string
           email: string
-          estado: string | null
           fecha: string
           hora: string
           id: string
           nombre: string
-          precio: string
-          recordatorio_enviado: boolean | null
           rut: string
-          servicio: string
           telefono: string
-          tipo_reunion: string | null
-          updated_at: string | null
           user_id: string | null
-          webhook_sent: boolean | null
+          servicio: string | null
+          precio: string | null
+          categoria: string | null
+          tipo_reunion: string | null
+          estado: 'pendiente' | 'confirmada' | 'completada' | 'cancelada'
+          recordatorio_enviado: boolean
+          webhook_sent: boolean
+          updated_at: string | null
         }
         Insert: {
           created_at?: string | null
-          descripcion?: string | null
+          descripcion: string
           email: string
-          estado?: string | null
           fecha: string
           hora: string
           id?: string
           nombre: string
-          precio: string
-          recordatorio_enviado?: boolean | null
           rut: string
-          servicio: string
           telefono: string
-          tipo_reunion?: string | null
-          updated_at?: string | null
           user_id?: string | null
-          webhook_sent?: boolean | null
+          servicio?: string | null
+          precio?: string | null
+          categoria?: string | null
+          tipo_reunion?: string | null
+          estado?: 'pendiente' | 'confirmada' | 'completada' | 'cancelada'
+          recordatorio_enviado?: boolean
+          webhook_sent?: boolean
+          updated_at?: string | null
         }
         Update: {
           created_at?: string | null
-          descripcion?: string | null
+          descripcion?: string
           email?: string
-          estado?: string | null
           fecha?: string
           hora?: string
           id?: string
           nombre?: string
-          precio?: string
-          recordatorio_enviado?: boolean | null
           rut?: string
-          servicio?: string
           telefono?: string
-          tipo_reunion?: string | null
-          updated_at?: string | null
           user_id?: string | null
-          webhook_sent?: boolean | null
+          servicio?: string | null
+          precio?: string | null
+          categoria?: string | null
+          tipo_reunion?: string | null
+          estado?: 'pendiente' | 'confirmada' | 'completada' | 'cancelada'
+          recordatorio_enviado?: boolean
+          webhook_sent?: boolean
+          updated_at?: string | null
         }
         Relationships: []
+      }
+      notificaciones: {
+        Row: {
+          id: string
+          reserva_id: string
+          tipo: 'nueva_reserva' | 'recordatorio' | 'comprobante'
+          estado: 'pendiente' | 'enviado' | 'fallido'
+          intentos: number
+          fecha_envio: string | null
+          ultimo_error: string | null
+          webhook_response: Json | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          reserva_id: string
+          tipo: 'nueva_reserva' | 'recordatorio' | 'comprobante'
+          estado?: 'pendiente' | 'enviado' | 'fallido'
+          intentos?: number
+          fecha_envio?: string | null
+          ultimo_error?: string | null
+          webhook_response?: Json | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          reserva_id?: string
+          tipo?: 'nueva_reserva' | 'recordatorio' | 'comprobante'
+          estado?: 'pendiente' | 'enviado' | 'fallido'
+          intentos?: number
+          fecha_envio?: string | null
+          ultimo_error?: string | null
+          webhook_response?: Json | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notificaciones_reserva_id_fkey"
+            columns: ["reserva_id"]
+            isOneToOne: false
+            referencedRelation: "reservas"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      pagos: {
+        Row: {
+          id: string
+          reserva_id: string
+          numero_comprobante: string
+          monto: number
+          metodo: string
+          numero_transaccion: string | null
+          estado: 'pendiente' | 'pagado' | 'fallido' | 'reembolsado'
+          fecha_pago: string | null
+          datos_pago: Json | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          reserva_id: string
+          numero_comprobante: string
+          monto: number
+          metodo: string
+          numero_transaccion?: string | null
+          estado?: 'pendiente' | 'pagado' | 'fallido' | 'reembolsado'
+          fecha_pago?: string | null
+          datos_pago?: Json | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          reserva_id?: string
+          numero_comprobante?: string
+          monto?: number
+          metodo?: string
+          numero_transaccion?: string | null
+          estado?: 'pendiente' | 'pagado' | 'fallido' | 'reembolsado'
+          fecha_pago?: string | null
+          datos_pago?: Json | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pagos_reserva_id_fkey"
+            columns: ["reserva_id"]
+            isOneToOne: false
+            referencedRelation: "reservas"
+            referencedColumns: ["id"]
+          }
+        ]
       }
     }
     Views: {
@@ -90,25 +221,21 @@ export type Database = {
   }
 }
 
-type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
-
-type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
+type DefaultSchema = Database[Extract<keyof Database, "public">]
 
 export type Tables<
   DefaultSchemaTableNameOrOptions extends
     | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
-    | { schema: keyof DatabaseWithoutInternals },
+    | { schema: keyof Database },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
+    schema: keyof Database
   }
-    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
+    ? keyof (Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        Database[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
     : never = never,
-> = DefaultSchemaTableNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
-}
-  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
+  ? (Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      Database[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
       Row: infer R
     }
     ? R
@@ -126,16 +253,14 @@ export type Tables<
 export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
-    | { schema: keyof DatabaseWithoutInternals },
+    | { schema: keyof Database },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
+    schema: keyof Database
   }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    ? keyof Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
-> = DefaultSchemaTableNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
-}
-  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
+  ? Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Insert: infer I
     }
     ? I
@@ -151,16 +276,14 @@ export type TablesInsert<
 export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
-    | { schema: keyof DatabaseWithoutInternals },
+    | { schema: keyof Database },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
+    schema: keyof Database
   }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    ? keyof Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
-> = DefaultSchemaTableNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
-}
-  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
+  ? Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Update: infer U
     }
     ? U
@@ -176,16 +299,14 @@ export type TablesUpdate<
 export type Enums<
   DefaultSchemaEnumNameOrOptions extends
     | keyof DefaultSchema["Enums"]
-    | { schema: keyof DatabaseWithoutInternals },
+    | { schema: keyof Database },
   EnumName extends DefaultSchemaEnumNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
+    schema: keyof Database
   }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
+    ? keyof Database[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
     : never = never,
-> = DefaultSchemaEnumNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
-}
-  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+> = DefaultSchemaEnumNameOrOptions extends { schema: keyof Database }
+  ? Database[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
   : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
     ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
     : never
@@ -193,16 +314,14 @@ export type Enums<
 export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
     | keyof DefaultSchema["CompositeTypes"]
-    | { schema: keyof DatabaseWithoutInternals },
+    | { schema: keyof Database },
   CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
+    schema: keyof Database
   }
-    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    ? keyof Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
     : never = never,
-> = PublicCompositeTypeNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
-}
-  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+> = PublicCompositeTypeNameOrOptions extends { schema: keyof Database }
+  ? Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
   : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
     ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
     : never
