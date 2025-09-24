@@ -3,11 +3,11 @@
  * No usar credenciales hardcodeadas para evitar conflictos
  */
 
-// Credenciales SOLO desde variables de entorno
+// Credenciales desde variables de entorno o fallback a producción
 export const SUPABASE_CREDENTIALS = {
-  URL: import.meta.env.VITE_SUPABASE_URL,
-  PUBLISHABLE_KEY: import.meta.env.VITE_SUPABASE_ANON_KEY,
-  PROJECT_REF: import.meta.env.VITE_SUPABASE_PROJECT_REF
+  URL: import.meta.env.VITE_SUPABASE_URL || 'https://qrgelocijmwnxcckxbdg.supabase.co',
+  PUBLISHABLE_KEY: import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFyZ2Vsb2Npam13bnhjY2t4YmRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc4MDI0MjksImV4cCI6MjA3MzM3ODQyOX0.0q_3bb8bKR8VVZZAK_hYvhvLSTaU1ioQzmO5fKALjbI',
+  PROJECT_REF: import.meta.env.VITE_SUPABASE_PROJECT_REF || 'qrgelocijmwnxcckxbdg'
 };
 
 // Verificar si las credenciales son válidas
