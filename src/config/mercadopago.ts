@@ -8,11 +8,11 @@ export const MERCADOPAGO_CONFIG = {
   locale: 'es-CL',
   currency: 'CLP',
   
-  // URLs de retorno (configuradas para producción)
+  // URLs de retorno (configuradas para Lovable)
   urls: {
-    success: `https://puntolegal.online/payment-success`,
-    failure: `https://puntolegal.online/payment-failure`,
-    pending: `https://puntolegal.online/payment-pending`
+    success: `https://bbe51df4-7509-42ac-ab63-61efdbec6cab.lovableproject.com/payment-success`,
+    failure: `https://bbe51df4-7509-42ac-ab63-61efdbec6cab.lovableproject.com/payment-failure`,
+    pending: `https://bbe51df4-7509-42ac-ab63-61efdbec6cab.lovableproject.com/payment-pending`
   },
   
   // Configuración de la empresa
@@ -32,7 +32,7 @@ export const MERCADOPAGO_CONFIG = {
   
   // Configuración de notificaciones
   notifications: {
-    webhookUrl: `https://puntolegal.online/.netlify/functions/mercadopago-webhook`
+    webhookUrl: `https://bbe51df4-7509-42ac-ab63-61efdbec6cab.lovableproject.com/.netlify/functions/mercadopago-webhook`
   }
 };
 
