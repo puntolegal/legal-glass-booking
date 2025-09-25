@@ -82,7 +82,7 @@ export async function quickDatabaseSetup(): Promise<{success: boolean; message: 
         telefono: '+56912345678',
         servicio: 'Consulta laboral de prueba',
         precio: '35000',
-        categoria: 'Laboral',
+        
         fecha: addDaysLocalYmd(1),
         hora: '15:00',
         descripcion: 'Consulta laboral de prueba - sistema de notificaciones',
@@ -98,7 +98,7 @@ export async function quickDatabaseSetup(): Promise<{success: boolean; message: 
         telefono: '+56987654321',
         servicio: 'Constitución de sociedad (demo)',
         precio: '50000',
-        categoria: 'Corporativo',
+        
         fecha: addDaysLocalYmd(2),
         hora: '10:30',
         descripcion: 'Constitución de sociedad de prueba',
@@ -112,7 +112,7 @@ export async function quickDatabaseSetup(): Promise<{success: boolean; message: 
     for (const reserva of reservasPrueba) {
       const { error: reservaError } = await supabase
         .from('reservas')
-        .insert([reserva]);
+        .insert([{...reserva, user_id: 'anonymous'}]);
       
       if (reservaError) {
         console.warn('Error creando reserva de prueba:', reservaError);
@@ -161,19 +161,13 @@ export async function quickDatabaseSetup(): Promise<{success: boolean; message: 
         rut: '11.111.111-1',
         servicio: 'Consulta Demo',
         precio: '45000',
-        categoria: 'Testing',
+        
         fecha: toLocalYmd(ahora),
         hora: '15:00',
         descripcion: 'Generada por quickDatabaseSetup para validar Resend.',
-        pago_metodo: 'pendiente',
-        pago_estado: 'pendiente',
-        pago_id: null,
-        pago_monto: null,
         tipo_reunion: 'online',
-        external_reference: null,
-        preference_id: null,
         estado: 'pendiente' as const,
-        email_enviado: false,
+        
         recordatorio_enviado: false,
         created_at: ahora.toISOString(),
         updated_at: ahora.toISOString()
@@ -210,7 +204,7 @@ export async function quickDatabaseSetup(): Promise<{success: boolean; message: 
     console.error('Error en configuración rápida:', error);
     return {
       success: false,
-      message: `Error general: ${error.message}`,
+      message: `Error general: ${error instanceof Error ? error.message : 'Error desconocido'}`,
       details: results
     };
   }
@@ -250,7 +244,11 @@ export async function getBasicStats(): Promise<{
 export async function testEmailDelivery(): Promise<{success: boolean, message: string}> {
   try {
     const { notificationService } = await import('@/services/notificationService');
-    return await notificationService.probarConexion();
+    const result = await notificationService.probarConexion();
+    return {
+      success: result.success,
+      message: result.success ? '✅ Conexión de emails funcionando' : result.error || 'Error de conexión'
+    };
   } catch (error) {
     return {
       success: false,

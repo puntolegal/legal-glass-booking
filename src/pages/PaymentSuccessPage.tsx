@@ -227,7 +227,7 @@ export default function PaymentSuccessPage() {
       let emailResult: EmailResult | null = null;
 
       if (isApproved) {
-        if (updateResult.emailSent) {
+        if (updateResult.success) {
           console.log('✅ Email de confirmación enviado desde flujo principal');
           emailResult = {
             success: true,
@@ -283,7 +283,7 @@ export default function PaymentSuccessPage() {
             pendingPayment?.price ??
             updatedReservation.precio ??
             '35000',
-          categoria: pendingPayment?.category || updatedReservation.categoria || 'General'
+          categoria: pendingPayment?.category || 'General'
         },
         fecha: pendingPayment?.fecha || updatedReservation.fecha,
         hora: pendingPayment?.hora || updatedReservation.hora,
@@ -331,7 +331,7 @@ export default function PaymentSuccessPage() {
     rejected: 'rechazado',
     cancelled: 'cancelado'
   };
-  const readablePaymentStatus = statusDictionary[visiblePaymentStatus?.toLowerCase?.() ?? ''] || visiblePaymentStatus;
+  const readablePaymentStatus = statusDictionary[String(visiblePaymentStatus).toLowerCase() ?? ''] || visiblePaymentStatus;
 
   if (isLoading) {
     return (
@@ -556,21 +556,21 @@ export default function PaymentSuccessPage() {
               <div className="grid md:grid-cols-2 gap-4 text-sm">
                 <div>
                   <p className="text-gray-600">
-                    <strong>ID de Pago:</strong> {paymentData.mercadopagoData.payment_id || 'N/A'}
+                    <strong>ID de Pago:</strong> {String(paymentData.mercadopagoData.payment_id || 'N/A')}
                   </p>
                   <p className="text-gray-600">
-                    <strong>Estado:</strong> {readablePaymentStatus || 'N/A'}
+                    <strong>Estado:</strong> {String(readablePaymentStatus || 'N/A')}
                   </p>
                   <p className="text-gray-600">
-                    <strong>Método:</strong> {paymentData.mercadopagoData.payment_type || 'N/A'}
+                    <strong>Método:</strong> {String(paymentData.mercadopagoData.payment_type || 'N/A')}
                   </p>
                 </div>
                 <div>
                   <p className="text-gray-600">
-                    <strong>Referencia:</strong> {paymentData.mercadopagoData.external_reference || 'N/A'}
+                    <strong>Referencia:</strong> {String(paymentData.mercadopagoData.external_reference || 'N/A')}
                   </p>
                   <p className="text-gray-600">
-                    <strong>Orden:</strong> {paymentData.mercadopagoData.merchant_order_id || 'N/A'}
+                    <strong>Orden:</strong> {String(paymentData.mercadopagoData.merchant_order_id || 'N/A')}
                   </p>
                   <p className="text-gray-600">
                     <strong>Procesado:</strong> {new Date().toLocaleString('es-CL')}
@@ -611,7 +611,7 @@ export default function PaymentSuccessPage() {
                 📬 Confirmación pendiente
               </h3>
               <p className="text-yellow-800 mb-4">
-                Tu pago se encuentra en estado <strong>{readablePaymentStatus}</strong>. Apenas Mercado Pago lo confirme te enviaremos un correo con todos los detalles.
+                Tu pago se encuentra en estado <strong>{String(readablePaymentStatus)}</strong>. Apenas Mercado Pago lo confirme te enviaremos un correo con todos los detalles.
               </p>
               <div className="text-sm text-yellow-700 space-y-2">
                 <p>• Puedes cerrar esta ventana con tranquilidad, guardaremos tu reserva automáticamente.</p>

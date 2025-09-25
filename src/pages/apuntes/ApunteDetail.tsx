@@ -110,15 +110,13 @@ ${(foundApunte.related || []).map((concept: string) => `- [[${concept}]]`).join(
         title: cleanTitle(foundApunte.title),
         content: processedContent,
         category: foundApunte.category || 'general',
-        difficulty: (['básico', 'intermedio', 'avanzado'] as const).includes(foundApunte.difficulty) 
-          ? foundApunte.difficulty as 'básico' | 'intermedio' | 'avanzado'
-          : 'básico',
+        difficulty: (foundApunte.difficulty as 'básico' | 'intermedio' | 'avanzado') || 'básico',
         readTime: calculateReadTime(processedContent),
         lastModified: foundApunte.lastModified || foundApunte.date || new Date().toISOString(),
         slug: foundApunte.slug || slug,
         author: foundApunte.author || 'Punto Legal',
         concepts: foundApunte.related || foundApunte.links || [],
-        points: calculatePoints(processedContent),
+        points: calculatePoints(processedContent, foundApunte.difficulty || 'básico'),
         excerpt: foundApunte.excerpt,
         related: foundApunte.related || [],
         tags: foundApunte.tags || []
@@ -196,7 +194,7 @@ ${(foundApunte.related || []).map((concept: string) => `- [[${concept}]]`).join(
         slug: note.slug || note.title.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, ''),
         author: note.author || 'Punto Legal',
         concepts: note.related || [],
-        points: calculatePoints(note.content || note.excerpt || ''),
+        points: calculatePoints(note.content || note.excerpt || '', note.difficulty || 'básico'),
         excerpt: note.excerpt
       }));
 

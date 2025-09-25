@@ -416,10 +416,11 @@ function createCodeSection(): ParsedSection {
     id: generateId(),
     type: 'code',
     content: '',
-    importance: 'high', // Cambiado de 'low' a 'high' porque los esquemas son importantes
-    points: 15, // Aumentado de 5 a 15 porque son valiosos para el aprendizaje
+    cleanContent: '',
+    importance: 'high',
+    points: 15,
     concepts: [],
-    className: 'schema-section' // Clase especial para esquemas
+    className: 'schema-section'
   };
 }
 
