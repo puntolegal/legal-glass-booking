@@ -66,6 +66,8 @@ const sendEmailWithSupabase = async (emailData: {
       hora: new Date().toTimeString().split(' ')[0],
       created_at: new Date().toISOString()
     };
+
+    console.log('🔍 DEBUG: Datos enviados a Supabase Function:', realBookingData);
     
     const response = await fetch(`${SUPABASE_CREDENTIALS.URL}/functions/v1/send-resend-emails`, {
       method: 'POST',

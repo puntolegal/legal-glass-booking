@@ -50,6 +50,13 @@ serve(async (req) => {
     const adminHTML = generateAdminEmailHTML(bookingData)
 
     // Enviar email al cliente
+    console.log('📧 Enviando email al cliente:', bookingData.cliente_email)
+    console.log('📧 Datos del cliente:', {
+      nombre: bookingData.cliente_nombre,
+      email: bookingData.cliente_email,
+      servicio: bookingData.servicio_tipo
+    })
+    
     const clientResult = await sendEmailWithResend({
       from: MAIL_FROM,
       to: [bookingData.cliente_email],
@@ -57,17 +64,28 @@ serve(async (req) => {
       html: clientHTML
     })
 
+    console.log('✅ Email al cliente enviado:', clientResult.id)
+
     // Delay para evitar rate limit de Resend (2 requests per second)
     console.log('⏳ Esperando 1 segundo para evitar rate limit...')
     await new Promise(resolve => setTimeout(resolve, 1000))
 
     // Enviar email al admin
+    console.log('📧 Enviando email al admin:', ADMIN_EMAIL)
+    console.log('📧 Datos del admin:', {
+      nombre: bookingData.cliente_nombre,
+      email: bookingData.cliente_email,
+      servicio: bookingData.servicio_tipo
+    })
+    
     const adminResult = await sendEmailWithResend({
       from: MAIL_FROM,
       to: [ADMIN_EMAIL],
       subject: `🔔 Nueva reserva - ${bookingData.cliente_nombre} - ${bookingData.servicio_tipo}`,
       html: adminHTML
     })
+
+    console.log('✅ Email al admin enviado:', adminResult.id)
 
     console.log('✅ Emails enviados exitosamente')
     console.log('✅ Email al cliente:', clientResult.id)
