@@ -69,13 +69,13 @@ serve(async (req) => {
         }
       },
       back_urls: {
-        success: `https://puntolegal.online/payment-success?source=mercadopago`,
-        failure: `https://puntolegal.online/payment-failure?source=mercadopago`,
-        pending: `https://puntolegal.online/payment-pending?source=mercadopago`
+        success: `https://www.puntolegal.online/payment-success?source=mercadopago`,
+        failure: `https://www.puntolegal.online/payment-failure?source=mercadopago`,
+        pending: `https://www.puntolegal.online/payment-pending?source=mercadopago`
       },
       auto_return: 'approved', // Auto-return for approved payments
       external_reference: paymentData.external_reference || `PL-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      notification_url: `https://puntolegal.online/api/mercadopago/webhook`,
+      notification_url: `https://www.puntolegal.online/api/mercadopago/webhook`,
       metadata: {
         client_name: paymentData.name,
         client_email: paymentData.email,
