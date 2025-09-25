@@ -75,12 +75,12 @@ const MobileMercadoPagoButton: React.FC<MobileMercadoPagoButtonProps> = ({
 
       console.log('📤 Creando preferencia con backend Supabase...');
       const result = await createCheckoutPreference(preferenceData);
-      console.log('✅ Preferencia creada:', result.id);
+      console.log('✅ Preferencia creada:', result.preference_id);
 
       // Guardar datos del pago
       localStorage.setItem('paymentData', JSON.stringify({
         ...paymentData,
-        preferenceId: result.id,
+        preferenceId: result.preference_id,
         timestamp: Date.now(),
         method: 'mercadopago_mobile_direct'
       }));

@@ -67,7 +67,7 @@ const MercadoPagoCheckoutPro: React.FC<CheckoutProProps> = ({
         notification_url: `${window.location.origin}/api/mercadopago/webhook`
       });
 
-      setPreferenceId(preference.id);
+      setPreferenceId(preference.preference_id);
       setCheckoutUrl(preference.sandbox_init_point || preference.init_point);
       
     } catch (err: any) {

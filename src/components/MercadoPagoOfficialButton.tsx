@@ -206,18 +206,18 @@ const MercadoPagoOfficialButton: React.FC<MercadoPagoOfficialButtonProps> = ({
       console.log('🔍 back_urls en preferenceData:', preferenceData.back_urls);
       
       const result = await createCheckoutPreference(preferenceData);
-      console.log('✅ Preferencia oficial creada:', result.id);
+      console.log('✅ Preferencia oficial creada:', result.preference_id);
       
       const storedPaymentData: PendingPaymentData = {
         ...paymentDataForStorage,
-        preferenceId: result.id ?? null
+        preferenceId: result.preference_id ?? null
       };
       localStorage.setItem('paymentData', JSON.stringify(storedPaymentData));
 
       // Guardar datos del pago
       localStorage.setItem('pendingPayment', JSON.stringify({
         ...paymentData,
-        preferenceId: result.id,
+        preferenceId: result.preference_id,
         timestamp: Date.now(),
         method: 'mercadopago_official'
       }));
