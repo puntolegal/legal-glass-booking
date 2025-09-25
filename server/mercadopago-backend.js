@@ -9,7 +9,7 @@ const app = express();
 const PORT = 3001;
 
 // Credenciales oficiales de producción
-const MERCADOPAGO_ACCESS_TOKEN = 'APP_USR-57706641806639-091313-aa2444bdca1b521ca4540fb1fc1c2dcb-2683873567';
+const MERCADOPAGO_ACCESS_TOKEN = process.env.MERCADOPAGO_ACCESS_TOKEN || 'APP_USR-7407359076060108-092318-7fb22dd54bc0d3e4a42accab058e8a3e-229698947';
 
 // Middleware
 app.use(cors());

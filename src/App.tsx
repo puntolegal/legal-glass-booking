@@ -13,6 +13,7 @@ import ErrorBoundary from '@/components/ErrorBoundary';
 import PageTransition from '@/components/PageTransition';
 import AccessibilityPanel from '@/components/AccessibilityPanel';
 import { MobileLayout } from '@/components/MobileLayout';
+import ConfigDebugger from '@/components/ConfigDebugger';
 import { useLocation } from 'react-router-dom';
 
 // Pages
@@ -194,6 +195,7 @@ function App() {
                 <Router>
                   <LayoutWrapper />
                   <AccessibilityPanel />
+                  <ConfigDebugger />
                 </Router>
               </SidebarProvider>
             </ConceptNavigationProvider>

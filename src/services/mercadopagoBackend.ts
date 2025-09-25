@@ -1,5 +1,5 @@
-// Simulación de backend para MercadoPago
-// En producción, estos endpoints deberían estar en un servidor Node.js/Python
+// Backend para MercadoPago
+// Usa el servidor Node.js local para crear preferencias de forma segura
 
 import { MERCADOPAGO_CONFIG } from '@/config/mercadopago';
 import { updatePaymentStatus, type PaymentStatusUpdate } from './supabaseBooking';
@@ -43,6 +43,126 @@ interface MercadoPagoWebhookNotification {
 export const createCheckoutPreference = async (preferenceData: CreatePreferenceRequest) => {
   try {
     console.log('🚀 Creando preferencia de Checkout Pro (oficial):', preferenceData);
+    
+    // Determinar si usar backend local o función de Supabase
+    const isProduction = import.meta.env.PROD;
+    const useSupabaseFunction = isProduction;
+    
+    if (useSupabaseFunction) {
+      console.log('🌐 Usando función de Supabase para producción');
+      return await createPreferenceWithSupabase(preferenceData);
+    } else {
+      console.log('🏠 Usando backend local para desarrollo');
+      return await createPreferenceWithLocalBackend(preferenceData);
+    }
+  } catch (error) {
+    console.error('❌ Error creando preferencia:', error);
+    throw new Error(`Error al crear la preferencia de pago: ${error instanceof Error ? error.message : 'Error desconocido'}`);
+  }
+};
+
+// Función para usar Supabase Functions (producción)
+const createPreferenceWithSupabase = async (preferenceData: CreatePreferenceRequest) => {
+  try {
+    // Preparar datos para la función de Supabase
+    const paymentData = {
+      service: preferenceData.items[0]?.title || 'Consulta Legal',
+      description: preferenceData.items[0]?.title || 'Consulta Legal',
+      price: preferenceData.items[0]?.unit_price || 0,
+      name: preferenceData.payer.name,
+      email: preferenceData.payer.email,
+      phone: preferenceData.payer.phone?.number || '',
+      date: preferenceData.metadata?.appointment_date || '',
+      time: preferenceData.metadata?.appointment_time || '',
+      external_reference: preferenceData.external_reference
+    };
+    
+    // Llamada a la función de Supabase
+    const response = await fetch('https://qrgelocijmwnxcckxbdg.supabase.co/functions/v1/create-mercadopago-preference', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`
+      },
+      body: JSON.stringify({ paymentData })
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error('❌ Error de Supabase Function:', errorData);
+      throw new Error(`Supabase Function Error: ${errorData.error || 'Error desconocido'}`);
+    }
+    
+    const result = await response.json();
+    
+    console.log('✅ Preferencia creada exitosamente:', result.preference_id);
+    console.log('🔗 Init Point:', result.init_point);
+    
+    return {
+      success: true,
+      preference_id: result.preference_id,
+      init_point: result.init_point,
+      sandbox_init_point: result.sandbox_init_point
+    };
+    
+  } catch (error) {
+    console.error('❌ Error con Supabase Function:', error);
+    throw error;
+  }
+};
+
+// Función para usar backend local (desarrollo)
+const createPreferenceWithLocalBackend = async (preferenceData: CreatePreferenceRequest) => {
+  try {
+    // Preparar datos para el backend local
+    const paymentData = {
+      service: preferenceData.items[0]?.title || 'Consulta Legal',
+      description: preferenceData.items[0]?.title || 'Consulta Legal',
+      price: preferenceData.items[0]?.unit_price || 0,
+      name: preferenceData.payer.name,
+      email: preferenceData.payer.email,
+      phone: preferenceData.payer.phone?.number || '',
+      date: preferenceData.metadata?.appointment_date || '',
+      time: preferenceData.metadata?.appointment_time || '',
+      external_reference: preferenceData.external_reference
+    };
+    
+    // Llamada al backend local
+    const response = await fetch('http://localhost:3001/create-preference', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ paymentData })
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error('❌ Error del backend local:', errorData);
+      throw new Error(`Backend Error: ${errorData.error || 'Error desconocido'}`);
+    }
+    
+    const result = await response.json();
+    
+    console.log('✅ Preferencia creada exitosamente:', result.preference_id);
+    console.log('🔗 Init Point:', result.init_point);
+    
+    return {
+      success: true,
+      preference_id: result.preference_id,
+      init_point: result.init_point,
+      sandbox_init_point: result.sandbox_init_point
+    };
+    
+  } catch (error) {
+    console.error('❌ Error con backend local:', error);
+    throw error;
+  }
+};
+
+// Función original (mantener para compatibilidad)
+const createPreferenceOriginal = async (preferenceData: CreatePreferenceRequest) => {
+  try {
     
     // Configuración de preferencia según documentación oficial
     const preference = {

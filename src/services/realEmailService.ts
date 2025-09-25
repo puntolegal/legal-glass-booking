@@ -47,10 +47,17 @@ const sendEmailWithResend = async (emailData: {
       subject: emailData.subject
     });
 
-    // Obtener API key de Resend desde variables de entorno
-    const RESEND_API_KEY = import.meta.env.VITE_RESEND_API_KEY;
+    // Importar configuración de Resend
+    const { RESEND_CONFIG, isResendConfigured } = await import('@/config/resendConfig');
     
-    if (!RESEND_API_KEY) {
+    console.log('🔍 Resend Config Debug:', {
+      apiKey: RESEND_CONFIG.apiKey ? 'Configurado' : 'No configurado',
+      isConfigured: isResendConfigured(),
+      from: RESEND_CONFIG.from,
+      adminEmail: RESEND_CONFIG.adminEmail
+    });
+    
+    if (!isResendConfigured()) {
       console.warn('⚠️ RESEND_API_KEY no configurada, simulando envío');
       return {
         id: `email_sim_${Date.now()}`,
@@ -59,12 +66,14 @@ const sendEmailWithResend = async (emailData: {
         created_at: new Date().toISOString()
       };
     }
+    
+    console.log('✅ Resend configurado correctamente, enviando email real');
 
     // Llamada real a Resend API
     const response = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${RESEND_API_KEY}`,
+        'Authorization': `Bearer ${RESEND_CONFIG.apiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
