@@ -127,15 +127,9 @@ export const createBookingWithRealEmail = async (
       created_at: reservaResult.reserva.created_at
     };
 
-    // 3. Enviar emails REALES de confirmación
-    console.log('📧 Enviando emails REALES de confirmación...');
-    const emailResult = await sendRealBookingEmails(emailData);
-    
-    if (emailResult.success) {
-      console.log('✅ Emails enviados exitosamente');
-    } else {
-      console.warn('⚠️ Error enviando emails, pero reserva creada:', emailResult.error);
-    }
+    // 3. NO enviar emails aquí - se enviarán cuando se confirme el pago
+    console.log('📦 Reserva creada en Supabase:', reservaResult.reserva.id);
+    console.log('📧 Emails se enviarán cuando se confirme el pago');
 
     // 4. Note: email_enviado field removed as it doesn't exist in database schema
 
