@@ -139,6 +139,8 @@ const MercadoPagoOfficialButton: React.FC<MercadoPagoOfficialButtonProps> = ({
         originalPrice: getMetadataNumber('precio_original'),
         fecha: getMetadataString('appointment_date', new Date().toISOString().split('T')[0])!,
         hora: getMetadataString('appointment_time', '10:00')!,
+        date: getMetadataString('appointment_date', new Date().toISOString().split('T')[0])!, // For compatibility
+        time: getMetadataString('appointment_time', '10:00')!, // For compatibility
         tipo_reunion: getMetadataString('meeting_type', 'online') || 'online',
         codigoConvenio: getMetadataString('codigo_convenio') || null,
         descuentoConvenio: getMetadataBoolean('descuento_convenio'),

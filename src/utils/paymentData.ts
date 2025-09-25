@@ -66,6 +66,8 @@ export const parsePendingPaymentData = (rawData: string): PendingPaymentData => 
     originalPrice,
     fecha: toStringValue(parsed.fecha) ?? new Date().toISOString().split('T')[0],
     hora: toStringValue(parsed.hora) ?? '10:00',
+    date: toStringValue(parsed.fecha) ?? new Date().toISOString().split('T')[0], // For compatibility
+    time: toStringValue(parsed.hora) ?? '10:00', // For compatibility
     tipo_reunion: toStringValue(parsed.tipo_reunion) ?? 'online',
     codigoConvenio: parsed.codigoConvenio ? String(parsed.codigoConvenio) : null,
     descuentoConvenio: typeof parsed.descuentoConvenio === 'boolean' ? parsed.descuentoConvenio : false,

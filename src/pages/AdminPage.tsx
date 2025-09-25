@@ -60,7 +60,10 @@ const AdminPage = () => {
       if (reservationsError) throw reservationsError;
 
       setUsers(usersData || []);
-      setReservations((reservationsData as Reserva[]) || []);
+      setReservations(reservationsData?.map(r => ({
+        ...r,
+        precio: String(r.precio || '0')
+      })) as any[] || []);
     } catch (error) {
       console.error('Error fetching data:', error);
       toast.error('Error al cargar los datos');

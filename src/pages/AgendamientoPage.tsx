@@ -622,6 +622,8 @@ export default function AgendamientoPage() {
                             originalPrice: originalPriceValue,
                             fecha: selectedDate,
                             hora: selectedTime,
+                            date: selectedDate, // For compatibility
+                            time: selectedTime, // For compatibility
                             tipo_reunion: selectedMeetingType,
                             codigoConvenio: formData.codigoConvenio || null,
                             descuentoConvenio: isConvenioValido,

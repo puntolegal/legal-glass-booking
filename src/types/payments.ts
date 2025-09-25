@@ -13,6 +13,8 @@ export interface PendingPaymentData {
   originalPrice?: number | null;
   fecha: string;
   hora: string;
+  date: string; // For compatibility
+  time: string; // For compatibility
   tipo_reunion: string;
   codigoConvenio?: string | null;
   descuentoConvenio?: boolean;

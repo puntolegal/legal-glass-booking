@@ -17,15 +17,10 @@ const mapDatabaseToReserva = (data: any): Reserva => ({
   fecha: data.fecha,
   hora: data.hora,
   descripcion: data.descripcion,
-  pago_metodo: null, // No existe en la tabla actual
-  pago_estado: null, // No existe en la tabla actual
-  pago_id: null, // No existe en la tabla actual
-  pago_monto: null, // No existe en la tabla actual
   tipo_reunion: data.tipo_reunion,
   external_reference: null, // No existe en la tabla actual
   preference_id: null, // No existe en la tabla actual
   estado: data.estado,
-  email_enviado: false, // No existe en la tabla actual
   recordatorio_enviado: data.recordatorio_enviado || false,
   created_at: data.created_at || new Date().toISOString(),
   updated_at: data.updated_at || new Date().toISOString()
@@ -65,15 +60,11 @@ export interface Reserva {
   telefono: string;
   rut: string | null;
   servicio: string;
-  precio: string | number;
+  precio: string;
   categoria?: string | null;
   fecha: string;
   hora: string;
   descripcion?: string | null;
-  pago_metodo: string | null;
-  pago_estado: string | null;
-  pago_id?: string | null;
-  pago_monto?: number | null;
   tipo_reunion?: string | null;
   external_reference?: string | null;
   preference_id?: string | null;
@@ -119,11 +110,9 @@ export const createBookingWithEmails = async (bookingData: BookingData): Promise
       email: reservaResult.reserva.email,
       telefono: reservaResult.reserva.telefono,
       servicio: reservaResult.reserva.servicio,
-      precio: reservaResult.reserva.precio,
+      precio: String(reservaResult.reserva.precio),
       fecha: reservaResult.reserva.fecha,
       hora: reservaResult.reserva.hora,
-      pago_metodo: reservaResult.reserva.pago_metodo,
-      pago_estado: reservaResult.reserva.pago_estado,
       created_at: reservaResult.reserva.created_at
     };
 
@@ -137,15 +126,7 @@ export const createBookingWithEmails = async (bookingData: BookingData): Promise
       console.warn('⚠️ Error enviando emails, pero reserva creada:', emailResult.error);
     }
 
-    // 4. Actualizar el estado de email_enviado en la reserva
-    try {
-      await supabase
-        .from('reservas')
-        .update({ email_enviado: emailResult.success })
-        .eq('id', reservaResult.reserva.id);
-    } catch (updateError) {
-      console.warn('⚠️ Error actualizando estado de email:', updateError);
-    }
+    // Note: email_enviado field removed as it doesn't exist in database schema
 
     return {
       success: true,
@@ -246,10 +227,6 @@ const createOfflineReserva = (bookingData: BookingData): { success: boolean; res
       tipo_reunion: bookingData.servicio.tipoReunion || null,
       fecha: bookingData.servicio.fecha,
       hora: bookingData.servicio.hora,
-      pago_metodo: bookingData.pago?.metodo || 'pendiente',
-      pago_estado: bookingData.pago?.estado || 'pendiente',
-      pago_id: bookingData.pago?.id,
-      pago_monto: bookingData.pago?.monto,
       descripcion:
         bookingData.descripcion ||
         bookingData.motivoConsulta ||
@@ -257,7 +234,6 @@ const createOfflineReserva = (bookingData: BookingData): { success: boolean; res
         bookingData.servicio.descripcion ||
         null,
       estado: 'pendiente',
-      email_enviado: false,
       recordatorio_enviado: false,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString()
@@ -410,9 +386,7 @@ const sendPaymentConfirmationEmail = async (reserva: Reserva) => {
     
     // Marcar email como enviado
     await supabase
-      .from('reservas')
-      .update({ email_enviado: true })
-      .eq('id', reserva.id);
+    // Note: email_enviado field removed as it doesn't exist in database schema
 
   } catch (error) {
     console.error('❌ Error en confirmación de pago:', error);

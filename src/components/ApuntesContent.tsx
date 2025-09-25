@@ -599,7 +599,7 @@ function renderEnhancedSection(
                     className="flex items-center space-x-1 px-2 py-1 bg-blue-100 dark:bg-blue-900/30 hover:bg-blue-200 dark:hover:bg-blue-800/40 rounded-md transition-colors text-blue-700 dark:text-blue-300"
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    onClick={() => handleSectionView(section.id, section.points)}
+                    onClick={() => console.log('Section marked as studied:', section.id)}
                   >
                     <Eye className="w-3 h-3" />
                     <span>Marcar como estudiado</span>

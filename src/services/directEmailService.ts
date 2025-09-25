@@ -109,7 +109,7 @@ const sendClientEmail = async (bookingData: BookingEmailData, config: any): Prom
     }
   } catch (error) {
     console.error('❌ Error enviando email al cliente:', error);
-    return { success: false, error: error.message };
+    return { success: false, error: error.message, message: error.message || 'Error desconocido' };
   }
 };
 
@@ -153,7 +153,7 @@ const sendAdminEmail = async (bookingData: BookingEmailData, config: any): Promi
     }
   } catch (error) {
     console.error('❌ Error enviando email al admin:', error);
-    return { success: false, error: error.message };
+    return { success: false, error: error.message, message: error.message || 'Error desconocido' };
   }
 };
 

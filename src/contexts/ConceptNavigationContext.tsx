@@ -6,6 +6,7 @@ interface NavigationStep {
   title: string;
   timestamp: number;
   sourceNote?: string;
+  source?: string; // For compatibility
 }
 
 // Interfaz del contexto

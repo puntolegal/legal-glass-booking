@@ -131,7 +131,17 @@ class MercadoPagoService {
       const { processPayment } = await import('@/api/mercadopago');
       const paymentResponse = await processPayment(paymentPayload);
       
-      return paymentResponse;
+      return {
+        id: paymentResponse.id,
+        status: paymentResponse.status,
+        transaction_amount: paymentResponse.transaction_amount,
+        payment_method: {
+          id: paymentResponse.payment_method_id || 'unknown',
+          type: paymentResponse.payment_type_id || 'unknown'
+        },
+        date_created: paymentResponse.date_created,
+        detail: paymentResponse.detail || 'Pago procesado'
+      };
 
     } catch (error) {
       console.error('❌ Error procesando pago:', error);
