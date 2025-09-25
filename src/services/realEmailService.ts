@@ -50,7 +50,19 @@ const sendEmailWithSupabase = async (emailData: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${SUPABASE_CREDENTIALS.PUBLISHABLE_KEY}`
       },
-      body: JSON.stringify({ emailData })
+      body: JSON.stringify({ 
+        bookingData: {
+          id: `email_${Date.now()}`,
+          cliente_nombre: 'Cliente',
+          cliente_email: emailData.to[0],
+          cliente_telefono: '',
+          servicio_tipo: 'Consulta Legal',
+          servicio_precio: '0',
+          fecha: new Date().toISOString().split('T')[0],
+          hora: new Date().toTimeString().split(' ')[0],
+          created_at: new Date().toISOString()
+        }
+      })
     });
 
     if (!response.ok) {
@@ -59,10 +71,10 @@ const sendEmailWithSupabase = async (emailData: {
     }
 
     const result = await response.json();
-    console.log('✅ Email enviado exitosamente con Supabase Function:', result.emailId);
+    console.log('✅ Email enviado exitosamente con Supabase Function:', result);
     
     return {
-      id: result.emailId,
+      id: result.clientEmail?.id || `email_${Date.now()}`,
       from: emailData.from,
       to: emailData.to[0],
       created_at: new Date().toISOString()
