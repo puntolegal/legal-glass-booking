@@ -44,7 +44,7 @@ const sendEmailWithSupabase = async (emailData: {
     // Usar la configuración centralizada de Supabase
     const { SUPABASE_CREDENTIALS } = await import('@/config/supabaseConfig');
     
-    const response = await fetch(`${SUPABASE_CREDENTIALS.URL}/functions/v1/send-email`, {
+    const response = await fetch(`${SUPABASE_CREDENTIALS.URL}/functions/v1/send-resend-emails`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
