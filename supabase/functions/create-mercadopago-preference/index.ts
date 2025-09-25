@@ -19,6 +19,9 @@ serve(async (req) => {
 
   try {
     console.log('🚀 Función create-mercadopago-preference iniciada');
+    console.log('🔍 Headers recibidos:', Object.fromEntries(req.headers.entries()));
+    console.log('🔍 Método:', req.method);
+    console.log('🔍 URL:', req.url);
     
     // Obtener credenciales de MercadoPago
     // Usar EDGE_ADMIN_TOKEN como fallback para MercadoPago

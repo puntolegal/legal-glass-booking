@@ -85,11 +85,12 @@ const createPreferenceWithSupabase = async (preferenceData: CreatePreferenceRequ
     };
     
     // Llamada a la función de Supabase
-    const response = await fetch('https://qrgelocijmwnxcckxbdg.supabase.co/functions/v1/create-mercadopago-preference', {
+    const { SUPABASE_CREDENTIALS } = await import('@/config/supabaseConfig');
+    const response = await fetch(`${SUPABASE_CREDENTIALS.URL}/functions/v1/create-mercadopago-preference`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`
+        'Authorization': `Bearer ${SUPABASE_CREDENTIALS.PUBLISHABLE_KEY}`
       },
       body: JSON.stringify({ paymentData })
     });
