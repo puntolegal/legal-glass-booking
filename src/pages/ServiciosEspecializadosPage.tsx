@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Scale, ScrollText, Users, FileText, Heart, MapPin } from 'lucide-react';
 import SEO from '../components/SEO';
 import Header from '../components/Header';
-import MobileLayout from '../components/MobileLayout';
+import { MobileLayout } from '../components/MobileLayout';
 import ServiceCard from '../components/ServiceCard';
 import ReservationForm from '../components/ReservationForm';
 

@@ -18,6 +18,7 @@ export interface PaymentResponse {
   transactionId?: string;
   message: string;
   redirectUrl?: string;
+  error?: string;
 }
 
 export type PaymentMethod = 'webpay' | 'transfer' | 'paypal';
@@ -52,7 +53,8 @@ export class PaymentService {
       console.error('Error en WebPay:', error);
       return {
         success: false,
-        message: 'Error al procesar el pago con WebPay'
+        message: 'Error al procesar el pago con WebPay',
+        error: 'Error al procesar el pago con WebPay'
       };
     }
   }
@@ -75,7 +77,8 @@ export class PaymentService {
       console.error('Error en transferencia bancaria:', error);
       return {
         success: false,
-        message: 'Error al procesar la transferencia bancaria'
+        message: 'Error al procesar la transferencia bancaria',
+        error: 'Error al procesar la transferencia bancaria'
       };
     }
   }
@@ -98,7 +101,8 @@ export class PaymentService {
       console.error('Error en PayPal:', error);
       return {
         success: false,
-        message: 'Error al procesar el pago con PayPal'
+        message: 'Error al procesar el pago con PayPal',
+        error: 'Error al procesar el pago con PayPal'
       };
     }
   }
@@ -115,7 +119,8 @@ export class PaymentService {
       default:
         return {
           success: false,
-          message: 'Método de pago no válido'
+          message: 'Método de pago no válido',
+          error: 'Método de pago no válido'
         };
   }
 }
@@ -211,3 +216,41 @@ export class PaymentService {
 }
 
 export default PaymentService.getInstance(); 
+
+// Hook for React components
+import { useState } from 'react';
+
+export const usePayment = () => {
+  const [isProcessing, setIsProcessing] = useState(false);
+  const paymentService = PaymentService.getInstance();
+
+  const processPayment = async (method: PaymentMethod, amount: number, description: string) => {
+    setIsProcessing(true);
+    try {
+      const paymentData: PaymentData = {
+        service: { id: 'generic', name: description, price: amount },
+        customer: {
+          firstName: 'Cliente',
+          lastName: 'Test',
+          email: 'test@example.com',
+          phone: '+56912345678',
+          rut: '12345678-9'
+        },
+        amount,
+        currency: 'CLP'
+      } as any;
+
+      const result = await paymentService.processPayment(paymentData, method);
+      return result;
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  return {
+    processPayment,
+    isProcessing,
+    validateCustomerData: paymentService.validateCustomerData.bind(paymentService),
+    getAvailablePaymentMethods: paymentService.getAvailablePaymentMethods.bind(paymentService)
+  };
+};
