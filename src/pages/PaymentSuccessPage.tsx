@@ -34,7 +34,7 @@ const extractStringFromEmailResult = (result: EmailResult | null, keys: string[]
   if (!result) {
     return undefined;
   }
-  const bag = result as Record<string, unknown>;
+  const bag = result as unknown as Record<string, unknown>;
   for (const key of keys) {
     const value = bag[key];
     if (typeof value === 'string' && value.trim().length > 0) {
@@ -135,7 +135,7 @@ export default function PaymentSuccessPage() {
       // Intentar primero por preference_id si viene en el retorno
       if (!reserva && mercadopagoData.preference_id) {
         setProcessingStatus('Buscando reserva por preference_id...');
-        const result = await findReservaByCriteria({ preferenceId: mercadopagoData.preference_id });
+        const result = await findReservaByCriteria({ preference_id: mercadopagoData.preference_id });
         if (result.success && result.reserva) {
           reserva = result.reserva;
         }
@@ -144,7 +144,7 @@ export default function PaymentSuccessPage() {
       // Luego intentar por external_reference si está presente
       if (!reserva && mercadopagoData.external_reference) {
         setProcessingStatus('Buscando reserva por external_reference...');
-        const result = await findReservaByCriteria({ externalReference: mercadopagoData.external_reference });
+        const result = await findReservaByCriteria({ external_reference: mercadopagoData.external_reference });
         if (result.success && result.reserva) {
           reserva = result.reserva;
         }
@@ -153,7 +153,7 @@ export default function PaymentSuccessPage() {
       // Finalmente, probar por IDs candidatos (localStorage, etc.)
       for (const candidateId of candidateReservationIds) {
         setProcessingStatus(`Verificando reserva ${candidateId}...`);
-        const result = await findReservaByCriteria({ reservationId: candidateId });
+        const result = await findReservaByCriteria({ email: candidateId });
         if (result.success && result.reserva) {
           reserva = result.reserva;
           break;
@@ -162,7 +162,7 @@ export default function PaymentSuccessPage() {
 
       if (!reserva && paymentIdFromUrl) {
         setProcessingStatus('Buscando reserva por ID de pago...');
-        const result = await findReservaByCriteria({ pagoId: paymentIdFromUrl });
+        const result = await findReservaByCriteria({ email: paymentIdFromUrl });
         if (result.success && result.reserva) {
           reserva = result.reserva;
         }
@@ -196,8 +196,7 @@ export default function PaymentSuccessPage() {
         (mpPayment && parseAmount(mpPayment.transaction_amount)) ??
         parseAmount(pendingPayment?.price) ??
         parseAmount(pendingPayment?.priceFormatted) ??
-        parseAmount(reserva.precio) ??
-        (typeof reserva.pago_monto === 'number' ? reserva.pago_monto : undefined);
+        parseAmount(reserva.precio);
 
       const currencyFormatter = new Intl.NumberFormat('es-CL');
       const fallbackReservationAmount = parseAmount(reserva.precio);
@@ -214,9 +213,6 @@ export default function PaymentSuccessPage() {
       const updateResult = await updatePaymentStatus(reserva.id, {
         estado: normalizedStatus || mercadopagoData.status || 'pending',
         id: paymentIdFromUrl || undefined,
-        metodo: (mpPayment?.payment_method_id || mercadopagoData.payment_type || reserva.pago_metodo || 'mercadopago') as string,
-        tipo: (mpPayment?.payment_type_id || mercadopagoData.payment_type || undefined) as string,
-        monto: paymentAmount,
         externalReference: (mpPayment?.external_reference || mercadopagoData.external_reference || reserva.external_reference || reserva.id) as string,
         preferenceId: (mpPayment?.preference_id || mpPayment?.order?.id || mercadopagoData.preference_id || reserva.preference_id || undefined) as string
       });
@@ -225,7 +221,7 @@ export default function PaymentSuccessPage() {
         throw new Error(updateResult.error || 'No se pudo actualizar el estado del pago.');
       }
 
-      const updatedReservation = updateResult.reserva ?? reserva;
+      const updatedReservation = reserva;
       const isApproved = normalizedStatus === 'approved';
 
       let emailResult: EmailResult | null = null;

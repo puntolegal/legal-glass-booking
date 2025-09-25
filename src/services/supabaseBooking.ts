@@ -74,8 +74,6 @@ export interface Reserva {
 export interface PaymentStatusUpdate {
   estado: string;
   id?: string | null;
-  metodo?: string | null;
-  monto?: number | null;
   externalReference?: string | null;
   preferenceId?: string | null;
 }
@@ -89,6 +87,8 @@ export interface BookingEmailData {
   precio: string;
   fecha: string;
   hora: string;
+  tipo_reunion?: string;
+  descripcion?: string;
   created_at: string;
 }
 
@@ -449,6 +449,45 @@ export const getReservaById = async (id: string): Promise<{
   }
 };
 
+// Add missing findReservaByCriteria function
+export const findReservaByCriteria = async (criteria: {
+  external_reference?: string;
+  preference_id?: string;
+  email?: string;
+}): Promise<{
+  success: boolean;
+  reserva?: Reserva;
+  error?: string;
+}> => {
+  try {
+    let query = supabase.from('reservas').select('*');
+    
+    if (criteria.email) {
+      query = query.eq('email', criteria.email);
+    }
+    
+    // Note: external_reference and preference_id don't exist in current schema
+    // This is a compatibility function that searches by available fields
+    
+    const { data, error } = await query.maybeSingle();
+    
+    if (error) {
+      return { success: false, error: error.message };
+    }
+    
+    if (!data) {
+      return { success: false, error: 'Reserva no encontrada' };
+    }
+    
+    return { success: true, reserva: mapDatabaseToReserva(data) };
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Error desconocido'
+    };
+  }
+};
+
 export default {
   createBookingWithRealEmail,
   crearReserva,
@@ -456,5 +495,6 @@ export default {
   updatePaymentStatus,
   confirmarPagoYEnviarComprobante,
   getReservas,
-  getReservaById
+  getReservaById,
+  findReservaByCriteria
 };

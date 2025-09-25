@@ -24,7 +24,7 @@ import SEO from '../components/SEO';
 import WeeklyDatePicker from '../components/WeeklyDatePicker';
 import BankTransferCard3D from '../components/BankTransferCard3D';
 import ServiceIcon from '../components/ServiceIcon';
-import { createBookingWithEmails, type BookingData } from '@/services/supabaseBooking';
+import { createBookingWithRealEmail, type BookingData } from '@/services/supabaseBooking';
 import { createOfflineBookingWithEmail, type OfflineBookingData } from '@/services/offlineBooking';
 import { sendRealBookingEmails, type BookingEmailData } from '@/services/realEmailService';
 import type { PendingPaymentData } from '@/types/payments';
@@ -662,7 +662,7 @@ export default function AgendamientoPage() {
                             const isSupabaseAvailable = await checkSupabaseConnection();
                             
                             if (isSupabaseAvailable) {
-                              const result = await createBookingWithEmails(bookingData);
+                              const result = await createBookingWithRealEmail(bookingData);
                               if (result.success) {
                             localStorage.setItem('paymentData', JSON.stringify({
                               ...paymentData,

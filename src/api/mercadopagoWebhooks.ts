@@ -203,7 +203,7 @@ const handleApprovedPayment = async (paymentInfo: any) => {
     
     if (paymentInfo.external_reference) {
       const result = await findReservaByCriteria({ 
-        externalReference: paymentInfo.external_reference 
+        external_reference: paymentInfo.external_reference 
       });
       reserva = result.reserva;
     }
@@ -223,19 +223,12 @@ const handleApprovedPayment = async (paymentInfo: any) => {
       const updateResult = await updatePaymentStatus(reserva.id, {
         estado: paymentInfo.status || 'approved',
         id: paymentInfo.id,
-        metodo: paymentInfo.payment_method_id || 'mercadopago',
-        tipo: paymentInfo.payment_type_id,
-        monto: paymentInfo.transaction_amount,
         externalReference: paymentInfo.external_reference || reserva.id,
-        preferenceId: paymentInfo.order?.id || paymentInfo.preference_id || paymentInfo.metadata?.preference_id || null,
-        statusDetail: paymentInfo.status_detail
+        preferenceId: paymentInfo.order?.id || paymentInfo.preference_id || paymentInfo.metadata?.preference_id || null
       });
 
       if (updateResult.success) {
-        console.log('✅ Reserva actualizada correctamente', {
-          emailSent: updateResult.emailSent,
-          alreadyConfirmed: updateResult.alreadyConfirmed
-        });
+        console.log('✅ Reserva actualizada correctamente');
       } else {
         console.error('❌ Error actualizando reserva:', updateResult.error);
       }
@@ -268,13 +261,8 @@ const handlePendingPayment = async (paymentInfo: any) => {
 
     if (paymentInfo.external_reference) {
       const result = await findReservaByCriteria({
-        externalReference: paymentInfo.external_reference
+        external_reference: paymentInfo.external_reference
       });
-      reserva = result.reserva;
-    }
-
-    if (!reserva && paymentInfo.id) {
-      const result = await findReservaByCriteria({ pagoId: paymentInfo.id });
       reserva = result.reserva;
     }
 
@@ -287,12 +275,8 @@ const handlePendingPayment = async (paymentInfo: any) => {
       await updatePaymentStatus(reserva.id, {
         estado: paymentInfo.status || 'pending',
         id: paymentInfo.id,
-        metodo: paymentInfo.payment_method_id || 'mercadopago',
-        tipo: paymentInfo.payment_type_id,
-        monto: paymentInfo.transaction_amount,
         externalReference: paymentInfo.external_reference || reserva.id,
-        preferenceId: paymentInfo.order?.id || paymentInfo.preference_id || paymentInfo.metadata?.preference_id || null,
-        statusDetail: paymentInfo.status_detail
+        preferenceId: paymentInfo.order?.id || paymentInfo.preference_id || paymentInfo.metadata?.preference_id || null
       });
     }
   } catch (error) {
@@ -309,13 +293,8 @@ const handleRejectedPayment = async (paymentInfo: any) => {
 
     if (paymentInfo.external_reference) {
       const result = await findReservaByCriteria({
-        externalReference: paymentInfo.external_reference
+        external_reference: paymentInfo.external_reference
       });
-      reserva = result.reserva;
-    }
-
-    if (!reserva && paymentInfo.id) {
-      const result = await findReservaByCriteria({ pagoId: paymentInfo.id });
       reserva = result.reserva;
     }
 
@@ -328,12 +307,8 @@ const handleRejectedPayment = async (paymentInfo: any) => {
       await updatePaymentStatus(reserva.id, {
         estado: paymentInfo.status || 'rejected',
         id: paymentInfo.id,
-        metodo: paymentInfo.payment_method_id || 'mercadopago',
-        tipo: paymentInfo.payment_type_id,
-        monto: paymentInfo.transaction_amount,
         externalReference: paymentInfo.external_reference || reserva.id,
-        preferenceId: paymentInfo.order?.id || paymentInfo.preference_id || paymentInfo.metadata?.preference_id || null,
-        statusDetail: paymentInfo.status_detail
+        preferenceId: paymentInfo.order?.id || paymentInfo.preference_id || paymentInfo.metadata?.preference_id || null
       });
     }
   } catch (error) {

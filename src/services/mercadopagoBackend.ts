@@ -294,12 +294,8 @@ export const handlePaymentNotification = async (notification: MercadoPagoWebhook
         const paymentUpdate: PaymentStatusUpdate = {
           estado: paymentInfo.status,
           id: paymentInfo.id?.toString() ?? notification.data.id,
-          metodo: paymentInfo.payment_method?.id || paymentInfo.payment_method_id || paymentInfo.payment_type_id,
-          tipo: paymentInfo.payment_type_id || undefined,
-          monto: paymentInfo.transaction_amount,
           externalReference: paymentInfo.external_reference ?? null,
-          preferenceId: paymentInfo.preference_id ?? null,
-          statusDetail: paymentInfo.status_detail ?? null
+          preferenceId: paymentInfo.preference_id ?? null
         };
 
         await updatePaymentStatus(reservaId, paymentUpdate);
