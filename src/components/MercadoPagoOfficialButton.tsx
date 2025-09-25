@@ -202,9 +202,9 @@ const MercadoPagoOfficialButton: React.FC<MercadoPagoOfficialButtonProps> = ({
       
       // Usar URLs absolutas válidas para MercadoPago
       const backUrls = {
-        success: `https://puntolegal.online/payment-success?source=mercadopago`,
-        failure: `https://puntolegal.online/payment-failure?source=mercadopago`,
-        pending: `https://puntolegal.online/payment-pending?source=mercadopago`
+        success: `https://www.puntolegal.online/payment-success?source=mercadopago`,
+        failure: `https://www.puntolegal.online/payment-failure?source=mercadopago`,
+        pending: `https://www.puntolegal.online/payment-pending?source=mercadopago`
       };
       
       console.log('back_urls configuradas:', backUrls);
@@ -226,7 +226,7 @@ const MercadoPagoOfficialButton: React.FC<MercadoPagoOfficialButtonProps> = ({
         back_urls: backUrls,
         auto_return: 'approved' as const,
         external_reference: reservation.id,
-        notification_url: `https://puntolegal.online/api/mercadopago/webhook`,
+        notification_url: `https://www.puntolegal.online/api/mercadopago/webhook`,
         metadata: {
           reservation_id: reservation.id,
           service_name: getMetadataString('service_name', paymentData.description),
