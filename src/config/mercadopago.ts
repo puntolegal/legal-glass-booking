@@ -14,9 +14,9 @@ export const MERCADOPAGO_CONFIG = {
   
   // URLs de retorno actualizadas para producción
   urls: {
-    success: `https://puntolegal.online/payment-success`,
-    failure: `https://puntolegal.online/payment-failure`,
-    pending: `https://puntolegal.online/payment-pending`
+    success: `https://www.puntolegal.online/payment-success`,
+    failure: `https://www.puntolegal.online/payment-failure`,
+    pending: `https://www.puntolegal.online/payment-pending`
   },
   
   // Configuración de la empresa
@@ -36,7 +36,7 @@ export const MERCADOPAGO_CONFIG = {
   
   // Configuración de notificaciones
   notifications: {
-    webhookUrl: `https://puntolegal.online/api/mercadopago/webhook`
+    webhookUrl: `https://www.puntolegal.online/api/mercadopago/webhook`
   }
 };
 
