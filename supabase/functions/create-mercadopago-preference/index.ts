@@ -17,10 +17,10 @@ serve(async (req) => {
 
   try {
     // Obtener credenciales de MercadoPago
-    const MERCADOPAGO_ACCESS_TOKEN = Deno.env.get('MERCADOPAGO_ACCESS_TOKEN') || 'APP_USR-7407359076060108-092318-7fb22dd54bc0d3e4a42accab058e8a3e-229698947'
+    const MERCADOPAGO_ACCESS_TOKEN = Deno.env.get('MERCADOPAGO_ACCESS_TOKEN') || Deno.env.get('VITE_MERCADOPAGO_ACCESS_TOKEN') || 'APP_USR-7407359076060108-092318-7fb22dd54bc0d3e4a42accab058e8a3e-229698947'
     
     if (!MERCADOPAGO_ACCESS_TOKEN) {
-      throw new Error('MERCADOPAGO_ACCESS_TOKEN no configurado')
+      throw new Error('MERCADOPAGO_ACCESS_TOKEN o VITE_MERCADOPAGO_ACCESS_TOKEN no configurado')
     }
 
     // Obtener datos del request

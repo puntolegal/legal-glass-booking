@@ -19,10 +19,10 @@ serve(async (req) => {
     }
 
     // Get Resend API Key from Supabase environment variables
-    const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY');
+    const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY') || Deno.env.get('VITE_RESEND_API_KEY');
 
     if (!RESEND_API_KEY) {
-      throw new Error('RESEND_API_KEY no está configurado en las variables de entorno de Supabase.');
+      throw new Error('RESEND_API_KEY o VITE_RESEND_API_KEY no está configurado en las variables de entorno de Supabase.');
     }
 
     // Llamada a Resend API desde el servidor
