@@ -150,7 +150,8 @@ const sendEmailWithResend = async (emailData: {
     console.log('✅ Resend configurado correctamente, enviando email real');
 
     // Determinar si usar Supabase Function o envío directo
-    const isProduction = import.meta.env.PROD;
+    // En producción siempre usar Supabase Function para evitar CORS
+    const isProduction = import.meta.env.PROD || window.location.hostname === 'puntolegal.online';
     
     if (isProduction) {
       console.log('🌐 Usando función de Supabase para envío de emails');
