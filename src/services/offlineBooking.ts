@@ -163,15 +163,36 @@ export const simulateEmailSend = (booking: OfflineBookingData): Promise<boolean>
   });
 };
 
-// Función principal para crear reserva offline con simulación de email
+// Función principal para crear reserva offline con envío real de emails
 export const createOfflineBookingWithEmail = async (bookingData: Omit<OfflineBookingData, 'id' | 'created_at' | 'updated_at'>): Promise<OfflineBookingData> => {
   try {
     // Guardar la reserva
     const newBooking = saveOfflineBooking(bookingData);
     
-    // Simular envío de emails (cliente y admin)
-    await simulateEmailSend(newBooking);
-    await simulateAdminNotification(newBooking);
+    // Enviar emails REALES (cliente y admin)
+    try {
+      const { sendRealBookingEmails } = await import('@/services/realEmailService');
+      const emailData = {
+        id: newBooking.id,
+        nombre: newBooking.nombre,
+        email: newBooking.email,
+        telefono: newBooking.telefono,
+        servicio: newBooking.servicio,
+        precio: String(newBooking.precio),
+        fecha: newBooking.fecha,
+        hora: newBooking.hora,
+        created_at: newBooking.created_at
+      };
+      
+      console.log('📧 Enviando emails REALES para reserva offline:', newBooking.id);
+      await sendRealBookingEmails(emailData);
+      console.log('✅ Emails enviados exitosamente para reserva offline');
+    } catch (emailError) {
+      console.error('❌ Error enviando emails reales, usando simulación:', emailError);
+      // Fallback a simulación si falla el envío real
+      await simulateEmailSend(newBooking);
+      await simulateAdminNotification(newBooking);
+    }
     
     // Actualizar estado para indicar que el email fue "enviado"
     const updatedBooking = updateOfflineBooking(newBooking.id, {

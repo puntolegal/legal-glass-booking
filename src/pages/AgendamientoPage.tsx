@@ -691,25 +691,8 @@ export default function AgendamientoPage() {
                               
                               const offlineResult = await createOfflineBookingWithEmail(offlineBookingData);
                               
-                              try {
-                                const emailData: BookingEmailData = {
-                                  id: offlineResult.id,
-                                  nombre: offlineResult.nombre,
-                                  email: offlineResult.email,
-                                  telefono: offlineResult.telefono,
-                                  cliente_empresa: offlineResult.cliente_empresa,
-                                  servicio: offlineResult.servicio,
-                                  precio: offlineResult.precio,
-                                  fecha: offlineResult.fecha,
-                                  hora: offlineResult.hora,
-                                  tipo_reunion: offlineResult.tipo_reunion,
-                                  descripcion: offlineResult.descripcion,
-                                  created_at: offlineResult.created_at
-                                };
-                                await sendRealBookingEmails(emailData);
-                              } catch (emailError) {
-                                console.error('Error enviando emails:', emailError);
-                              }
+                              // Los emails ya se envían automáticamente en createOfflineBookingWithEmail
+                              // No es necesario enviarlos manualmente aquí
 
                               localStorage.setItem('paymentData', JSON.stringify({
                                 ...paymentData,
