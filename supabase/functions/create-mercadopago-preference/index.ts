@@ -16,9 +16,13 @@ serve(async (req) => {
   }
 
   try {
+    console.log('🚀 Función create-mercadopago-preference iniciada');
+    
     // Obtener credenciales de MercadoPago
     // Usar EDGE_ADMIN_TOKEN como fallback para MercadoPago
     const MERCADOPAGO_ACCESS_TOKEN = Deno.env.get('EDGE_ADMIN_TOKEN') || 'APP_USR-7407359076060108-092318-7fb22dd54bc0d3e4a42accab058e8a3e-229698947'
+    
+    console.log('🔑 MercadoPago Access Token:', MERCADOPAGO_ACCESS_TOKEN ? 'Configurado' : 'No configurado');
     
     if (!MERCADOPAGO_ACCESS_TOKEN) {
       throw new Error('EDGE_ADMIN_TOKEN no configurado para MercadoPago')
@@ -26,6 +30,8 @@ serve(async (req) => {
 
     // Obtener datos del request
     const { paymentData } = await req.json()
+    
+    console.log('📋 Datos de pago recibidos:', paymentData);
     
     if (!paymentData) {
       return new Response(

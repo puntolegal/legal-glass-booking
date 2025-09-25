@@ -45,8 +45,15 @@ export const createCheckoutPreference = async (preferenceData: CreatePreferenceR
     console.log('🚀 Creando preferencia de Checkout Pro (oficial):', preferenceData);
     
     // Determinar si usar backend local o función de Supabase
-    const isProduction = import.meta.env.PROD;
+    const isProduction = import.meta.env.PROD || window.location.hostname === 'puntolegal.online';
     const useSupabaseFunction = isProduction;
+    
+    console.log('🔍 DEBUG MercadoPago Backend:', {
+      'import.meta.env.PROD': import.meta.env.PROD,
+      'window.location.hostname': window.location.hostname,
+      'isProduction': isProduction,
+      'useSupabaseFunction': useSupabaseFunction
+    });
     
     if (useSupabaseFunction) {
       console.log('🌐 Usando función de Supabase para producción');
