@@ -39,10 +39,33 @@ const sendEmailWithSupabase = async (emailData: {
   to: string[];
   subject: string;
   html: string;
-}): Promise<any> => {
+}, bookingData?: BookingEmailData): Promise<any> => {
   try {
     // Usar la configuración centralizada de Supabase
     const { SUPABASE_CREDENTIALS } = await import('@/config/supabaseConfig');
+    
+    // Usar datos reales si están disponibles, sino datos genéricos
+    const realBookingData = bookingData ? {
+      id: bookingData.id,
+      cliente_nombre: bookingData.nombre,
+      cliente_email: bookingData.email,
+      cliente_telefono: bookingData.telefono || '',
+      servicio_tipo: bookingData.servicio,
+      servicio_precio: bookingData.precio,
+      fecha: bookingData.fecha,
+      hora: bookingData.hora,
+      created_at: bookingData.created_at
+    } : {
+      id: `email_${Date.now()}`,
+      cliente_nombre: 'Cliente',
+      cliente_email: emailData.to[0],
+      cliente_telefono: '',
+      servicio_tipo: 'Consulta Legal',
+      servicio_precio: '0',
+      fecha: new Date().toISOString().split('T')[0],
+      hora: new Date().toTimeString().split(' ')[0],
+      created_at: new Date().toISOString()
+    };
     
     const response = await fetch(`${SUPABASE_CREDENTIALS.URL}/functions/v1/send-resend-emails`, {
       method: 'POST',
@@ -51,17 +74,7 @@ const sendEmailWithSupabase = async (emailData: {
         'Authorization': `Bearer ${SUPABASE_CREDENTIALS.PUBLISHABLE_KEY}`
       },
       body: JSON.stringify({ 
-        bookingData: {
-          id: `email_${Date.now()}`,
-          cliente_nombre: 'Cliente',
-          cliente_email: emailData.to[0],
-          cliente_telefono: '',
-          servicio_tipo: 'Consulta Legal',
-          servicio_precio: '0',
-          fecha: new Date().toISOString().split('T')[0],
-          hora: new Date().toTimeString().split(' ')[0],
-          created_at: new Date().toISOString()
-        }
+        bookingData: realBookingData
       })
     });
 
@@ -138,7 +151,7 @@ const sendEmailWithResend = async (emailData: {
   to: string[];
   subject: string;
   html: string;
-}): Promise<any> => {
+}, bookingData?: BookingEmailData): Promise<any> => {
   try {
     console.log('📧 Enviando email real con Resend:', {
       from: emailData.from,
@@ -181,7 +194,7 @@ const sendEmailWithResend = async (emailData: {
     if (isProduction) {
       console.log('🌐 Usando función de Supabase para envío de emails');
       try {
-        return await sendEmailWithSupabase(emailData);
+        return await sendEmailWithSupabase(emailData, bookingData);
       } catch (error) {
         console.warn('⚠️ Error con Supabase Function, usando fallback:', error);
         // Fallback: simular envío exitoso en producción
@@ -678,14 +691,14 @@ export const sendRealBookingEmails = async (bookingData: BookingEmailData): Prom
       to: [bookingData.email],
       subject: `✅ Confirmación de tu cita - ${bookingData.servicio} - Punto Legal`,
       html: clientHTML
-    });
+    }, bookingData);
 
     const adminResult = await sendEmailWithResend({
       from: 'Punto Legal <team@puntolegal.online>',
       to: ['puntolegalelgolf@gmail.com'],
       subject: `🔔 Nueva reserva - ${bookingData.nombre} - ${bookingData.servicio}`,
       html: adminHTML
-    });
+    }, bookingData);
 
     console.log('✅ Emails REALES enviados exitosamente');
     console.log('✅ Email al cliente:', clientResult.id);
