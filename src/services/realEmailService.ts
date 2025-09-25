@@ -32,6 +32,86 @@ export interface EmailResult {
 const RESEND_API_URL = 'https://api.resend.com/emails';
 
 /**
+ * Enviar email usando Supabase Function (producción)
+ */
+const sendEmailWithSupabase = async (emailData: {
+  from: string;
+  to: string[];
+  subject: string;
+  html: string;
+}): Promise<any> => {
+  try {
+    const response = await fetch('https://qrgelocijmwnxcckxbdg.supabase.co/functions/v1/send-email', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`
+      },
+      body: JSON.stringify({ emailData })
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(`Supabase Function Error: ${errorData.error || 'Error desconocido'}`);
+    }
+
+    const result = await response.json();
+    console.log('✅ Email enviado exitosamente con Supabase Function:', result.emailId);
+    
+    return {
+      id: result.emailId,
+      from: emailData.from,
+      to: emailData.to[0],
+      created_at: new Date().toISOString()
+    };
+
+  } catch (error) {
+    console.error('❌ Error con Supabase Function:', error);
+    throw error;
+  }
+};
+
+/**
+ * Enviar email directamente (desarrollo)
+ */
+const sendEmailDirect = async (emailData: {
+  from: string;
+  to: string[];
+  subject: string;
+  html: string;
+}): Promise<any> => {
+  try {
+    const response = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${RESEND_CONFIG.apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        from: emailData.from,
+        to: emailData.to,
+        subject: emailData.subject,
+        html: emailData.html,
+      }),
+    });
+
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(`Resend error ${response.status}: ${error}`);
+    }
+
+    const result = await response.json();
+    console.log('✅ Email enviado exitosamente con Resend directo:', result.id);
+    
+    return result;
+
+  } catch (error) {
+    console.error('❌ Error con envío directo:', error);
+    throw error;
+  }
+};
+
+/**
  * Función para enviar email usando Resend API
  */
 const sendEmailWithResend = async (emailData: {
@@ -69,30 +149,16 @@ const sendEmailWithResend = async (emailData: {
     
     console.log('✅ Resend configurado correctamente, enviando email real');
 
-    // Llamada real a Resend API
-    const response = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${RESEND_CONFIG.apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        from: emailData.from,
-        to: emailData.to,
-        subject: emailData.subject,
-        html: emailData.html,
-      }),
-    });
-
-    if (!response.ok) {
-      const error = await response.text();
-      throw new Error(`Resend error ${response.status}: ${error}`);
-    }
-
-    const result = await response.json();
-    console.log('✅ Email enviado exitosamente con Resend:', result.id);
+    // Determinar si usar Supabase Function o envío directo
+    const isProduction = import.meta.env.PROD;
     
-    return result;
+    if (isProduction) {
+      console.log('🌐 Usando función de Supabase para envío de emails');
+      return await sendEmailWithSupabase(emailData);
+    } else {
+      console.log('🏠 Usando envío directo para desarrollo');
+      return await sendEmailDirect(emailData);
+    }
   } catch (error) {
     console.error('❌ Error enviando email con Resend:', error);
     
