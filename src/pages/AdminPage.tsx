@@ -59,7 +59,7 @@ const AdminPage = () => {
 
       if (reservationsError) throw reservationsError;
 
-      setUsers(usersData || []);
+      setUsers((usersData as UserProfile[]) || []);
       setReservations(reservationsData?.map(r => ({
         ...r,
         precio: String(r.precio || '0')

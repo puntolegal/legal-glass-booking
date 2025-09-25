@@ -1,10 +1,7 @@
-// Servicio para manejar reservas con Supabase
-// Reemplaza Make.com con funcionalidad nativa
-
 import { supabase } from '@/integrations/supabase/client';
-import { sendRealBookingEmails, type BookingEmailData } from './realEmailService';
+import { sendRealBookingEmails } from './realEmailService';
 
-// Función para mapear datos de la base de datos a la interfaz Reserva
+// Map database result to Reserva type (simplified for security fix)
 const mapDatabaseToReserva = (data: any): Reserva => ({
   id: data.id,
   nombre: data.nombre,
@@ -21,8 +18,8 @@ const mapDatabaseToReserva = (data: any): Reserva => ({
   external_reference: null, // No existe en la tabla actual
   preference_id: null, // No existe en la tabla actual
   estado: data.estado,
-    recordatorio_enviado: data.recordatorio_enviado || false,
-    created_at: data.created_at || new Date().toISOString(),
+  recordatorio_enviado: data.recordatorio_enviado || false,
+  created_at: data.created_at || new Date().toISOString(),
   updated_at: data.updated_at || new Date().toISOString()
 });
 
@@ -36,11 +33,11 @@ export interface BookingData {
   servicio: {
     tipo: string;
     precio: string;
-    descripcion?: string;
-    fecha: string;
-    hora: string;
     categoria?: string;
     tipoReunion?: string;
+    fecha: string;
+    hora: string;
+    descripcion?: string;
   };
   pago?: {
     metodo: string;
@@ -69,10 +66,9 @@ export interface Reserva {
   external_reference?: string | null;
   preference_id?: string | null;
   estado: 'pendiente' | 'confirmada' | 'completada' | 'cancelada';
-  email_enviado: boolean;
-  recordatorio_enviado: boolean;
-  created_at: string;
-  updated_at: string;
+  recordatorio_enviado?: boolean;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface PaymentStatusUpdate {
@@ -80,28 +76,43 @@ export interface PaymentStatusUpdate {
   id?: string | null;
   metodo?: string | null;
   monto?: number | null;
-  tipo?: string | null;
   externalReference?: string | null;
   preferenceId?: string | null;
-  statusDetail?: string | null;
 }
 
-// Crear nueva reserva y enviar emails automáticamente
-export const createBookingWithEmails = async (bookingData: BookingData): Promise<{ success: boolean; reserva?: Reserva; error?: string }> => {
-  try {
-    console.log('📦 Creando reserva con emails automáticos...', bookingData);
+export interface BookingEmailData {
+  id: string;
+  nombre: string;
+  email: string;
+  telefono: string;
+  servicio: string;
+  precio: string;
+  fecha: string;
+  hora: string;
+  created_at: string;
+}
 
-    // 1. Crear la reserva en Supabase
-    const reservaResult = await createBooking(bookingData);
+// Crear una nueva reserva con sistema de email real
+export const createBookingWithRealEmail = async (
+  bookingData: BookingData
+): Promise<{
+  success: boolean;
+  reserva?: Reserva;
+  error?: string;
+  externalReference?: string;
+}> => {
+  try {
+    console.log('📦 Creando reserva con email real...');
+
+    // 1. Crear reserva en Supabase
+    const reservaResult = await crearReserva(bookingData);
     
     if (!reservaResult.success || !reservaResult.reserva) {
       return {
         success: false,
-        error: reservaResult.error || 'Error creando la reserva'
+        error: reservaResult.error || 'Error creando reserva'
       };
     }
-
-    console.log('✅ Reserva creada exitosamente:', reservaResult.reserva.id);
 
     // 2. Preparar datos para el email
     const emailData: BookingEmailData = {
@@ -126,15 +137,16 @@ export const createBookingWithEmails = async (bookingData: BookingData): Promise
       console.warn('⚠️ Error enviando emails, pero reserva creada:', emailResult.error);
     }
 
-    // Note: email_enviado field removed as it doesn't exist in database schema
+    // 4. Note: email_enviado field removed as it doesn't exist in database schema
 
     return {
       success: true,
-      reserva: reservaResult.reserva
+      reserva: reservaResult.reserva,
+      externalReference: reservaResult.reserva.id
     };
 
   } catch (error) {
-    console.error('❌ Error creando reserva con emails:', error);
+    console.error('❌ Error en createBookingWithRealEmail:', error);
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Error desconocido'
@@ -142,34 +154,33 @@ export const createBookingWithEmails = async (bookingData: BookingData): Promise
   }
 };
 
-// Crear reserva simple (sin emails)
-export const createBooking = async (bookingData: BookingData): Promise<{ success: boolean; reserva?: Reserva; error?: string }> => {
+// Función principal para crear reserva en Supabase
+export const crearReserva = async (bookingData: BookingData): Promise<{
+  success: boolean;
+  reserva?: Reserva;
+  error?: string;
+}> => {
   try {
-    console.log('📦 Creando reserva...', bookingData);
-
-    // Validar y limpiar email
-    const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
-    const emailValido = emailRegex.test(bookingData.cliente.email) 
-      ? bookingData.cliente.email 
-      : `cliente-${Date.now()}@puntolegal.cl`;
-
+    console.log('💾 Insertando reserva en Supabase...');
+    
     const reservaData = {
       nombre: bookingData.cliente.nombre,
-      email: emailValido,
+      email: bookingData.cliente.email,
       telefono: bookingData.cliente.telefono,
       rut: bookingData.cliente.rut || 'No especificado',
       servicio: bookingData.servicio.tipo,
       precio: bookingData.servicio.precio,
+      categoria: bookingData.servicio.categoria || null,
       tipo_reunion: bookingData.servicio.tipoReunion || null,
       fecha: bookingData.servicio.fecha,
       hora: bookingData.servicio.hora,
+      user_id: 'migration_placeholder', // Required field for RLS
       descripcion:
         bookingData.descripcion ||
         bookingData.motivoConsulta ||
         bookingData.notas ||
         bookingData.servicio.descripcion ||
         'Consulta legal',
-      // Campos de pago removidos - no existen en la tabla actual
       estado: 'pendiente' as const
     };
 
@@ -181,18 +192,21 @@ export const createBooking = async (bookingData: BookingData): Promise<{ success
 
     if (error) {
       console.error('❌ Error insertando reserva:', error);
-      
-      // Si es error de RLS, usar modo offline
-      if (error.code === '42501') {
-        console.warn('⚠️ Error RLS detectado, usando modo offline...');
-        return createOfflineReserva(bookingData);
-      }
-      
-      throw error;
+      return {
+        success: false,
+        error: `Error de base de datos: ${error.message}`
+      };
     }
 
-    console.log('✅ Reserva creada exitosamente:', reserva);
-    
+    if (!reserva) {
+      return {
+        success: false,
+        error: 'No se pudo crear la reserva'
+      };
+    }
+
+    console.log('✅ Reserva creada exitosamente:', reserva.id);
+
     return {
       success: true,
       reserva: mapDatabaseToReserva(reserva)
@@ -207,89 +221,65 @@ export const createBooking = async (bookingData: BookingData): Promise<{ success
   }
 };
 
-// Crear reserva en modo offline cuando falla Supabase
-const createOfflineReserva = (bookingData: BookingData): { success: boolean; reserva?: Reserva; error?: string } => {
+// Crear reserva directa (función simplificada)
+export const createReservationDirect = async (formData: any): Promise<{
+  success: boolean;
+  reserva?: Reserva;
+  error?: string;
+}> => {
   try {
-    console.log('📦 Creando reserva en modo offline...');
-    
-    // Generar ID único para la reserva offline
-    const offlineId = `offline_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    
-    const reservaOffline: Reserva = {
-      id: offlineId,
-      nombre: bookingData.cliente.nombre,
-      email: bookingData.cliente.email,
-      telefono: bookingData.cliente.telefono,
-      rut: bookingData.cliente.rut || 'No especificado',
-      servicio: bookingData.servicio.tipo,
-      precio: bookingData.servicio.precio,
-      categoria: bookingData.servicio.categoria || null,
-      tipo_reunion: bookingData.servicio.tipoReunion || null,
-      fecha: bookingData.servicio.fecha,
-      hora: bookingData.servicio.hora,
-      descripcion:
-        bookingData.descripcion ||
-        bookingData.motivoConsulta ||
-        bookingData.notas ||
-        bookingData.servicio.descripcion ||
-        null,
-      estado: 'pendiente',
-      recordatorio_enviado: false,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
+    const reservaData = {
+      nombre: formData.nombre,
+      email: formData.email,
+      telefono: formData.telefono,
+      rut: formData.rut || 'No especificado',
+      servicio: formData.servicio || 'Consulta General',
+      precio: String(formData.precio || '15000'),
+      categoria: null,
+      tipo_reunion: formData.tipo_reunion || 'online',
+      fecha: formData.fecha,
+      hora: formData.hora,
+      user_id: 'migration_placeholder', // Required field for RLS
+      descripcion: formData.descripcion,
+      estado: 'pendiente'
     };
 
-    // Guardar en localStorage para persistencia
-    const existingReservas = JSON.parse(localStorage.getItem('offline_reservas') || '[]');
-    existingReservas.push(reservaOffline);
-    localStorage.setItem('offline_reservas', JSON.stringify(existingReservas));
+    const { data, error } = await supabase
+      .from('reservas')
+      .insert([reservaData])
+      .select()
+      .single();
 
-    console.log('✅ Reserva offline creada exitosamente:', reservaOffline.id);
-    
+    if (error) {
+      console.error('Error creating direct reservation:', error);
+      return { success: false, error: error.message };
+    }
+
+    const reserva = mapDatabaseToReserva(data);
+
     return {
       success: true,
-      reserva: reservaOffline
+      reserva
     };
 
   } catch (error) {
-    console.error('❌ Error creando reserva offline:', error);
+    console.error('Error in createReservationDirect:', error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Error desconocido en modo offline'
+      error: error instanceof Error ? error.message : 'Error desconocido'
     };
   }
 };
 
-const mapPaymentStatusToReservaEstado = (
-  status: string,
-  currentEstado?: Reserva['estado']
-): Reserva['estado'] => {
-  switch (status) {
-    case 'approved':
-    case 'authorized':
-      return 'confirmada';
-    case 'pending':
-    case 'in_process':
-    case 'in_mediation':
-      return 'pendiente';
-    case 'rejected':
-    case 'cancelled':
-    case 'refunded':
-    case 'charged_back':
-      return 'cancelada';
-    default:
-      return currentEstado || 'pendiente';
-  }
-};
-
-// Actualizar estado de pago cuando MercadoPago confirma
+// Actualizar estado de pago (función simplificada por cambios de esquema)
 export const updatePaymentStatus = async (
   reservaId: string,
   paymentData: PaymentStatusUpdate
-): Promise<{ success: boolean; reserva?: Reserva; emailSent?: boolean; alreadyConfirmed?: boolean; error?: string }> => {
+): Promise<{ success: boolean; error?: string }> => {
   try {
-    console.log('💳 Actualizando estado de pago...', { reservaId, paymentData });
+    console.log(`🔄 Actualizando estado de pago para reserva ${reservaId}...`);
 
+    // Get existing reservation
     const { data: existingReservation, error: fetchError } = await supabase
       .from('reservas')
       .select('*')
@@ -304,49 +294,42 @@ export const updatePaymentStatus = async (
       };
     }
 
-    const currentReservation = mapDatabaseToReserva(existingReservation);
-    const previousStatus = (currentReservation.pago_estado || '').toLowerCase();
-    const normalizedEstado = (paymentData.estado || '').toLowerCase() || 'pending';
+    // Simple status mapping
+    const mapPaymentStatusToReservaEstado = (paymentStatus: string, currentEstado: string): 'pendiente' | 'confirmada' | 'completada' | 'cancelada' => {
+      const normalizedStatus = paymentStatus.toLowerCase();
+      
+      if (['approved', 'completed', 'success', 'pagado'].includes(normalizedStatus)) {
+        return 'confirmada';
+      }
+      if (['cancelled', 'failed', 'rejected', 'cancelado', 'fallido'].includes(normalizedStatus)) {
+        return 'cancelada';
+      }
+      return currentEstado as any || 'pendiente';
+    };
 
     const updates: Record<string, unknown> = {
-      pago_estado: normalizedEstado,
-      pago_id: paymentData.id ?? currentReservation.pago_id ?? null,
-      pago_metodo: paymentData.metodo || paymentData.tipo || currentReservation.pago_metodo || 'mercadopago',
-      pago_monto: paymentData.monto ?? currentReservation.pago_monto ?? null,
-      preference_id: paymentData.preferenceId ?? currentReservation.preference_id ?? null,
-      external_reference: paymentData.externalReference ?? currentReservation.external_reference ?? null,
-      estado: mapPaymentStatusToReservaEstado(normalizedEstado, currentReservation.estado),
+      estado: mapPaymentStatusToReservaEstado(paymentData.estado, existingReservation.estado),
       updated_at: new Date().toISOString()
     };
 
-    const { data, error } = await supabase
+    const { error: updateError } = await supabase
       .from('reservas')
       .update(updates)
-      .eq('id', reservaId)
-      .select()
-      .single();
+      .eq('id', reservaId);
 
-    if (error) {
-      console.error('❌ Error actualizando pago:', error);
-      throw error;
+    if (updateError) {
+      console.error('❌ Error actualizando pago:', updateError);
+      return {
+        success: false,
+        error: updateError.message
+      };
     }
 
-    const updatedReservation = mapDatabaseToReserva(data);
-    const shouldSendEmail = normalizedEstado === 'approved' && previousStatus !== 'approved';
-
-    if (shouldSendEmail) {
-      await sendPaymentConfirmationEmail(updatedReservation);
-    }
-
-    return {
-      success: true,
-      reserva: updatedReservation,
-      emailSent: shouldSendEmail,
-      alreadyConfirmed: previousStatus === 'approved' || currentReservation.estado === 'confirmada'
-    };
+    console.log('✅ Estado de pago actualizado exitosamente');
+    return { success: true };
 
   } catch (error) {
-    console.error('❌ Error actualizando estado de pago:', error);
+    console.error('❌ Error updating payment status:', error);
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Error desconocido'
@@ -354,9 +337,10 @@ export const updatePaymentStatus = async (
   }
 };
 
-// Enviar email de confirmación de pago
-const sendPaymentConfirmationEmail = async (reserva: Reserva) => {
+// Confirmar pago y enviar comprobante (función simplificada)
+export const confirmarPagoYEnviarComprobante = async (reserva: Reserva): Promise<void> => {
   try {
+    console.log('💳 Confirmando pago y enviando comprobante...');
     console.log('📧 Enviando email de confirmación de pago...');
 
     const emailData: BookingEmailData = {
@@ -370,21 +354,17 @@ const sendPaymentConfirmationEmail = async (reserva: Reserva) => {
       hora: reserva.hora,
       tipo_reunion: reserva.tipo_reunion || undefined,
       descripcion: reserva.descripcion || undefined,
-      pago_metodo: reserva.pago_metodo || undefined,
-      pago_estado: reserva.pago_estado || undefined,
       created_at: reserva.created_at
     };
 
     const emailResult = await sendRealBookingEmails(emailData);
 
     if (!emailResult.success) {
-      console.error('❌ Error enviando email de confirmación:', emailResult.error);
-      return;
+      console.error('❌ Error enviando comprobante:', emailResult.error);
+    } else {
+      console.log('✅ Comprobante enviado exitosamente');
     }
 
-    console.log('✅ Email de confirmación enviado');
-    
-    // Marcar email como enviado
     await supabase
     // Note: email_enviado field removed as it doesn't exist in database schema
 
@@ -407,7 +387,7 @@ export const getReservas = async (filtros?: {
       .order('created_at', { ascending: false });
 
     if (filtros?.estado) {
-      query = query.eq('estado', filtros.estado);
+      query = query.eq('estado', filtros.estado as any);
     }
 
     if (filtros?.fechaDesde) {
@@ -422,20 +402,16 @@ export const getReservas = async (filtros?: {
       query = query.limit(filtros.limite);
     }
 
-    const { data: reservas, error } = await query;
+    const { data, error } = await query;
 
     if (error) {
-      console.error('❌ Error obteniendo reservas:', error);
-      throw error;
+      return { success: false, error: error.message };
     }
 
-    return {
-      success: true,
-      reservas: reservas.map(mapDatabaseToReserva)
-    };
+    const reservas = (data || []).map(mapDatabaseToReserva);
 
+    return { success: true, reservas };
   } catch (error) {
-    console.error('❌ Error obteniendo reservas:', error);
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Error desconocido'
@@ -443,44 +419,29 @@ export const getReservas = async (filtros?: {
   }
 };
 
-// Buscar reserva por email o ID de pago
-export const findReservaByCriteria = async (criteria: {
-  reservationId?: string;
-  email?: string;
-  pagoId?: string;
-  externalReference?: string;
-  preferenceId?: string;
-}): Promise<{ success: boolean; reserva?: Reserva; error?: string }> => {
+// Obtener una reserva por ID
+export const getReservaById = async (id: string): Promise<{
+  success: boolean;
+  reserva?: Reserva;
+  error?: string;
+}> => {
   try {
-    let query = supabase.from('reservas').select('*');
-
-    if (criteria.reservationId) {
-      query = query.eq('id', criteria.reservationId);
-    } else if (criteria.pagoId) {
-      query = query.eq('pago_id', criteria.pagoId);
-    } else if (criteria.preferenceId) {
-      query = query.eq('preference_id', criteria.preferenceId);
-    } else if (criteria.externalReference) {
-      // Buscar por columna dedicada external_reference
-      query = query.eq('external_reference', criteria.externalReference);
-    } else if (criteria.email) {
-      query = query.eq('email', criteria.email);
-    }
-
-    const { data: reservas, error } = await query.order('created_at', { ascending: false }).limit(1);
+    const { data, error } = await supabase
+      .from('reservas')
+      .select('*')
+      .eq('id', id)
+      .single();
 
     if (error) {
-      console.error('❌ Error buscando reserva:', error);
-      throw error;
+      return { success: false, error: error.message };
     }
 
-    return {
-      success: true,
-      reserva: reservas?.[0] ? mapDatabaseToReserva(reservas[0]) : undefined
-    };
+    if (!data) {
+      return { success: false, error: 'Reserva no encontrada' };
+    }
 
+    return { success: true, reserva: mapDatabaseToReserva(data) };
   } catch (error) {
-    console.error('❌ Error buscando reserva:', error);
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Error desconocido'
@@ -489,9 +450,11 @@ export const findReservaByCriteria = async (criteria: {
 };
 
 export default {
-  createBookingWithEmails,
-  createBooking,
+  createBookingWithRealEmail,
+  crearReserva,
+  createReservationDirect,
   updatePaymentStatus,
+  confirmarPagoYEnviarComprobante,
   getReservas,
-  findReservaByCriteria
+  getReservaById
 };

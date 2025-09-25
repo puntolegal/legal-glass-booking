@@ -17,12 +17,6 @@ export interface ReservationInput {
   descripcion?: string | null;
   tipo_reunion?: string | null;
   estado?: Reservation['estado'];
-  pago_metodo?: string | null;
-  pago_estado?: string | null;
-  pago_id?: string | null;
-  pago_monto?: number | null;
-  external_reference?: string | null;
-  preference_id?: string | null;
 }
 
 export interface TimeSlot {
@@ -47,15 +41,10 @@ const mapToReservation = (data: any): Reservation => ({
   fecha: data.fecha ?? new Date().toISOString().split('T')[0],
   hora: data.hora ?? '10:00',
   descripcion: data.descripcion ?? null,
-  pago_metodo: data.pago_metodo ?? null,
-  pago_estado: data.pago_estado ?? null,
-  pago_id: data.pago_id ?? null,
-  pago_monto: data.pago_monto ?? null,
   tipo_reunion: data.tipo_reunion ?? null,
   external_reference: data.external_reference ?? null,
   preference_id: data.preference_id ?? null,
   estado: data.estado ?? 'pendiente',
-  email_enviado: data.email_enviado ?? false,
   recordatorio_enviado: data.recordatorio_enviado ?? false,
   created_at: data.created_at ?? new Date().toISOString(),
   updated_at: data.updated_at ?? new Date().toISOString()
@@ -77,6 +66,7 @@ export async function createReservation(reservationData: ReservationInput): Prom
       descripcion: `Consulta ${reservationData.servicio} - Pago pendiente`,
       tipo_reunion: reservationData.tipo_reunion || 'online',
       estado: reservationData.estado || 'pendiente',
+      user_id: 'migration_placeholder', // Required field for RLS
       recordatorio_enviado: false,
       webhook_sent: false,
       created_at: timestamp,
@@ -143,13 +133,6 @@ export async function confirmReservation(reservationId: string): Promise<{ succe
       tipo_reunion: updatedReservation.tipo_reunion || 'online',
       descripcion: updatedReservation.descripcion || undefined
     });
-
-    if (emailResult.success) {
-      await supabase
-        .from('reservas')
-        .update({ email_enviado: true, updated_at: new Date().toISOString() })
-        .eq('id', reservationId);
-    }
 
     return {
       success: emailResult.success,

@@ -23,6 +23,7 @@ export interface EmailResult {
   clientEmail?: any;
   adminEmail?: any;
   error?: string;
+  [key: string]: unknown; // Add index signature for compatibility
 }
 
 /**
