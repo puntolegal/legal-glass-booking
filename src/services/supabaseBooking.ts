@@ -21,8 +21,8 @@ const mapDatabaseToReserva = (data: any): Reserva => ({
   external_reference: null, // No existe en la tabla actual
   preference_id: null, // No existe en la tabla actual
   estado: data.estado,
-  recordatorio_enviado: data.recordatorio_enviado || false,
-  created_at: data.created_at || new Date().toISOString(),
+    recordatorio_enviado: data.recordatorio_enviado || false,
+    created_at: data.created_at || new Date().toISOString(),
   updated_at: data.updated_at || new Date().toISOString()
 });
 
