@@ -3,7 +3,6 @@
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
-import { MercadoPagoConfig, Preference } from 'https://esm.sh/mercadopago@2.0.7'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -51,10 +50,7 @@ serve(async (req) => {
 
     console.log('🚀 Creando preferencia oficial...', paymentData)
     
-    // Usar la nueva estructura oficial de MercadoPago con MercadoPagoConfig
-    const client = new MercadoPagoConfig({ accessToken: MERCADOPAGO_ACCESS_TOKEN });
-    const preference = new Preference(client);
-
+    // Usar API REST de MercadoPago directamente (compatible con Deno)
     const preferenceBody = {
       items: [
         {
@@ -94,7 +90,33 @@ serve(async (req) => {
 
     console.log('📋 Estructura de preferencia:', JSON.stringify(preferenceBody, null, 2))
 
-    const result = await preference.create({ body: preferenceBody });
+    // Llamada directa a la API REST de MercadoPago
+    const response = await fetch('https://api.mercadopago.com/checkout/preferences', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${MERCADOPAGO_ACCESS_TOKEN}`
+      },
+      body: JSON.stringify(preferenceBody)
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('❌ Error API MercadoPago:', response.status, errorText);
+      
+      return new Response(
+        JSON.stringify({ 
+          success: false, 
+          error: `Error ${response.status}: ${errorText}` 
+        }),
+        { 
+          status: response.status, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      );
+    }
+
+    const result = await response.json();
 
     console.log('✅ Preferencia creada exitosamente:', result.id)
     
