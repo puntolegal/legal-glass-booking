@@ -57,6 +57,10 @@ serve(async (req) => {
       html: clientHTML
     })
 
+    // Delay para evitar rate limit de Resend (2 requests per second)
+    console.log('⏳ Esperando 1 segundo para evitar rate limit...')
+    await new Promise(resolve => setTimeout(resolve, 1000))
+
     // Enviar email al admin
     const adminResult = await sendEmailWithResend({
       from: MAIL_FROM,

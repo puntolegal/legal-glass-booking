@@ -73,6 +73,10 @@ const sendEmailWithSupabase = async (emailData: {
     const result = await response.json();
     console.log('✅ Email enviado exitosamente con Supabase Function:', result);
     
+    // Delay para evitar rate limit de Resend (2 requests per second)
+    console.log('⏳ Esperando 1 segundo para evitar rate limit...');
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
     return {
       id: result.clientEmail?.id || `email_${Date.now()}`,
       from: emailData.from,
