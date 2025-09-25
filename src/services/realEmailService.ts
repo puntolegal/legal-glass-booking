@@ -41,11 +41,14 @@ const sendEmailWithSupabase = async (emailData: {
   html: string;
 }): Promise<any> => {
   try {
-    const response = await fetch('https://qrgelocijmwnxcckxbdg.supabase.co/functions/v1/send-email', {
+    // Usar la configuración centralizada de Supabase
+    const { SUPABASE_CREDENTIALS } = await import('@/config/supabaseConfig');
+    
+    const response = await fetch(`${SUPABASE_CREDENTIALS.URL}/functions/v1/send-email`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`
+        'Authorization': `Bearer ${SUPABASE_CREDENTIALS.PUBLISHABLE_KEY}`
       },
       body: JSON.stringify({ emailData })
     });
@@ -152,6 +155,12 @@ const sendEmailWithResend = async (emailData: {
     // Determinar si usar Supabase Function o envío directo
     // En producción siempre usar Supabase Function para evitar CORS
     const isProduction = import.meta.env.PROD || window.location.hostname === 'puntolegal.online';
+    
+    console.log('🔍 DEBUG Producción:', {
+      'import.meta.env.PROD': import.meta.env.PROD,
+      'window.location.hostname': window.location.hostname,
+      'isProduction': isProduction
+    });
     
     if (isProduction) {
       console.log('🌐 Usando función de Supabase para envío de emails');
