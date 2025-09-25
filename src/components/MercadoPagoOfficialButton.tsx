@@ -61,9 +61,16 @@ const MercadoPagoOfficialButton: React.FC<MercadoPagoOfficialButtonProps> = ({
     try {
       setBackendStatus('checking');
       
-      // Verificar que las credenciales de MercadoPago estén configuradas
-      const accessToken = import.meta.env.VITE_MERCADOPAGO_ACCESS_TOKEN;
-      const publicKey = import.meta.env.VITE_MERCADOPAGO_PUBLIC_KEY;
+      // Verificar que las credenciales de MercadoPago estén configuradas usando configuración centralizada
+      const { MERCADOPAGO_CONFIG } = await import('@/config/mercadopago');
+      const accessToken = MERCADOPAGO_CONFIG.accessToken;
+      const publicKey = MERCADOPAGO_CONFIG.publicKey;
+      
+      console.log('🔍 DEBUG MercadoPago Backend Check:', {
+        accessToken: accessToken ? 'Configurado' : 'No configurado',
+        publicKey: publicKey ? 'Configurado' : 'No configurado',
+        isProduction: import.meta.env.PROD || window.location.hostname === 'puntolegal.online'
+      });
       
       if (!accessToken || !publicKey) {
         setBackendStatus('unavailable');
@@ -71,19 +78,46 @@ const MercadoPagoOfficialButton: React.FC<MercadoPagoOfficialButtonProps> = ({
         return;
       }
       
-      // Verificar conectividad con Supabase (nuestro backend)
-      const { supabase } = await import('@/integrations/supabase/client');
-      const { data, error } = await supabase
-        .from('reservas')
-        .select('id')
-        .limit(1);
+      // En producción, verificar que la función de Supabase esté disponible
+      const isProduction = import.meta.env.PROD || window.location.hostname === 'puntolegal.online';
       
-      if (error) {
-        setBackendStatus('unavailable');
-        console.log('⚠️ Error conectando con Supabase:', error.message);
+      if (isProduction) {
+        // Verificar conectividad con función de Supabase
+        const { SUPABASE_CREDENTIALS } = await import('@/config/supabaseConfig');
+        try {
+          const response = await fetch(`${SUPABASE_CREDENTIALS.URL}/functions/v1/create-mercadopago-preference`, {
+            method: 'OPTIONS',
+            headers: {
+              'Authorization': `Bearer ${SUPABASE_CREDENTIALS.PUBLISHABLE_KEY}`
+            }
+          });
+          
+          if (response.ok) {
+            setBackendStatus('available');
+            console.log('✅ Función de Supabase disponible para MercadoPago');
+          } else {
+            setBackendStatus('unavailable');
+            console.log('⚠️ Función de Supabase no disponible:', response.status);
+          }
+        } catch (error) {
+          setBackendStatus('unavailable');
+          console.log('⚠️ Error verificando función de Supabase:', error.message);
+        }
       } else {
-        setBackendStatus('available');
-        console.log('✅ Backend Supabase disponible para MercadoPago');
+        // En desarrollo, verificar conectividad con Supabase
+        const { supabase } = await import('@/integrations/supabase/client');
+        const { data, error } = await supabase
+          .from('reservas')
+          .select('id')
+          .limit(1);
+        
+        if (error) {
+          setBackendStatus('unavailable');
+          console.log('⚠️ Error conectando con Supabase:', error.message);
+        } else {
+          setBackendStatus('available');
+          console.log('✅ Backend Supabase disponible para MercadoPago');
+        }
       }
     } catch (error) {
       setBackendStatus('unavailable');
