@@ -19,11 +19,15 @@ serve(async (req) => {
     }
 
     // Get Resend API Key from Supabase environment variables
-    const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY') || Deno.env.get('VITE_RESEND_API_KEY');
+    const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY');
 
     if (!RESEND_API_KEY) {
-      throw new Error('RESEND_API_KEY o VITE_RESEND_API_KEY no está configurado en las variables de entorno de Supabase.');
+      throw new Error('RESEND_API_KEY no está configurado en las variables de entorno de Supabase.');
     }
+
+    // Usar variables de Supabase para configuración de email
+    const MAIL_FROM = Deno.env.get('MAIL_FROM') || emailData.from;
+    const ADMIN_EMAIL = Deno.env.get('ADMIN_EMAIL') || 'puntolegalelgolf@gmail.com';
 
     // Llamada a Resend API desde el servidor
     const response = await fetch('https://api.resend.com/emails', {
@@ -33,7 +37,7 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: emailData.from,
+        from: MAIL_FROM,
         to: emailData.to,
         subject: emailData.subject,
         html: emailData.html,
