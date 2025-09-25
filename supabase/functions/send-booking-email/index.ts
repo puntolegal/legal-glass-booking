@@ -109,7 +109,7 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({
         success: false,
-        error: error.message
+        error: error instanceof Error ? error.message : 'Error desconocido'
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -140,7 +140,7 @@ async function sendEmail(supabase: any, emailData: any) {
     return { success: true, data }
   } catch (error) {
     console.error('❌ Error enviando email:', error)
-    return { success: false, error: error.message }
+    return { success: false, error: error instanceof Error ? error.message : 'Error desconocido' }
   }
 }
 

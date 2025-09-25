@@ -1,29 +1,22 @@
-// Configuración oficial de MercadoPago - Punto Legal
-// Valores de fallback para producción
-const FALLBACK_PUBLIC_KEY = 'APP_USR-ebca3c36-af6d-4e88-ac94-5e984ce6bf5e';
-const FALLBACK_ACCESS_TOKEN = 'APP_USR-7407359076060108-092318-7fb22dd54bc0d3e4a42accab058e8a3e-229698947';
-
-// Debug: Verificar configuración de MercadoPago
-console.log('🔍 DEBUG MercadoPago Config:');
-console.log('VITE_MERCADOPAGO_PUBLIC_KEY:', import.meta.env.VITE_MERCADOPAGO_PUBLIC_KEY ? 'Configurado' : 'No configurado');
-console.log('VITE_MERCADOPAGO_ACCESS_TOKEN:', import.meta.env.VITE_MERCADOPAGO_ACCESS_TOKEN ? 'Configurado' : 'No configurado');
-console.log('FALLBACK_PUBLIC_KEY:', FALLBACK_PUBLIC_KEY ? 'Configurado' : 'No configurado');
-console.log('FALLBACK_ACCESS_TOKEN:', FALLBACK_ACCESS_TOKEN ? 'Configurado' : 'No configurado');
+// Configuración oficial de MercadoPago - Punto Legal  
+// Credenciales aplicadas directamente como requerido por Lovable
+const MERCADOPAGO_ACCESS_TOKEN = 'APP_USR-7407359076060108-092318-7fb22dd54bc0d3e4a42accab058e8a3e-229698947';
+const MERCADOPAGO_PUBLIC_KEY = 'APP_USR-ebca3c36-af6d-4e88-ac94-5e984ce6bf5e';
 
 export const MERCADOPAGO_CONFIG = {
   // Credenciales oficiales de PRODUCCIÓN - Mercado Pago Punto Legal
-  publicKey: import.meta.env.VITE_MERCADOPAGO_PUBLIC_KEY || FALLBACK_PUBLIC_KEY,
-  accessToken: import.meta.env.VITE_MERCADOPAGO_ACCESS_TOKEN || FALLBACK_ACCESS_TOKEN,
+  publicKey: MERCADOPAGO_PUBLIC_KEY,
+  accessToken: MERCADOPAGO_ACCESS_TOKEN,
   
   // Configuración regional
   locale: 'es-CL',
   currency: 'CLP',
   
-  // URLs de retorno (configuradas para puerto 8081)
+  // URLs de retorno actualizadas para producción
   urls: {
-    success: `http://localhost:8081/payment-success`,
-    failure: `http://localhost:8081/payment-failure`,
-    pending: `http://localhost:8081/payment-pending`
+    success: `https://puntolegal.online/payment-success`,
+    failure: `https://puntolegal.online/payment-failure`,
+    pending: `https://puntolegal.online/payment-pending`
   },
   
   // Configuración de la empresa
@@ -43,7 +36,7 @@ export const MERCADOPAGO_CONFIG = {
   
   // Configuración de notificaciones
   notifications: {
-    webhookUrl: `${window.location.origin}/api/mercadopago/webhook`
+    webhookUrl: `https://puntolegal.online/api/mercadopago/webhook`
   }
 };
 

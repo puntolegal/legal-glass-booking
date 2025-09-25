@@ -1,3 +1,88 @@
+import React, { useState } from 'react';
+import { Scale, ScrollText, Users, FileText, Heart, MapPin } from 'lucide-react';
+import SEO from '../components/SEO';
+import Header from '../components/Header';
+import MobileLayout from '../components/MobileLayout';
+import ServiceCard from '../components/ServiceCard';
+import ReservationForm from '../components/ReservationForm';
+
+const ServiciosEspecializadosPage = () => {
+  const [showForm, setShowForm] = useState(false);
+  const [selectedService, setSelectedService] = useState<any>(null);
+
+  const handleAgendarClick = (service: any) => {
+    setSelectedService(service);
+    setShowForm(true);
+  };
+
+  const handleCloseForm = () => {
+    setShowForm(false);
+    setSelectedService(null);
+  };
+
+  const specializedServices = [
+    {
+      title: "Derecho de Familia",
+      description: "Asesoría integral en temas familiares con enfoque humano y profesional.",
+      price: "$25.000",
+      features: [
+        "Divorcios y separaciones",
+        "Pensión alimenticia",
+        "Custodia y cuidado personal",
+        "Violencia intrafamiliar",
+        "Adopción y filiación"
+      ],
+      icon: <Heart className="w-6 h-6 text-primary" />,
+      badge: "ESPECIALIZADO",
+      href: "/familia",
+      testimonials: [
+        {
+          name: "María González",
+          text: "Excelente atención en mi proceso de divorcio. Muy profesional y empática.",
+          rating: 5
+        },
+        {
+          name: "Carlos Muñoz",
+          text: "Me ayudaron con la pensión alimenticia de manera muy eficiente.",
+          rating: 5
+        }
+      ],
+      blogPosts: [
+        {
+          title: "Guía completa para procesos de divorcio en Chile",
+          excerpt: "Todo lo que necesitas saber sobre divorcio en Chile...",
+          href: "/blog/divorcio-chile"
+        },
+        {
+          title: "Cálculo de pensión alimenticia: factores clave",
+          excerpt: "Aprende cómo se calcula la pensión alimenticia...",
+          href: "/blog/pension-alimenticia"
+        }
+      ]
+    },
+    {
+      title: "Derecho Laboral",
+      description: "Protección integral de derechos laborales con resultados comprobados.",
+      price: "$20.000",
+      features: [
+        "Despidos injustificados",
+        "Finiquitos y liquidaciones",
+        "Acoso laboral",
+        "Accidentes del trabajo",
+        "Contratos laborales"
+      ],
+      icon: <Users className="w-6 h-6 text-primary" />,
+      badge: "POPULAR",
+      href: "/laboral",
+      testimonials: [
+        {
+          name: "Andrea Silva",
+          text: "Recuperé todo lo que me correspondía por despido injustificado. Excelente trabajo.",
+          rating: 5
+        },
+        {
+          name: "Roberto Pérez",
+          text: "Muy buena asesoría en mi caso de acoso laboral. Profesionales serios.",
           rating: 5
         }
       ],
@@ -155,4 +240,4 @@
   );
 };
 
-export default ServiciosEspecializadosPage; 
+export default ServiciosEspecializadosPage;
