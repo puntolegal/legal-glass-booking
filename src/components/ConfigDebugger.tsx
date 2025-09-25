@@ -34,7 +34,7 @@ export const ConfigDebugger = () => {
         const { RESEND_CONFIG, isResendConfigured } = await import('@/config/resendConfig');
         
         // Verificar Supabase
-        const { supabase } = await import('@/integrations/supabase/client');
+        const { SUPABASE_CREDENTIALS } = await import('@/config/supabaseConfig');
         
         const configStatus: ConfigStatus = {
           mercadopago: {
@@ -49,9 +49,9 @@ export const ConfigDebugger = () => {
             configured: isResendConfigured()
           },
           supabase: {
-            url: !!import.meta.env.VITE_SUPABASE_URL,
-            anonKey: !!import.meta.env.VITE_SUPABASE_ANON_KEY,
-            configured: !!(import.meta.env.VITE_SUPABASE_URL && import.meta.env.VITE_SUPABASE_ANON_KEY)
+            url: !!SUPABASE_CREDENTIALS.URL,
+            anonKey: !!SUPABASE_CREDENTIALS.PUBLISHABLE_KEY,
+            configured: !!(SUPABASE_CREDENTIALS.URL && SUPABASE_CREDENTIALS.PUBLISHABLE_KEY)
           }
         };
         
@@ -63,6 +63,13 @@ export const ConfigDebugger = () => {
         console.log('MercadoPago:', configStatus.mercadopago);
         console.log('Resend:', configStatus.resend);
         console.log('Supabase:', configStatus.supabase);
+        
+        // Debug específico de Supabase
+        console.log('🔍 SUPABASE DEBUG DETALLADO:');
+        console.log('SUPABASE_CREDENTIALS.URL:', SUPABASE_CREDENTIALS.URL);
+        console.log('SUPABASE_CREDENTIALS.PUBLISHABLE_KEY:', SUPABASE_CREDENTIALS.PUBLISHABLE_KEY ? 'Presente' : 'Ausente');
+        console.log('import.meta.env.VITE_SUPABASE_URL:', import.meta.env.VITE_SUPABASE_URL);
+        console.log('import.meta.env.VITE_SUPABASE_ANON_KEY:', import.meta.env.VITE_SUPABASE_ANON_KEY ? 'Presente' : 'Ausente');
         
       } catch (error) {
         console.error('❌ Error verificando configuraciones:', error);

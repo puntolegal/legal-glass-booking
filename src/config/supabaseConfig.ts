@@ -9,6 +9,13 @@ const FALLBACK_URL = 'https://qrgelocijmwnxcckxbdg.supabase.co';
 const FALLBACK_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFyZ2Vsb2Npam13bnhjY2t4YmRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc4MDI0MjksImV4cCI6MjA3MzM3ODQyOX0.0q_3bb8bKR8VVZZAK_hYvhvLSTaU1ioQzmO5fKALjbI';
 const FALLBACK_PROJECT_REF = 'qrgelocijmwnxcckxbdg';
 
+// Debug: Verificar configuración de Supabase
+console.log('🔍 DEBUG Supabase Config:');
+console.log('VITE_SUPABASE_URL:', import.meta.env.VITE_SUPABASE_URL ? 'Configurado' : 'No configurado');
+console.log('VITE_SUPABASE_ANON_KEY:', import.meta.env.VITE_SUPABASE_ANON_KEY ? 'Configurado' : 'No configurado');
+console.log('FALLBACK_URL:', FALLBACK_URL ? 'Configurado' : 'No configurado');
+console.log('FALLBACK_ANON_KEY:', FALLBACK_ANON_KEY ? 'Configurado' : 'No configurado');
+
 export const SUPABASE_CREDENTIALS = {
   URL: import.meta.env.VITE_SUPABASE_URL || FALLBACK_URL,
   PUBLISHABLE_KEY: import.meta.env.VITE_SUPABASE_ANON_KEY || FALLBACK_ANON_KEY,
