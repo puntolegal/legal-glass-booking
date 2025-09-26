@@ -241,6 +241,22 @@ const MercadoPagoOfficialButton: React.FC<MercadoPagoOfficialButtonProps> = ({
       
       const result = await createCheckoutPreference(preferenceData);
       console.log('✅ Preferencia oficial creada:', result.preference_id);
+      console.log('🔍 Resultado completo en MercadoPagoOfficialButton:', JSON.stringify(result, null, 2));
+      console.log('🔗 Init Point recibido:', result.init_point);
+      console.log('🔗 Sandbox Init Point recibido:', result.sandbox_init_point);
+      console.log('🔍 Status recibido:', result.status);
+      console.log('🔍 Live Mode recibido:', result.live_mode);
+      
+      // Verificar que los campos necesarios estén presentes
+      if (!result.preference_id) {
+        console.error('❌ ERROR: result.preference_id no está presente en MercadoPagoOfficialButton');
+        throw new Error('ID de preferencia no recibido');
+      }
+      
+      if (!result.init_point) {
+        console.error('❌ ERROR: result.init_point no está presente en MercadoPagoOfficialButton');
+        throw new Error('Init Point no recibido');
+      }
       
       const storedPaymentData: PendingPaymentData = {
         ...paymentDataForStorage,
@@ -258,6 +274,7 @@ const MercadoPagoOfficialButton: React.FC<MercadoPagoOfficialButtonProps> = ({
       
       // Redirigir al Checkout Pro oficial
       console.log('🚀 Redirigiendo a Checkout Pro oficial...');
+      console.log('🔗 URL de redirección:', result.init_point);
       window.location.href = result.init_point;
       
     } catch (error) {

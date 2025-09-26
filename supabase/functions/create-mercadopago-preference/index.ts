@@ -108,13 +108,31 @@ serve(async (req) => {
     const result = await response.json();
 
     console.log('✅ Preferencia creada exitosamente:', result.id)
+    console.log('🔍 Resultado completo de MercadoPago:', JSON.stringify(result, null, 2))
+    console.log('🔗 Init Point:', result.init_point)
+    console.log('🔗 Sandbox Init Point:', result.sandbox_init_point)
+    console.log('🔍 Status de la preferencia:', result.status)
+    console.log('🔍 Modo de la preferencia:', result.live_mode ? 'Producción' : 'Sandbox')
+    
+    // Verificar que los campos necesarios estén presentes
+    if (!result.id) {
+      console.error('❌ ERROR: result.id no está presente')
+      throw new Error('ID de preferencia no recibido de MercadoPago')
+    }
+    
+    if (!result.init_point) {
+      console.error('❌ ERROR: result.init_point no está presente')
+      throw new Error('Init Point no recibido de MercadoPago')
+    }
     
     return new Response(
       JSON.stringify({
         success: true,
         preference_id: result.id,
         init_point: result.init_point,
-        sandbox_init_point: result.sandbox_init_point
+        sandbox_init_point: result.sandbox_init_point,
+        status: result.status,
+        live_mode: result.live_mode
       }),
       { 
         status: 200, 

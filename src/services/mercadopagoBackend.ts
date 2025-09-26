@@ -104,13 +104,30 @@ const createPreferenceWithSupabase = async (preferenceData: CreatePreferenceRequ
     const result = await response.json();
     
     console.log('✅ Preferencia creada exitosamente:', result.preference_id);
+    console.log('🔍 Resultado completo de Supabase Function:', JSON.stringify(result, null, 2));
     console.log('🔗 Init Point:', result.init_point);
+    console.log('🔗 Sandbox Init Point:', result.sandbox_init_point);
+    console.log('🔍 Status:', result.status);
+    console.log('🔍 Live Mode:', result.live_mode);
+    
+    // Verificar que los campos necesarios estén presentes
+    if (!result.preference_id) {
+      console.error('❌ ERROR: result.preference_id no está presente');
+      throw new Error('ID de preferencia no recibido de Supabase Function');
+    }
+    
+    if (!result.init_point) {
+      console.error('❌ ERROR: result.init_point no está presente');
+      throw new Error('Init Point no recibido de Supabase Function');
+    }
     
     return {
       success: true,
       preference_id: result.preference_id,
       init_point: result.init_point,
-      sandbox_init_point: result.sandbox_init_point
+      sandbox_init_point: result.sandbox_init_point,
+      status: result.status,
+      live_mode: result.live_mode
     };
     
   } catch (error) {
