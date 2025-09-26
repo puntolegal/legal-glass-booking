@@ -51,11 +51,11 @@ serve(async (req) => {
     console.log('🚀 Creando preferencia oficial...', paymentData)
     
     // Usar API REST de MercadoPago directamente (compatible con Deno)
+    // Estructura simplificada para evitar problemas de validación
     const preferenceBody = {
       items: [
         {
           title: `${paymentData.service} - Punto Legal`,
-          description: paymentData.description || `Consulta legal agendada para ${paymentData.date} a las ${paymentData.time}`,
           quantity: 1,
           unit_price: parseFloat(paymentData.price),
           currency_id: 'CLP'
@@ -63,32 +63,19 @@ serve(async (req) => {
       ],
       payer: {
         name: paymentData.name,
-        email: paymentData.email,
-        phone: {
-          number: paymentData.phone
-        }
+        email: paymentData.email
       },
       back_urls: {
         success: `https://www.puntolegal.online/payment-success?source=mercadopago`,
         failure: `https://www.puntolegal.online/payment-failure?source=mercadopago`,
         pending: `https://www.puntolegal.online/payment-pending?source=mercadopago`
       },
-      auto_return: 'approved', // Auto-return for approved payments
-      external_reference: paymentData.external_reference || `PL-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      notification_url: `https://www.puntolegal.online/api/mercadopago/webhook`,
-      metadata: {
-        client_name: paymentData.name,
-        client_email: paymentData.email,
-        service_type: paymentData.service,
-        appointment_date: paymentData.date,
-        appointment_time: paymentData.time,
-        source: 'punto-legal-web',
-        integration_type: 'checkout_pro_supabase_function'
-      },
-      statement_descriptor: 'PUNTO LEGAL'
+      auto_return: 'approved',
+      external_reference: paymentData.external_reference || `PL-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
     };
 
     console.log('📋 Estructura de preferencia:', JSON.stringify(preferenceBody, null, 2))
+    console.log('🔑 Token de acceso:', MERCADOPAGO_ACCESS_TOKEN ? `${MERCADOPAGO_ACCESS_TOKEN.substring(0, 20)}...` : 'No configurado')
 
     // Llamada directa a la API REST de MercadoPago
     const response = await fetch('https://api.mercadopago.com/checkout/preferences', {
@@ -99,6 +86,8 @@ serve(async (req) => {
       },
       body: JSON.stringify(preferenceBody)
     });
+
+    console.log('📤 Respuesta de MercadoPago:', response.status, response.statusText)
 
     if (!response.ok) {
       const errorText = await response.text();
