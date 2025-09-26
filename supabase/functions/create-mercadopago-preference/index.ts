@@ -20,7 +20,7 @@ serve(async (req) => {
   try {
     console.log('🚀 Función create-mercadopago-preference iniciada');
     console.log('🔍 Headers recibidos:', Object.fromEntries(req.headers.entries()));
-    console.log('�� Método:', req.method);
+    console.log('🔍 Método:', req.method);
     console.log('🔍 URL:', req.url);
     
     // Obtener credenciales de MercadoPago
@@ -76,13 +76,6 @@ serve(async (req) => {
 
     console.log('📋 Estructura de preferencia:', JSON.stringify(preferenceBody, null, 2))
     console.log('🔑 Token de acceso:', MERCADOPAGO_ACCESS_TOKEN ? `${MERCADOPAGO_ACCESS_TOKEN.substring(0, 20)}...` : 'No configurado')
-    console.log('🌐 URLs de retorno configuradas:')
-    console.log('  - Success:', preferenceBody.back_urls.success)
-    console.log('  - Failure:', preferenceBody.back_urls.failure)
-    console.log('  - Pending:', preferenceBody.back_urls.pending)
-    console.log('🔄 Auto return:', preferenceBody.auto_return)
-    console.log('📦 Items:', preferenceBody.items)
-    console.log('👤 Payer:', preferenceBody.payer)
 
     // Llamada directa a la API REST de MercadoPago
     const response = await fetch('https://api.mercadopago.com/checkout/preferences', {
@@ -95,7 +88,6 @@ serve(async (req) => {
     });
 
     console.log('📤 Respuesta de MercadoPago:', response.status, response.statusText)
-    console.log('📤 Headers de respuesta:', Object.fromEntries(response.headers.entries()))
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -116,8 +108,6 @@ serve(async (req) => {
     const result = await response.json();
 
     console.log('✅ Preferencia creada exitosamente:', result.id)
-    console.log('🔗 Init Point:', result.init_point)
-    console.log('🔗 Sandbox Init Point:', result.sandbox_init_point)
     
     return new Response(
       JSON.stringify({
