@@ -256,6 +256,18 @@ const MercadoPagoOfficialButton: React.FC<MercadoPagoOfficialButtonProps> = ({
         throw new Error('Init Point no recibido');
       }
       
+      // Actualizar la reserva con el preference_id para poder encontrarla después
+      try {
+        const { updateReservation } = await import('@/services/supabaseBooking');
+        await updateReservation(reservation.id, {
+          preference_id: result.preference_id,
+          external_reference: reservation.id // Usar el ID de la reserva como external_reference
+        });
+        console.log('✅ Reserva actualizada con preference_id:', result.preference_id);
+      } catch (updateError) {
+        console.warn('⚠️ No se pudo actualizar la reserva con preference_id:', updateError);
+      }
+
       const storedPaymentData: PendingPaymentData = {
         ...paymentDataForStorage,
         preferenceId: result.preference_id ?? null

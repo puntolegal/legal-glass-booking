@@ -7,7 +7,7 @@ import { sendRealBookingEmails, type BookingEmailData, type EmailResult } from '
 import { findReservaByCriteria, updatePaymentStatus, type Reserva } from '../services/supabaseBooking';
 import type { PendingPaymentData } from '@/types/payments';
 import { ensurePriceFormatted, parsePendingPaymentData } from '@/utils/paymentData';
-import { getPaymentInfo } from '@/services/mercadopagoBackend';
+import { getMercadoPagoPaymentInfo } from '@/services/mercadopagoPaymentInfo';
 
 interface PaymentSuccessState {
   reservation: Reserva;
@@ -123,9 +123,12 @@ export default function PaymentSuccessPage() {
       if (paymentIdFromUrl) {
         setProcessingStatus('Consultando estado del pago en MercadoPago...');
         try {
-          mpPayment = await getPaymentInfo(String(paymentIdFromUrl));
-          if (mpPayment?.status) {
-            normalizedStatus = String(mpPayment.status).toLowerCase();
+          const paymentInfoResponse = await getMercadoPagoPaymentInfo(String(paymentIdFromUrl));
+          if (paymentInfoResponse.success && paymentInfoResponse.payment) {
+            mpPayment = paymentInfoResponse.payment;
+            if (mpPayment?.status) {
+              normalizedStatus = String(mpPayment.status).toLowerCase();
+            }
           }
         } catch (e) {
           console.warn('⚠️ No se pudo obtener info del pago desde MercadoPago:', e);
