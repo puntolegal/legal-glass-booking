@@ -187,8 +187,8 @@ const MercadoPagoOfficialButton: React.FC<MercadoPagoOfficialButtonProps> = ({
       console.log('🔍 paymentDataForStorage:', paymentDataForStorage);
       console.log('🔍 localStorage paymentData:', localStorage.getItem('paymentData'));
 
-      // Usar la función de Supabase directamente
-      const { createCheckoutPreference } = await import('@/services/mercadopagoBackend');
+      // Usar servicio directo de MercadoPago (sin Edge Function)
+      const { createMercadoPagoPreferenceDirect, createStandardPreferenceData } = await import('@/services/mercadopagoDirect');
       
       // Debug: Verificar URLs de retorno
       console.log('🔍 INICIO DEBUG - Verificando entorno:');
@@ -224,7 +224,7 @@ const MercadoPagoOfficialButton: React.FC<MercadoPagoOfficialButtonProps> = ({
         back_urls: backUrls,
         auto_return: 'approved' as const,
         external_reference: reservation.id,
-        notification_url: `https://www.puntolegal.online/api/mercadopago/webhook`,
+        notification_url: `https://qrgelocijmwnxcckxbdg.supabase.co/functions/v1/mercadopago-webhook`,
         metadata: {
           reservation_id: reservation.id,
           service_name: getMetadataString('service_name', paymentData.description),
@@ -234,10 +234,10 @@ const MercadoPagoOfficialButton: React.FC<MercadoPagoOfficialButtonProps> = ({
         }
       };
       
-      console.log('🚀 Llamando a createCheckoutPreference con:', preferenceData);
+      console.log('🚀 Llamando a createMercadoPagoPreferenceDirect con:', preferenceData);
       console.log('🔍 back_urls en preferenceData:', preferenceData.back_urls);
       
-      const result = await createCheckoutPreference(preferenceData);
+      const result = await createMercadoPagoPreferenceDirect(preferenceData);
       console.log('✅ Preferencia oficial creada:', result.preference_id);
       console.log('🔍 Resultado completo en MercadoPagoOfficialButton:', JSON.stringify(result, null, 2));
       console.log('🔗 Init Point recibido:', result.init_point);
