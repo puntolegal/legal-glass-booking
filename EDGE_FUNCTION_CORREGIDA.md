@@ -1,3 +1,14 @@
+# 🔧 EDGE FUNCTION CORREGIDA - create-mercadopago-preference
+
+## 🚨 **PROBLEMA IDENTIFICADO**
+
+**Error CORS:** La Edge Function tenía un conflicto de merge que causaba errores de sintaxis.
+
+## ✅ **CÓDIGO CORREGIDO**
+
+### **Copia este código completo y reemplaza en Supabase:**
+
+```typescript
 // Función de Supabase para crear preferencias de MercadoPago
 // Reemplaza el backend local en producción
 
@@ -70,8 +81,9 @@ serve(async (req) => {
         failure: `https://www.puntolegal.online/payment-failure?source=mercadopago`,
         pending: `https://www.puntolegal.online/payment-pending?source=mercadopago`
       },
-      // auto_return: 'approved' as const, // Deshabilitado temporalmente para desarrollo local
-      external_reference: paymentData.external_reference || `PL-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+      auto_return: 'approved',
+      external_reference: paymentData.external_reference || `PL-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      notification_url: `https://qrgelocijmwnxcckxbdg.supabase.co/functions/v1/mercadopago-webhook`
     };
 
     console.log('📋 Estructura de preferencia:', JSON.stringify(preferenceBody, null, 2))
@@ -155,3 +167,67 @@ serve(async (req) => {
     )
   }
 })
+```
+
+---
+
+## 🚀 **PASOS PARA APLICAR LA CORRECCIÓN**
+
+### **1. Ir al Dashboard de Supabase:**
+- **URL:** https://supabase.com/dashboard/project/qrgelocijmwnxcckxbdg/functions
+
+### **2. Editar la función:**
+- **Hacer clic en:** `create-mercadopago-preference`
+- **Hacer clic en:** "Edit function"
+
+### **3. Reemplazar el código:**
+- **Seleccionar todo** el código existente
+- **Eliminar** el código actual
+- **Pegar** el código de arriba
+
+### **4. Desplegar:**
+- **Hacer clic en:** "Deploy function"
+
+---
+
+## ✅ **CORRECCIONES APLICADAS**
+
+### **🔧 Problemas resueltos:**
+- ✅ **Conflicto de merge eliminado**
+- ✅ **URLs de retorno fijas** (producción)
+- ✅ **Headers CORS correctos**
+- ✅ **Webhook configurado**
+- ✅ **auto_return habilitado**
+
+### **🎯 URLs configuradas:**
+- ✅ **Success:** `https://www.puntolegal.online/payment-success?source=mercadopago`
+- ✅ **Failure:** `https://www.puntolegal.online/payment-failure?source=mercadopago`
+- ✅ **Pending:** `https://www.puntolegal.online/payment-pending?source=mercadopago`
+- ✅ **Webhook:** `https://qrgelocijmwnxcckxbdg.supabase.co/functions/v1/mercadopago-webhook`
+
+---
+
+## 🧪 **VERIFICACIÓN POST-DEPLOY**
+
+### **Después del deploy, probar:**
+```bash
+curl -X POST 'https://qrgelocijmwnxcckxbdg.supabase.co/functions/v1/create-mercadopago-preference' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "paymentData": {
+      "service": "Consulta Legal",
+      "price": "35000",
+      "name": "Juan Pérez",
+      "email": "juan@test.com"
+    }
+  }'
+```
+
+### **Resultado esperado:**
+```json
+{
+  "success": true,
+  "preference_id": "229698947-...",
+  "init_point": "https://www.mercadopago.cl/checkout/v1/redirect?..."
+}
+```
