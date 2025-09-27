@@ -88,7 +88,7 @@ export function getReturnUrls() {
   const baseUrl = import.meta.env.VITE_APP_URL || 
                   import.meta.env.VITE_APP_BASE_URL || 
                   window.location.origin || 
-                  (import.meta.env.PROD ? 'https://puntolegal.online' : 'http://localhost:5173');
+                  (import.meta.env.PROD ? 'https://puntolegal.online' : 'http://localhost:8080');
   
   return {
     success: `${baseUrl}/payment-success?source=mercadopago`,

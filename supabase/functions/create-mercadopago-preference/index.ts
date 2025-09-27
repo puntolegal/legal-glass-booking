@@ -25,6 +25,7 @@ serve(async (req) => {
     
     // ✅ SEGURO - Solo usar variables de entorno, sin fallback hardcodeado
     const MERCADOPAGO_ACCESS_TOKEN = Deno.env.get('MERCADOPAGO_ACCESS_TOKEN');
+    const APP_URL = Deno.env.get('APP_URL') || 'https://puntolegal.online';
     
     console.log('🔑 MercadoPago Access Token:', MERCADOPAGO_ACCESS_TOKEN ? 'Configurado' : 'No configurado');
     
@@ -66,11 +67,11 @@ serve(async (req) => {
         email: paymentData.email
       },
       back_urls: {
-        success: `https://www.puntolegal.online/payment-success?source=mercadopago`,
-        failure: `https://www.puntolegal.online/payment-failure?source=mercadopago`,
-        pending: `https://www.puntolegal.online/payment-pending?source=mercadopago`
+        success: `${APP_URL}/payment-success?source=mercadopago`,
+        failure: `${APP_URL}/payment-failure?source=mercadopago`,
+        pending: `${APP_URL}/payment-pending?source=mercadopago`
       },
-      auto_return: 'approved',
+      // auto_return: 'approved' as const, // Deshabilitado temporalmente para desarrollo local
       external_reference: paymentData.external_reference || `PL-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
     };
 

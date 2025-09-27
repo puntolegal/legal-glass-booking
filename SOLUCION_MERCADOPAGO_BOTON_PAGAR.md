@@ -1,138 +1,124 @@
-# 🔧 SOLUCIÓN: Botón de MercadoPago No Funciona
+# 🔧 Solución rápida: el botón “Pagar” (Checkout Pro) no hace nada
 
-## ❌ **PROBLEMA IDENTIFICADO**
-El botón "Pagar" de MercadoPago no funciona porque **las URLs de retorno NO están configuradas en el dashboard de MercadoPago**.
+Estos son los motivos más comunes y cómo resolverlos en minutos, alineado con este repo (Vite frontend + backend/Edge para crear la preferencia).
 
-## ✅ **SOLUCIÓN PASO A PASO**
+## Causas típicas y fixes
 
-### **1. Verificar URLs de Retorno (YA FUNCIONAN)**
-✅ **Las URLs responden correctamente:**
-- `https://www.puntolegal.online/payment-success` → 200 OK
-- `https://www.puntolegal.online/payment-failure` → 200 OK  
-- `https://www.puntolegal.online/payment-pending` → 200 OK
-- `https://www.puntolegal.online/api/mercadopago/webhook` → 200 OK
+1) Preferencia inválida o no creada
+- Síntoma: el botón no navega o queda deshabilitado.
+- Chequea: la respuesta de crear preferencia debe incluir `id` e `init_point` (o `sandbox_init_point`).
+- Fix: loguea HTTP status, `id`, `init_point`/`sandbox_init_point` y, si falla, imprime el body completo para ver la causa.
 
-### **2. Configurar Dashboard de MercadoPago**
+2) Mezcla de entornos (sandbox vs producción)
+- Síntoma: botón “muerto” o error genérico al abrir.
+- Chequea: en dev, token `TEST-` y usar `sandbox_init_point`; en prod, token `APP_USR-` y usar `init_point`.
+- Fix: selecciona URL por entorno; en Vite preferí `import.meta.env.PROD`.
 
-#### **Paso 1: Acceder al Dashboard**
-1. Ir a: https://www.mercadopago.cl/developers/panel
-2. Iniciar sesión con tu cuenta de MercadoPago Chile
-3. Seleccionar la aplicación "Punto Legal"
+3) Token/cuenta no habilitada para cobrar
+- Síntoma: preferencia no se crea o viene sin init_point válido.
+- Chequea: `MERCADOPAGO_ACCESS_TOKEN` sea del vendedor correcto y la cuenta esté verificada (KYC).
+- Fix: valida con `GET https://api.mercadopago.com/users/me` usando el token.
 
-#### **Paso 2: Configurar URLs de Retorno**
-1. Ir a **"Configuración"** > **"URLs de retorno"**
-2. Agregar las siguientes URLs:
+4) Items mal formados o montos inválidos
+- Síntoma: la API responde 4xx.
+- Chequea: `title` string, `quantity` > 0, `unit_price` > 0, moneda/site correctos.
+- Fix: valida el payload antes de llamar a la API.
 
-**URL de Éxito:**
-```
-https://www.puntolegal.online/payment-success?source=mercadopago
-```
+5) URLs de retorno no HTTPS o dominio inconsistente
+- Síntoma: error genérico al volver o flujo interrumpido.
+- Chequea: `success/failure/pending` sean HTTPS en prod y del mismo dominio público.
+- Fix: corrige a `https://…` y usa tu dominio público.
 
-**URL de Fallo:**
-```
-https://www.puntolegal.online/payment-failure?source=mercadopago
-```
+6) No redirigís al `init_point`
+- Síntoma: el botón no navega aunque tengas preferencia.
+- Fix: redirigí con `window.location.href`. Snippet correcto:
 
-**URL Pendiente:**
-```
-https://www.puntolegal.online/payment-pending?source=mercadopago
-```
-
-#### **Paso 3: Configurar Webhook**
-1. Ir a **"Webhooks"** > **"Configurar notificaciones"**
-2. Seleccionar **"Modo productivo"**
-3. URL del webhook:
-```
-https://www.puntolegal.online/api/mercadopago/webhook
-```
-4. Evento: **"Pagos"**
-5. Clave secreta: `ee672ff228a693e920ef6e5948e5b0329241cf76895b95c0c3675c8c286276dd`
-6. **IMPORTANTE:** La URL base debe ser `https://www.puntolegal.online` (sin `/api/mercadopago/webhook`)
-
-#### **Paso 4: Guardar Configuración**
-1. Hacer clic en **"Guardar configuración"**
-2. Esperar confirmación de guardado
-
-### **3. Verificar Configuración**
-
-#### **Probar Webhook:**
-1. En el dashboard, hacer clic en **"Simular"**
-2. Seleccionar la URL de producción
-3. Evento: "Pagos"
-4. Data ID: `123456`
-5. Hacer clic en **"Enviar prueba"**
-
-#### **Probar Botón de Pago:**
-1. Ir a `https://www.puntolegal.online`
-2. Hacer una reserva
-3. Probar el botón de MercadoPago
-4. Usar tarjeta de prueba:
-   - **Número:** `4509 9535 6623 3704`
-   - **CVV:** `123`
-   - **Vencimiento:** `11/25`
-
-## 🔍 **DIAGNÓSTICO TÉCNICO**
-
-### **Configuración Actual en Código:**
-```typescript
-// En supabase/functions/create-mercadopago-preference/index.ts
-back_urls: {
-  success: `https://www.puntolegal.online/payment-success?source=mercadopago`,
-  failure: `https://www.puntolegal.online/payment-failure?source=mercadopago`,
-  pending: `https://www.puntolegal.online/payment-pending?source=mercadopago`
-},
-auto_return: 'approved'
-```
-
-### **Configuración en MercadoPagoOfficialButton.tsx:**
-```typescript
-const backUrls = {
-  success: `https://www.puntolegal.online/payment-success?source=mercadopago`,
-  failure: `https://www.puntolegal.online/payment-failure?source=mercadopago`,
-  pending: `https://www.puntolegal.online/payment-pending?source=mercadopago`
+```ts
+const goPay = async () => {
+  const r = await fetch('/api/mercadopago/create-preference', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ items })
+  });
+  const data = await r.json();
+  if (!r.ok || data.error) throw new Error('No se pudo crear la preferencia');
+  const url = (import.meta.env.PROD ? data.init_point : (data.sandbox_init_point || data.init_point));
+  window.location.href = url;
 };
 ```
 
-## ⚠️ **IMPORTANTE**
+7) Bloqueo por navegador/extensiones
+- Síntoma: click sin efecto en ciertos usuarios.
+- Chequea: ad-blockers, privacy, bloqueo de popups/redirecciones.
+- Fix: probar incógnito sin extensiones y redirigir en misma pestaña.
 
-### **Según Documentación de MercadoPago:**
-> **"Las URLs configuradas durante la creación de un pago tendrán prioridad por sobre aquellas configuradas a través de Tus integraciones."**
+8) CSP/IFrame que bloquea scripts/redirecciones
+- Síntoma: errores CSP o navegación bloqueada.
+- Chequea: permitir `https://sdk.mercadopago.com`, `https://api.mercadopago.com`, `https://www.mercadopago.com` en `script-src`, `connect-src`, `frame-src`.
+- Fix: ajusta tu Content-Security-Policy.
 
-**Esto significa:**
-1. **Primero** se validan las URLs del dashboard
-2. **Luego** se validan las URLs de la preferencia
-3. Si **ambas** están configuradas correctamente, el botón funcionará
+9) SDK mal inicializado (Bricks/SDK cliente)
+- Síntoma: botón renderiza pero queda deshabilitado.
+- Chequea: `VITE_MERCADOPAGO_PUBLIC_KEY` cargada y no duplicar instancias/listeners.
+- Fix: revisa orden de inicialización y una sola instancia del SDK.
 
-## 🧪 **PRUEBA FINAL**
+10) Estado del comprador de prueba / medios de pago
+- Síntoma: en sandbox el flujo no avanza o rechaza siempre.
+- Chequea: comprador de prueba distinto al vendedor; tarjetas de prueba válidas.
+- Fix: cambia cuentas de test; usa tarjetas oficiales.
 
-### **Después de configurar todo:**
-1. **Refrescar** `www.puntolegal.online`
-2. **Probar** el botón de MercadoPago
-3. **Verificar** que el botón de pago sea funcional
-4. **Completar** el pago con tarjeta de prueba
+11) Credenciales en lugar incorrecto (frontend vs backend)
+- Síntoma: CORS o token expuesto.
+- Chequea: la preferencia se crea en backend/edge; el frontend NUNCA usa el Access Token.
+- Fix: deja `MERCADOPAGO_ACCESS_TOKEN` solo en backend y `VITE_MERCADOPAGO_PUBLIC_KEY` en frontend.
 
-### **Logs a Verificar:**
-- Consola del navegador (F12)
-- Logs de la función de Supabase
-- Respuesta de la API de MercadoPago
+12) Botón propio con handler roto
+- Síntoma: atributo `disabled`/estilos bloqueando o handler no vinculado.
+- Fix: asegurar enabled y que el onClick ejecute la redirección.
 
-## 📞 **SI EL PROBLEMA PERSISTE**
+13) Caché/SSR mezclando variables
+- Síntoma: usa claves/URLs del entorno equivocado.
+- Fix: limpiar cachés y verificar variables en el panel del hosting.
 
-### **Verificar:**
-1. ✅ URLs configuradas en el dashboard
-2. ✅ URLs responden correctamente
-3. ✅ Función de Supabase funcionando
-4. ✅ Credenciales de MercadoPago válidas
+---
 
-### **Contactar Soporte:**
-- MercadoPago Chile: https://www.mercadopago.cl/developers/support
-- Incluir logs de la función de Supabase
-- Incluir capturas de pantalla del dashboard
+## Prueba de humo en 2 minutos
+- Crear preferencia (backend) y loguear: status, `id`, `init_point`/`sandbox_init_point`.
+- Pegar `init_point` en el navegador: si abre, el problema está en el botón/JS.
+- Probar en incógnito sin extensiones.
+- Revisar consola y Network: ¿4xx/5xx de la API? ¿CSP bloquea algo?
 
-## 🎯 **RESULTADO ESPERADO**
+---
 
-Después de seguir estos pasos:
-- ✅ El botón "Pagar" será funcional
-- ✅ Los usuarios podrán completar pagos
-- ✅ Las redirecciones funcionarán correctamente
-- ✅ Los webhooks se procesarán correctamente
+## Mini-checklist del repo
+- `MERCADOPAGO_ACCESS_TOKEN` solo en backend/hosting.
+- `VITE_MERCADOPAGO_PUBLIC_KEY` en frontend (Vite).
+- En dev usa `sandbox_init_point`; en prod `init_point`.
+- `back_urls` HTTPS en prod y del dominio público.
+- Botón llama a backend/edge y redirige al `init_point`.
+
+---
+
+## Health-check rápido
+
+Opción CLI: ejecuta el script de sanity que crea una preferencia de prueba con tu token del backend.
+
+```
+node scripts/mp-sanity-check.mjs
+```
+
+Opción UI: usa el snippet del punto 6 para crear y redirigir al `init_point`.
+
+---
+
+## Panel de Mercado Pago (opcional/fallback)
+
+Aunque `back_urls` en la preferencia tienen prioridad, podés configurar URLs y webhook en el panel para validar conectividad:
+- URL de éxito: `https://www.puntolegal.online/payment-success?source=mercadopago`
+- URL de fallo: `https://www.puntolegal.online/payment-failure?source=mercadopago`
+- URL pendiente: `https://www.puntolegal.online/payment-pending?source=mercadopago`
+- Webhook: `https://www.puntolegal.online/api/mercadopago/webhook`
+- Evento: “Pagos”
+- Clave secreta: crea/usa una propia y guárdala solo como variable del hosting (no la dejes en docs/código)
+
+Sugerencia: validá con el simulador del panel y verificá logs de tu backend/edge.

@@ -5,7 +5,8 @@ import fetch from "node-fetch";
 import assert from "node:assert";
 import dotenv from "dotenv";
 
-// Cargar variables de entorno
+// Cargar variables de entorno (backend y frontend)
+dotenv.config({ path: '.env' });
 dotenv.config({ path: '.env.local' });
 
 console.log("🔍 Verificando Checkout Pro de MercadoPago...");
@@ -13,20 +14,17 @@ console.log("🔍 Verificando Checkout Pro de MercadoPago...");
 // Determinar entorno
 const isProduction = process.env.NODE_ENV === 'production' || 
                     process.env.MODE === 'production' ||
-                    process.env.VITE_APP_BASE_URL?.includes('puntolegal.online');
+                    (process.env.VITE_APP_BASE_URL || process.env.VITE_APP_URL || '').includes('puntolegal.online');
 
 const MP_ENV = isProduction ? 'production' : 'sandbox';
 console.log(`📋 Entorno: ${MP_ENV}`);
 
-// Obtener credenciales
-const token = MP_ENV === 'production' 
-  ? process.env.VITE_MP_ACCESS_TOKEN_PROD 
-  : process.env.VITE_MP_ACCESS_TOKEN_TEST;
-
-assert(token, "No hay Access Token configurado");
+// Obtener credenciales (alineado al backend del repo)
+const token = process.env.MERCADOPAGO_ACCESS_TOKEN;
+assert(token, "No hay MERCADOPAGO_ACCESS_TOKEN configurado");
 
 // Obtener URLs
-const baseUrl = process.env.VITE_APP_BASE_URL || 'https://www.puntolegal.online';
+const baseUrl = process.env.VITE_APP_URL || process.env.VITE_APP_BASE_URL || 'https://www.puntolegal.online';
 const successUrl = process.env.VITE_SUCCESS_URL || `${baseUrl}/payment-success?source=mercadopago`;
 const failureUrl = process.env.VITE_FAILURE_URL || `${baseUrl}/payment-failure?source=mercadopago`;
 const pendingUrl = process.env.VITE_PENDING_URL || `${baseUrl}/payment-pending?source=mercadopago`;
@@ -57,7 +55,7 @@ const preferenceBody = {
     failure: failureUrl,
     pending: pendingUrl
   },
-  auto_return: "approved",
+  // auto_return: "approved", // Deshabilitado para desarrollo local
   external_reference: `TEST-${Date.now()}`,
   notification_url: webhookUrl,
   binary_mode: true
@@ -113,16 +111,18 @@ try {
   console.log(`  External Reference: ${data.external_reference}`);
 
   // Mostrar URL de redirección correcta
-  const redirectUrl = MP_ENV === 'production' ? data.init_point : data.sandbox_init_point;
+  // Determinar URL de redirección según token/entorno real
+  const looksLikeProd = token.startsWith('APP_USR-');
+  const redirectUrl = (isProduction || looksLikeProd) ? data.init_point : (data.sandbox_init_point || data.init_point);
   console.log(`🔗 URL de redirección: ${redirectUrl}`);
 
   // Verificar que las URLs sean correctas
-  if (MP_ENV === 'production' && !data.init_point) {
+  if ((isProduction || looksLikeProd) && !data.init_point) {
     console.error("❌ Error: No se generó init_point para producción");
     process.exit(1);
   }
 
-  if (MP_ENV === 'sandbox' && !data.sandbox_init_point) {
+  if (!(isProduction || looksLikeProd) && !data.sandbox_init_point) {
     console.error("❌ Error: No se generó sandbox_init_point para sandbox");
     process.exit(1);
   }

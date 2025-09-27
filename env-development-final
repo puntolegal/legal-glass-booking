@@ -35,15 +35,15 @@ VITE_ADMIN_EMAIL=dev-admin@puntolegal.online
 # CONFIGURACIÓN DE LA APLICACIÓN
 # ===========================================
 VITE_APP_NAME=Punto Legal (Dev)
-VITE_APP_URL=http://localhost:5173
+VITE_APP_URL=http://localhost:8080
 VITE_APP_VERSION=1.0.0-dev
 
 # ===========================================
 # URLs DE RETORNO (DESARROLLO)
 # ===========================================
-VITE_SUCCESS_URL=http://localhost:5173/payment-success?source=mercadopago
-VITE_FAILURE_URL=http://localhost:5173/payment-failure?source=mercadopago
-VITE_PENDING_URL=http://localhost:5173/payment-pending?source=mercadopago
+VITE_SUCCESS_URL=http://localhost:8080/payment-success?source=mercadopago
+VITE_FAILURE_URL=http://localhost:8080/payment-failure?source=mercadopago
+VITE_PENDING_URL=http://localhost:8080/payment-pending?source=mercadopago
 
 # ===========================================
 # CONFIGURACIÓN DE DESARROLLO
