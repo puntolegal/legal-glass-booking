@@ -37,11 +37,11 @@ envContent.split('\n').forEach(line => {
 
 console.log(`📋 Variables encontradas: ${Object.keys(variables).length}`);
 
-// ❌ CRÍTICO - NO verificar credenciales secretas en frontend
+// Verificar variables requeridas
 const requiredVars = [
-  // 'VITE_MERCADOPAGO_ACCESS_TOKEN', // NO_USAR_EN_FRONTEND
+  'VITE_MERCADOPAGO_ACCESS_TOKEN',
   'VITE_MERCADOPAGO_PUBLIC_KEY',
-  // 'VITE_RESEND_API_KEY', // NO_USAR_EN_FRONTEND
+  'VITE_RESEND_API_KEY',
   'VITE_MAIL_FROM',
   'VITE_ADMIN_EMAIL',
   'VITE_SUPABASE_URL',

@@ -64,9 +64,9 @@ serve(async (req) => {
     );
 
   } catch (error) {
-    console.error('Error en Supabase Function send-email:', error);
+    console.error('Error en Supabase Function send-email:', error.message);
     return new Response(
-      JSON.stringify({ success: false, error: error instanceof Error ? error.message : 'Error desconocido' }),
+      JSON.stringify({ success: false, error: error.message }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }

@@ -19,26 +19,29 @@ export const MercadoPagoStatusChecker: React.FC<MercadoPagoStatusCheckerProps> =
     try {
       setStatus('checking');
       
-      // Debug: Verificar variables de entorno (solo públicas)
+      // Debug: Verificar variables de entorno
       console.log('🔍 DEBUG - Verificando variables de entorno:');
       console.log('import.meta.env:', import.meta.env);
-      // ❌ REMOVIDO - accessToken no debe estar en frontend
+      console.log('VITE_MERCADOPAGO_ACCESS_TOKEN:', import.meta.env.VITE_MERCADOPAGO_ACCESS_TOKEN);
       console.log('VITE_MERCADOPAGO_PUBLIC_KEY:', import.meta.env.VITE_MERCADOPAGO_PUBLIC_KEY);
       console.log('NODE_ENV:', import.meta.env.MODE);
       
       // Verificar que las credenciales de MercadoPago estén configuradas
       const { MERCADOPAGO_CONFIG } = await import('@/config/mercadopago');
+      const accessToken = MERCADOPAGO_CONFIG.accessToken;
       const publicKey = MERCADOPAGO_CONFIG.publicKey;
       
-      if (!publicKey) {
+      if (!accessToken || !publicKey) {
         setStatus('unavailable');
         onStatusChange?.(false);
         console.log('⚠️ Credenciales de MercadoPago no configuradas');
+        console.log('Access Token:', accessToken ? 'Configurado' : 'No configurado');
         console.log('Public Key:', publicKey ? 'Configurado' : 'No configurado');
         return;
       }
       
       console.log('✅ Credenciales de MercadoPago configuradas');
+      console.log('Access Token:', accessToken ? 'Configurado' : 'No configurado');
       console.log('Public Key:', publicKey ? 'Configurado' : 'No configurado');
       
       // Verificar conectividad con Supabase (nuestro backend)

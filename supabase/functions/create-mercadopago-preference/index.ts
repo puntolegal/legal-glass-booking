@@ -23,14 +23,14 @@ serve(async (req) => {
     console.log('🔍 Método:', req.method);
     console.log('🔍 URL:', req.url);
     
-    // ✅ SEGURO - Solo usar variables de entorno, sin fallback hardcodeado
-    const MERCADOPAGO_ACCESS_TOKEN = Deno.env.get('MERCADOPAGO_ACCESS_TOKEN');
+    // Obtener credenciales de MercadoPago
+    // Usar MERCADOPAGO_ACCESS_TOKEN directamente
+    const MERCADOPAGO_ACCESS_TOKEN = Deno.env.get('MERCADOPAGO_ACCESS_TOKEN') || 'APP_USR-7407359076060108-092318-7fb22dd54bc0d3e4a42accab058e8a3e-229698947'
     
     console.log('🔑 MercadoPago Access Token:', MERCADOPAGO_ACCESS_TOKEN ? 'Configurado' : 'No configurado');
     
     if (!MERCADOPAGO_ACCESS_TOKEN) {
-      throw new Error('❌ MERCADOPAGO_ACCESS_TOKEN no configurado en Supabase Edge Functions\n' +
-        'Configura la variable de entorno en el dashboard de Supabase');
+      throw new Error('MERCADOPAGO_ACCESS_TOKEN no configurado para MercadoPago')
     }
 
     // Obtener datos del request
@@ -146,7 +146,7 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({ 
         success: false, 
-        error: error instanceof Error ? error.message : 'Error desconocido'
+        error: error.message 
       }),
       { 
         status: 500, 

@@ -3,8 +3,7 @@
  * Alternativa a la Edge Function para mayor confiabilidad
  */
 
-// ❌ REMOVIDO - Credenciales secretas no deben estar en el frontend
-// Las operaciones de email se manejan en el backend (Supabase Edge Functions)
+const RESEND_API_KEY = import.meta.env.VITE_RESEND_API_KEY || '';
 const MAIL_FROM = import.meta.env.VITE_MAIL_FROM || 'Punto Legal <team@puntolegal.online>';
 const ADMIN_EMAIL = import.meta.env.VITE_ADMIN_EMAIL || 'puntolegalelgolf@gmail.com';
 
@@ -29,26 +28,31 @@ interface BookingData {
 }
 
 export async function sendResendEmail(emailData: EmailData): Promise<{ success: boolean; id?: string; error?: string }> {
-  // ❌ REMOVIDO - El envío directo de emails desde el frontend no es seguro
-  // Usar Supabase Edge Function para operaciones de email
-  
   try {
-    const { supabase } = await import('@/integrations/supabase/client');
-    
-    // Llamar a la edge function para enviar email
-    const { data, error } = await supabase.functions.invoke('send-email', {
-      body: emailData
+    const response = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${RESEND_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        from: MAIL_FROM,
+        to: [emailData.to],
+        subject: emailData.subject,
+        html: emailData.html,
+      }),
     });
 
-    if (error) {
-      console.error('Error enviando email via Supabase:', error);
-      return { success: false, error: error.message };
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(`Resend error ${response.status}: ${error}`);
     }
 
-    return { success: true, id: data?.id };
+    const result = await response.json();
+    return { success: true, id: result.id };
   } catch (error) {
-    console.error('Error en sendResendEmail:', error);
-    return { success: false, error: 'Error interno del servicio' };
+    console.error('Error enviando email:', error);
+    return { success: false, error: error instanceof Error ? error.message : 'Error desconocido' };
   }
 }
 

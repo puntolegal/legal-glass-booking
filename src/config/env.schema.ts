@@ -42,32 +42,25 @@ export type Env = z.infer<typeof EnvSchema>;
 
 // Función para determinar el entorno de MercadoPago
 export function getMercadoPagoEnv(): 'sandbox' | 'production' {
-  // Prioridad 1: Variable de entorno explícita
-  if (import.meta.env.VITE_MERCADOPAGO_ENV) {
-    return import.meta.env.VITE_MERCADOPAGO_ENV as 'sandbox' | 'production';
-  }
+  const isProduction = import.meta.env.PROD || 
+                      import.meta.env.MODE === 'production' || 
+                      window.location.hostname === 'www.puntolegal.online' ||
+                      window.location.hostname === 'puntolegal.online';
   
-  // Prioridad 2: Modo de Vite
-  if (import.meta.env.PROD) return 'production';
-  if (import.meta.env.MODE === 'production') return 'production';
-  
-  // Prioridad 3: Hostname (solo si es explícitamente producción)
-  const hostname = window.location.hostname;
-  if (hostname === 'puntolegal.online' || hostname === 'www.puntolegal.online') {
-    return 'production';
-  }
-  
-  // Por defecto: sandbox
-  return 'sandbox';
+  return isProduction ? 'production' : 'sandbox';
 }
 
 // Función para obtener el Access Token correcto
 export function getMpAccessToken(): string {
   const env = getMercadoPagoEnv();
   
-  // ❌ REMOVIDO - accessToken no debe estar en frontend
-  // Las operaciones con accessToken se manejan en el backend
-  throw new Error('Access Token no debe obtenerse en el frontend. Usar Supabase Edge Functions.');
+  if (env === 'production') {
+    return import.meta.env.VITE_MP_ACCESS_TOKEN_PROD || 
+           'APP_USR-7407359076060108-092318-7fb22dd54bc0d3e4a42accab058e8a3e-229698947';
+  } else {
+    return import.meta.env.VITE_MP_ACCESS_TOKEN_TEST || 
+           'TEST-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx';
+  }
 }
 
 // Función para obtener la Public Key correcta
@@ -76,19 +69,18 @@ export function getMpPublicKey(): string {
   
   if (env === 'production') {
     return import.meta.env.VITE_MP_PUBLIC_KEY_PROD || 
-           'CONFIGURAR_VITE_MP_PUBLIC_KEY_PROD';
+           'APP_USR-ebca3c36-af6d-4e88-ac94-5e984ce6bf5e';
   } else {
     return import.meta.env.VITE_MP_PUBLIC_KEY_TEST || 
-           'CONFIGURAR_VITE_MP_PUBLIC_KEY_TEST';
+           'TEST-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx';
   }
 }
 
 // Función para obtener URLs de retorno
 export function getReturnUrls() {
-  const baseUrl = import.meta.env.VITE_APP_URL || 
-                  import.meta.env.VITE_APP_BASE_URL || 
+  const baseUrl = import.meta.env.VITE_APP_BASE_URL || 
                   window.location.origin || 
-                  (import.meta.env.PROD ? 'https://puntolegal.online' : 'http://localhost:5173');
+                  'https://www.puntolegal.online';
   
   return {
     success: `${baseUrl}/payment-success?source=mercadopago`,

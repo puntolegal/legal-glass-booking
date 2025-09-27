@@ -118,8 +118,7 @@ const sendEmailDirect = async (emailData: {
     const response = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
-        // ❌ REMOVIDO - API Key no debe estar en el frontend
-        // 'Authorization': `Bearer ${import.meta.env.VITE_RESEND_API_KEY}`,
+        'Authorization': `Bearer ${import.meta.env.VITE_RESEND_API_KEY}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
@@ -166,6 +165,7 @@ const sendEmailWithResend = async (emailData: {
     const { RESEND_CONFIG, isResendConfigured } = await import('@/config/resendConfig');
     
     console.log('🔍 Resend Config Debug:', {
+      apiKey: RESEND_CONFIG.apiKey ? 'Configurado' : 'No configurado',
       isConfigured: isResendConfigured(),
       from: RESEND_CONFIG.from,
       adminEmail: RESEND_CONFIG.adminEmail

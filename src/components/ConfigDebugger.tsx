@@ -38,12 +38,12 @@ export const ConfigDebugger = () => {
         
         const configStatus: ConfigStatus = {
           mercadopago: {
-            accessToken: false, // No disponible en frontend por seguridad
+            accessToken: !!import.meta.env.VITE_MERCADOPAGO_ACCESS_TOKEN,
             publicKey: !!MERCADOPAGO_CONFIG.publicKey,
-            configured: !!MERCADOPAGO_CONFIG.publicKey
+            configured: !!(import.meta.env.VITE_MERCADOPAGO_ACCESS_TOKEN && MERCADOPAGO_CONFIG.publicKey)
           },
           resend: {
-            apiKey: false, // No disponible en frontend por seguridad
+            apiKey: !!RESEND_CONFIG.apiKey,
             from: !!RESEND_CONFIG.from,
             adminEmail: !!RESEND_CONFIG.adminEmail,
             configured: isResendConfigured()

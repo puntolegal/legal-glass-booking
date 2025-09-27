@@ -15,8 +15,7 @@ export interface MercadoPagoPreferenceData {
 // Credenciales oficiales de producción
 export const MERCADOPAGO_CREDENTIALS = {
   publicKey: import.meta.env.VITE_MERCADOPAGO_PUBLIC_KEY || '',
-  // ❌ REMOVIDO - accessToken no debe estar en frontend
-  // accessToken: import.meta.env.VITE_MERCADOPAGO_ACCESS_TOKEN || ''
+  accessToken: import.meta.env.VITE_MERCADOPAGO_ACCESS_TOKEN || ''
 };
 
 // Crear preferencia siguiendo la documentación oficial exacta
@@ -62,28 +61,43 @@ export const createOfficialPreference = async (paymentData: MercadoPagoPreferenc
       },
       statement_descriptor: 'PUNTO LEGAL'
     };
-    // ❌ REMOVIDO - No usar accessToken en frontend
-    // Las operaciones de pago se manejan en el backend (Supabase Edge Functions)
     
-    // Usar Supabase Edge Function en su lugar
-    const { supabase } = await import('@/integrations/supabase/client');
+    console.log('📤 Enviando a API oficial de MercadoPago...');
     
-    const { data, error } = await supabase.functions.invoke('create-mercadopago-preference', {
-      body: preferencePayload
+    // Llamada exacta a la API oficial
+    const response = await fetch('https://api.mercadopago.com/checkout/preferences', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${MERCADOPAGO_CREDENTIALS.accessToken}`
+      },
+      body: JSON.stringify(preferencePayload)
     });
     
-    if (error) {
-      console.error('❌ Error creando preferencia via Supabase:', error);
-      throw new Error(`Error del servidor: ${error.message}`);
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => null);
+      const errorText = await response.text().catch(() => 'Error desconocido');
+      
+      console.error('❌ Error API MercadoPago:', {
+        status: response.status,
+        statusText: response.statusText,
+        data: errorData,
+        text: errorText
+      });
+      
+      throw new Error(`Error ${response.status}: ${errorData?.message || errorText}`);
     }
     
-    if (!data?.preference_id) {
-      throw new Error('No se recibió preference_id del servidor');
-    }
+    const preferenceResult = await response.json();
+    
+    console.log('✅ Preferencia oficial creada:', {
+      id: preferenceResult.id,
+      init_point: preferenceResult.init_point
+    });
     
     return {
-      preference_id: data.preference_id,
-      init_point: data.init_point || `https://www.mercadopago.com.ar/checkout/v1/redirect?pref_id=${data.preference_id}`
+      preference_id: preferenceResult.id,
+      init_point: preferenceResult.init_point
     };
     
   } catch (error) {
