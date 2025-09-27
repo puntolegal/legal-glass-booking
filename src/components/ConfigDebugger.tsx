@@ -38,9 +38,9 @@ export const ConfigDebugger = () => {
         
         const configStatus: ConfigStatus = {
           mercadopago: {
-            accessToken: !!MERCADOPAGO_CONFIG.accessToken,
+            accessToken: !!import.meta.env.VITE_MERCADOPAGO_ACCESS_TOKEN,
             publicKey: !!MERCADOPAGO_CONFIG.publicKey,
-            configured: !!(MERCADOPAGO_CONFIG.accessToken && MERCADOPAGO_CONFIG.publicKey)
+            configured: !!(import.meta.env.VITE_MERCADOPAGO_ACCESS_TOKEN && MERCADOPAGO_CONFIG.publicKey)
           },
           resend: {
             apiKey: !!RESEND_CONFIG.apiKey,

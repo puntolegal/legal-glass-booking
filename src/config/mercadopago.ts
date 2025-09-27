@@ -7,8 +7,9 @@ const APP_BASE_URL = import.meta.env.VITE_APP_BASE_URL;
 const APP_NAME = import.meta.env.VITE_APP_NAME || 'Punto Legal';
 
 export const MERCADOPAGO_CONFIG = {
-  // Solo clave pública (el access token se usa en el backend)
+  // Claves públicas para el frontend
   publicKey: MERCADOPAGO_PUBLIC_KEY,
+  accessToken: import.meta.env.VITE_MERCADOPAGO_ACCESS_TOKEN || '', // Solo para debugging
   
   // Configuración regional
   locale: 'es-CL',
