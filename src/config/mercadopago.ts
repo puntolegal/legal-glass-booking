@@ -1,7 +1,11 @@
 // Configuración oficial de MercadoPago - Punto Legal  
-// Credenciales actualizadas para Chile
-const MERCADOPAGO_ACCESS_TOKEN = 'APP_USR-7407359076060108-092318-7fb22dd54bc0d3e4a42accab058e8a3e-229698947';
-const MERCADOPAGO_PUBLIC_KEY = 'APP_USR-ebca3c36-af6d-4e88-ac94-5e984ce6bf5e';
+// Usar esquema de validación de entorno
+import { getMercadoPagoEnv, getMpAccessToken, getMpPublicKey, getReturnUrls, getWebhookUrl } from './env.schema';
+
+// Determinar entorno automáticamente
+const MP_ENV = getMercadoPagoEnv();
+const MERCADOPAGO_ACCESS_TOKEN = getMpAccessToken();
+const MERCADOPAGO_PUBLIC_KEY = getMpPublicKey();
 
 export const MERCADOPAGO_CONFIG = {
   // Credenciales oficiales de PRODUCCIÓN - Mercado Pago Punto Legal
@@ -12,12 +16,8 @@ export const MERCADOPAGO_CONFIG = {
   locale: 'es-CL',
   currency: 'CLP',
   
-  // URLs de retorno actualizadas para producción
-  urls: {
-    success: `https://www.puntolegal.online/payment-success`,
-    failure: `https://www.puntolegal.online/payment-failure`,
-    pending: `https://www.puntolegal.online/payment-pending`
-  },
+  // URLs de retorno dinámicas según entorno
+  urls: getReturnUrls(),
   
   // Configuración de la empresa
   business: {
@@ -36,8 +36,11 @@ export const MERCADOPAGO_CONFIG = {
   
   // Configuración de notificaciones
   notifications: {
-    webhookUrl: `https://www.puntolegal.online/api/mercadopago/webhook`
-  }
+    webhookUrl: getWebhookUrl()
+  },
+  
+  // Información del entorno
+  environment: MP_ENV
 };
 
 // Tipos de pago soportados

@@ -30,6 +30,9 @@
     "lint:fix": "eslint . --fix",
     "docker:build": "docker build -t punto-legal-apuntes .",
     "docker:run": "docker run -p 8080:80 punto-legal-apuntes",
+    "env:check": "node scripts/validate-mercadopago-env.mjs",
+    "mp:sanity": "node scripts/mp-sanity-check.mjs",
+    "mp:test": "npm run env:check && npm run mp:sanity",
     "docker:dev": "docker-compose up --build",
     "supabase:security-fix": "node scripts/apply-security-fixes.js",
     "ensure-mercadopago": "node scripts/ensure-mercadopago-running.js",
@@ -74,11 +77,13 @@
     "clsx": "^2.1.1",
     "cmdk": "^1.0.0",
     "date-fns": "^3.6.0",
+    "dotenv": "^17.2.2",
     "embla-carousel-react": "^8.3.0",
     "framer-motion": "^12.23.0",
     "input-otp": "^1.2.4",
     "lucide-react": "^0.462.0",
     "next-themes": "^0.3.0",
+    "node-fetch": "^3.3.2",
     "react": "^18.3.1",
     "react-chartjs-2": "^5.3.0",
     "react-day-picker": "^8.10.1",
@@ -93,7 +98,7 @@
     "tailwind-merge": "^2.5.2",
     "tailwindcss-animate": "^1.0.7",
     "vaul": "^0.9.3",
-    "zod": "^3.23.8"
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@eslint/js": "^9.9.0",
