@@ -98,11 +98,11 @@ class MercadoPagoService {
         statement_descriptor: 'PUNTO LEGAL'
       };
 
-      // Por ahora usar API simulada (en producción usar backend real)
-      const { createPaymentPreference } = await import('@/api/mercadopago');
-      const preferenceResponse = await createPaymentPreference(preference);
+      // Usar el servicio de backend de MercadoPago
+      const { createCheckoutPreference } = await import('@/services/mercadopagoBackend');
+      const preferenceResponse = await createCheckoutPreference(preference);
       
-      return preferenceResponse.id;
+      return preferenceResponse.preference_id;
 
     } catch (error) {
       console.error('❌ Error creando preferencia de pago:', error);
@@ -127,20 +127,19 @@ class MercadoPagoService {
         metadata: paymentData.metadata
       };
 
-      // Por ahora usar API simulada (en producción usar backend real)
-      const { processPayment } = await import('@/api/mercadopago');
-      const paymentResponse = await processPayment(paymentPayload);
+      // Simular procesamiento de pago (sin backend real)
+      console.warn('⚠️ processCardPayment no implementado - simulando respuesta');
       
       return {
-        id: paymentResponse.id,
-        status: paymentResponse.status,
-        transaction_amount: paymentResponse.transaction_amount,
+        id: `sim_${Date.now()}`,
+        status: 'approved',
+        transaction_amount: paymentData.amount,
         payment_method: {
-          id: paymentResponse.payment_method_id || 'unknown',
-          type: paymentResponse.payment_type_id || 'unknown'
+          id: 'visa',
+          type: 'credit_card'
         },
-        date_created: paymentResponse.date_created,
-        detail: paymentResponse.detail || 'Pago procesado'
+        date_created: new Date().toISOString(),
+        detail: 'Pago simulado'
       };
 
     } catch (error) {

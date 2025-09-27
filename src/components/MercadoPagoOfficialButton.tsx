@@ -242,8 +242,8 @@ const MercadoPagoOfficialButton: React.FC<MercadoPagoOfficialButtonProps> = ({
       console.log('🔍 Resultado completo en MercadoPagoOfficialButton:', JSON.stringify(result, null, 2));
       console.log('🔗 Init Point recibido:', result.init_point);
       console.log('🔗 Sandbox Init Point recibido:', result.sandbox_init_point);
-      console.log('🔍 Status recibido:', result.status);
-      console.log('🔍 Live Mode recibido:', result.live_mode);
+        console.log('✅ Preferencia creada - Success:', result.success);
+        console.log('✅ Preferencia creada - Preference ID:', result.preference_id);
       
       // Verificar que los campos necesarios estén presentes
       if (!result.preference_id) {
