@@ -91,9 +91,9 @@ export function getReturnUrls() {
 
 // Función para obtener URL del webhook
 export function getWebhookUrl(): string {
-  const baseUrl = import.meta.env.VITE_APP_BASE_URL || 
-                  window.location.origin || 
-                  'https://www.puntolegal.online';
+  // Usar la función de Supabase Edge Function para el webhook
+  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 
+                      'https://tu-proyecto.supabase.co';
   
-  return `${baseUrl}/api/mercadopago/webhook`;
+  return `${supabaseUrl}/functions/v1/mercadopago-webhook`;
 }
