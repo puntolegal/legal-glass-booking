@@ -8,8 +8,14 @@ const fetch = require('node-fetch');
 const app = express();
 const PORT = 3001;
 
-// Credenciales oficiales de producción
-const MERCADOPAGO_ACCESS_TOKEN = process.env.MERCADOPAGO_ACCESS_TOKEN || 'APP_USR-7407359076060108-092318-7fb22dd54bc0d3e4a42accab058e8a3e-229698947';
+// ✅ SEGURO - Solo usar variables de entorno, sin fallback hardcodeado
+const MERCADOPAGO_ACCESS_TOKEN = process.env.MERCADOPAGO_ACCESS_TOKEN;
+
+if (!MERCADOPAGO_ACCESS_TOKEN) {
+  console.error('❌ ERROR: MERCADOPAGO_ACCESS_TOKEN no configurado');
+  console.error('Configura la variable de entorno MERCADOPAGO_ACCESS_TOKEN');
+  process.exit(1);
+}
 
 // Middleware
 app.use(cors());

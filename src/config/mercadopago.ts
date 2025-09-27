@@ -3,13 +3,13 @@
 
 // Configuración del frontend (solo variables públicas)
 const MERCADOPAGO_PUBLIC_KEY = import.meta.env.VITE_MERCADOPAGO_PUBLIC_KEY;
-const APP_BASE_URL = import.meta.env.VITE_APP_BASE_URL;
+const APP_URL = import.meta.env.VITE_APP_URL || import.meta.env.VITE_APP_BASE_URL;
 const APP_NAME = import.meta.env.VITE_APP_NAME || 'Punto Legal';
 
 export const MERCADOPAGO_CONFIG = {
-  // Claves públicas para el frontend
+  // ✅ SEGURO - Solo claves públicas para el frontend
   publicKey: MERCADOPAGO_PUBLIC_KEY,
-  accessToken: import.meta.env.VITE_MERCADOPAGO_ACCESS_TOKEN || '', // Solo para debugging
+  // ❌ REMOVIDO - accessToken no debe estar en el frontend
   
   // Configuración regional
   locale: 'es-CL',
@@ -17,9 +17,9 @@ export const MERCADOPAGO_CONFIG = {
   
   // URLs de retorno (configuradas en el backend)
   urls: {
-    success: `${APP_BASE_URL}/payment-success?source=mercadopago`,
-    failure: `${APP_BASE_URL}/payment-failure?source=mercadopago`,
-    pending: `${APP_BASE_URL}/payment-pending?source=mercadopago`
+    success: `${APP_URL}/payment-success?source=mercadopago`,
+    failure: `${APP_URL}/payment-failure?source=mercadopago`,
+    pending: `${APP_URL}/payment-pending?source=mercadopago`
   },
   
   // Configuración de la empresa
@@ -39,7 +39,7 @@ export const MERCADOPAGO_CONFIG = {
   
   // Configuración de notificaciones (webhook se maneja en Supabase Edge Function)
   notifications: {
-    webhookUrl: `https://qrgelocijmwnxcckxbdg.supabase.co/functions/v1/mercadopago-webhook`
+    webhookUrl: `${import.meta.env.VITE_SUPABASE_URL || 'https://tu-proyecto.supabase.co'}/functions/v1/mercadopago-webhook`
   },
   
   // Información del entorno

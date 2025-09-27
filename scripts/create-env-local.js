@@ -13,13 +13,14 @@ const __dirname = path.dirname(__filename);
 
 console.log('🔧 Creando archivo .env.local...');
 
-const envContent = `VITE_MERCADOPAGO_ACCESS_TOKEN=APP_USR-7407359076060108-092318-7fb22dd54bc0d3e4a42accab058e8a3e-229698947
-VITE_MERCADOPAGO_PUBLIC_KEY=APP_USR-ebca3c36-af6d-4e88-ac94-5e984ce6bf5e
-VITE_RESEND_API_KEY=re_RNEXa27x_GqqBRBWbLjp3tFwVUFm1gX9C
-VITE_MAIL_FROM=Punto Legal <team@puntolegal.online>
-VITE_ADMIN_EMAIL=puntolegalelgolf@gmail.com
-VITE_SUPABASE_URL=https://qrgelocijmwnxcckxbdg.supabase.co
-VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFyZ2Vsb2Npam13bnhjY2t4YmRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc4MDI0MjksImV4cCI6MjA3MzM3ODQyOX0.0q_3bb8bKR8VVZZAK_hYvhvLSTaU1iozmO5fKALjbI`;
+const envContent = `# ❌ CRÍTICO - NO usar credenciales secretas en frontend
+# VITE_MERCADOPAGO_ACCESS_TOKEN=NO_USAR_EN_FRONTEND
+VITE_MERCADOPAGO_PUBLIC_KEY=APP_USR-tu-public-key-aqui
+# VITE_RESEND_API_KEY=NO_USAR_EN_FRONTEND
+VITE_MAIL_FROM=Tu Nombre <tu-email@dominio.com>
+VITE_ADMIN_EMAIL=tu-admin-email@dominio.com
+VITE_SUPABASE_URL=https://tu-proyecto.supabase.co
+VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.tu-anon-key-aqui`;
 
 const envPath = path.join(__dirname, '..', '.env.local');
 

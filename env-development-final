@@ -1,0 +1,71 @@
+# ===========================================
+# CONFIGURACIÓN DE DESARROLLO - PUNTO LEGAL
+# ===========================================
+# Este archivo es para desarrollo local
+# Solo variables públicas para el frontend
+
+# ===========================================
+# CONFIGURACIÓN GENERAL
+# ===========================================
+NODE_ENV=development
+MODE=development
+VITE_MERCADOPAGO_ENV=sandbox
+
+# ===========================================
+# MERCADOPAGO - SOLO CLAVES PÚBLICAS DE SANDBOX
+# ===========================================
+# ⚠️ CRÍTICO - Usar SOLO credenciales de SANDBOX para desarrollo
+# Obtener de: https://www.mercadopago.com.ar/developers (crear aplicación TEST)
+VITE_MERCADOPAGO_PUBLIC_KEY=TEST-tu-public-key-sandbox-aqui
+
+# ===========================================
+# SUPABASE - CONFIGURACIÓN PÚBLICA
+# ===========================================
+VITE_SUPABASE_URL=https://qrgelocijmwnxcckxbdg.supabase.co
+VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFyZ2Vsb2Npam13bnhjY2t4YmRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc4MDI0MjksImV4cCI6MjA3MzM3ODQyOX0.0q_3bb8bKR8VVZZAK_hYvhvLSTaU1iozmO5fKALjbI
+VITE_SUPABASE_PROJECT_REF=qrgelocijmwnxcckxbdg
+
+# ===========================================
+# CONFIGURACIÓN DE EMAIL (SOLO PÚBLICA)
+# ===========================================
+VITE_MAIL_FROM=Desarrollo <dev@puntolegal.online>
+VITE_ADMIN_EMAIL=dev-admin@puntolegal.online
+
+# ===========================================
+# CONFIGURACIÓN DE LA APLICACIÓN
+# ===========================================
+VITE_APP_NAME=Punto Legal (Dev)
+VITE_APP_URL=http://localhost:5173
+VITE_APP_VERSION=1.0.0-dev
+
+# ===========================================
+# URLs DE RETORNO (DESARROLLO)
+# ===========================================
+VITE_SUCCESS_URL=http://localhost:5173/payment-success?source=mercadopago
+VITE_FAILURE_URL=http://localhost:5173/payment-failure?source=mercadopago
+VITE_PENDING_URL=http://localhost:5173/payment-pending?source=mercadopago
+
+# ===========================================
+# CONFIGURACIÓN DE DESARROLLO
+# ===========================================
+VITE_DEBUG=true
+VITE_LOG_LEVEL=debug
+
+# ===========================================
+# NOTAS IMPORTANTES
+# ===========================================
+# ❌ NO incluir aquí:
+# - MERCADOPAGO_ACCESS_TOKEN (ni siquiera de sandbox)
+# - RESEND_API_KEY
+# - SUPABASE_SERVICE_ROLE_KEY
+# - EDGE_ADMIN_TOKEN
+# - Cualquier credencial secreta
+#
+# ✅ Las credenciales secretas se configuran en:
+# - Supabase Dashboard → Edge Functions → Secrets
+# - Variables del servidor backend
+#
+# 🔧 Para desarrollo:
+# - Usar credenciales de sandbox de MercadoPago
+# - Usar base de datos de desarrollo
+# - Las operaciones sensibles se manejan via Edge Functions

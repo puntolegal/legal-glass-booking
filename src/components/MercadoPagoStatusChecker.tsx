@@ -19,10 +19,10 @@ export const MercadoPagoStatusChecker: React.FC<MercadoPagoStatusCheckerProps> =
     try {
       setStatus('checking');
       
-      // Debug: Verificar variables de entorno
+      // Debug: Verificar variables de entorno (solo públicas)
       console.log('🔍 DEBUG - Verificando variables de entorno:');
       console.log('import.meta.env:', import.meta.env);
-      console.log('VITE_MERCADOPAGO_ACCESS_TOKEN:', import.meta.env.VITE_MERCADOPAGO_ACCESS_TOKEN);
+      // ❌ REMOVIDO - accessToken no debe estar en frontend
       console.log('VITE_MERCADOPAGO_PUBLIC_KEY:', import.meta.env.VITE_MERCADOPAGO_PUBLIC_KEY);
       console.log('NODE_ENV:', import.meta.env.MODE);
       

@@ -3,31 +3,34 @@
  * No usar credenciales hardcodeadas para evitar conflictos
  */
 
-// Credenciales desde variables de entorno o fallback a producción
-// Valores de fallback garantizados para evitar errores de inicialización
-const FALLBACK_URL = 'https://qrgelocijmwnxcckxbdg.supabase.co';
-const FALLBACK_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFyZ2Vsb2Npam13bnhjY2t4YmRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc4MDI0MjksImV4cCI6MjA3MzM3ODQyOX0.0q_3bb8bKR8VVZZAK_hYvhvLSTaU1ioQzmO5fKALjbI';
-const FALLBACK_PROJECT_REF = 'qrgelocijmwnxcckxbdg';
+// ✅ SEGURO - Solo usar variables de entorno, sin fallbacks con credenciales reales
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
+const SUPABASE_PROJECT_REF = import.meta.env.VITE_SUPABASE_PROJECT_REF;
 
 // Debug: Verificar configuración de Supabase
 console.log('🔍 DEBUG Supabase Config:');
-console.log('VITE_SUPABASE_URL:', import.meta.env.VITE_SUPABASE_URL ? 'Configurado' : 'No configurado');
-console.log('VITE_SUPABASE_ANON_KEY:', import.meta.env.VITE_SUPABASE_ANON_KEY ? 'Configurado' : 'No configurado');
-console.log('FALLBACK_URL:', FALLBACK_URL ? 'Configurado' : 'No configurado');
-console.log('FALLBACK_ANON_KEY:', FALLBACK_ANON_KEY ? 'Configurado' : 'No configurado');
+console.log('VITE_SUPABASE_URL:', SUPABASE_URL ? 'Configurado' : '❌ No configurado');
+console.log('VITE_SUPABASE_ANON_KEY:', SUPABASE_ANON_KEY ? 'Configurado' : '❌ No configurado');
+console.log('VITE_SUPABASE_PROJECT_REF:', SUPABASE_PROJECT_REF ? 'Configurado' : '❌ No configurado');
+
+// Validar credenciales requeridas
+if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+  console.error('❌ ERROR: Credenciales de Supabase no configuradas');
+  console.error('Configura VITE_SUPABASE_URL y VITE_SUPABASE_ANON_KEY en tu archivo .env');
+}
 
 export const SUPABASE_CREDENTIALS = {
-  URL: import.meta.env.VITE_SUPABASE_URL || FALLBACK_URL,
-  PUBLISHABLE_KEY: import.meta.env.VITE_SUPABASE_ANON_KEY || FALLBACK_ANON_KEY,
-  PROJECT_REF: import.meta.env.VITE_SUPABASE_PROJECT_REF || FALLBACK_PROJECT_REF
+  URL: SUPABASE_URL || '',
+  PUBLISHABLE_KEY: SUPABASE_ANON_KEY || '',
+  PROJECT_REF: SUPABASE_PROJECT_REF || ''
 };
 
 // Verificar si las credenciales son válidas
 export const areCredentialsValid = (): boolean => {
   return Boolean(
     SUPABASE_CREDENTIALS.URL &&
-    SUPABASE_CREDENTIALS.PUBLISHABLE_KEY &&
-    SUPABASE_CREDENTIALS.PROJECT_REF
+    SUPABASE_CREDENTIALS.PUBLISHABLE_KEY
   );
 };
 
@@ -37,7 +40,7 @@ export const SUPABASE_CONFIG = {
   anonKey: SUPABASE_CREDENTIALS.PUBLISHABLE_KEY,
   projectRef: SUPABASE_CREDENTIALS.PROJECT_REF,
   isValid: areCredentialsValid(),
-  forceOffline: false
+  forceOffline: !areCredentialsValid()
 };
 
 // Información de diagnóstico
@@ -48,7 +51,7 @@ export const getDiagnosticInfo = () => {
     credentialsValid: areCredentialsValid(),
     mode: areCredentialsValid() ? 'online' : 'offline',
     reason: areCredentialsValid() 
-      ? 'Credenciales válidas del mismo proyecto' 
-      : 'Credenciales incompletas o inválidas'
+      ? 'Credenciales válidas configuradas' 
+      : 'Credenciales incompletas o inválidas - Configura las variables de entorno'
   };
 };

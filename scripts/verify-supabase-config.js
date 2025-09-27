@@ -6,14 +6,14 @@
 console.log('🔍 VERIFICANDO CONFIGURACIÓN DE SUPABASE');
 console.log('==========================================\n');
 
-// Configuraciones que deberían estar en Supabase
+// ✅ SEGURO - Configuraciones requeridas (sin credenciales reales)
 const requiredConfig = {
-  RESEND_API_KEY: 're_gvt6L3ER_5JiDjxtbkT1UpYowirF24DFW',
-  MAIL_FROM: 'Punto Legal <puntolegalelgolf@gmail.com>',
-  ADMIN_EMAIL: 'puntolegalelgolf@gmail.com',
-  SUPABASE_URL: 'https://qrgelocijmwnxcckxbdg.supabase.co',
-  SUPABASE_SERVICE_ROLE_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFyZ2Vsb2Npam13bnhjY2t4YmRnIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NzgwMjQyOSwiZXhwIjoyMDczMzc4NDI5fQ.eKvVrXiuz39_JP9lydQI6gxyrYX2tLQWIJzlI4lqnYg',
-  EDGE_ADMIN_TOKEN: 'puntolegal-admin-token-2025'
+  RESEND_API_KEY: 'CONFIGURAR_EN_SUPABASE_DASHBOARD',
+  MAIL_FROM: 'CONFIGURAR_EN_SUPABASE_DASHBOARD',
+  ADMIN_EMAIL: 'CONFIGURAR_EN_SUPABASE_DASHBOARD',
+  SUPABASE_URL: 'CONFIGURAR_EN_SUPABASE_DASHBOARD',
+  SUPABASE_SERVICE_ROLE_KEY: 'CONFIGURAR_EN_SUPABASE_DASHBOARD',
+  EDGE_ADMIN_TOKEN: 'CONFIGURAR_EN_SUPABASE_DASHBOARD'
 };
 
 console.log('✅ CONFIGURACIONES REQUERIDAS:');
@@ -36,13 +36,13 @@ console.log('1. Ir a Supabase Dashboard:');
 console.log('   https://supabase.com/dashboard/project/qrgelocijmwnxcckxbdg');
 console.log('   Settings → Configuration → Secrets');
 console.log('');
-console.log('2. Agregar estas 6 variables:');
-console.log('   RESEND_API_KEY=re_gvt6L3ER_5JiDjxtbkT1UpYowirF24DFW');
-console.log('   MAIL_FROM=Punto Legal <puntolegalelgolf@gmail.com>');
-console.log('   ADMIN_EMAIL=puntolegalelgolf@gmail.com');
-console.log('   SUPABASE_URL=https://qrgelocijmwnxcckxbdg.supabase.co');
-console.log('   SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFyZ2Vsb2Npam13bnhjY2t4YmRnIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NzgwMjQyOSwiZXhwIjoyMDczMzc4NDI5fQ.eKvVrXiuz39_JP9lydQI6gxyrYX2tLQWIJzlI4lqnYg');
-console.log('   EDGE_ADMIN_TOKEN=puntolegal-admin-token-2025');
+console.log('2. Agregar estas 6 variables (obtener valores reales de tus dashboards):');
+console.log('   RESEND_API_KEY=tu-resend-api-key-aqui');
+console.log('   MAIL_FROM=Tu Nombre <tu-email@dominio.com>');
+console.log('   ADMIN_EMAIL=tu-admin-email@dominio.com');
+console.log('   SUPABASE_URL=https://tu-proyecto.supabase.co');
+console.log('   SUPABASE_SERVICE_ROLE_KEY=tu-service-role-key-aqui');
+console.log('   EDGE_ADMIN_TOKEN=tu-admin-token-seguro');
 console.log('');
 console.log('3. Instalar Supabase CLI:');
 console.log('   # Opción 1: Homebrew');
@@ -63,9 +63,9 @@ console.log('7. Probar sistema:');
 console.log('   node scripts/test-supabase-email-system.js');
 
 console.log('\n🧪 PRUEBA MANUAL DE EDGE FUNCTION:');
-console.log('curl -X POST https://qrgelocijmwnxcckxbdg.supabase.co/functions/v1/send-booking-emails \\');
+console.log('curl -X POST https://tu-proyecto.supabase.co/functions/v1/send-booking-emails \\');
 console.log('  -H "Content-Type: application/json" \\');
-console.log('  -H "X-Admin-Token: puntolegal-admin-token-2025" \\');
+console.log('  -H "X-Admin-Token: tu-admin-token-seguro" \\');
 console.log('  -d \'{"booking_id": "test-reservation-id"}\'');
 
 console.log('\n🔍 VERIFICAR EN:');

@@ -1,0 +1,65 @@
+# ===========================================
+# CONFIGURACIÓN DE PRODUCCIÓN - SEGURA
+# ===========================================
+# Este archivo es para configurar en plataformas de hosting
+# (Vercel, Netlify, etc.) - Solo variables públicas
+
+# ===========================================
+# CONFIGURACIÓN GENERAL
+# ===========================================
+NODE_ENV=production
+MODE=production
+
+# ===========================================
+# MERCADOPAGO - SOLO CLAVES PÚBLICAS
+# ===========================================
+# ⚠️ CRÍTICO - Usar SOLO credenciales de PRODUCCIÓN para producción
+# Obtener de: https://www.mercadopago.com.ar/developers (aplicación de PRODUCCIÓN)
+VITE_MERCADOPAGO_PUBLIC_KEY=APP_USR-tu-public-key-prod-aqui
+
+# ===========================================
+# SUPABASE - CONFIGURACIÓN PÚBLICA
+# ===========================================
+VITE_SUPABASE_URL=https://tu-proyecto.supabase.co
+VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.tu-anon-key-real-aqui
+VITE_SUPABASE_PROJECT_REF=tu-proyecto-ref
+
+# ===========================================
+# CONFIGURACIÓN DE EMAIL (SOLO PÚBLICA)
+# ===========================================
+VITE_MAIL_FROM=Tu Nombre <tu-email@dominio.com>
+VITE_ADMIN_EMAIL=tu-admin-email@dominio.com
+
+# ===========================================
+# CONFIGURACIÓN DE LA APLICACIÓN
+# ===========================================
+VITE_APP_NAME=Punto Legal
+VITE_APP_URL=https://tu-dominio.com
+VITE_APP_VERSION=1.0.0
+
+# ===========================================
+# URLs DE RETORNO (MERCADOPAGO)
+# ===========================================
+VITE_SUCCESS_URL=https://tu-dominio.com/payment-success?source=mercadopago
+VITE_FAILURE_URL=https://tu-dominio.com/payment-failure?source=mercadopago
+VITE_PENDING_URL=https://tu-dominio.com/payment-pending?source=mercadopago
+
+# ===========================================
+# CONFIGURACIÓN DE DESARROLLO
+# ===========================================
+VITE_DEBUG=false
+VITE_LOG_LEVEL=info
+
+# ===========================================
+# NOTAS IMPORTANTES
+# ===========================================
+# ❌ NO incluir aquí:
+# - MERCADOPAGO_ACCESS_TOKEN
+# - RESEND_API_KEY
+# - SUPABASE_SERVICE_ROLE_KEY
+# - EDGE_ADMIN_TOKEN
+# - Cualquier credencial secreta
+#
+# ✅ Las credenciales secretas se configuran en:
+# - Supabase Dashboard → Edge Functions → Secrets
+# - Variables del servidor backend

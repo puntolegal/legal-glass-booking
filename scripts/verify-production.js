@@ -29,12 +29,12 @@ const jsFiles = fs.readdirSync(assetsPath).filter(file => file.endsWith('.js'));
 
 console.log(`📁 Archivos JS encontrados: ${jsFiles.length}`);
 
-// Verificar variables críticas
+// ❌ CRÍTICO - NO verificar credenciales secretas en frontend
 const criticalVars = {
-  'VITE_MERCADOPAGO_ACCESS_TOKEN': 'APP_USR-7407359076060108-092318-7fb22dd54bc0d3e4a42accab058e8a3e-229698947',
-  'VITE_MERCADOPAGO_PUBLIC_KEY': 'APP_USR-ebca3c36-af6d-4e88-ac94-5e984ce6bf5e',
-  'VITE_RESEND_API_KEY': 're_RNEXa27x_GqqBRBWbLjp3tFwVUFm1gX9C',
-  'VITE_SUPABASE_URL': 'https://qrgelocijmwnxcckxbdg.supabase.co'
+  // 'VITE_MERCADOPAGO_ACCESS_TOKEN': 'NO_USAR_EN_FRONTEND',
+  'VITE_MERCADOPAGO_PUBLIC_KEY': 'APP_USR-tu-public-key-aqui',
+  // 'VITE_RESEND_API_KEY': 'NO_USAR_EN_FRONTEND',
+  'VITE_SUPABASE_URL': 'https://tu-proyecto.supabase.co'
 };
 
 let allContent = indexContent;

@@ -38,9 +38,9 @@ export const ConfigDebugger = () => {
         
         const configStatus: ConfigStatus = {
           mercadopago: {
-            accessToken: !!import.meta.env.VITE_MERCADOPAGO_ACCESS_TOKEN,
+            // ❌ REMOVIDO - accessToken no debe estar en frontend
             publicKey: !!MERCADOPAGO_CONFIG.publicKey,
-            configured: !!(import.meta.env.VITE_MERCADOPAGO_ACCESS_TOKEN && MERCADOPAGO_CONFIG.publicKey)
+            configured: !!MERCADOPAGO_CONFIG.publicKey
           },
           resend: {
             apiKey: !!RESEND_CONFIG.apiKey,
