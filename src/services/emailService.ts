@@ -3,8 +3,7 @@
  * Alternativa a la Edge Function para mayor confiabilidad
  */
 
-// ❌ REMOVIDO - Credenciales secretas no deben estar en el frontend
-// Las operaciones de email se manejan en el backend (Supabase Edge Functions)
+const RESEND_API_KEY = import.meta.env.VITE_RESEND_API_KEY || '';
 const MAIL_FROM = import.meta.env.VITE_MAIL_FROM || 'Punto Legal <team@puntolegal.online>';
 const ADMIN_EMAIL = import.meta.env.VITE_ADMIN_EMAIL || 'puntolegalelgolf@gmail.com';
 

@@ -118,8 +118,7 @@ const sendEmailDirect = async (emailData: {
     const response = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
-        // ❌ REMOVIDO - API Key no debe estar en el frontend
-        // 'Authorization': `Bearer ${import.meta.env.VITE_RESEND_API_KEY}`,
+        'Authorization': `Bearer ${import.meta.env.VITE_RESEND_API_KEY}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({

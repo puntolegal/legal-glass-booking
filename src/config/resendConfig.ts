@@ -2,8 +2,8 @@
 // Valores por defecto para producción
 
 export const RESEND_CONFIG = {
-  // ❌ REMOVIDO - API Key no debe estar en el frontend
-  // Las operaciones de email se manejan en el backend
+  // API Key de Resend (valores hardcodeados para producción)
+  apiKey: import.meta.env.VITE_RESEND_API_KEY || 're_RNEXa27x_GqqBRBWbLjp3tFwVUFm1gX9C',
   
   // Configuración de email
   from: import.meta.env.VITE_MAIL_FROM || 'Punto Legal <team@puntolegal.online>',
