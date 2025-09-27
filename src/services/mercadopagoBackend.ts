@@ -278,18 +278,20 @@ const createPreferenceOriginal = async (preferenceData: CreatePreferenceRequest)
     }
     
     // Llamada real a la API de MercadoPago
-    console.log('🔑 Usando token de acceso:', MERCADOPAGO_CONFIG.accessToken ? 'Configurado' : 'No configurado');
-    console.log('🔍 Token completo:', MERCADOPAGO_CONFIG.accessToken ? `${MERCADOPAGO_CONFIG.accessToken.substring(0, 20)}...` : 'No disponible');
+    // El accessToken se obtiene del backend, no del frontend
+    const accessToken = process.env.MERCADOPAGO_ACCESS_TOKEN;
+    console.log('🔑 Usando token de acceso:', accessToken ? 'Configurado' : 'No configurado');
+    console.log('🔍 Token completo:', accessToken ? `${accessToken.substring(0, 20)}...` : 'No disponible');
     console.log('🔄 Auto return configurado:', preference.back_urls.success.startsWith('https://') ? 'Sí (HTTPS)' : 'No (HTTP local)');
     
-    if (!MERCADOPAGO_CONFIG.accessToken) {
+    if (!accessToken) {
       throw new Error('Token de acceso de MercadoPago no configurado');
     }
     
     const response = await fetch('https://api.mercadopago.com/checkout/preferences', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${MERCADOPAGO_CONFIG.accessToken}`,
+        'Authorization': `Bearer ${accessToken}`,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(preference)
@@ -373,10 +375,7 @@ export const getPaymentInfo = async (paymentId: string) => {
       console.log('ℹ️ Backend local no disponible para /payment, usando fallback');
     }
 
-    const accessToken =
-      MERCADOPAGO_CONFIG.accessToken ||
-      (typeof process !== 'undefined' ? (process as any).env?.MERCADOPAGO_ACCESS_TOKEN : '') ||
-      (typeof process !== 'undefined' ? (process as any).env?.VITE_MERCADOPAGO_ACCESS_TOKEN : '');
+    const accessToken = process.env.MERCADOPAGO_ACCESS_TOKEN;
 
     if (!accessToken) {
       console.warn('⚠️ Access token de MercadoPago no configurado, utilizando datos simulados.');

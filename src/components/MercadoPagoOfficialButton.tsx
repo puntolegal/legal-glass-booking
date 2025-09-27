@@ -63,18 +63,16 @@ const MercadoPagoOfficialButton: React.FC<MercadoPagoOfficialButtonProps> = ({
       
       // Verificar que las credenciales de MercadoPago estén configuradas usando configuración centralizada
       const { MERCADOPAGO_CONFIG } = await import('@/config/mercadopago');
-      const accessToken = MERCADOPAGO_CONFIG.accessToken;
       const publicKey = MERCADOPAGO_CONFIG.publicKey;
       
       console.log('🔍 DEBUG MercadoPago Backend Check:', {
-        accessToken: accessToken ? 'Configurado' : 'No configurado',
         publicKey: publicKey ? 'Configurado' : 'No configurado',
         isProduction: import.meta.env.PROD || window.location.hostname === 'puntolegal.online'
       });
       
-      if (!accessToken || !publicKey) {
+      if (!publicKey) {
         setBackendStatus('unavailable');
-        console.log('⚠️ Credenciales de MercadoPago no configuradas');
+        console.log('⚠️ Public Key de MercadoPago no configurada');
         return;
       }
       
