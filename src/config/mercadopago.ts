@@ -36,9 +36,9 @@ export const MERCADOPAGO_CONFIG = {
     maxInstallments: 12
   },
   
-  // Configuración de notificaciones (webhook se maneja en el backend)
+  // Configuración de notificaciones (webhook se maneja en Supabase Edge Function)
   notifications: {
-    webhookUrl: `${APP_BASE_URL}/api/mercadopago/webhook`
+    webhookUrl: `https://qrgelocijmwnxcckxbdg.supabase.co/functions/v1/mercadopago-webhook`
   },
   
   // Información del entorno
