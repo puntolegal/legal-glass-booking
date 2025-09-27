@@ -1,112 +1,108 @@
-// API endpoints para MercadoPago
-// Nota: En producción, estos endpoints deberían estar en un servidor backend
+// API para MercadoPago - Backend
+// Maneja la creación de preferencias de pago de forma segura
 
-import { MERCADOPAGO_CONFIG } from '@/config/mercadopago';
+interface PaymentData {
+  amount: number;
+  description: string;
+  external_reference?: string;
+  customer?: {
+    name: string;
+    email: string;
+    phone?: string;
+  };
+}
 
-// Simular creación de preferencia de pago
-export const createPaymentPreference = async (preferenceData: any) => {
-  try {
-    // En producción, esto debería llamar a tu backend
-    // Por ahora, simulamos la respuesta de MercadoPago
-    
-    const mockPreference = {
-      id: `PREF-${Date.now()}`,
-      init_point: `https://www.mercadopago.com.ar/checkout/v1/redirect?pref_id=PREF-${Date.now()}`,
-      sandbox_init_point: `https://sandbox.mercadopago.com.ar/checkout/v1/redirect?pref_id=PREF-${Date.now()}`,
-      collector_id: 2685419265,
-      client_id: 4010337867785275,
-      items: preferenceData.items,
-      payer: preferenceData.payer,
-      back_urls: preferenceData.back_urls,
-      auto_return: preferenceData.auto_return,
-      external_reference: preferenceData.external_reference,
-      notification_url: preferenceData.notification_url
+interface MercadoPagoPreference {
+  id: string;
+  init_point: string;
+  sandbox_init_point?: string;
+}
+
+export class MercadoPagoAPI {
+  private accessToken: string;
+  private baseUrl: string;
+
+  constructor() {
+    // Solo usar en el backend - nunca en el frontend
+    this.accessToken = process.env.MERCADOPAGO_ACCESS_TOKEN || '';
+    this.baseUrl = process.env.NODE_ENV === 'production' 
+      ? 'https://api.mercadopago.com' 
+      : 'https://api.mercadopago.com/sandbox';
+  }
+
+  async createPreference(paymentData: PaymentData): Promise<MercadoPagoPreference> {
+    const preference = {
+      items: [
+        {
+          title: paymentData.description,
+          quantity: 1,
+          unit_price: paymentData.amount,
+          currency_id: 'CLP'
+        }
+      ],
+      back_urls: {
+        success: process.env.SUCCESS_URL || `${process.env.APP_BASE_URL}/payment-success?source=mercadopago`,
+        failure: process.env.FAILURE_URL || `${process.env.APP_BASE_URL}/payment-failure?source=mercadopago`,
+        pending: process.env.PENDING_URL || `${process.env.APP_BASE_URL}/payment-pending?source=mercadopago`
+      },
+      auto_return: 'approved',
+      external_reference: paymentData.external_reference || `PL-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      notification_url: process.env.MP_WEBHOOK_URL,
+      payer: paymentData.customer ? {
+        name: paymentData.customer.name,
+        email: paymentData.customer.email,
+        phone: paymentData.customer.phone ? {
+          number: paymentData.customer.phone
+        } : undefined
+      } : undefined
     };
 
-    console.log('✅ Preferencia de pago creada (simulada):', mockPreference);
-    return mockPreference;
+    const response = await fetch(`${this.baseUrl}/checkout/preferences`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${this.accessToken}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(preference)
+    });
 
-  } catch (error) {
-    console.error('❌ Error creando preferencia:', error);
-    throw error;
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(`Error creando preferencia: ${response.status} - ${error}`);
+    }
+
+    return await response.json();
   }
-};
 
-// Simular procesamiento de pago
-export const processPayment = async (paymentData: any) => {
-  try {
-    // En producción, esto debería llamar a la API de MercadoPago
-    // Por ahora, simulamos una respuesta exitosa
-    
-    const mockPayment = {
-      id: `PAY-${Date.now()}`,
-      status: 'approved',
-      status_detail: 'accredited',
-      transaction_amount: paymentData.transaction_amount,
-      currency_id: 'CLP',
-      payment_method_id: paymentData.payment_method_id || 'visa',
-      payment_type_id: 'credit_card',
-      date_created: new Date().toISOString(),
-      date_approved: new Date().toISOString(),
-      payer: paymentData.payer,
-      external_reference: paymentData.external_reference,
-      metadata: paymentData.metadata,
-      detail: 'Payment approved'
-    };
-
-    // Simular delay de procesamiento
-    await new Promise(resolve => setTimeout(resolve, 2000));
-
-    console.log('✅ Pago procesado (simulado):', mockPayment);
-    return mockPayment;
-
-  } catch (error) {
-    console.error('❌ Error procesando pago:', error);
-    throw error;
-  }
-};
-
-// Manejar notificaciones de webhook
-export const handleWebhookNotification = async (notification: any) => {
-  try {
-    console.log('🔔 Notificación de MercadoPago recibida:', notification);
-    
-    // En producción, aquí validarías la notificación
-    // y actualizarías el estado del pago en tu base de datos
-    
-    return {
-      status: 'ok',
-      message: 'Notificación procesada'
-    };
-    
-  } catch (error) {
-    console.error('❌ Error procesando notificación:', error);
-    throw error;
-  }
-};
-
-// Obtener información de pago
-export const getPaymentInfo = async (paymentId: string) => {
-  try {
-    // En producción, esto consultaría la API de MercadoPago
-    // Por ahora, devolvemos datos simulados
-    
-    const mockPaymentInfo = {
-      id: paymentId,
-      status: 'approved',
-      transaction_amount: 35000,
-      currency_id: 'CLP',
-      date_created: new Date().toISOString(),
-      payment_method: {
-        id: 'visa',
-        type: 'credit_card'
+  async getPayment(paymentId: string) {
+    const response = await fetch(`${this.baseUrl}/v1/payments/${paymentId}`, {
+      headers: {
+        'Authorization': `Bearer ${this.accessToken}`
       }
-    };
+    });
 
-    return mockPaymentInfo;
-    
-  } catch (error) {
-    console.error('❌ Error obteniendo información de pago:', error);
-    throw error;
+    if (!response.ok) {
+      throw new Error(`Error obteniendo pago: ${response.status}`);
+    }
+
+    return await response.json();
   }
-};
+}
+
+// Función helper para crear preferencia desde el frontend
+export async function createPaymentPreference(paymentData: PaymentData): Promise<MercadoPagoPreference> {
+  const response = await fetch('/api/mercadopago/create-preference', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(paymentData)
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || 'Error creando preferencia de pago');
+  }
+
+  return await response.json();
+}

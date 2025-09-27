@@ -1,28 +1,30 @@
 // Configuración oficial de MercadoPago - Punto Legal  
-// Usar esquema de validación de entorno
-import { getMercadoPagoEnv, getMpAccessToken, getMpPublicKey, getReturnUrls, getWebhookUrl } from './env.schema';
+// Solo variables VITE_ (públicas) en el frontend
 
-// Determinar entorno automáticamente
-const MP_ENV = getMercadoPagoEnv();
-const MERCADOPAGO_ACCESS_TOKEN = getMpAccessToken();
-const MERCADOPAGO_PUBLIC_KEY = getMpPublicKey();
+// Configuración del frontend (solo variables públicas)
+const MERCADOPAGO_PUBLIC_KEY = import.meta.env.VITE_MERCADOPAGO_PUBLIC_KEY;
+const APP_BASE_URL = import.meta.env.VITE_APP_BASE_URL;
+const APP_NAME = import.meta.env.VITE_APP_NAME || 'Punto Legal';
 
 export const MERCADOPAGO_CONFIG = {
-  // Credenciales oficiales de PRODUCCIÓN - Mercado Pago Punto Legal
+  // Solo clave pública (el access token se usa en el backend)
   publicKey: MERCADOPAGO_PUBLIC_KEY,
-  accessToken: MERCADOPAGO_ACCESS_TOKEN,
   
   // Configuración regional
   locale: 'es-CL',
   currency: 'CLP',
   
-  // URLs de retorno dinámicas según entorno
-  urls: getReturnUrls(),
+  // URLs de retorno (configuradas en el backend)
+  urls: {
+    success: `${APP_BASE_URL}/payment-success?source=mercadopago`,
+    failure: `${APP_BASE_URL}/payment-failure?source=mercadopago`,
+    pending: `${APP_BASE_URL}/payment-pending?source=mercadopago`
+  },
   
   // Configuración de la empresa
   business: {
-    name: 'Punto Legal',
-    email: 'puntolegalelgolf@gmail.com',
+    name: APP_NAME,
+    email: import.meta.env.VITE_ADMIN_EMAIL || 'puntolegalelgolf@gmail.com',
     phone: '+56962321883',
     address: 'El Golf, Las Condes, Santiago'
   },
@@ -34,13 +36,13 @@ export const MERCADOPAGO_CONFIG = {
     maxInstallments: 12
   },
   
-  // Configuración de notificaciones
+  // Configuración de notificaciones (webhook se maneja en el backend)
   notifications: {
-    webhookUrl: getWebhookUrl()
+    webhookUrl: `${APP_BASE_URL}/api/mercadopago/webhook`
   },
   
   // Información del entorno
-  environment: MP_ENV
+  environment: import.meta.env.PROD ? 'production' : 'sandbox'
 };
 
 // Tipos de pago soportados
