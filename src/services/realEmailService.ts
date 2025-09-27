@@ -166,7 +166,6 @@ const sendEmailWithResend = async (emailData: {
     const { RESEND_CONFIG, isResendConfigured } = await import('@/config/resendConfig');
     
     console.log('🔍 Resend Config Debug:', {
-      apiKey: RESEND_CONFIG.apiKey ? 'Configurado' : 'No configurado',
       isConfigured: isResendConfigured(),
       from: RESEND_CONFIG.from,
       adminEmail: RESEND_CONFIG.adminEmail

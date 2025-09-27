@@ -38,12 +38,12 @@ export const ConfigDebugger = () => {
         
         const configStatus: ConfigStatus = {
           mercadopago: {
-            // ❌ REMOVIDO - accessToken no debe estar en frontend
+            accessToken: false, // No disponible en frontend por seguridad
             publicKey: !!MERCADOPAGO_CONFIG.publicKey,
             configured: !!MERCADOPAGO_CONFIG.publicKey
           },
           resend: {
-            apiKey: !!RESEND_CONFIG.apiKey,
+            apiKey: false, // No disponible en frontend por seguridad
             from: !!RESEND_CONFIG.from,
             adminEmail: !!RESEND_CONFIG.adminEmail,
             configured: isResendConfigured()

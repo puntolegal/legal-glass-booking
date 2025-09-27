@@ -28,20 +28,17 @@ export const MercadoPagoStatusChecker: React.FC<MercadoPagoStatusCheckerProps> =
       
       // Verificar que las credenciales de MercadoPago estén configuradas
       const { MERCADOPAGO_CONFIG } = await import('@/config/mercadopago');
-      const accessToken = MERCADOPAGO_CONFIG.accessToken;
       const publicKey = MERCADOPAGO_CONFIG.publicKey;
       
-      if (!accessToken || !publicKey) {
+      if (!publicKey) {
         setStatus('unavailable');
         onStatusChange?.(false);
         console.log('⚠️ Credenciales de MercadoPago no configuradas');
-        console.log('Access Token:', accessToken ? 'Configurado' : 'No configurado');
         console.log('Public Key:', publicKey ? 'Configurado' : 'No configurado');
         return;
       }
       
       console.log('✅ Credenciales de MercadoPago configuradas');
-      console.log('Access Token:', accessToken ? 'Configurado' : 'No configurado');
       console.log('Public Key:', publicKey ? 'Configurado' : 'No configurado');
       
       // Verificar conectividad con Supabase (nuestro backend)
