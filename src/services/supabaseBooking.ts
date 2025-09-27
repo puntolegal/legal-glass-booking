@@ -454,12 +454,21 @@ export const findReservaByCriteria = async (criteria: {
   try {
     let query = supabase.from('reservas').select('*');
     
+    // Buscar por external_reference (que en realidad es el ID de la reserva)
+    if (criteria.external_reference) {
+      query = query.eq('id', criteria.external_reference);
+    }
+    
+    // Buscar por preference_id (que no existe en el esquema actual, pero podemos buscar por ID)
+    if (criteria.preference_id) {
+      // Como no tenemos preference_id en el esquema, buscamos por ID si coincide
+      query = query.eq('id', criteria.preference_id);
+    }
+    
+    // Buscar por email
     if (criteria.email) {
       query = query.eq('email', criteria.email);
     }
-    
-    // Note: external_reference and preference_id don't exist in current schema
-    // This is a compatibility function that searches by available fields
     
     const { data, error } = await query.maybeSingle();
     
