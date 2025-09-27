@@ -41,9 +41,9 @@ export class MercadoPagoAPI {
         }
       ],
       back_urls: {
-        success: process.env.SUCCESS_URL || `${process.env.APP_BASE_URL}/payment-success?source=mercadopago`,
-        failure: process.env.FAILURE_URL || `${process.env.APP_BASE_URL}/payment-failure?source=mercadopago`,
-        pending: process.env.PENDING_URL || `${process.env.APP_BASE_URL}/payment-pending?source=mercadopago`
+        success: process.env.SUCCESS_URL || `https://www.puntolegal.online/payment-success?source=mercadopago`,
+        failure: process.env.FAILURE_URL || `https://www.puntolegal.online/payment-failure?source=mercadopago`,
+        pending: process.env.PENDING_URL || `https://www.puntolegal.online/payment-pending?source=mercadopago`
       },
       auto_return: 'approved',
       external_reference: paymentData.external_reference || `PL-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,

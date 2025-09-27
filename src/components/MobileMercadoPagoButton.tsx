@@ -55,13 +55,13 @@ const MobileMercadoPagoButton: React.FC<MobileMercadoPagoButtonProps> = ({
           }
         },
         back_urls: {
-          success: `${window.location.origin}/payment-success?source=mercadopago`,
-          failure: `${window.location.origin}/payment-failure?source=mercadopago`,
-          pending: `${window.location.origin}/payment-pending?source=mercadopago`
+          success: `https://www.puntolegal.online/payment-success?source=mercadopago`,
+          failure: `https://www.puntolegal.online/payment-failure?source=mercadopago`,
+          pending: `https://www.puntolegal.online/payment-pending?source=mercadopago`
         },
         auto_return: 'approved' as const,
         external_reference: `PL-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-        notification_url: `${window.location.origin}/api/mercadopago/webhook`,
+        notification_url: `https://qrgelocijmwnxcckxbdg.supabase.co/functions/v1/mercadopago-webhook`,
         metadata: {
           client_name: paymentData.payer.name,
           client_email: paymentData.payer.email,

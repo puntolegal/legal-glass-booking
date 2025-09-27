@@ -37,13 +37,13 @@ export const createPreferenceViaProxy = async (paymentData: PaymentData): Promis
         }
       },
       back_urls: {
-        success: `${window.location.origin}/payment-success?source=mercadopago`,
-        failure: `${window.location.origin}/payment-failure?source=mercadopago`,
-        pending: `${window.location.origin}/payment-pending?source=mercadopago`
+        success: `https://www.puntolegal.online/payment-success?source=mercadopago`,
+        failure: `https://www.puntolegal.online/payment-failure?source=mercadopago`,
+        pending: `https://www.puntolegal.online/payment-pending?source=mercadopago`
       },
       auto_return: 'approved',
       external_reference: `PL-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      notification_url: `${window.location.origin}/api/mercadopago/webhook`,
+      notification_url: `https://qrgelocijmwnxcckxbdg.supabase.co/functions/v1/mercadopago-webhook`,
       metadata: {
         client_name: paymentData.name,
         client_email: paymentData.email,
@@ -113,9 +113,9 @@ const createFallbackPreference = async (paymentData: PaymentData): Promise<{ pre
       `&currency_id=CLP` +
       `&payer_name=${encodeURIComponent(paymentData.name)}` +
       `&payer_email=${encodeURIComponent(paymentData.email)}` +
-      `&back_urls[success]=${encodeURIComponent(`${window.location.origin}/payment-success?source=mercadopago`)}` +
-      `&back_urls[failure]=${encodeURIComponent(`${window.location.origin}/payment-failure?source=mercadopago`)}` +
-      `&back_urls[pending]=${encodeURIComponent(`${window.location.origin}/payment-pending?source=mercadopago`)}` +
+      `&back_urls[success]=${encodeURIComponent(`https://www.puntolegal.online/payment-success?source=mercadopago`)}` +
+      `&back_urls[failure]=${encodeURIComponent(`https://www.puntolegal.online/payment-failure?source=mercadopago`)}` +
+      `&back_urls[pending]=${encodeURIComponent(`https://www.puntolegal.online/payment-pending?source=mercadopago`)}` +
       `&auto_return=approved` +
       `&external_reference=PL-${Date.now()}`;
     

@@ -1,3 +1,17 @@
+# 🔧 CÓDIGO CORREGIDO PARA EL WEBHOOK DE MERCADOPAGO
+
+## 🎯 **PROBLEMA RESUELTO**
+
+**Error:** `401 - Unauthorized` en el webhook  
+**Solución:** Permitir requests de MercadoPago sin autenticación
+
+---
+
+## 📋 **CÓDIGO ACTUALIZADO**
+
+### **Copia este código completo en el dashboard de Supabase:**
+
+```typescript
 // Webhook de MercadoPago para Supabase Edge Functions
 // Maneja notificaciones de pagos en producción
 
@@ -110,3 +124,62 @@ serve(async (req) => {
     );
   }
 })
+```
+
+---
+
+## 🚀 **PASOS PARA APLICAR LA CORRECCIÓN**
+
+### **1. Ir al Dashboard de Supabase:**
+- **URL:** https://supabase.com/dashboard/project/qrgelocijmwnxcckxbdg/functions
+
+### **2. Editar la función:**
+- **Hacer clic en:** `mercadopago-webhook`
+- **Hacer clic en:** "Edit function"
+
+### **3. Reemplazar el código:**
+- **Seleccionar todo** el código existente
+- **Eliminar** el código actual
+- **Pegar** el código de arriba
+
+### **4. Desplegar:**
+- **Hacer clic en:** "Deploy function"
+
+---
+
+## 🧪 **VERIFICACIÓN**
+
+### **Después del deploy, probar en MercadoPago:**
+```
+https://qrgelocijmwnxcckxbdg.supabase.co/functions/v1/mercadopago-webhook
+```
+
+### **Resultado esperado:**
+```json
+{
+  "success": true,
+  "message": "Webhook procesado correctamente"
+}
+```
+
+---
+
+## ✅ **¿QUÉ CAMBIÓ?**
+
+### **Antes:**
+- ❌ Todos los requests requerían autenticación
+- ❌ MercadoPago no podía acceder (401 Unauthorized)
+
+### **Después:**
+- ✅ Requests de MercadoPago permitidos sin autenticación
+- ✅ Otros requests siguen requiriendo autenticación
+- ✅ Webhook funcionará correctamente
+
+---
+
+## 🎯 **PRÓXIMO PASO**
+
+1. **Aplicar la corrección** en el dashboard de Supabase
+2. **Probar la URL** en MercadoPago
+3. **Configurar las URLs de retorno** en MercadoPago
+4. **Probar el flujo completo** de pago

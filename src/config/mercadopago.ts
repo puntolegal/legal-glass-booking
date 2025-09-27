@@ -15,11 +15,11 @@ export const MERCADOPAGO_CONFIG = {
   locale: 'es-CL',
   currency: 'CLP',
   
-  // URLs de retorno (configuradas en el backend)
+  // URLs de retorno (configuradas en el backend) - SIEMPRE PRODUCCIÓN
   urls: {
-    success: `${APP_BASE_URL}/payment-success?source=mercadopago`,
-    failure: `${APP_BASE_URL}/payment-failure?source=mercadopago`,
-    pending: `${APP_BASE_URL}/payment-pending?source=mercadopago`
+    success: `https://www.puntolegal.online/payment-success?source=mercadopago`,
+    failure: `https://www.puntolegal.online/payment-failure?source=mercadopago`,
+    pending: `https://www.puntolegal.online/payment-pending?source=mercadopago`
   },
   
   // Configuración de la empresa
