@@ -348,7 +348,7 @@ const MercadoPagoOfficialButton: React.FC<MercadoPagoOfficialButtonProps> = ({
         ) : (
           <>
             <CreditCard className="h-5 w-5" />
-            <span>Pagar con MercadoPago</span>
+            <span>Pagar</span>
             <ExternalLink className="h-4 w-4" />
           </>
         )}
