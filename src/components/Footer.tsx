@@ -55,7 +55,7 @@ const Footer: React.FC = () => {
     ];
 
     return (
-      <footer className="relative bg-gradient-to-br from-slate-900 via-gray-900 to-slate-800 text-white overflow-hidden border-t border-white/10 shadow-2xl backdrop-blur-xl">
+      <footer className="relative bg-gradient-to-br from-black via-gray-900 to-black text-white overflow-hidden border-t border-white/10 shadow-2xl backdrop-blur-xl">
         {/* Efectos de fondo animados */}
         <div className="absolute inset-0 overflow-hidden">
           {/* Círculos decorativos */}
@@ -356,7 +356,7 @@ const Footer: React.FC = () => {
   ];
 
   return (
-    <footer className="relative bg-gradient-to-br from-slate-900 via-gray-900 to-slate-800 text-white overflow-hidden border-t border-white/10 shadow-2xl backdrop-blur-xl">
+    <footer className="relative bg-gradient-to-br from-black via-gray-900 to-black text-white overflow-hidden border-t border-white/10 shadow-2xl backdrop-blur-xl">
       {/* Efectos de fondo consistentes con Docker y Sidebar */}
       <div className="absolute inset-0 overflow-hidden">
         {/* Gradiente sutil de brillo */}
@@ -482,23 +482,6 @@ const Footer: React.FC = () => {
               ))}
             </ul>
 
-            {/* Redes sociales */}
-            <div className="mt-6">
-              <h4 className="text-lg font-medium mb-3">Síguenos</h4>
-              <div className="flex space-x-3">
-                {socialLinksMain.map((social) => (
-                  <a
-                    key={social.name}
-                    href={social.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-10 h-10 bg-white/10 hover:bg-primary/20 backdrop-blur-sm border border-white/20 hover:border-primary/40 rounded-lg flex items-center justify-center transition-all duration-300 hover:shadow-lg hover:shadow-primary/20 group"
-                  >
-                    <span>{social.icon}</span>
-                  </a>
-                ))}
-              </div>
-            </div>
           </motion.div>
         </div>
 

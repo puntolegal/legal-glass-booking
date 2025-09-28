@@ -705,8 +705,8 @@ export default function Sidebar() {
               <p className="text-xs text-foreground/60">Casos</p>
             </div>
             <div>
-              <p className={`text-lg font-bold ${isMobile ? 'text-stone-400' : 'text-primary'}`}>98%</p>
-              <p className="text-xs text-foreground/60">Éxito</p>
+              <p className={`text-lg font-bold ${isMobile ? 'text-stone-400' : 'text-primary'}`}>+2.6M</p>
+              <p className="text-xs text-foreground/60">Recuperados</p>
             </div>
           </div>
         </div>
