@@ -116,7 +116,7 @@ export default function CorporateLoginSimple({ onClose, onLoginSuccess, isModal 
       initial={{ scale: 0.9, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
       exit={{ scale: 0.9, opacity: 0 }}
-      className="bg-white rounded-2xl max-w-md w-full max-h-[90vh] overflow-y-auto shadow-2xl"
+      className="bg-white rounded-2xl max-w-md w-full max-h-[95vh] overflow-y-auto shadow-2xl"
     >
         {/* Header */}
         <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-6 rounded-t-2xl relative">
@@ -144,9 +144,9 @@ export default function CorporateLoginSimple({ onClose, onLoginSuccess, isModal 
         </div>
 
         {/* Content */}
-        <div className="p-6">
+        <div className="p-4">
           {/* Toggle Login/Register */}
-          <div className="flex bg-gray-100 rounded-lg p-1 mb-6">
+          <div className="flex bg-gray-100 rounded-lg p-1 mb-4">
             <button
               type="button"
               onClick={() => {
@@ -194,7 +194,7 @@ export default function CorporateLoginSimple({ onClose, onLoginSuccess, isModal 
           )}
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-3">
             {/* Email */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -272,7 +272,7 @@ export default function CorporateLoginSimple({ onClose, onLoginSuccess, isModal 
           </form>
 
           {/* Info */}
-          <div className="mt-6 p-4 bg-blue-50 rounded-lg">
+          <div className="mt-4 p-3 bg-blue-50 rounded-lg">
             <h4 className="font-semibold text-blue-900 mb-2">Portal Corporativo</h4>
             <ul className="text-sm text-blue-700 space-y-1">
               <li>• Gestión de contratos y documentos</li>

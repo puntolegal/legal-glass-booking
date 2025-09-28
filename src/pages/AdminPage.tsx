@@ -161,84 +161,110 @@ const AdminPage = () => {
     <>
       {/* Navegación Flotante Móvil */}
       
-      <div className="min-h-screen bg-background p-4 lg:p-8">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 p-4 lg:p-8">
         <div className="max-w-7xl mx-auto">
-        {/* Header */}
+        {/* Header Premium */}
         <div className="mb-8">
-          <div className="flex items-center space-x-3 mb-4">
-            <Shield className="w-8 h-8 text-primary" />
-            <h1 className="text-3xl font-bold text-foreground">Panel de Administración</h1>
+          <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl rounded-3xl p-8 border border-white/20 dark:border-slate-700/40 shadow-2xl shadow-blue-500/10">
+            <div className="flex items-center space-x-4 mb-6">
+              <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/30">
+                <Shield className="w-8 h-8 text-white" />
+              </div>
+              <div>
+                <h1 className="text-4xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 dark:from-white dark:to-slate-200 bg-clip-text text-transparent">
+                  Panel de Administración
+                </h1>
+                <p className="text-slate-600 dark:text-slate-400 mt-2">
+                  Bienvenido, <span className="font-semibold text-blue-600 dark:text-blue-400">{profile?.nombre || 'Administrador'}</span>. 
+                  Gestiona usuarios, reservas y configuraciones del sistema.
+                </p>
+              </div>
+            </div>
           </div>
-          <p className="text-muted-foreground">
-            Bienvenido, {profile?.nombre || 'Administrador'}. Aquí puedes gestionar usuarios y reservas.
-          </p>
         </div>
 
-        {/* Stats Cards */}
+        {/* Stats Cards Premium */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <Card className="glass">
-            <CardContent className="p-6">
-              <div className="flex items-center space-x-3">
-                <Users className="w-8 h-8 text-blue-500" />
-                <div>
-                  <p className="text-sm text-muted-foreground">Total Usuarios</p>
-                  <p className="text-2xl font-bold">{users.length}</p>
-                </div>
-                  </div>
-            </CardContent>
-          </Card>
-
-          <Card className="glass">
-            <CardContent className="p-6">
-              <div className="flex items-center space-x-3">
-                <Calendar className="w-8 h-8 text-green-500" />
-                <div>
-                  <p className="text-sm text-muted-foreground">Total Reservas</p>
-                  <p className="text-2xl font-bold">{reservations.length}</p>
-                </div>
+          {/* Total Usuarios */}
+          <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl rounded-2xl p-6 border border-white/20 dark:border-slate-700/40 shadow-xl shadow-blue-500/10 hover:shadow-2xl hover:shadow-blue-500/20 transition-all duration-300">
+            <div className="flex items-center justify-between mb-4">
+              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/30">
+                <Users className="w-6 h-6 text-white" />
               </div>
-            </CardContent>
-          </Card>
-
-          <Card className="glass">
-            <CardContent className="p-6">
-              <div className="flex items-center space-x-3">
-                <UserCheck className="w-8 h-8 text-purple-500" />
-                <div>
-                  <p className="text-sm text-muted-foreground">Usuarios Activos</p>
-                  <p className="text-2xl font-bold">{users.filter(u => u.is_active).length}</p>
-                </div>
+              <div className="text-right">
+                <p className="text-sm font-medium text-slate-600 dark:text-slate-400">Total Usuarios</p>
+                <p className="text-3xl font-bold text-slate-900 dark:text-white">{users.length}</p>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+            <div className="h-1 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full"></div>
+          </div>
+
+          {/* Total Reservas */}
+          <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl rounded-2xl p-6 border border-white/20 dark:border-slate-700/40 shadow-xl shadow-emerald-500/10 hover:shadow-2xl hover:shadow-emerald-500/20 transition-all duration-300">
+            <div className="flex items-center justify-between mb-4">
+              <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/30">
+                <Calendar className="w-6 h-6 text-white" />
+              </div>
+              <div className="text-right">
+                <p className="text-sm font-medium text-slate-600 dark:text-slate-400">Total Reservas</p>
+                <p className="text-3xl font-bold text-slate-900 dark:text-white">{reservations.length}</p>
+              </div>
+            </div>
+            <div className="h-1 bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-full"></div>
+          </div>
+
+          {/* Usuarios Activos */}
+          <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl rounded-2xl p-6 border border-white/20 dark:border-slate-700/40 shadow-xl shadow-purple-500/10 hover:shadow-2xl hover:shadow-purple-500/20 transition-all duration-300">
+            <div className="flex items-center justify-between mb-4">
+              <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg shadow-purple-500/30">
+                <UserCheck className="w-6 h-6 text-white" />
+              </div>
+              <div className="text-right">
+                <p className="text-sm font-medium text-slate-600 dark:text-slate-400">Usuarios Activos</p>
+                <p className="text-3xl font-bold text-slate-900 dark:text-white">{users.filter(u => u.is_active).length}</p>
+              </div>
+            </div>
+            <div className="h-1 bg-gradient-to-r from-purple-500 to-purple-600 rounded-full"></div>
+          </div>
         </div>
 
-        {/* Tabs */}
+        {/* Tabs Premium */}
         <Tabs defaultValue="users" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="users" className="flex items-center space-x-2">
-              <Users className="w-4 h-4" />
-              <span>Usuarios</span>
-            </TabsTrigger>
-            <TabsTrigger value="reservations" className="flex items-center space-x-2">
-              <Calendar className="w-4 h-4" />
-              <span>Reservas</span>
-            </TabsTrigger>
-            <TabsTrigger value="notifications" className="flex items-center space-x-2">
-              <Mail className="w-4 h-4" />
-              <span>Notificaciones</span>
-            </TabsTrigger>
-          </TabsList>
+          <div className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl rounded-2xl p-2 border border-white/20 dark:border-slate-700/40 shadow-lg">
+            <TabsList className="grid w-full grid-cols-3 bg-transparent h-auto p-0">
+              <TabsTrigger 
+                value="users" 
+                className="flex items-center space-x-2 py-3 px-4 rounded-xl data-[state=active]:bg-white dark:data-[state=active]:bg-slate-700 data-[state=active]:shadow-lg data-[state=active]:border data-[state=active]:border-white/20 dark:data-[state=active]:border-slate-600/40 transition-all duration-200"
+              >
+                <Users className="w-4 h-4" />
+                <span className="font-medium">Usuarios</span>
+              </TabsTrigger>
+              <TabsTrigger 
+                value="reservations" 
+                className="flex items-center space-x-2 py-3 px-4 rounded-xl data-[state=active]:bg-white dark:data-[state=active]:bg-slate-700 data-[state=active]:shadow-lg data-[state=active]:border data-[state=active]:border-white/20 dark:data-[state=active]:border-slate-600/40 transition-all duration-200"
+              >
+                <Calendar className="w-4 h-4" />
+                <span className="font-medium">Reservas</span>
+              </TabsTrigger>
+              <TabsTrigger 
+                value="notifications" 
+                className="flex items-center space-x-2 py-3 px-4 rounded-xl data-[state=active]:bg-white dark:data-[state=active]:bg-slate-700 data-[state=active]:shadow-lg data-[state=active]:border data-[state=active]:border-white/20 dark:data-[state=active]:border-slate-600/40 transition-all duration-200"
+              >
+                <Mail className="w-4 h-4" />
+                <span className="font-medium">Notificaciones</span>
+              </TabsTrigger>
+            </TabsList>
+          </div>
 
           <TabsContent value="users" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Gestión de Usuarios</CardTitle>
-                <CardDescription>
-                  Administra usuarios, roles y estados de cuenta
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
+            <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl rounded-2xl border border-white/20 dark:border-slate-700/40 shadow-xl">
+              <div className="p-6 border-b border-slate-200/60 dark:border-slate-700/60">
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Gestión de Usuarios</h3>
+                <p className="text-slate-600 dark:text-slate-400">
+                  Administra usuarios, roles y estados de cuenta del sistema
+                </p>
+              </div>
+              <div className="p-6">
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -297,19 +323,19 @@ const AdminPage = () => {
                     ))}
                   </TableBody>
                 </Table>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </TabsContent>
 
           <TabsContent value="reservations" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Gestión de Reservas</CardTitle>
-                <CardDescription>
+            <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl rounded-2xl border border-white/20 dark:border-slate-700/40 shadow-xl">
+              <div className="p-6 border-b border-slate-200/60 dark:border-slate-700/60">
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Gestión de Reservas</h3>
+                <p className="text-slate-600 dark:text-slate-400">
                   Visualiza y administra todas las reservas del sistema
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
+                </p>
+              </div>
+              <div className="p-6">
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -346,8 +372,8 @@ const AdminPage = () => {
                     ))}
                   </TableBody>
                 </Table>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </TabsContent>
 
           <TabsContent value="notifications" className="space-y-4">
@@ -355,15 +381,17 @@ const AdminPage = () => {
           </TabsContent>
         </Tabs>
 
-        {/* Back Button */}
+        {/* Back Button Premium */}
         <div className="text-center mt-8">
-          <Button
-            variant="outline"
+          <button
             onClick={() => window.location.href = "/"}
-            className="px-8"
+            className="bg-gradient-to-r from-slate-600 to-slate-700 hover:from-slate-700 hover:to-slate-800 text-white px-8 py-3 rounded-xl font-semibold shadow-lg shadow-slate-500/25 hover:shadow-xl hover:shadow-slate-500/30 transition-all duration-200 flex items-center gap-2 mx-auto"
           >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
             Volver al Inicio
-          </Button>
+          </button>
         </div>
         </div>
       </div>
