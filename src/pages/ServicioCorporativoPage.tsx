@@ -91,9 +91,17 @@ export default function ServicioCorporativoPage() {
     setShowDashboard(false);
   };
 
-  // Si el usuario está logueado, mostrar el dashboard
+  // Si el usuario está logueado, mostrar el dashboard sin layout
   if (showDashboard && currentUser) {
-    return <CorporateDashboard user={currentUser} onLogout={handleLogout} />;
+    return (
+      <>
+        <SEO 
+          title="Portal Corporativo - Punto Legal"
+          description="Panel de administración corporativo para gestión de causas legales y comparendos."
+        />
+        <CorporateDashboard user={currentUser} onLogout={handleLogout} />
+      </>
+    );
   }
 
   const pageContent = (
