@@ -558,7 +558,7 @@ export default function PaymentSuccessPage() {
               <div className="flex items-center justify-between">
                 <span className="text-lg font-semibold text-gray-900">Total pagado</span>
                 <span className="text-2xl font-bold text-green-600">
-                  ${paymentData?.priceFormatted ?? 'Confirmado'}
+                  ${paymentData?.priceFormatted ? paymentData.priceFormatted.replace('$', '') : 'Confirmado'} CLP
                 </span>
               </div>
             </div>

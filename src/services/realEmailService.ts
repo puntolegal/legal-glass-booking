@@ -391,7 +391,7 @@ const generateClientEmailHTML = (booking: BookingEmailData): string => {
                 ` : ''}
                 <div class="info-row">
                     <span class="info-label">Precio:</span>
-                    <span class="info-value"><strong>$${booking.precio}</strong></span>
+                    <span class="info-value"><strong>$${parseInt(booking.precio).toLocaleString('es-CL')} CLP</strong></span>
                 </div>
                 <div class="info-row">
                     <span class="info-label">ID de Reserva:</span>
@@ -603,7 +603,7 @@ const generateAdminEmailHTML = (booking: BookingEmailData): string => {
                 ` : ''}
                 <div class="info-row">
                     <span class="info-label">Precio:</span>
-                    <span class="info-value"><strong>$${booking.precio}</strong></span>
+                    <span class="info-value"><strong>$${parseInt(booking.precio).toLocaleString('es-CL')} CLP</strong></span>
                 </div>
                 <div class="info-row">
                     <span class="info-label">Estado de Pago:</span>
