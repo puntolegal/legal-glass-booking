@@ -127,7 +127,7 @@ export const PremiumMobileDock: React.FC<PremiumMobileDockProps> = ({ className 
               damping: 25,
               opacity: { duration: 0.3 }
             }}
-            className={`lg:hidden fixed bottom-4 left-1/2 transform -translate-x-1/2 z-50 ${className}`}
+            className={`lg:hidden fixed bottom-4 left-1/2 -translate-x-1/2 z-50 ${className}`}
           >
             {/* Dock Container - Glassmorphism Premium */}
             <div className="relative">
@@ -135,10 +135,10 @@ export const PremiumMobileDock: React.FC<PremiumMobileDockProps> = ({ className 
               <div className="absolute inset-0 bg-gradient-to-r from-orange-500/10 via-orange-500/15 to-orange-500/10 rounded-3xl blur-2xl w-full" />
               
               {/* Main Dock - Reorganizado horizontalmente */}
-              <div className="relative bg-white/90 dark:bg-black/80 backdrop-blur-3xl border border-white/30 dark:border-gray-800/40 rounded-3xl px-4 py-3 shadow-2xl shadow-black/20 w-fit min-w-[280px] max-w-[320px]">
+              <div className="relative bg-white/90 dark:bg-black/80 backdrop-blur-3xl border border-white/30 dark:border-gray-800/40 rounded-3xl px-4 py-3 shadow-2xl shadow-black/20 w-fit min-w-[320px] max-w-[360px]">
                 <div className="flex items-center justify-between gap-2">
                   {/* Dock principal - 4 botones */}
-                  <div className="flex items-center gap-1">
+                  <div className="flex items-center gap-2">
                     {dockItems.map((item, index) => (
                       <motion.button
                         key={item.label}
@@ -173,10 +173,11 @@ export const PremiumMobileDock: React.FC<PremiumMobileDockProps> = ({ className 
                       whileHover={{ scale: 1.05, y: -1 }}
                       whileTap={{ scale: 0.95 }}
                       onClick={handleAccessibilityClick}
-                      className="w-10 h-10 rounded-2xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl border border-white/20 dark:border-gray-700/30 shadow-lg shadow-black/10 text-gray-700 dark:text-gray-300 transition-all duration-200 hover:bg-gray-100/80 dark:hover:bg-gray-700/80 flex items-center justify-center"
+                      className="relative flex flex-col items-center justify-center w-12 h-12 rounded-2xl transition-all duration-300 text-gray-600 dark:text-gray-300 hover:bg-gray-100/60 dark:hover:bg-gray-800/60"
                       aria-label="Accesibilidad"
                     >
-                      <Accessibility className="w-4 h-4" />
+                      <Accessibility className="w-4 h-4 mb-0.5" />
+                      <span className="text-[10px] font-medium leading-none">Acceso</span>
                     </motion.button>
 
                     {/* Botón de Subir */}
@@ -184,10 +185,11 @@ export const PremiumMobileDock: React.FC<PremiumMobileDockProps> = ({ className 
                       whileHover={{ scale: 1.05, y: -1 }}
                       whileTap={{ scale: 0.95 }}
                       onClick={handleScrollToTop}
-                      className="w-10 h-10 rounded-2xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl border border-white/20 dark:border-gray-700/30 shadow-lg shadow-black/10 text-gray-700 dark:text-gray-300 transition-all duration-200 hover:bg-gray-100/80 dark:hover:bg-gray-700/80 flex items-center justify-center"
+                      className="relative flex flex-col items-center justify-center w-12 h-12 rounded-2xl transition-all duration-300 text-gray-600 dark:text-gray-300 hover:bg-gray-100/60 dark:hover:bg-gray-800/60"
                       aria-label="Subir arriba"
                     >
-                      <ArrowUp className="w-4 h-4" />
+                      <ArrowUp className="w-4 h-4 mb-0.5" />
+                      <span className="text-[10px] font-medium leading-none">Subir</span>
                     </motion.button>
                   </div>
                 </div>
