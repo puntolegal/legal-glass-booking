@@ -31,6 +31,12 @@ DROP POLICY IF EXISTS "Enable insert for authenticated users only" ON public.res
 DROP POLICY IF EXISTS "Enable update for users based on email" ON public.reservas;
 DROP POLICY IF EXISTS "Allow anonymous users to create reservations only" ON public.reservas;
 DROP POLICY IF EXISTS "Deny read and update for anonymous users" ON public.reservas;
+DROP POLICY IF EXISTS "deny_anon_select" ON public.reservas;
+DROP POLICY IF EXISTS "deny_anon_update" ON public.reservas;
+DROP POLICY IF EXISTS "deny_anon_delete" ON public.reservas;
+DROP POLICY IF EXISTS "service_role_full_access" ON public.reservas;
+DROP POLICY IF EXISTS "authenticated_users_own_reservations" ON public.reservas;
+DROP POLICY IF EXISTS "anonymous_users_create_only" ON public.reservas;
 
 -- =====================================================
 -- PASO 2: HABILITAR RLS
@@ -63,9 +69,21 @@ FOR INSERT
 TO anon
 WITH CHECK (true);
 
--- Política 4: EXPLÍCITAMENTE denegar SELECT, UPDATE, DELETE para usuarios anónimos
-CREATE POLICY "deny_anon_read_update_delete" ON public.reservas
-FOR SELECT, UPDATE, DELETE
+-- Política 4: EXPLÍCITAMENTE denegar SELECT para usuarios anónimos
+CREATE POLICY "deny_anon_select" ON public.reservas
+FOR SELECT
+TO anon
+USING (false);
+
+-- Política 5: EXPLÍCITAMENTE denegar UPDATE para usuarios anónimos
+CREATE POLICY "deny_anon_update" ON public.reservas
+FOR UPDATE
+TO anon
+USING (false);
+
+-- Política 6: EXPLÍCITAMENTE denegar DELETE para usuarios anónimos
+CREATE POLICY "deny_anon_delete" ON public.reservas
+FOR DELETE
 TO anon
 USING (false);
 
