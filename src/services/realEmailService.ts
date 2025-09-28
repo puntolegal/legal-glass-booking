@@ -69,14 +69,15 @@ const sendEmailWithSupabase = async (emailData: {
 
     console.log('🔍 DEBUG: Datos enviados a Supabase Function:', realBookingData);
     
-    const response = await fetch(`${SUPABASE_CREDENTIALS.URL}/functions/v1/send-resend-emails`, {
+    const response = await fetch(`${SUPABASE_CREDENTIALS.URL}/functions/v1/clever-action`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${SUPABASE_CREDENTIALS.PUBLISHABLE_KEY}`
+        'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFyZ2Vsb2Npam13bnhjY2t4YmRnIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NzgwMjQyOSwiZXhwIjoyMDczMzc4NDI5fQ.eKvVrXiuz39_JP9lydQI6gxyrYX2tLQWIJzlI4lqnYg',
+        'X-Admin-Token': 'puntolegal-admin-token-2025'
       },
       body: JSON.stringify({ 
-        bookingData: realBookingData
+        booking_id: realBookingData.id
       })
     });
 
