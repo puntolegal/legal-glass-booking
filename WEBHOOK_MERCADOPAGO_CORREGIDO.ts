@@ -8,7 +8,6 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL') || 'https://qrgelocijmwnxcckxbdg.supabase.co'
 const SUPABASE_ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY') || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFyZ2Vsb2Npam13bnhjY2t4YmRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc4MDI0MjksImV4cCI6MjA3MzM3ODQyOX0.0q_3bb8bKR8VVZZAK_hYvhvLSTaU1ioQzmO5fKALjbI'
 const MERCADOPAGO_ACCESS_TOKEN = Deno.env.get('MERCADOPAGO_ACCESS_TOKEN') || 'APP_USR-7407359076060108-092318-7fb22dd54bc0d3e4a42accab058e8a3e-229698947'
-const MERCADOPAGO_WEBHOOK_SECRET = Deno.env.get('MERCADOPAGO_WEBHOOK_SECRET') || 'd5818a98ec20e01124607d033512760d8fa7b3b539d28ccdc8000a34eb6734ac'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -23,13 +22,25 @@ serve(async (req) => {
     return new Response('ok', { headers: corsHeaders })
   }
 
-  // Validar que el webhook viene de MercadoPago usando la clave secreta
-  const signature = req.headers.get('x-signature');
-  const timestamp = req.headers.get('x-request-id');
-  
-  console.log('🔐 Validando webhook de MercadoPago...');
-  console.log('📋 Signature:', signature);
-  console.log('📋 Request ID:', timestamp);
+  // Verificar autenticación solo si no viene de MercadoPago
+  const authHeader = req.headers.get('authorization');
+  const userAgent = req.headers.get('user-agent') || '';
+  const isFromMercadoPago = userAgent.includes('MercadoPago') || 
+                           req.headers.get('x-mercadopago-signature') ||
+                           req.url.includes('topic=') ||
+                           req.url.includes('payment');
+
+  // Si no viene de MercadoPago y no tiene auth, rechazar
+  if (!isFromMercadoPago && !authHeader) {
+    console.log('❌ Acceso no autorizado - falta autenticación');
+    return new Response(
+      JSON.stringify({ error: 'Unauthorized' }),
+      { 
+        status: 401, 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+      }
+    );
+  }
 
   try {
     console.log('🔔 Webhook de MercadoPago recibido');
@@ -207,7 +218,8 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({ 
         success: false, 
-        error: 'Error interno del servidor' 
+        error: 'Error interno del servidor',
+        details: error.message
       }),
       { 
         status: 500, 

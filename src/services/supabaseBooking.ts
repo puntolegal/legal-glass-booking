@@ -1,7 +1,7 @@
 import { supabase } from '@/integrations/supabase/client';
 import { sendRealBookingEmails } from './realEmailService';
 
-// Map database result to Reserva type (simplified for security fix)
+// Map database result to Reserva type (corregido para incluir campos reales)
 const mapDatabaseToReserva = (data: any): Reserva => ({
   id: data.id,
   nombre: data.nombre,
@@ -15,8 +15,8 @@ const mapDatabaseToReserva = (data: any): Reserva => ({
   hora: data.hora,
   descripcion: data.descripcion,
   tipo_reunion: data.tipo_reunion,
-  external_reference: null, // No existe en la tabla actual
-  preference_id: null, // No existe en la tabla actual
+  external_reference: data.external_reference, // Campo real en la base de datos
+  preference_id: data.preference_id, // Campo real en la base de datos
   estado: data.estado,
   recordatorio_enviado: data.recordatorio_enviado || false,
   created_at: data.created_at || new Date().toISOString(),
@@ -464,9 +464,9 @@ export const findReservaByCriteria = async (criteria: {
       query = query.eq('preference_id', criteria.preference_id);
     }
     
-    // Buscar por email (usar cliente_email según el esquema)
+    // Buscar por email (usar email según el esquema real)
     if (criteria.email) {
-      query = query.eq('cliente_email', criteria.email);
+      query = query.eq('email', criteria.email);
     }
     
     const { data, error } = await query.maybeSingle();
