@@ -55,7 +55,7 @@ const Footer: React.FC = () => {
     ];
 
     return (
-      <footer className="relative bg-gradient-to-br from-blue-900 via-indigo-900 to-purple-900 text-white overflow-hidden">
+      <footer className="relative bg-gradient-to-br from-slate-900 via-blue-900 to-slate-800 dark:from-slate-900 dark:via-blue-900 dark:to-slate-800 text-white overflow-hidden border-t border-slate-700/50">
         {/* Efectos de fondo animados */}
         <div className="absolute inset-0 overflow-hidden">
           {/* Círculos decorativos */}
@@ -356,16 +356,16 @@ const Footer: React.FC = () => {
   ];
 
   return (
-    <footer className="relative bg-gradient-to-br from-gray-900 via-slate-900 to-gray-800 text-white overflow-hidden">
-      {/* Efectos de fondo */}
+    <footer className="relative bg-gradient-to-br from-slate-900 via-blue-900 to-slate-800 dark:from-slate-900 dark:via-blue-900 dark:to-slate-800 text-white overflow-hidden border-t border-slate-700/50">
+      {/* Efectos de fondo - Colores profesionales legales */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-24 -left-24 w-48 h-48 bg-orange-500/10 rounded-full animate-pulse" />
-        <div className="absolute top-32 -right-32 w-64 h-64 bg-amber-500/10 rounded-full animate-pulse delay-1000" />
+        <div className="absolute -top-24 -left-24 w-48 h-48 bg-blue-500/10 rounded-full animate-pulse" />
+        <div className="absolute top-32 -right-32 w-64 h-64 bg-slate-500/10 rounded-full animate-pulse delay-1000" />
         
         {[...Array(12)].map((_, i) => (
           <motion.div
             key={i}
-            className="absolute w-1 h-1 bg-orange-400/30 rounded-full"
+            className="absolute w-1 h-1 bg-blue-400/30 dark:bg-blue-300/30 rounded-full"
             animate={{
               y: [0, -80, 0],
               x: [0, Math.random() * 40 - 20, 0],
@@ -486,7 +486,7 @@ const Footer: React.FC = () => {
                     href={social.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-10 h-10 bg-white/10 hover:bg-orange-500/20 rounded-lg flex items-center justify-center transition-all duration-300"
+                    className="w-10 h-10 bg-white/10 hover:bg-blue-500/20 dark:bg-white/10 dark:hover:bg-blue-400/20 rounded-lg flex items-center justify-center transition-all duration-300"
                   >
                     <span>{social.icon}</span>
                   </a>
@@ -497,17 +497,17 @@ const Footer: React.FC = () => {
         </div>
 
         {/* Footer inferior */}
-        <div className="border-t border-gray-700 pt-8">
+        <div className="border-t border-slate-700/50 dark:border-slate-600/50 pt-8">
           <div className="flex flex-col md:flex-row items-center justify-between">
-            <p className="text-gray-400 text-sm mb-4 md:mb-0">
+            <p className="text-slate-400 dark:text-slate-300 text-sm mb-4 md:mb-0">
               © 2025 Punto Legal. Todos los derechos reservados.
             </p>
-            <p className="text-gray-400 text-sm flex items-center gap-2">
+            <p className="text-slate-400 dark:text-slate-300 text-sm flex items-center gap-2">
               <span>Hecho con</span>
-              <span className="text-red-500">❤️</span>
+              <span className="text-red-500 dark:text-red-400">❤️</span>
               <span>en Chile</span>
-              <span className="text-blue-500">🇨🇱</span>
-              <span>• Startup Legal</span>
+              <span className="text-blue-500 dark:text-blue-400">🇨🇱</span>
+              <span>• Consultoría Legal</span>
             </p>
           </div>
         </div>
