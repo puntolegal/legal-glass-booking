@@ -452,10 +452,10 @@ export default function ServicioCorporativoPage() {
                          index === 4 ? '350.000' : '500.000'}
                       </p>
                       <Link
-                        to={`/contacto?servicio=${service.title.toLowerCase().replace(/\s+/g, '-')}`}
-                        className="w-full bg-primary/10 text-primary border border-primary/30 rounded-lg py-2 px-4 text-sm font-semibold hover:bg-primary/20 transition-all duration-300 text-center block"
+                        to="/agendamiento?plan=corporativo"
+                        className="w-full bg-primary text-white rounded-lg py-2 px-4 text-sm font-semibold hover:bg-primary/90 transition-all duration-300 text-center block shadow-lg hover:shadow-xl"
                       >
-                        Solicitar Cotización
+                        Agendar Consulta
                       </Link>
                     </div>
                   </div>
