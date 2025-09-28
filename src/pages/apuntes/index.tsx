@@ -10,6 +10,7 @@ import {
   BookOpen,
   Zap,
   Award,
+  Scale,
   TrendingUp,
   Sparkles,
   Target,
@@ -387,8 +388,8 @@ const ApuntesIndex: React.FC = () => {
               >
                 <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-purple-600/5 group-hover:from-purple-500/10 group-hover:to-purple-600/10 transition-all duration-300" />
                 <div className="relative flex items-center space-x-3">
-                  <div className="p-2 md:p-3 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl shadow-lg">
-                    <Award className="w-5 h-5 md:w-6 md:h-6 text-white" />
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center backdrop-blur-xl shadow-lg border border-white/10">
+                    <Scale className="w-5 h-5 md:w-6 md:h-6 text-primary" />
                   </div>
                   <div>
                     <div className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">
