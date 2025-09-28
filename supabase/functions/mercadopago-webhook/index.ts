@@ -174,7 +174,7 @@ serve(async (req) => {
           console.error('❌ Error en envío de emails:', emailError);
         }
       }
-
+      
       return new Response(
         JSON.stringify({ 
           success: true, 
