@@ -80,11 +80,7 @@ export function getMpPublicKey(): string {
 export function getReturnUrls() {
   const baseUrl = import.meta.env.VITE_APP_BASE_URL || 
                   window.location.origin || 
-<<<<<<< HEAD
                   (import.meta.env.PROD ? 'https://puntolegal.online' : 'http://localhost:8080');
-=======
-                  'https://www.puntolegal.online';
->>>>>>> 4326cbc9a5e2d683ab0c120e73189948ca80fe4d
   
   return {
     success: `${baseUrl}/payment-success?source=mercadopago`,

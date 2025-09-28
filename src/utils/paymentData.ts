@@ -42,6 +42,7 @@ export const parsePendingPaymentData = (rawData: string): PendingPaymentData => 
   const telefono = toStringValue(parsed.telefono) ?? toStringValue(cliente?.telefono) ?? 'No especificado';
 
   const priceValue = toNumber(parsed.price);
+  const originalPrice = toNumber(parsed.originalPrice);
   
   // Validación más flexible para localStorage (solo fallback)
   if (!parsed.id || priceValue === null) {
@@ -76,8 +77,6 @@ export const parsePendingPaymentData = (rawData: string): PendingPaymentData => 
 
   const priceFormatted = toStringValue(parsed.priceFormatted)
     ?? currencyFormatter.format(Math.max(0, Math.round(priceValue)));
-
-  const originalPrice = toNumber(parsed.originalPrice);
 
   return {
     id: String(parsed.id),
