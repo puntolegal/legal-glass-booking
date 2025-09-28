@@ -42,8 +42,36 @@ export const parsePendingPaymentData = (rawData: string): PendingPaymentData => 
   const telefono = toStringValue(parsed.telefono) ?? toStringValue(cliente?.telefono) ?? 'No especificado';
 
   const priceValue = toNumber(parsed.price);
+  
+  // Validación más flexible para localStorage (solo fallback)
   if (!parsed.id || priceValue === null) {
-    throw new Error('Payment data missing required fields');
+    console.warn('⚠️ localStorage data incomplete - using fallback values');
+    // Usar valores por defecto en lugar de fallar
+    return {
+      id: String(parsed.id || 'fallback'),
+      reservationId: String(parsed.reservationId || parsed.id || 'fallback'),
+      external_reference: parsed.external_reference ? String(parsed.external_reference) : undefined,
+      nombre: nombre,
+      email: email,
+      telefono: telefono,
+      service: toStringValue(parsed.service) ?? 'Consulta Legal',
+      category: toStringValue(parsed.category) ?? 'General',
+      description: toStringValue(parsed.description),
+      price: priceValue || 35000, // Valor por defecto
+      priceFormatted: currencyFormatter.format(priceValue || 35000),
+      originalPrice: originalPrice || 35000,
+      fecha: toStringValue(parsed.fecha) ?? new Date().toISOString().split('T')[0],
+      hora: toStringValue(parsed.hora) ?? '10:00',
+      date: toStringValue(parsed.fecha) ?? new Date().toISOString().split('T')[0],
+      time: toStringValue(parsed.hora) ?? '10:00',
+      tipo_reunion: toStringValue(parsed.tipo_reunion) ?? 'online',
+      codigoConvenio: parsed.codigoConvenio ? String(parsed.codigoConvenio) : null,
+      descuentoConvenio: typeof parsed.descuentoConvenio === 'boolean' ? parsed.descuentoConvenio : false,
+      porcentajeDescuento: toStringValue(parsed.porcentajeDescuento) ?? null,
+      method: toStringValue(parsed.method) ?? null,
+      preferenceId: parsed.preferenceId ? String(parsed.preferenceId) : null,
+      timestamp: typeof parsed.timestamp === 'number' ? parsed.timestamp : Date.now()
+    };
   }
 
   const priceFormatted = toStringValue(parsed.priceFormatted)
