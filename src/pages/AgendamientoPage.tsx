@@ -27,6 +27,7 @@ import ServiceIcon from '../components/ServiceIcon';
 import { createBookingWithRealEmail, type BookingData } from '@/services/supabaseBooking';
 import { createOfflineBookingWithEmail, type OfflineBookingData } from '@/services/offlineBooking';
 import { sendRealBookingEmails, type BookingEmailData } from '@/services/realEmailService';
+import { getReservationsByDate, isTimeSlotAvailable } from '@/services/reservationService';
 import type { PendingPaymentData } from '@/types/payments';
 import { checkSupabaseConnection } from '@/integrations/supabase/client';
 import SupabaseStatusIndicator from '@/components/SupabaseStatusIndicator';
@@ -101,6 +102,8 @@ export default function AgendamientoPage() {
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedTime, setSelectedTime] = useState('');
   const [selectedMeetingType, setSelectedMeetingType] = useState('videollamada');
+  const [occupiedTimes, setOccupiedTimes] = useState<string[]>([]);
+  const [loadingAvailability, setLoadingAvailability] = useState(false);
   const [formData, setFormData] = useState({
     nombre: '',
     email: '',
@@ -112,6 +115,13 @@ export default function AgendamientoPage() {
 
   // Verificar si es emergencia
   const isEmergency = plan === 'emergencia';
+
+  // Cargar horas ocupadas cuando se selecciona una fecha
+  useEffect(() => {
+    if (selectedDate) {
+      loadOccupiedTimes(selectedDate);
+    }
+  }, [selectedDate]);
 
   // Lógica del código de convenio y admin
   const isConvenioValido = formData.codigoConvenio === CODIGO_CONVENIO_VALIDO;
@@ -153,6 +163,30 @@ export default function AgendamientoPage() {
       }
     }
     return times;
+  };
+
+  // Función para cargar las horas ocupadas
+  const loadOccupiedTimes = async (date: string) => {
+    if (!date) return;
+    
+    try {
+      setLoadingAvailability(true);
+      const reservations = await getReservationsByDate(date);
+      const occupied = reservations
+        .filter(reserva => reserva.estado !== 'cancelada')
+        .map(reserva => reserva.hora);
+      setOccupiedTimes(occupied);
+    } catch (error) {
+      console.error('Error cargando disponibilidad:', error);
+      setOccupiedTimes([]);
+    } finally {
+      setLoadingAvailability(false);
+    }
+  };
+
+  // Función para verificar si una hora está disponible
+  const isTimeAvailable = (time: string) => {
+    return !occupiedTimes.includes(time);
   };
 
   // Obtener colores del servicio
@@ -556,25 +590,49 @@ export default function AgendamientoPage() {
                           </div>
                           <div>
                             <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100">Elige tu horario</h3>
-                            <p className="text-sm text-gray-500 dark:text-gray-400">Horarios disponibles para {selectedDate}</p>
+                            <p className="text-sm text-gray-500 dark:text-gray-400">
+                              {loadingAvailability ? 'Cargando horarios...' : `Horarios disponibles para ${selectedDate}`}
+                            </p>
                         </div>
                       </div>
 
-                      <div className="grid grid-cols-2 gap-3">
-                        {getAvailableTimes().map((time) => (
-                          <button
-                            key={time}
-                            onClick={() => setSelectedTime(time)}
-                            className={`py-4 px-4 rounded-xl font-semibold transition-all ${
-                              selectedTime === time
-                                ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/30 scale-105'
-                                : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 hover:scale-102'
-                            }`}
-                          >
-                            {time}
-                          </button>
-                        ))}
-                      </div>
+                      {loadingAvailability ? (
+                        <div className="flex items-center justify-center py-8">
+                          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+                          <span className="ml-3 text-gray-600 dark:text-gray-400">Verificando disponibilidad...</span>
+                        </div>
+                      ) : (
+                        <div className="grid grid-cols-2 gap-3">
+                          {getAvailableTimes().map((time) => {
+                            const isAvailable = isTimeAvailable(time);
+                            const isSelected = selectedTime === time;
+                            
+                            return (
+                              <button
+                                key={time}
+                                onClick={() => isAvailable && setSelectedTime(time)}
+                                disabled={!isAvailable}
+                                className={`py-4 px-4 rounded-xl font-semibold transition-all relative ${
+                                  isSelected
+                                    ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/30 scale-105'
+                                    : isAvailable
+                                    ? 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 hover:scale-102'
+                                    : 'bg-red-100 dark:bg-red-900/20 text-red-400 dark:text-red-500 cursor-not-allowed opacity-60'
+                                }`}
+                                title={!isAvailable ? 'Horario ocupado' : ''}
+                              >
+                                <div className="flex items-center justify-center gap-2">
+                                  {!isAvailable && <X className="w-4 h-4" />}
+                                  {time}
+                                </div>
+                                {!isAvailable && (
+                                  <div className="absolute -top-2 -right-2 w-3 h-3 bg-red-500 rounded-full"></div>
+                                )}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      )}
                       </motion.div>
                     )}
 
