@@ -58,7 +58,7 @@ const MercadoPagoCheckoutPro: React.FC<CheckoutProProps> = ({
           pending: `https://www.puntolegal.online/payment-pending?source=mercadopago`
         },
         auto_return: 'approved',
-        external_reference: `PL-${Date.now()}`,
+        external_reference: paymentData.metadata?.reservation_id || `PL-${Date.now()}`,
         metadata: {
           ...paymentData.metadata,
           source: 'punto-legal-web',

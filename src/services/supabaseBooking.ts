@@ -454,20 +454,19 @@ export const findReservaByCriteria = async (criteria: {
   try {
     let query = supabase.from('reservas').select('*');
     
-    // Buscar por external_reference (que en realidad es el ID de la reserva)
+    // Buscar por external_reference (columna real en la base de datos)
     if (criteria.external_reference) {
-      query = query.eq('id', criteria.external_reference);
+      query = query.eq('external_reference', criteria.external_reference);
     }
     
-    // Buscar por preference_id (que no existe en el esquema actual, pero podemos buscar por ID)
+    // Buscar por preference_id (columna real en la base de datos)
     if (criteria.preference_id) {
-      // Como no tenemos preference_id en el esquema, buscamos por ID si coincide
-      query = query.eq('id', criteria.preference_id);
+      query = query.eq('preference_id', criteria.preference_id);
     }
     
-    // Buscar por email
+    // Buscar por email (usar cliente_email según el esquema)
     if (criteria.email) {
-      query = query.eq('email', criteria.email);
+      query = query.eq('cliente_email', criteria.email);
     }
     
     const { data, error } = await query.maybeSingle();
@@ -482,6 +481,35 @@ export const findReservaByCriteria = async (criteria: {
     
     return { success: true, reserva: mapDatabaseToReserva(data) };
   } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Error desconocido'
+    };
+  }
+};
+
+// Función para actualizar una reserva
+export const updateReservation = async (reservationId: string, updates: Partial<Reserva>): Promise<{
+  success: boolean;
+  error?: string;
+}> => {
+  try {
+    console.log('🔄 Actualizando reserva:', reservationId, 'con datos:', updates);
+    
+    const { error } = await supabase
+      .from('reservas')
+      .update(updates)
+      .eq('id', reservationId);
+    
+    if (error) {
+      console.error('❌ Error actualizando reserva:', error);
+      return { success: false, error: error.message };
+    }
+    
+    console.log('✅ Reserva actualizada exitosamente');
+    return { success: true };
+  } catch (error) {
+    console.error('❌ Error en updateReservation:', error);
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Error desconocido'

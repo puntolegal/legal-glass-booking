@@ -48,6 +48,11 @@ export const createCheckoutPreference = async (preferenceData: CreatePreferenceR
     const isProduction = import.meta.env.PROD || window.location.hostname === 'www.puntolegal.online' || window.location.hostname === 'puntolegal.online';
     const useSupabaseFunction = isProduction;
     
+    // CRÍTICO: En producción, NUNCA usar localhost
+    if (isProduction) {
+      console.log('🚨 PRODUCCIÓN DETECTADA - Forzando uso de Supabase Function');
+    }
+    
     console.log('🔍 DEBUG MercadoPago Backend:', {
       'import.meta.env.PROD': import.meta.env.PROD,
       'window.location.hostname': window.location.hostname,
@@ -59,6 +64,11 @@ export const createCheckoutPreference = async (preferenceData: CreatePreferenceR
       console.log('🌐 Usando función de Supabase para producción');
       return await createPreferenceWithSupabase(preferenceData);
     } else {
+      // Validación adicional: No usar localhost en producción
+      if (window.location.hostname.includes('puntolegal.online')) {
+        console.error('🚨 ERROR CRÍTICO: Intento de usar localhost en producción');
+        throw new Error('No se puede usar backend local en producción');
+      }
       console.log('🏠 Usando backend local para desarrollo');
       return await createPreferenceWithLocalBackend(preferenceData);
     }
@@ -152,7 +162,7 @@ const createPreferenceWithLocalBackend = async (preferenceData: CreatePreference
       external_reference: preferenceData.external_reference
     };
     
-    // Llamada al backend local
+    // Llamada al backend local (solo para desarrollo)
     const response = await fetch('http://localhost:3001/create-preference', {
       method: 'POST',
       headers: {
@@ -355,24 +365,29 @@ export const getPaymentInfo = async (paymentId: string) => {
   try {
     console.log('🔍 Obteniendo información del pago:', paymentId);
 
-    // 0) Intentar via backend local (si está disponible) para no exponer token
-    try {
-      const ctrl = typeof AbortController !== 'undefined' ? new AbortController() : undefined;
-      const t = setTimeout(() => ctrl?.abort(), 2500);
-      const localRes = await fetch(`http://localhost:3001/payment/${paymentId}`, {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-        signal: ctrl?.signal
-      } as RequestInit);
-      clearTimeout(t);
-      if (localRes.ok) {
-        const payload = await localRes.json();
-        if (payload?.success && payload?.payment) {
-          return payload.payment;
+    // 0) Intentar via backend local (solo en desarrollo)
+    const isProduction = window.location.hostname.includes('puntolegal.online');
+    if (!isProduction) {
+      try {
+        const ctrl = typeof AbortController !== 'undefined' ? new AbortController() : undefined;
+        const t = setTimeout(() => ctrl?.abort(), 2500);
+        const localRes = await fetch(`http://localhost:3001/payment/${paymentId}`, {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' },
+          signal: ctrl?.signal
+        } as RequestInit);
+        clearTimeout(t);
+        if (localRes.ok) {
+          const payload = await localRes.json();
+          if (payload?.success && payload?.payment) {
+            return payload.payment;
+          }
         }
+      } catch (e) {
+        console.log('ℹ️ Backend local no disponible para /payment, usando fallback');
       }
-    } catch (e) {
-      console.log('ℹ️ Backend local no disponible para /payment, usando fallback');
+    } else {
+      console.log('🌐 Producción detectada - Saltando backend local');
     }
 
     const accessToken = process.env.MERCADOPAGO_ACCESS_TOKEN;

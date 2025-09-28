@@ -98,21 +98,42 @@ export default function PaymentSuccessPage() {
         }
       }
 
-      console.log('📋 Datos de pago almacenados:', pendingPayment);
+      console.log('📋 Datos de pago almacenados (fallback):', pendingPayment);
       console.log('🔍 storedData raw:', storedData);
       console.log('🔍 storedReservationId:', storedReservationId);
       console.log('🔍 storedExternalReference:', storedExternalReference);
+      console.log('ℹ️ NOTA: localStorage es solo un fallback. Priorizando parámetros de URL.');
 
+      // PRIORIZAR parámetros de URL sobre localStorage
+      console.log('🔍 Buscando reserva usando parámetros de URL...');
+      console.log('🔍 external_reference de URL:', mercadopagoData.external_reference);
+      console.log('🔍 preference_id de URL:', mercadopagoData.preference_id);
+
+      // Crear lista de candidatos priorizando URL sobre localStorage
       const candidateReservationIds = new Set<string>();
+      
+      // PRIMERO: Parámetros de URL (más confiables)
+      if (mercadopagoData.external_reference) {
+        candidateReservationIds.add(mercadopagoData.external_reference);
+        console.log('✅ Agregado external_reference de URL:', mercadopagoData.external_reference);
+      }
+      if (mercadopagoData.preference_id) {
+        candidateReservationIds.add(mercadopagoData.preference_id);
+        console.log('✅ Agregado preference_id de URL:', mercadopagoData.preference_id);
+      }
+      
+      // SEGUNDO: localStorage (como fallback)
       [
         pendingPayment?.reservationId,
         pendingPayment?.id,
         storedReservationId,
-        storedExternalReference,
-        mercadopagoData.external_reference
+        storedExternalReference
       ]
         .filter((value): value is string => typeof value === 'string' && value.trim().length > 0)
-        .forEach(value => candidateReservationIds.add(value));
+        .forEach(value => {
+          candidateReservationIds.add(value);
+          console.log('📦 Agregado desde localStorage (fallback):', value);
+        });
 
       let reserva: Reserva | undefined;
       let mpPayment: any | null = null;
@@ -135,31 +156,66 @@ export default function PaymentSuccessPage() {
         }
       }
 
-      // Intentar primero por preference_id si viene en el retorno
-      if (!reserva && mercadopagoData.preference_id) {
-        setProcessingStatus('Buscando reserva por preference_id...');
-        const result = await findReservaByCriteria({ preference_id: mercadopagoData.preference_id });
-        if (result.success && result.reserva) {
-          reserva = result.reserva;
-        }
-      }
-
-      // Luego intentar por external_reference si está presente
+      // PRIORIZAR búsqueda por parámetros de URL (más confiables)
+      
+      // 1. Buscar por external_reference de URL (más confiable)
       if (!reserva && mercadopagoData.external_reference) {
-        setProcessingStatus('Buscando reserva por external_reference...');
+        setProcessingStatus('Buscando reserva por external_reference de URL...');
+        console.log('🔍 Buscando por external_reference:', mercadopagoData.external_reference);
         const result = await findReservaByCriteria({ external_reference: mercadopagoData.external_reference });
         if (result.success && result.reserva) {
           reserva = result.reserva;
+          console.log('✅ Reserva encontrada por external_reference de URL');
+        } else {
+          console.log('❌ No se encontró reserva por external_reference de URL');
         }
       }
 
-      // Finalmente, probar por IDs candidatos (localStorage, etc.)
-      for (const candidateId of candidateReservationIds) {
-        setProcessingStatus(`Verificando reserva ${candidateId}...`);
-        const result = await findReservaByCriteria({ email: candidateId });
+      // 2. Buscar por preference_id de URL (segunda opción más confiable)
+      if (!reserva && mercadopagoData.preference_id) {
+        setProcessingStatus('Buscando reserva por preference_id de URL...');
+        console.log('🔍 Buscando por preference_id:', mercadopagoData.preference_id);
+        const result = await findReservaByCriteria({ preference_id: mercadopagoData.preference_id });
         if (result.success && result.reserva) {
           reserva = result.reserva;
-          break;
+          console.log('✅ Reserva encontrada por preference_id de URL');
+        } else {
+          console.log('❌ No se encontró reserva por preference_id de URL');
+        }
+      }
+
+      // 3. Fallback: buscar por localStorage y otros candidatos (solo si no se encontró por URL)
+      if (!reserva && candidateReservationIds.size > 0) {
+        console.log('🔍 Usando fallback: buscando por candidatos de localStorage...');
+        setProcessingStatus('Buscando por datos de localStorage (fallback)...');
+        
+        for (const candidateId of candidateReservationIds) {
+          console.log(`🔍 Verificando candidato: ${candidateId}`);
+          setProcessingStatus(`Verificando reserva ${candidateId}...`);
+          
+          // Intentar buscar por external_reference primero
+          let result = await findReservaByCriteria({ external_reference: candidateId });
+          if (result.success && result.reserva) {
+            reserva = result.reserva;
+            console.log('✅ Reserva encontrada por external_reference (fallback)');
+            break;
+          }
+          
+          // Luego por preference_id
+          result = await findReservaByCriteria({ preference_id: candidateId });
+          if (result.success && result.reserva) {
+            reserva = result.reserva;
+            console.log('✅ Reserva encontrada por preference_id (fallback)');
+            break;
+          }
+          
+          // Finalmente por email (menos confiable)
+          result = await findReservaByCriteria({ email: candidateId });
+          if (result.success && result.reserva) {
+            reserva = result.reserva;
+            console.log('✅ Reserva encontrada por email (fallback)');
+            break;
+          }
         }
       }
 
