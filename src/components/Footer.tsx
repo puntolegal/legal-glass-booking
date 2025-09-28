@@ -402,8 +402,8 @@ const Footer: React.FC = () => {
             className="lg:col-span-2"
           >
             <div className="flex items-center space-x-3 mb-6">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500/20 to-orange-600/10 flex items-center justify-center backdrop-blur-xl shadow-lg border border-white/10">
-                <Scale className="w-6 h-6 text-orange-500" />
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500/20 to-orange-600/10 dark:from-orange-500/30 dark:to-orange-600/20 flex items-center justify-center backdrop-blur-xl shadow-lg border border-white/10 dark:border-gray-700/30">
+                <Scale className="w-6 h-6 text-orange-500 dark:text-orange-400" />
               </div>
               <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Punto Legal</h2>
             </div>
@@ -414,16 +414,16 @@ const Footer: React.FC = () => {
             
             {/* Valores Auténticos - Startup Chilena */}
             <div className="grid grid-cols-3 gap-4">
-              <div className="text-center p-3 bg-white/10 dark:bg-gray-800/20 rounded-lg backdrop-blur-sm">
-                <div className="text-2xl font-bold text-orange-500">🇨🇱</div>
+              <div className="text-center p-3 bg-white/10 dark:bg-gray-800/20 rounded-lg backdrop-blur-sm border border-white/20 dark:border-gray-700/30">
+                <div className="text-2xl font-bold text-orange-500 dark:text-orange-400">🇨🇱</div>
                 <div className="text-xs text-gray-600 dark:text-gray-300">Hecho en Chile</div>
               </div>
-              <div className="text-center p-3 bg-white/10 dark:bg-gray-800/20 rounded-lg backdrop-blur-sm">
-                <div className="text-2xl font-bold text-orange-500">2025</div>
+              <div className="text-center p-3 bg-white/10 dark:bg-gray-800/20 rounded-lg backdrop-blur-sm border border-white/20 dark:border-gray-700/30">
+                <div className="text-2xl font-bold text-orange-500 dark:text-orange-400">2025</div>
                 <div className="text-xs text-gray-600 dark:text-gray-300">Startup Legal</div>
               </div>
-              <div className="text-center p-3 bg-white/10 dark:bg-gray-800/20 rounded-lg backdrop-blur-sm">
-                <div className="text-2xl font-bold text-orange-500">✨</div>
+              <div className="text-center p-3 bg-white/10 dark:bg-gray-800/20 rounded-lg backdrop-blur-sm border border-white/20 dark:border-gray-700/30">
+                <div className="text-2xl font-bold text-orange-500 dark:text-orange-400">✨</div>
                 <div className="text-xs text-gray-600 dark:text-gray-300">Innovación</div>
               </div>
             </div>
