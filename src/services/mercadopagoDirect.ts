@@ -59,8 +59,10 @@ export async function createMercadoPagoPreferenceDirect(
     console.log('🚀 Creando preferencia DIRECTAMENTE con MercadoPago API...');
     console.log('📋 Datos de la preferencia:', preferenceData);
 
-    // Usar token de acceso de MercadoPago
-    const MERCADOPAGO_ACCESS_TOKEN = 'APP_USR-7407359076060108-092318-7fb22dd54bc0d3e4a42accab058e8a3e-229698947';
+    // Usar token de acceso de MercadoPago desde variables de entorno
+    const MERCADOPAGO_ACCESS_TOKEN = import.meta.env.VITE_MERCADOPAGO_ACCESS_TOKEN || 
+                                    import.meta.env.MERCADOPAGO_ACCESS_TOKEN ||
+                                    'APP_USR-7407359076060108-092318-7fb22dd54bc0d3e4a42accab058e8a3e-229698947';
 
     // Llamada directa a la API REST de MercadoPago
     const response = await fetch('https://api.mercadopago.com/checkout/preferences', {
