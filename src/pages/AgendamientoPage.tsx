@@ -591,7 +591,7 @@ export default function AgendamientoPage() {
                           <div>
                             <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100">Elige tu horario</h3>
                             <p className="text-sm text-gray-500 dark:text-gray-400">
-                              {loadingAvailability ? 'Cargando horarios...' : `Horarios disponibles para ${selectedDate}`}
+                              {loadingAvailability ? 'Cargando horarios...' : 'Horarios disponibles'}
                             </p>
                         </div>
                       </div>
