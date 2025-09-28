@@ -696,18 +696,18 @@ export default function Sidebar() {
           }
         `}>
           <div className="grid grid-cols-3 gap-2 text-center">
-                          <div>
-                <p className={`text-lg font-bold ${isMobile ? 'text-slate-400' : 'text-primary'}`}>1,247</p>
-                <p className="text-xs text-foreground/60">Confidencialidad</p>
-              </div>
-              <div>
-                <p className={`text-lg font-bold ${isMobile ? 'text-zinc-400' : 'text-primary'}`}>$2.3M</p>
-                <p className="text-xs text-foreground/60">Recuperados</p>
-              </div>
-              <div>
-                <p className={`text-lg font-bold ${isMobile ? 'text-stone-400' : 'text-primary'}`}>98%</p>
-                <p className="text-xs text-foreground/60">Éxito</p>
-              </div>
+            <div>
+              <p className={`text-lg font-bold ${isMobile ? 'text-slate-400' : 'text-primary'}`}>100%</p>
+              <p className="text-xs text-foreground/60">Confidencialidad</p>
+            </div>
+            <div>
+              <p className={`text-lg font-bold ${isMobile ? 'text-zinc-400' : 'text-primary'}`}>+1000</p>
+              <p className="text-xs text-foreground/60">Casos</p>
+            </div>
+            <div>
+              <p className={`text-lg font-bold ${isMobile ? 'text-stone-400' : 'text-primary'}`}>98%</p>
+              <p className="text-xs text-foreground/60">Éxito</p>
+            </div>
           </div>
         </div>
 

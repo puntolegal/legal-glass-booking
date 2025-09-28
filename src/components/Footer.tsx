@@ -55,7 +55,7 @@ const Footer: React.FC = () => {
     ];
 
     return (
-      <footer className="relative bg-gradient-to-br from-black via-gray-900 to-black text-white overflow-hidden border-t border-gray-800/50 shadow-2xl">
+      <footer className="relative bg-gradient-to-br from-slate-900 via-gray-900 to-slate-800 text-white overflow-hidden border-t border-white/10 shadow-2xl backdrop-blur-xl">
         {/* Efectos de fondo animados */}
         <div className="absolute inset-0 overflow-hidden">
           {/* Círculos decorativos */}
@@ -356,21 +356,21 @@ const Footer: React.FC = () => {
   ];
 
   return (
-    <footer className="relative bg-gradient-to-br from-black via-gray-900 to-black text-white overflow-hidden border-t border-gray-800/50 shadow-2xl">
-      {/* Efectos de fondo premium - Negro elegante */}
+    <footer className="relative bg-gradient-to-br from-slate-900 via-gray-900 to-slate-800 text-white overflow-hidden border-t border-white/10 shadow-2xl backdrop-blur-xl">
+      {/* Efectos de fondo consistentes con Docker y Sidebar */}
       <div className="absolute inset-0 overflow-hidden">
         {/* Gradiente sutil de brillo */}
-        <div className="absolute inset-0 bg-gradient-to-br from-transparent via-gray-900/20 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-br from-transparent via-primary/5 to-transparent" />
         
-        {/* Círculos de luz sutil */}
-        <div className="absolute -top-24 -left-24 w-48 h-48 bg-white/5 rounded-full animate-pulse blur-xl" />
-        <div className="absolute top-32 -right-32 w-64 h-64 bg-white/3 rounded-full animate-pulse delay-1000 blur-2xl" />
+        {/* Círculos de luz sutil - consistentes con el diseño */}
+        <div className="absolute -top-24 -left-24 w-48 h-48 bg-primary/10 rounded-full animate-pulse blur-xl" />
+        <div className="absolute top-32 -right-32 w-64 h-64 bg-primary/5 rounded-full animate-pulse delay-1000 blur-2xl" />
         
-        {/* Partículas doradas premium */}
+        {/* Partículas naranjas premium - consistentes con el tema */}
         {[...Array(12)].map((_, i) => (
           <motion.div
             key={i}
-            className="absolute w-1 h-1 bg-gradient-to-r from-yellow-400/40 to-amber-500/40 rounded-full shadow-lg"
+            className="absolute w-1 h-1 bg-gradient-to-r from-orange-400/40 to-orange-500/40 rounded-full shadow-lg"
             animate={{
               y: [0, -80, 0],
               x: [0, Math.random() * 40 - 20, 0],
@@ -492,7 +492,7 @@ const Footer: React.FC = () => {
                     href={social.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-10 h-10 bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/20 hover:border-white/40 rounded-lg flex items-center justify-center transition-all duration-300 hover:shadow-lg hover:shadow-white/10 group"
+                    className="w-10 h-10 bg-white/10 hover:bg-primary/20 backdrop-blur-sm border border-white/20 hover:border-primary/40 rounded-lg flex items-center justify-center transition-all duration-300 hover:shadow-lg hover:shadow-primary/20 group"
                   >
                     <span>{social.icon}</span>
                   </a>
@@ -512,7 +512,7 @@ const Footer: React.FC = () => {
               <span>Hecho con</span>
               <span className="text-red-400 animate-pulse">❤️</span>
               <span>en Chile</span>
-              <span className="text-yellow-400">🇨🇱</span>
+              <span className="text-primary">🇨🇱</span>
               <span>• Consultoría Legal Premium</span>
             </p>
           </div>
