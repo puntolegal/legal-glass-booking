@@ -7,6 +7,7 @@ import {
   Brain, 
   Target, 
   Award,
+  Scale,
   Mail,
   Phone,
   MapPin,
@@ -401,29 +402,29 @@ const Footer: React.FC = () => {
             className="lg:col-span-2"
           >
             <div className="flex items-center space-x-3 mb-6">
-              <div className="p-2 bg-gradient-to-br from-orange-500 to-amber-600 rounded-xl">
-                <Award className="w-6 h-6 text-white" />
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500/20 to-orange-600/10 flex items-center justify-center backdrop-blur-xl shadow-lg border border-white/10">
+                <Scale className="w-6 h-6 text-orange-500" />
               </div>
-              <h2 className="text-2xl font-bold">Punto Legal</h2>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Punto Legal</h2>
             </div>
-            <p className="text-gray-300 mb-6 leading-relaxed">
+            <p className="text-gray-600 dark:text-gray-300 mb-6 leading-relaxed">
               Startup legal chilena que democratiza el acceso a la justicia con tecnología. 
               Creamos soluciones jurídicas modernas, accesibles y de alta calidad.
             </p>
             
             {/* Valores Auténticos - Startup Chilena */}
             <div className="grid grid-cols-3 gap-4">
-              <div className="text-center p-3 bg-white/5 rounded-lg">
-                <div className="text-2xl font-bold text-blue-400">🇨🇱</div>
-                <div className="text-xs text-gray-400">Hecho en Chile</div>
+              <div className="text-center p-3 bg-white/10 dark:bg-gray-800/20 rounded-lg backdrop-blur-sm">
+                <div className="text-2xl font-bold text-orange-500">🇨🇱</div>
+                <div className="text-xs text-gray-600 dark:text-gray-300">Hecho en Chile</div>
               </div>
-              <div className="text-center p-3 bg-white/5 rounded-lg">
-                <div className="text-2xl font-bold text-emerald-400">2025</div>
-                <div className="text-xs text-gray-400">Startup Legal</div>
+              <div className="text-center p-3 bg-white/10 dark:bg-gray-800/20 rounded-lg backdrop-blur-sm">
+                <div className="text-2xl font-bold text-orange-500">2025</div>
+                <div className="text-xs text-gray-600 dark:text-gray-300">Startup Legal</div>
               </div>
-              <div className="text-center p-3 bg-white/5 rounded-lg">
-                <div className="text-2xl font-bold text-purple-400">✨</div>
-                <div className="text-xs text-gray-400">Innovación</div>
+              <div className="text-center p-3 bg-white/10 dark:bg-gray-800/20 rounded-lg backdrop-blur-sm">
+                <div className="text-2xl font-bold text-orange-500">✨</div>
+                <div className="text-xs text-gray-600 dark:text-gray-300">Innovación</div>
               </div>
             </div>
           </motion.div>
@@ -434,13 +435,13 @@ const Footer: React.FC = () => {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
           >
-            <h3 className="text-xl font-semibold mb-4">Servicios Legales</h3>
+            <h3 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Servicios Legales</h3>
             <ul className="space-y-2">
               {services.map((service) => (
                 <li key={service.name}>
                   <Link
                     to={service.href}
-                    className="text-gray-300 hover:text-orange-400 transition-colors duration-200"
+                    className="text-gray-600 dark:text-gray-300 hover:text-orange-500 transition-colors duration-200"
                   >
                     {service.name}
                   </Link>
@@ -455,26 +456,26 @@ const Footer: React.FC = () => {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
-            <h3 className="text-xl font-semibold mb-4">Contacto</h3>
+            <h3 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Contacto</h3>
             <div className="space-y-3 mb-6">
-              <div className="flex items-center space-x-2 text-gray-300">
+              <div className="flex items-center space-x-2 text-gray-600 dark:text-gray-300">
                 <Mail className="w-4 h-4" />
                 <span className="text-sm">puntolegalelgolf@gmail.com</span>
               </div>
-              <div className="flex items-center space-x-2 text-gray-300">
+              <div className="flex items-center space-x-2 text-gray-600 dark:text-gray-300">
                 <Phone className="w-4 h-4" />
                 <span className="text-sm">+56 9 6232 1883</span>
               </div>
             </div>
 
             {/* Legal */}
-            <h4 className="text-lg font-medium mb-2">Legal</h4>
+            <h4 className="text-lg font-medium mb-2 text-gray-900 dark:text-white">Legal</h4>
             <ul className="space-y-1">
               {legalMain.map((item) => (
                 <li key={item.name}>
                   <Link
                     to={item.href}
-                    className="text-gray-300 hover:text-orange-400 transition-colors duration-200 text-sm"
+                    className="text-gray-600 dark:text-gray-300 hover:text-orange-500 transition-colors duration-200 text-sm"
                   >
                     {item.name}
                   </Link>
