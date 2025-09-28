@@ -19,6 +19,7 @@ const mapDatabaseToReserva = (data: any): Reserva => ({
   preference_id: data.preference_id, // Campo real en la base de datos
   estado: data.estado,
   recordatorio_enviado: data.recordatorio_enviado || false,
+  email_enviado: data.email_enviado || false, // Campo real en la base de datos
   created_at: data.created_at || new Date().toISOString(),
   updated_at: data.updated_at || new Date().toISOString()
 });
@@ -67,6 +68,7 @@ export interface Reserva {
   preference_id?: string | null;
   estado: 'pendiente' | 'confirmada' | 'completada' | 'cancelada';
   recordatorio_enviado?: boolean;
+  email_enviado?: boolean;
   created_at?: string;
   updated_at?: string;
 }

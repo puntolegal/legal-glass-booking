@@ -5,6 +5,7 @@ import { CheckCircle, Calendar, Clock, User, Mail, Phone, ArrowRight, Home, Cred
 import SEO from '../components/SEO';
 import { sendRealBookingEmails, type BookingEmailData, type EmailResult } from '@/services/realEmailService';
 import { findReservaByCriteria, updatePaymentStatus, type Reserva } from '../services/supabaseBooking';
+import { supabase } from '@/integrations/supabase/client';
 import type { PendingPaymentData } from '@/types/payments';
 import { ensurePriceFormatted, parsePendingPaymentData } from '@/utils/paymentData';
 import { getMercadoPagoPaymentInfo } from '@/services/mercadopagoPaymentInfo';
@@ -294,11 +295,37 @@ export default function PaymentSuccessPage() {
             message: 'Emails ya enviados previamente'
           };
         } else if (updateResult.success) {
-          console.log('✅ Email de confirmación enviado desde flujo principal');
-          emailResult = {
-            success: true,
-            message: 'Confirmación enviada en flujo principal'
+          console.log('📧 Enviando emails de confirmación...');
+          setProcessingStatus('Enviando emails de confirmación...');
+          const emailData: BookingEmailData = {
+            id: updatedReservation.id,
+            nombre: updatedReservation.nombre,
+            email: updatedReservation.email,
+            telefono: updatedReservation.telefono,
+            servicio: updatedReservation.servicio || pendingPayment?.service || 'Consulta General',
+            precio:
+              typeof updatedReservation.precio === 'string'
+                ? updatedReservation.precio
+                : paymentAmount?.toString() || '35000',
+            fecha: updatedReservation.fecha,
+            hora: updatedReservation.hora,
+            tipo_reunion: updatedReservation.tipo_reunion || pendingPayment?.tipo_reunion || 'online',
+            descripcion: updatedReservation.descripcion || pendingPayment?.description,
+            created_at: updatedReservation.created_at
           };
+
+          emailResult = await sendRealBookingEmails(emailData);
+          
+          if (emailResult.success) {
+            console.log('✅ Emails enviados exitosamente desde flujo principal');
+            // Marcar que los emails fueron enviados
+            await supabase
+              .from('reservas')
+              .update({ email_enviado: true } as any)
+              .eq('id', updatedReservation.id);
+          } else {
+            console.error('❌ Error enviando emails:', emailResult.error);
+          }
         } else {
           setProcessingStatus('Pago aprobado, enviando emails de respaldo...');
           const emailData: BookingEmailData = {
@@ -328,9 +355,8 @@ export default function PaymentSuccessPage() {
             console.log('✅ Emails enviados exitosamente - marcando como enviado');
             const { updateReservation } = await import('@/services/supabaseBooking');
             await updateReservation(updatedReservation.id, {
-              email_enviado: true,
-              email_enviado_at: new Date().toISOString()
-            });
+              email_enviado: true
+            } as any);
           }
         }
         setProcessingStatus('¡Pago aprobado y reserva confirmada!');
