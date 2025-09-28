@@ -1,0 +1,21 @@
+{
+  "timestamp": "2025-09-28T00:52:20.709Z",
+  "systemHealth": {
+    "reservations": {
+      "total": 0,
+      "issues": 0,
+      "health": "HEALTHY"
+    },
+    "edgeFunctions": {
+      "healthy": 3,
+      "total": 3,
+      "health": "HEALTHY"
+    },
+    "configuration": {
+      "issues": 0,
+      "health": "HEALTHY"
+    }
+  },
+  "overallHealth": "HEALTHY",
+  "recommendations": []
+}

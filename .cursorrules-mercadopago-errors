@@ -1,0 +1,122 @@
+# 🔍 Reglas de Detección de Errores - MercadoPago CheckoutPro
+# Punto Legal - Sistema de Agendamiento
+
+## ⚠️ PATRONES CRÍTICOS DE ERROR
+
+### 1. **URL del backend mal configurada** [CRITICAL]
+**Patrón:** `localhost:3001`, `localhost:5173`, `127.0.0.1`
+**Archivos afectados:** `src/pages/PaymentSuccessPage.tsx`, `src/components/MercadoPago*.tsx`
+**Síntomas:** `GET http://localhost:3001/payment/... net::ERR_CONNECTION_REFUSED`
+**Solución:** Usar `https://www.puntolegal.online` en producción
+
+### 2. **Falta de external_reference** [HIGH]
+**Patrón:** `storedReservationId: null`, `storedExternalReference: null`
+**Archivos afectados:** `src/services/mercadopagoDirect.ts`, `supabase/functions/create-mercadopago-preference/`
+**Síntomas:** "No se encontró la reserva asociada al pago"
+**Solución:** Asegurar que `external_reference` se pase en la preferencia
+
+### 3. **Dependencia de localStorage** [HIGH]
+**Patrón:** `Datos de pago almacenados: null`, `localStorage.getItem.*null`
+**Archivos afectados:** `src/pages/PaymentSuccessPage.tsx`
+**Síntomas:** Datos perdidos al volver de MercadoPago
+**Solución:** Usar búsqueda por `preference_id` o `external_reference`
+
+### 4. **Consultas directas a MP desde cliente** [MEDIUM]
+**Patrón:** `MERCADOPAGO_ACCESS_TOKEN.*undefined`, `Access token.*no configurado`
+**Archivos afectados:** `src/services/mercadopagoPaymentInfo.ts`
+**Síntomas:** "usando datos simulados"
+**Solución:** Usar Edge Functions para consultas a MercadoPago
+
+### 5. **Webhook no configurado** [HIGH]
+**Patrón:** `notification_url.*undefined`, `webhook.*failed`
+**Archivos afectados:** `supabase/functions/mercadopago-webhook/`
+**Síntomas:** Pagos aprobados pero reservas pendientes
+**Solución:** Verificar `notification_url` en preferencias
+
+### 6. **Ambiente dev mezclado con prod** [CRITICAL]
+**Patrón:** `http://localhost`, `Warning: URLs HTTP`
+**Archivos afectados:** `src/config/mercadopago.ts`, `.env*`
+**Síntomas:** `auto_return invalid`, errores de CORS
+**Solución:** Usar variables de entorno de producción
+
+### 7. **Fallbacks en producción** [MEDIUM]
+**Patrón:** `usando datos simulados`, `datos simulados`
+**Archivos afectados:** `src/services/*.ts`
+**Síntomas:** Usuario ve información genérica
+**Solución:** Desactivar fallbacks en builds de producción
+
+## 🔧 REGLAS DE VALIDACIÓN
+
+### URLs de Producción
+```typescript
+// ✅ CORRECTO
+const PRODUCTION_URL = 'https://www.puntolegal.online';
+const WEBHOOK_URL = 'https://qrgelocijmwnxcckxbdg.supabase.co/functions/v1/mercadopago-webhook';
+
+// ❌ INCORRECTO
+const DEV_URL = 'http://localhost:3001';
+const LOCAL_WEBHOOK = 'http://localhost:3001/api/webhook';
+```
+
+### External Reference
+```typescript
+// ✅ CORRECTO
+const preferenceData = {
+  external_reference: reservation.id,
+  notification_url: WEBHOOK_URL,
+  back_urls: {
+    success: `${PRODUCTION_URL}/payment-success?source=mercadopago`
+  }
+};
+
+// ❌ INCORRECTO
+const preferenceData = {
+  // Sin external_reference
+  back_urls: {
+    success: 'http://localhost:3001/success' // localhost en producción
+  }
+};
+```
+
+### Búsqueda de Reservas
+```typescript
+// ✅ CORRECTO
+const reserva = await findReservaByCriteria({ 
+  external_reference: externalReferenceFromURL 
+});
+
+// ❌ INCORRECTO
+const reserva = localStorage.getItem('reservationData'); // Dependencia de localStorage
+```
+
+## 📊 MONITOREO AUTOMÁTICO
+
+### Scripts de Verificación
+- `node scripts/error-pattern-detector.mjs` - Detectar patrones en código
+- `node scripts/realtime-error-monitor.mjs` - Monitoreo en tiempo real
+- `node scripts/verify-rls-fix.mjs` - Verificar seguridad RLS
+
+### Archivos de Reporte
+- `error-patterns-report.json` - Patrones detectados
+- `system-health-report.json` - Estado del sistema
+
+## 🚨 ALERTAS CRÍTICAS
+
+Si detectas alguno de estos patrones, aplicar inmediatamente:
+
+1. **localhost en producción** → Cambiar a URLs de producción
+2. **external_reference faltante** → Agregar en creación de preferencia
+3. **localStorage como única fuente** → Implementar búsqueda por ID
+4. **webhook fallando** → Verificar Edge Function
+5. **fallbacks activos** → Desactivar en producción
+
+## ✅ CHECKLIST DE VALIDACIÓN
+
+Antes de cada deploy verificar:
+- [ ] URLs son de producción (https://www.puntolegal.online)
+- [ ] external_reference se pasa correctamente
+- [ ] webhook URL configurada
+- [ ] Sin dependencias de localStorage
+- [ ] Edge Functions operativas
+- [ ] Variables de entorno correctas
+- [ ] Fallbacks desactivados en producción

@@ -1,0 +1,75 @@
+{
+  "timestamp": "2025-09-28T00:51:33.978Z",
+  "patterns": [
+    {
+      "id": "localhost_in_production",
+      "name": "URL del backend mal configurada",
+      "pattern": {},
+      "severity": "CRITICAL",
+      "description": "En producción el success page sigue apuntando a localhost",
+      "effect": "Se usa el fallback → se muestran datos simulados/default",
+      "fix": "Actualizar todas las URLs a https://www.puntolegal.online"
+    },
+    {
+      "id": "missing_external_reference",
+      "name": "Falta de external_reference o metadata",
+      "pattern": {},
+      "severity": "HIGH",
+      "description": "La preferencia creada no lleva external_reference con el ID de reserva",
+      "effect": "No se puede relacionar el pago con la reserva",
+      "fix": "Asegurar que createMercadoPagoPreference incluya external_reference"
+    },
+    {
+      "id": "localstorage_dependency",
+      "name": "Uso de localStorage como única fuente",
+      "pattern": {},
+      "severity": "HIGH",
+      "description": "El success page depende de localStorage para reconstruir datos",
+      "effect": "Tras volver de MP en otro navegador/dispositivo → todo llega null",
+      "fix": "Implementar búsqueda por preference_id o external_reference en URL"
+    },
+    {
+      "id": "direct_mp_api_client",
+      "name": "Consultas directas a la API de MercadoPago desde el cliente",
+      "pattern": {},
+      "severity": "MEDIUM",
+      "description": "El frontend intenta llamar a MP sin ACCESS_TOKEN",
+      "effect": "No obtiene info real del pago → fallback o error crítico",
+      "fix": "Usar Edge Functions para consultas a MercadoPago API"
+    },
+    {
+      "id": "webhook_not_configured",
+      "name": "Webhook no configurado o inactivo",
+      "pattern": {},
+      "severity": "HIGH",
+      "description": "No existe o no responde la notification_url",
+      "effect": "La reserva no se actualiza automáticamente",
+      "fix": "Configurar notification_url en preferencias de MercadoPago"
+    },
+    {
+      "id": "dev_prod_mixed",
+      "name": "Ambiente dev mezclado con prod",
+      "pattern": {},
+      "severity": "CRITICAL",
+      "description": "Variables de entorno de dev usadas en deploy",
+      "effect": "Errores de seguridad, redirecciones inválidas",
+      "fix": "Usar variables de entorno de producción"
+    },
+    {
+      "id": "fallbacks_in_production",
+      "name": "Fallbacks habilitados en producción",
+      "pattern": {},
+      "severity": "MEDIUM",
+      "description": "Código preparado para dev/testing que no se desactiva en prod",
+      "effect": "Usuario ve información genérica y no sus datos reales",
+      "fix": "Desactivar fallbacks en producción"
+    }
+  ],
+  "recommendations": [
+    "Implementar validación automática de URLs en CI/CD",
+    "Usar variables de entorno estrictas para producción",
+    "Implementar tests que verifiquen external_reference",
+    "Desactivar fallbacks en builds de producción",
+    "Monitorear logs de webhook en tiempo real"
+  ]
+}
