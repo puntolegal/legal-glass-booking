@@ -55,7 +55,7 @@ const Footer: React.FC = () => {
     ];
 
     return (
-      <footer className="relative bg-gradient-to-br from-slate-900 via-blue-900 to-slate-800 dark:from-slate-900 dark:via-blue-900 dark:to-slate-800 text-white overflow-hidden border-t border-slate-700/50">
+      <footer className="relative bg-gradient-to-br from-black via-gray-900 to-black text-white overflow-hidden border-t border-gray-800/50 shadow-2xl">
         {/* Efectos de fondo animados */}
         <div className="absolute inset-0 overflow-hidden">
           {/* Círculos decorativos */}
@@ -356,25 +356,31 @@ const Footer: React.FC = () => {
   ];
 
   return (
-    <footer className="relative bg-gradient-to-br from-slate-900 via-blue-900 to-slate-800 dark:from-slate-900 dark:via-blue-900 dark:to-slate-800 text-white overflow-hidden border-t border-slate-700/50">
-      {/* Efectos de fondo - Colores profesionales legales */}
+    <footer className="relative bg-gradient-to-br from-black via-gray-900 to-black text-white overflow-hidden border-t border-gray-800/50 shadow-2xl">
+      {/* Efectos de fondo premium - Negro elegante */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-24 -left-24 w-48 h-48 bg-blue-500/10 rounded-full animate-pulse" />
-        <div className="absolute top-32 -right-32 w-64 h-64 bg-slate-500/10 rounded-full animate-pulse delay-1000" />
+        {/* Gradiente sutil de brillo */}
+        <div className="absolute inset-0 bg-gradient-to-br from-transparent via-gray-900/20 to-transparent" />
         
+        {/* Círculos de luz sutil */}
+        <div className="absolute -top-24 -left-24 w-48 h-48 bg-white/5 rounded-full animate-pulse blur-xl" />
+        <div className="absolute top-32 -right-32 w-64 h-64 bg-white/3 rounded-full animate-pulse delay-1000 blur-2xl" />
+        
+        {/* Partículas doradas premium */}
         {[...Array(12)].map((_, i) => (
           <motion.div
             key={i}
-            className="absolute w-1 h-1 bg-blue-400/30 dark:bg-blue-300/30 rounded-full"
+            className="absolute w-1 h-1 bg-gradient-to-r from-yellow-400/40 to-amber-500/40 rounded-full shadow-lg"
             animate={{
               y: [0, -80, 0],
               x: [0, Math.random() * 40 - 20, 0],
-              opacity: [0, 1, 0],
+              opacity: [0, 0.8, 0],
+              scale: [0.5, 1, 0.5],
             }}
             transition={{
-              duration: 6 + i * 0.5,
+              duration: 8 + i * 0.3,
               repeat: Infinity,
-              delay: i * 0.6,
+              delay: i * 0.8,
               ease: "easeInOut"
             }}
             style={{
@@ -383,6 +389,10 @@ const Footer: React.FC = () => {
             }}
           />
         ))}
+        
+        {/* Líneas de luz sutiles */}
+        <div className="absolute top-0 left-1/4 w-px h-full bg-gradient-to-b from-transparent via-white/10 to-transparent" />
+        <div className="absolute top-0 right-1/3 w-px h-full bg-gradient-to-b from-transparent via-white/10 to-transparent" />
       </div>
 
       <div className="relative z-10 container mx-auto px-4 py-16">
@@ -486,7 +496,7 @@ const Footer: React.FC = () => {
                     href={social.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-10 h-10 bg-white/10 hover:bg-blue-500/20 dark:bg-white/10 dark:hover:bg-blue-400/20 rounded-lg flex items-center justify-center transition-all duration-300"
+                    className="w-10 h-10 bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/20 hover:border-white/40 rounded-lg flex items-center justify-center transition-all duration-300 hover:shadow-lg hover:shadow-white/10 group"
                   >
                     <span>{social.icon}</span>
                   </a>
@@ -496,18 +506,18 @@ const Footer: React.FC = () => {
           </motion.div>
         </div>
 
-        {/* Footer inferior */}
-        <div className="border-t border-slate-700/50 dark:border-slate-600/50 pt-8">
+        {/* Footer inferior premium */}
+        <div className="border-t border-white/10 pt-8 backdrop-blur-sm">
           <div className="flex flex-col md:flex-row items-center justify-between">
-            <p className="text-slate-400 dark:text-slate-300 text-sm mb-4 md:mb-0">
+            <p className="text-gray-400 text-sm mb-4 md:mb-0 font-light">
               © 2025 Punto Legal. Todos los derechos reservados.
             </p>
-            <p className="text-slate-400 dark:text-slate-300 text-sm flex items-center gap-2">
+            <p className="text-gray-400 text-sm flex items-center gap-2 font-light">
               <span>Hecho con</span>
-              <span className="text-red-500 dark:text-red-400">❤️</span>
+              <span className="text-red-400 animate-pulse">❤️</span>
               <span>en Chile</span>
-              <span className="text-blue-500 dark:text-blue-400">🇨🇱</span>
-              <span>• Consultoría Legal</span>
+              <span className="text-yellow-400">🇨🇱</span>
+              <span>• Consultoría Legal Premium</span>
             </p>
           </div>
         </div>
