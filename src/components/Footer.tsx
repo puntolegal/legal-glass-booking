@@ -56,7 +56,7 @@ const Footer: React.FC = () => {
     ];
 
     return (
-      <footer className="relative bg-white/90 dark:bg-gray-900/90 backdrop-blur-3xl border-t border-white/30 dark:border-gray-700/40 shadow-2xl shadow-black/20 text-gray-900 dark:text-white overflow-hidden">
+      <footer className="relative bg-white/90 dark:bg-black/80 backdrop-blur-3xl border-t border-white/30 dark:border-gray-700/40 shadow-2xl shadow-black/20 text-gray-900 dark:text-white overflow-hidden">
         {/* Efectos de fondo animados */}
         <div className="absolute inset-0 overflow-hidden">
           {/* Círculos decorativos */}
@@ -357,21 +357,21 @@ const Footer: React.FC = () => {
   ];
 
   return (
-    <footer className="relative bg-white/90 dark:bg-gray-900/90 backdrop-blur-3xl border-t border-white/30 dark:border-gray-700/40 shadow-2xl shadow-black/20 text-gray-900 dark:text-white overflow-hidden">
+    <footer className="relative bg-white/90 dark:bg-black/80 backdrop-blur-3xl border-t border-white/30 dark:border-gray-700/40 shadow-2xl shadow-black/20 text-gray-900 dark:text-white overflow-hidden">
       {/* Efectos de fondo glassmorphism iOS moderno */}
       <div className="absolute inset-0 overflow-hidden">
         {/* Gradiente sutil de brillo - estilo Docker */}
-        <div className="absolute inset-0 bg-gradient-to-br from-transparent via-gray-100/20 dark:via-gray-800/20 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-br from-transparent via-gray-100/20 dark:via-orange-500/5 to-transparent" />
         
         {/* Círculos de luz sutil - consistentes con Docker */}
-        <div className="absolute -top-24 -left-24 w-48 h-48 bg-gray-200/30 dark:bg-gray-700/30 rounded-full animate-pulse blur-xl" />
-        <div className="absolute top-32 -right-32 w-64 h-64 bg-gray-100/20 dark:bg-gray-800/20 rounded-full animate-pulse delay-1000 blur-2xl" />
+        <div className="absolute -top-24 -left-24 w-48 h-48 bg-gray-200/30 dark:bg-orange-500/10 rounded-full animate-pulse blur-xl" />
+        <div className="absolute top-32 -right-32 w-64 h-64 bg-gray-100/20 dark:bg-orange-500/5 rounded-full animate-pulse delay-1000 blur-2xl" />
         
         {/* Partículas sutiles - estilo iOS */}
         {[...Array(8)].map((_, i) => (
           <motion.div
             key={i}
-            className="absolute w-1 h-1 bg-gray-400/30 dark:bg-gray-500/30 rounded-full shadow-sm"
+            className="absolute w-1 h-1 bg-gray-400/30 dark:bg-orange-500/20 rounded-full shadow-sm"
             animate={{
               y: [0, -60, 0],
               x: [0, Math.random() * 30 - 15, 0],
@@ -402,8 +402,8 @@ const Footer: React.FC = () => {
             className="lg:col-span-2"
           >
             <div className="flex items-center space-x-3 mb-6">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500/20 to-orange-600/10 dark:from-orange-500/30 dark:to-orange-600/20 flex items-center justify-center backdrop-blur-xl shadow-lg border border-white/10 dark:border-gray-700/30">
-                <Scale className="w-6 h-6 text-orange-500 dark:text-orange-400" />
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500/20 to-orange-600/10 dark:from-orange-500/20 dark:to-orange-600/10 flex items-center justify-center backdrop-blur-xl shadow-lg border border-white/10 dark:border-gray-800/40">
+                <Scale className="w-6 h-6 text-orange-500 dark:text-orange-500" />
               </div>
               <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Punto Legal</h2>
             </div>
@@ -414,16 +414,16 @@ const Footer: React.FC = () => {
             
             {/* Valores Auténticos - Startup Chilena */}
             <div className="grid grid-cols-3 gap-4">
-              <div className="text-center p-3 bg-white/10 dark:bg-gray-800/20 rounded-lg backdrop-blur-sm border border-white/20 dark:border-gray-700/30">
-                <div className="text-2xl font-bold text-orange-500 dark:text-orange-400">🇨🇱</div>
+              <div className="text-center p-3 bg-white/10 dark:bg-gray-900/30 rounded-lg backdrop-blur-sm border border-white/20 dark:border-gray-800/40">
+                <div className="text-2xl font-bold text-orange-500 dark:text-orange-500">🇨🇱</div>
                 <div className="text-xs text-gray-600 dark:text-gray-300">Hecho en Chile</div>
               </div>
-              <div className="text-center p-3 bg-white/10 dark:bg-gray-800/20 rounded-lg backdrop-blur-sm border border-white/20 dark:border-gray-700/30">
-                <div className="text-2xl font-bold text-orange-500 dark:text-orange-400">2025</div>
+              <div className="text-center p-3 bg-white/10 dark:bg-gray-900/30 rounded-lg backdrop-blur-sm border border-white/20 dark:border-gray-800/40">
+                <div className="text-2xl font-bold text-orange-500 dark:text-orange-500">2025</div>
                 <div className="text-xs text-gray-600 dark:text-gray-300">Startup Legal</div>
               </div>
-              <div className="text-center p-3 bg-white/10 dark:bg-gray-800/20 rounded-lg backdrop-blur-sm border border-white/20 dark:border-gray-700/30">
-                <div className="text-2xl font-bold text-orange-500 dark:text-orange-400">✨</div>
+              <div className="text-center p-3 bg-white/10 dark:bg-gray-900/30 rounded-lg backdrop-blur-sm border border-white/20 dark:border-gray-800/40">
+                <div className="text-2xl font-bold text-orange-500 dark:text-orange-500">✨</div>
                 <div className="text-xs text-gray-600 dark:text-gray-300">Innovación</div>
               </div>
             </div>
