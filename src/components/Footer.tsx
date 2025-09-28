@@ -389,10 +389,6 @@ const Footer: React.FC = () => {
             }}
           />
         ))}
-        
-        {/* Líneas de luz sutiles */}
-        <div className="absolute top-0 left-1/4 w-px h-full bg-gradient-to-b from-transparent via-white/10 to-transparent" />
-        <div className="absolute top-0 right-1/3 w-px h-full bg-gradient-to-b from-transparent via-white/10 to-transparent" />
       </div>
 
       <div className="relative z-10 container mx-auto px-4 py-16">
