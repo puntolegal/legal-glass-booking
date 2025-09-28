@@ -286,7 +286,14 @@ export default function PaymentSuccessPage() {
       let emailResult: EmailResult | null = null;
 
       if (isApproved) {
-        if (updateResult.success) {
+        // Verificar si los emails ya fueron enviados para evitar duplicación
+        if (updatedReservation.email_enviado) {
+          console.log('📧 Emails ya enviados previamente - evitando duplicación');
+          emailResult = {
+            success: true,
+            message: 'Emails ya enviados previamente'
+          };
+        } else if (updateResult.success) {
           console.log('✅ Email de confirmación enviado desde flujo principal');
           emailResult = {
             success: true,
@@ -315,6 +322,16 @@ export default function PaymentSuccessPage() {
 
           console.log('📧 Enviando emails de respaldo via Resend:', emailData);
           emailResult = await sendRealBookingEmails(emailData);
+          
+          // Marcar como enviado para evitar futuras duplicaciones
+          if (emailResult.success) {
+            console.log('✅ Emails enviados exitosamente - marcando como enviado');
+            const { updateReservation } = await import('@/services/supabaseBooking');
+            await updateReservation(updatedReservation.id, {
+              email_enviado: true,
+              email_enviado_at: new Date().toISOString()
+            });
+          }
         }
         setProcessingStatus('¡Pago aprobado y reserva confirmada!');
       } else {
