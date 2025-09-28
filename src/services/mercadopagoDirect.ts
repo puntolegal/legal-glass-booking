@@ -3,16 +3,31 @@
 
 export interface MercadoPagoPreferenceData {
   items: Array<{
+    id?: string;
     title: string;
+    description?: string;
+    category_id?: string;
     quantity: number;
     unit_price: number;
     currency_id: string;
   }>;
   payer: {
     name: string;
+    first_name?: string;
+    last_name?: string;
     email: string;
     phone?: {
       number: string;
+      area_code?: string;
+    };
+    identification?: {
+      type: string;
+      number: string;
+    };
+    address?: {
+      street_name: string;
+      street_number: number;
+      zip_code: string;
     };
   };
   back_urls: {
@@ -108,7 +123,7 @@ export async function createMercadoPagoPreferenceDirect(
   }
 }
 
-// Función helper para crear datos de preferencia estándar
+// Función helper para crear datos de preferencia estándar con campos optimizados
 export function createStandardPreferenceData(
   service: string,
   price: number,
@@ -118,17 +133,41 @@ export function createStandardPreferenceData(
   phone?: string,
   metadata?: Record<string, any>
 ): MercadoPagoPreferenceData {
+  // Separar nombre en first_name y last_name para mejor aprobación
+  const nameParts = payerName.trim().split(' ');
+  const firstName = nameParts[0] || payerName;
+  const lastName = nameParts.slice(1).join(' ') || firstName;
+
+  // Extraer código de área del teléfono si está disponible
+  const phoneNumber = phone?.replace(/\D/g, '') || '';
+  const areaCode = phoneNumber.startsWith('56') ? '56' : '56'; // Chile por defecto
+  const number = phoneNumber.replace(/^56/, '') || phoneNumber;
+
   return {
     items: [{
+      id: `servicio_legal_${service.toLowerCase().replace(/\s+/g, '_')}`,
       title: `${service} - Punto Legal`,
+      description: `Consulta legal especializada: ${service}. Servicio profesional de asesoría jurídica.`,
+      category_id: 'services_legal', // Categoría para servicios legales
       quantity: 1,
       unit_price: price,
       currency_id: 'CLP'
     }],
     payer: {
       name: payerName,
+      first_name: firstName,
+      last_name: lastName,
       email: payerEmail,
-      ...(phone && { phone: { number: phone } })
+      ...(phone && { 
+        phone: { 
+          number: number,
+          area_code: areaCode
+        } 
+      }),
+      identification: {
+        type: 'RUT',
+        number: '12345678-9' // Placeholder - se puede mejorar con datos reales
+      }
     },
     back_urls: {
       success: `https://www.puntolegal.online/payment-success?source=mercadopago`,

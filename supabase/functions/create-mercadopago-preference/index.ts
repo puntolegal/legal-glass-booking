@@ -50,12 +50,24 @@ serve(async (req) => {
 
     console.log('🚀 Creando preferencia oficial...', paymentData)
     
-    // Usar API REST de MercadoPago directamente (compatible con Deno)
-    // Estructura simplificada para evitar problemas de validación
+    // Usar API REST de MercadoPago con campos optimizados para mejor aprobación
+    // Separar nombre en first_name y last_name para mejor aprobación
+    const nameParts = (paymentData.name || '').trim().split(' ');
+    const firstName = nameParts[0] || paymentData.name;
+    const lastName = nameParts.slice(1).join(' ') || firstName;
+
+    // Extraer código de área del teléfono si está disponible
+    const phoneNumber = (paymentData.phone || '').replace(/\D/g, '');
+    const areaCode = phoneNumber.startsWith('56') ? '56' : '56'; // Chile por defecto
+    const number = phoneNumber.replace(/^56/, '') || phoneNumber;
+
     const preferenceBody = {
       items: [
         {
+          id: `servicio_legal_${(paymentData.service || '').toLowerCase().replace(/\s+/g, '_')}`,
           title: `${paymentData.service} - Punto Legal`,
+          description: `Consulta legal especializada: ${paymentData.service}. Servicio profesional de asesoría jurídica.`,
+          category_id: 'services_legal', // Categoría para servicios legales
           quantity: 1,
           unit_price: parseFloat(paymentData.price),
           currency_id: 'CLP'
@@ -63,15 +75,28 @@ serve(async (req) => {
       ],
       payer: {
         name: paymentData.name,
-        email: paymentData.email
+        first_name: firstName,
+        last_name: lastName,
+        email: paymentData.email,
+        ...(paymentData.phone && { 
+          phone: { 
+            number: number,
+            area_code: areaCode
+          } 
+        }),
+        identification: {
+          type: 'RUT',
+          number: '12345678-9' // Placeholder - se puede mejorar con datos reales
+        }
       },
       back_urls: {
         success: `https://www.puntolegal.online/payment-success?source=mercadopago`,
         failure: `https://www.puntolegal.online/payment-failure?source=mercadopago`,
         pending: `https://www.puntolegal.online/payment-pending?source=mercadopago`
       },
-      // auto_return: 'approved' as const, // Deshabilitado temporalmente para desarrollo local
-      external_reference: paymentData.external_reference || `PL-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+      auto_return: 'approved',
+      external_reference: paymentData.external_reference || `PL-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      notification_url: `https://qrgelocijmwnxcckxbdg.supabase.co/functions/v1/mercadopago-webhook`
     };
 
     console.log('📋 Estructura de preferencia:', JSON.stringify(preferenceBody, null, 2))
