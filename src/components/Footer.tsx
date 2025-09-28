@@ -55,7 +55,7 @@ const Footer: React.FC = () => {
     ];
 
     return (
-      <footer className="relative bg-gradient-to-br from-black via-gray-900 to-black text-white overflow-hidden border-t border-white/10 shadow-2xl backdrop-blur-xl">
+      <footer className="relative bg-white/90 dark:bg-gray-900/90 backdrop-blur-3xl border-t border-white/30 dark:border-gray-700/40 shadow-2xl shadow-black/20 text-gray-900 dark:text-white overflow-hidden">
         {/* Efectos de fondo animados */}
         <div className="absolute inset-0 overflow-hidden">
           {/* Círculos decorativos */}
@@ -356,31 +356,31 @@ const Footer: React.FC = () => {
   ];
 
   return (
-    <footer className="relative bg-gradient-to-br from-black via-gray-900 to-black text-white overflow-hidden border-t border-white/10 shadow-2xl backdrop-blur-xl">
-      {/* Efectos de fondo consistentes con Docker y Sidebar */}
+    <footer className="relative bg-white/90 dark:bg-gray-900/90 backdrop-blur-3xl border-t border-white/30 dark:border-gray-700/40 shadow-2xl shadow-black/20 text-gray-900 dark:text-white overflow-hidden">
+      {/* Efectos de fondo glassmorphism iOS moderno */}
       <div className="absolute inset-0 overflow-hidden">
-        {/* Gradiente sutil de brillo */}
-        <div className="absolute inset-0 bg-gradient-to-br from-transparent via-primary/5 to-transparent" />
+        {/* Gradiente sutil de brillo - estilo Docker */}
+        <div className="absolute inset-0 bg-gradient-to-br from-transparent via-gray-100/20 dark:via-gray-800/20 to-transparent" />
         
-        {/* Círculos de luz sutil - consistentes con el diseño */}
-        <div className="absolute -top-24 -left-24 w-48 h-48 bg-primary/10 rounded-full animate-pulse blur-xl" />
-        <div className="absolute top-32 -right-32 w-64 h-64 bg-primary/5 rounded-full animate-pulse delay-1000 blur-2xl" />
+        {/* Círculos de luz sutil - consistentes con Docker */}
+        <div className="absolute -top-24 -left-24 w-48 h-48 bg-gray-200/30 dark:bg-gray-700/30 rounded-full animate-pulse blur-xl" />
+        <div className="absolute top-32 -right-32 w-64 h-64 bg-gray-100/20 dark:bg-gray-800/20 rounded-full animate-pulse delay-1000 blur-2xl" />
         
-        {/* Partículas naranjas premium - consistentes con el tema */}
-        {[...Array(12)].map((_, i) => (
+        {/* Partículas sutiles - estilo iOS */}
+        {[...Array(8)].map((_, i) => (
           <motion.div
             key={i}
-            className="absolute w-1 h-1 bg-gradient-to-r from-orange-400/40 to-orange-500/40 rounded-full shadow-lg"
+            className="absolute w-1 h-1 bg-gray-400/30 dark:bg-gray-500/30 rounded-full shadow-sm"
             animate={{
-              y: [0, -80, 0],
-              x: [0, Math.random() * 40 - 20, 0],
-              opacity: [0, 0.8, 0],
+              y: [0, -60, 0],
+              x: [0, Math.random() * 30 - 15, 0],
+              opacity: [0, 0.6, 0],
               scale: [0.5, 1, 0.5],
             }}
             transition={{
-              duration: 8 + i * 0.3,
+              duration: 10 + i * 0.5,
               repeat: Infinity,
-              delay: i * 0.8,
+              delay: i * 1.2,
               ease: "easeInOut"
             }}
             style={{
@@ -485,17 +485,17 @@ const Footer: React.FC = () => {
           </motion.div>
         </div>
 
-        {/* Footer inferior premium */}
-        <div className="border-t border-white/10 pt-8 backdrop-blur-sm">
+        {/* Footer inferior glassmorphism iOS */}
+        <div className="border-t border-gray-200/30 dark:border-gray-700/40 pt-8 backdrop-blur-sm">
           <div className="flex flex-col md:flex-row items-center justify-between">
-            <p className="text-gray-400 text-sm mb-4 md:mb-0 font-light">
+            <p className="text-gray-600 dark:text-gray-400 text-sm mb-4 md:mb-0 font-light">
               © 2025 Punto Legal. Todos los derechos reservados.
             </p>
-            <p className="text-gray-400 text-sm flex items-center gap-2 font-light">
+            <p className="text-gray-600 dark:text-gray-400 text-sm flex items-center gap-2 font-light">
               <span>Hecho con</span>
-              <span className="text-red-400 animate-pulse">❤️</span>
+              <span className="text-red-500 dark:text-red-400 animate-pulse">❤️</span>
               <span>en Chile</span>
-              <span className="text-primary">🇨🇱</span>
+              <span className="text-orange-500 dark:text-orange-400">🇨🇱</span>
               <span>• Consultoría Legal Premium</span>
             </p>
           </div>
