@@ -2,6 +2,7 @@ export interface PendingPaymentData {
   id: string;
   reservationId?: string;
   external_reference?: string;
+  externalReference?: string; // Alias para consistencia
   nombre: string;
   email: string;
   telefono: string;

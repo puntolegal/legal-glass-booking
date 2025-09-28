@@ -207,32 +207,22 @@ const MercadoPagoOfficialButton: React.FC<MercadoPagoOfficialButtonProps> = ({
       
       console.log('back_urls configuradas:', backUrls);
 
-      const preferenceData = {
-        items: [{
-          title: `${paymentData.description} - Punto Legal`,
-          quantity: 1,
-          unit_price: paymentData.amount,
-          currency_id: 'CLP'
-        }],
-        payer: {
-          name: paymentData.payer.name,
-          email: paymentData.payer.email,
-          phone: {
-            number: paymentData.payer.phone || ''
-          }
-        },
-        back_urls: backUrls,
-        auto_return: 'approved' as const,
-        external_reference: reservation.id,
-        notification_url: `https://qrgelocijmwnxcckxbdg.supabase.co/functions/v1/mercadopago-webhook`,
-        metadata: {
+      // Usar la función optimizada para crear datos de preferencia
+      const preferenceData = createStandardPreferenceData(
+        getMetadataString('service_name', paymentData.description),
+        paymentData.amount,
+        paymentData.payer.name,
+        paymentData.payer.email,
+        reservation.id, // Usar ID de reserva como external_reference consistente
+        paymentData.payer.phone,
+        {
           reservation_id: reservation.id,
           service_name: getMetadataString('service_name', paymentData.description),
           appointment_date: getMetadataString('appointment_date', new Date().toISOString().split('T')[0]),
           appointment_time: getMetadataString('appointment_time', '10:00'),
           meeting_type: getMetadataString('meeting_type', 'online')
         }
-      };
+      );
       
       console.log('🚀 Llamando a createMercadoPagoPreferenceDirect con:', preferenceData);
       console.log('🔍 back_urls en preferenceData:', preferenceData.back_urls);
@@ -261,26 +251,22 @@ const MercadoPagoOfficialButton: React.FC<MercadoPagoOfficialButtonProps> = ({
         const { updateReservation } = await import('@/services/supabaseBooking');
         await updateReservation(reservation.id, {
           preference_id: result.preference_id,
-          external_reference: reservation.id // Usar el ID de la reserva como external_reference
+          external_reference: reservation.id // Usar el ID de la reserva como external_reference consistente
         });
         console.log('✅ Reserva actualizada con preference_id:', result.preference_id);
+        console.log('✅ External reference configurado como:', reservation.id);
       } catch (updateError) {
         console.warn('⚠️ No se pudo actualizar la reserva con preference_id:', updateError);
       }
 
+      // Guardar datos del pago en UNA SOLA clave para evitar conflictos
       const storedPaymentData: PendingPaymentData = {
         ...paymentDataForStorage,
-        preferenceId: result.preference_id ?? null
+        preferenceId: result.preference_id ?? null,
+        externalReference: reservation.id // Agregar external_reference para consistencia
       };
       localStorage.setItem('paymentData', JSON.stringify(storedPaymentData));
-
-      // Guardar datos del pago
-      localStorage.setItem('pendingPayment', JSON.stringify({
-        ...paymentData,
-        preferenceId: result.preference_id,
-        timestamp: Date.now(),
-        method: 'mercadopago_official'
-      }));
+      console.log('✅ Datos guardados en localStorage con external_reference:', reservation.id);
       
       // Redirigir al Checkout Pro oficial
       console.log('🚀 Redirigiendo a Checkout Pro oficial...');
