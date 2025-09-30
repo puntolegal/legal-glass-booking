@@ -23,14 +23,14 @@ serve(async (req) => {
     console.log('🔍 Método:', req.method);
     console.log('🔍 URL:', req.url);
     
-    // Obtener credenciales de MercadoPago
-    const MERCADOPAGO_ACCESS_TOKEN = Deno.env.get('MERCADOPAGO_ACCESS_TOKEN') || 'APP_USR-7407359076060108-092318-7fb22dd54bc0d3e4a42accab058e8a3e-229698947'
+    // Obtener credenciales de MercadoPago desde variables de entorno
+    const MERCADOPAGO_ACCESS_TOKEN = Deno.env.get('MERCADOPAGO_ACCESS_TOKEN')
     const APP_URL = Deno.env.get('APP_URL') || 'https://puntolegal.online'
     
-    console.log('🔑 MercadoPago Access Token:', MERCADOPAGO_ACCESS_TOKEN ? 'Configurado' : 'No configurado');
+    console.log('🔑 MercadoPago Access Token:', MERCADOPAGO_ACCESS_TOKEN ? 'Configurado desde variables de entorno' : 'NO CONFIGURADO');
     
     if (!MERCADOPAGO_ACCESS_TOKEN) {
-      throw new Error('MERCADOPAGO_ACCESS_TOKEN no configurado para MercadoPago')
+      throw new Error('MERCADOPAGO_ACCESS_TOKEN no está configurado en las variables de entorno de Supabase')
     }
 
     // Obtener datos del request

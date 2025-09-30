@@ -56,7 +56,7 @@ export function getMpAccessToken(): string {
   
   if (env === 'production') {
     return import.meta.env.VITE_MP_ACCESS_TOKEN_PROD || 
-           'APP_USR-7407359076060108-092318-7fb22dd54bc0d3e4a42accab058e8a3e-229698947';
+           'NO_TOKEN_CONFIGURADO';
   } else {
     return import.meta.env.VITE_MP_ACCESS_TOKEN_TEST || 
            'TEST-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx';
