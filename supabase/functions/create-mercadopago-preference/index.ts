@@ -25,7 +25,7 @@ serve(async (req) => {
     
     // Obtener credenciales de MercadoPago
     const MERCADOPAGO_ACCESS_TOKEN = Deno.env.get('MERCADOPAGO_ACCESS_TOKEN') || 'APP_USR-7407359076060108-092318-7fb22dd54bc0d3e4a42accab058e8a3e-229698947'
-    const APP_URL = Deno.env.get('APP_URL') || 'https://www.puntolegal.online'
+    const APP_URL = Deno.env.get('APP_URL') || 'https://puntolegal.online'
     
     console.log('🔑 MercadoPago Access Token:', MERCADOPAGO_ACCESS_TOKEN ? 'Configurado' : 'No configurado');
     
@@ -90,9 +90,9 @@ serve(async (req) => {
         }
       },
       back_urls: {
-        success: `https://www.puntolegal.online/payment-success?source=mercadopago`,
-        failure: `https://www.puntolegal.online/payment-failure?source=mercadopago`,
-        pending: `https://www.puntolegal.online/payment-pending?source=mercadopago`
+        success: `https://puntolegal.online/payment-success?source=mercadopago`,
+        failure: `https://puntolegal.online/payment-failure?source=mercadopago`,
+        pending: `https://puntolegal.online/payment-pending?source=mercadopago`
       },
       auto_return: 'approved',
       external_reference: paymentData.external_reference || `PL-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,

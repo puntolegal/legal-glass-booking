@@ -44,7 +44,7 @@ export type Env = z.infer<typeof EnvSchema>;
 export function getMercadoPagoEnv(): 'sandbox' | 'production' {
   const isProduction = import.meta.env.PROD || 
                       import.meta.env.MODE === 'production' || 
-                      window.location.hostname === 'www.puntolegal.online' ||
+                      window.location.hostname === 'puntolegal.online' ||
                       window.location.hostname === 'puntolegal.online';
   
   return isProduction ? 'production' : 'sandbox';
