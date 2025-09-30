@@ -83,8 +83,8 @@ const MercadoPagoOfficialButton: React.FC<MercadoPagoOfficialButtonProps> = ({
           const controller = new AbortController();
           const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 segundos timeout
           
-          const response = await fetch('https://api.puntolegal.online/health', {
-            method: 'GET',
+          const response = await fetch('https://qrgelocijmwnxcckxbdg.supabase.co/functions/v1/create-mercadopago-preference', {
+            method: 'OPTIONS',
             signal: controller.signal
           });
           
@@ -205,9 +205,9 @@ const MercadoPagoOfficialButton: React.FC<MercadoPagoOfficialButtonProps> = ({
       // Usar backend según entorno (desarrollo vs producción)
       const backendUrl = import.meta.env.MODE === 'development' 
         ? 'http://localhost:3001' 
-        : 'https://api.puntolegal.online'; // Backend en producción
+        : 'https://qrgelocijmwnxcckxbdg.supabase.co/functions/v1'; // Supabase Edge Functions
       
-      const response = await fetch(`${backendUrl}/create-preference`, {
+      const response = await fetch(`${backendUrl}/create-mercadopago-preference`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
