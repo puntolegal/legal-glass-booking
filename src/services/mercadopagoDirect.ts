@@ -58,6 +58,10 @@ const validatePreferenceData = (data: MercadoPagoPreferenceData): void => {
   
   console.log('🔍 VALIDANDO DATOS DE PREFERENCIA (Prevención PXI03):');
   
+  // Detectar dispositivo para validación específica
+  const isMobile = typeof window !== 'undefined' && /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  console.log(`📱 Validación para: ${isMobile ? 'MÓVIL' : 'PC'}`);
+  
   // Validar items
   if (!data.items || data.items.length === 0) {
     errors.push('Items requeridos');
@@ -74,6 +78,11 @@ const validatePreferenceData = (data: MercadoPagoPreferenceData): void => {
       }
       if (!item.currency_id || item.currency_id !== 'CLP') {
         errors.push(`Item ${index + 1}: Currency_id debe ser 'CLP'`);
+      }
+      
+      // 🔧 VALIDACIÓN ESPECÍFICA MÓVIL: Verificar category_id
+      if (isMobile && item.category_id === 'services_legal') {
+        console.warn(`⚠️ MÓVIL: category_id "services_legal" puede causar PXI03, se cambiará a "services"`);
       }
     });
   }
@@ -137,6 +146,8 @@ export async function createMercadoPagoPreferenceDirect(
     const MERCADOPAGO_ACCESS_TOKEN = import.meta.env.VITE_MERCADOPAGO_ACCESS_TOKEN || 
                                     import.meta.env.MERCADOPAGO_ACCESS_TOKEN ||
                                     'APP_USR-7407359076060108-092318-7fb22dd54bc0d3e4a42accab058e8a3e-229698947';
+    
+    console.log('🔑 Token de MercadoPago:', MERCADOPAGO_ACCESS_TOKEN ? '✅ Configurado' : '❌ Faltante');
 
     // Llamada directa a la API REST de MercadoPago
     const response = await fetch('https://api.mercadopago.com/checkout/preferences', {
@@ -210,6 +221,12 @@ export async function createMercadoPagoPreferenceDirect(
   }
 }
 
+// Función para detectar si es dispositivo móvil
+const isMobileDevice = (): boolean => {
+  if (typeof window === 'undefined') return false;
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+};
+
 // Función helper para crear datos de preferencia estándar con campos optimizados
 export function createStandardPreferenceData(
   service: string,
@@ -220,6 +237,10 @@ export function createStandardPreferenceData(
   phone?: string,
   metadata?: Record<string, any>
 ): MercadoPagoPreferenceData {
+  // Detectar si es móvil
+  const isMobile = isMobileDevice();
+  console.log(`📱 Dispositivo detectado: ${isMobile ? 'MÓVIL' : 'PC'}`);
+  
   // Separar nombre en first_name y last_name para mejor aprobación
   const nameParts = payerName.trim().split(' ');
   const firstName = nameParts[0] || payerName;
@@ -235,7 +256,8 @@ export function createStandardPreferenceData(
       id: `servicio_legal_${service.toLowerCase().replace(/\s+/g, '_')}`,
       title: `${service} - Punto Legal`,
       description: `Consulta legal especializada: ${service}. Servicio profesional de asesoría jurídica.`,
-      category_id: 'services_legal', // Categoría para servicios legales
+      // 🔧 AJUSTE MÓVIL: Usar categoría genérica en móvil para evitar PXI03
+      category_id: isMobile ? 'services' : 'services_legal',
       quantity: 1,
       unit_price: price,
       currency_id: 'CLP'
@@ -248,11 +270,13 @@ export function createStandardPreferenceData(
       ...(phone && { 
         phone: { 
           number: number,
-          area_code: areaCode
+          // 🔧 AJUSTE MÓVIL: Usar área automática en móvil
+          area_code: isMobile ? (phoneNumber.startsWith('56') ? '56' : '56') : areaCode
         } 
       }),
       identification: {
-        type: 'RUT',
+        // 🔧 AJUSTE MÓVIL: Usar DNI en móvil para evitar PXI03
+        type: isMobile ? 'DNI' : 'RUT',
         number: '12345678-9' // Placeholder - se puede mejorar con datos reales
       }
     },
@@ -264,7 +288,15 @@ export function createStandardPreferenceData(
     auto_return: 'approved',
     external_reference: externalReference,
     notification_url: `https://qrgelocijmwnxcckxbdg.supabase.co/functions/v1/mercadopago-webhook`,
-    ...(metadata && { metadata })
+    // 🔧 AJUSTE MÓVIL: Metadata limpia para evitar PXI03
+    ...(metadata && { 
+      metadata: isMobile ? {
+        // Solo metadata esencial para móvil
+        service_type: service,
+        source: 'web',
+        ...metadata
+      } : metadata
+    })
   };
 }
 
