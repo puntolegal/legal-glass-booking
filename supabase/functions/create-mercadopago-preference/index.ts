@@ -96,11 +96,29 @@ serve(async (req) => {
       },
       auto_return: 'approved',
       external_reference: paymentData.external_reference || `PL-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      notification_url: `https://qrgelocijmwnxcckxbdg.supabase.co/functions/v1/mercadopago-webhook`
+      notification_url: `https://qrgelocijmwnxcckxbdg.supabase.co/functions/v1/mercadopago-webhook`,
+      metadata: {
+        client_name: paymentData.name,
+        client_email: paymentData.email,
+        service_type: paymentData.service,
+        appointment_date: paymentData.date,
+        appointment_time: paymentData.time,
+        source: 'punto-legal-web',
+        integration_type: 'supabase_edge_function',
+        mobile_compatible: 'true', // 🔧 CRÍTICO: Marcar como compatible con móvil
+        auto_return_enabled: 'true', // 🔧 CRÍTICO: Confirmar auto_return habilitado
+        platform: 'web_mobile' // 🔧 CRÍTICO: Identificar plataforma
+      },
+      statement_descriptor: 'PUNTO LEGAL'
     };
 
     console.log('📋 Estructura de preferencia:', JSON.stringify(preferenceBody, null, 2))
     console.log('🔑 Token de acceso:', MERCADOPAGO_ACCESS_TOKEN ? `${MERCADOPAGO_ACCESS_TOKEN.substring(0, 20)}...` : 'No configurado')
+    console.log('📱 Configuración móvil:')
+    console.log('   ✅ auto_return: approved')
+    console.log('   ✅ back_urls configuradas')
+    console.log('   ✅ mobile_compatible: true')
+    console.log('   ✅ platform: web_mobile')
 
     // Llamada directa a la API REST de MercadoPago
     const response = await fetch('https://api.mercadopago.com/checkout/preferences', {

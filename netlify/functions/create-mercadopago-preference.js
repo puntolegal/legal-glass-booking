@@ -69,7 +69,10 @@ exports.handler = async (event, context) => {
         appointment_date: paymentData.date,
         appointment_time: paymentData.time,
         source: 'punto-legal-web',
-        integration_type: 'netlify_function'
+        integration_type: 'netlify_function',
+        mobile_compatible: 'true', // 🔧 CRÍTICO: Marcar como compatible con móvil
+        auto_return_enabled: 'true', // 🔧 CRÍTICO: Confirmar auto_return habilitado
+        platform: 'web_mobile' // 🔧 CRÍTICO: Identificar plataforma
       },
       statement_descriptor: 'PUNTO LEGAL'
     };
