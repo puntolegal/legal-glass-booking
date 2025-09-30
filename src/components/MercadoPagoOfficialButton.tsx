@@ -187,47 +187,48 @@ const MercadoPagoOfficialButton: React.FC<MercadoPagoOfficialButtonProps> = ({
       console.log('🔍 paymentDataForStorage:', paymentDataForStorage);
       console.log('🔍 localStorage paymentData:', localStorage.getItem('paymentData'));
 
-      // Usar servicio directo de MercadoPago (sin Edge Function)
-      const { createMercadoPagoPreferenceDirect, createStandardPreferenceData } = await import('@/services/mercadopagoDirect');
+      // Usar backend para crear preferencia (patrón correcto según brief)
+      console.log('🚀 Creando preferencia via backend...');
       
-      // Debug: Verificar URLs de retorno
-      console.log('🔍 INICIO DEBUG - Verificando entorno:');
-      console.log('window.location.origin:', window.location.origin);
-      console.log('window.location.href:', window.location.href);
-      console.log('NODE_ENV:', import.meta.env.MODE);
+      // Usar backend según entorno (desarrollo vs producción)
+      const backendUrl = import.meta.env.MODE === 'development' 
+        ? 'http://localhost:3001' 
+        : 'https://api.puntolegal.online'; // Backend en producción
       
-      const baseUrl = window.location.origin;
+      const response = await fetch(`${backendUrl}/create-preference`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          paymentData: {
+            service: getMetadataString('service_name', paymentData.description),
+            description: paymentData.description,
+            price: paymentData.amount,
+            name: paymentData.payer.name,
+            email: paymentData.payer.email,
+            phone: paymentData.payer.phone || '',
+            date: getMetadataString('appointment_date', new Date().toISOString().split('T')[0]),
+            time: getMetadataString('appointment_time', '10:00'),
+            external_reference: reservation.id
+          }
+        })
+      });
       
-      // Usar URLs absolutas válidas para MercadoPago
-      const backUrls = {
-        success: `https://www.puntolegal.online/payment-success?source=mercadopago`,
-        failure: `https://www.puntolegal.online/payment-failure?source=mercadopago`,
-        pending: `https://www.puntolegal.online/payment-pending?source=mercadopago`
-      };
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('❌ Error backend:', response.status, errorText);
+        throw new Error(`Error ${response.status}: ${errorText}`);
+      }
       
-      console.log('back_urls configuradas:', backUrls);
-
-      // Usar la función optimizada para crear datos de preferencia
-      const preferenceData = createStandardPreferenceData(
-        getMetadataString('service_name', paymentData.description),
-        paymentData.amount,
-        paymentData.payer.name,
-        paymentData.payer.email,
-        reservation.id, // Usar ID de reserva como external_reference consistente
-        paymentData.payer.phone,
-        {
-          reservation_id: reservation.id,
-          service_name: getMetadataString('service_name', paymentData.description),
-          appointment_date: getMetadataString('appointment_date', new Date().toISOString().split('T')[0]),
-          appointment_time: getMetadataString('appointment_time', '10:00'),
-          meeting_type: getMetadataString('meeting_type', 'online')
-        }
-      );
+      const result = await response.json();
       
-      console.log('🚀 Llamando a createMercadoPagoPreferenceDirect con:', preferenceData);
-      console.log('🔍 back_urls en preferenceData:', preferenceData.back_urls);
+      if (!result.success) {
+        console.error('❌ Error en respuesta backend:', result.error);
+        throw new Error(`Error creando preferencia: ${result.error}`);
+      }
       
-      const result = await createMercadoPagoPreferenceDirect(preferenceData);
+      console.log('✅ Preferencia creada exitosamente:', result.preference_id);
       console.log('✅ Preferencia oficial creada:', result.preference_id);
       console.log('🔍 Resultado completo en MercadoPagoOfficialButton:', JSON.stringify(result, null, 2));
       console.log('🔗 Init Point recibido:', result.init_point);
@@ -268,10 +269,19 @@ const MercadoPagoOfficialButton: React.FC<MercadoPagoOfficialButtonProps> = ({
       localStorage.setItem('paymentData', JSON.stringify(storedPaymentData));
       console.log('✅ Datos guardados en localStorage con external_reference:', reservation.id);
       
-      // Redirigir al Checkout Pro oficial
-      console.log('🚀 Redirigiendo a Checkout Pro oficial...');
-      console.log('🔗 URL de redirección:', result.init_point);
-      window.location.href = result.init_point;
+      // Redirección correcta según brief: usar window.location.assign para móvil
+      const redirectUrl = result.init_point || result.sandbox_init_point;
+      
+      if (redirectUrl) {
+        console.log('🚀 Redirigiendo a Checkout Pro oficial...');
+        console.log('📱 URL de redirección:', redirectUrl);
+        
+        // Usar window.location.assign para evitar bloqueos en móvil
+        window.location.assign(redirectUrl);
+      } else {
+        console.error('❌ No se recibió init_point ni sandbox_init_point');
+        throw new Error('No se recibió URL de redirección de MercadoPago');
+      }
       
     } catch (error) {
       console.error('❌ Error en checkout oficial:', error);
