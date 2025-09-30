@@ -58,6 +58,7 @@ app.post('/create-preference', async (req, res) => {
         failure: `${process.env.BASE_URL || 'https://www.puntolegal.online'}/payment-failure?source=mercadopago`,
         pending: `${process.env.BASE_URL || 'https://www.puntolegal.online'}/payment-pending?source=mercadopago`
       },
+      auto_return: 'approved', // 🔧 CRÍTICO: Redirección automática para móvil
       external_reference: paymentData.external_reference || `PL-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       notification_url: `${process.env.BASE_URL || 'https://www.puntolegal.online'}/api/mercadopago/webhook`,
       metadata: {
@@ -67,7 +68,10 @@ app.post('/create-preference', async (req, res) => {
         appointment_date: paymentData.date,
         appointment_time: paymentData.time,
         source: 'punto-legal-web',
-        integration_type: 'checkout_pro_official'
+        integration_type: 'checkout_pro_official',
+        mobile_compatible: 'true', // 🔧 CRÍTICO: Marcar como compatible con móvil
+        auto_return_enabled: 'true', // 🔧 CRÍTICO: Confirmar auto_return habilitado
+        platform: 'web_mobile' // 🔧 CRÍTICO: Identificar plataforma
       },
       statement_descriptor: 'PUNTO LEGAL'
     };
@@ -75,6 +79,11 @@ app.post('/create-preference', async (req, res) => {
     console.log('📤 Enviando a API oficial de MercadoPago...');
     console.log('🔍 Token (primeros 20 chars):', MERCADOPAGO_ACCESS_TOKEN.substring(0, 20) + '...');
     console.log('🔍 Ambiente detectado:', MERCADOPAGO_ACCESS_TOKEN.includes('TEST') ? 'SANDBOX' : 'PRODUCCIÓN');
+    console.log('📱 Configuración móvil:');
+    console.log('   ✅ auto_return: approved');
+    console.log('   ✅ back_urls configuradas');
+    console.log('   ✅ mobile_compatible: true');
+    console.log('   ✅ platform: web_mobile');
     
     // Llamada oficial a la API de MercadoPago
     const response = await fetch('https://api.mercadopago.com/checkout/preferences', {
