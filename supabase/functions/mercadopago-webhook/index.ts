@@ -136,23 +136,9 @@ serve(async (req) => {
         console.log('📧 Enviando emails de confirmación...');
         
         try {
-          const emailResponse = await supabase.functions.invoke('send-resend-emails', {
+          const emailResponse = await supabase.functions.invoke('clever-action', {
             body: {
-              bookingData: {
-                id: updatedReservation.id,
-                cliente_nombre: updatedReservation.nombre,
-                cliente_email: updatedReservation.email,
-                cliente_telefono: updatedReservation.telefono,
-                servicio_tipo: updatedReservation.servicio,
-                servicio_precio: updatedReservation.precio,
-                fecha: updatedReservation.fecha,
-                hora: updatedReservation.hora,
-                tipo_reunion: updatedReservation.tipo_reunion,
-                descripcion: updatedReservation.descripcion,
-                pago_metodo: updatedReservation.pago_metodo,
-                pago_estado: updatedReservation.pago_estado,
-                created_at: updatedReservation.created_at
-              }
+              booking_id: updatedReservation.id
             }
           });
 
