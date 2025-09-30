@@ -269,30 +269,31 @@ const MercadoPagoOfficialButton: React.FC<MercadoPagoOfficialButtonProps> = ({
       localStorage.setItem('paymentData', JSON.stringify(storedPaymentData));
       console.log('✅ Datos guardados en localStorage con external_reference:', reservation.id);
       
-      // 🔧 CORRECCIÓN PXL03: Detectar ambiente correctamente para evitar mezcla
-      const isProduction = import.meta.env.MODE === 'production' || 
-                          window.location.hostname === 'www.puntolegal.online';
+      // 🔧 CORRECCIÓN PXI03: Detectar ambiente según el token usado (no según URL)
+      // El token determina si es sandbox o producción, no la URL
+      const isSandboxToken = result.live_mode === false; // Si live_mode es false = sandbox
       
-      console.log('🔍 Ambiente detectado:', isProduction ? 'PRODUCCIÓN' : 'SANDBOX');
+      console.log('🔍 Token ambiente detectado:', isSandboxToken ? 'SANDBOX' : 'PRODUCCIÓN');
+      console.log('🔍 live_mode:', result.live_mode);
       console.log('🔍 init_point disponible:', !!result.init_point);
       console.log('🔍 sandbox_init_point disponible:', !!result.sandbox_init_point);
       
-      // Usar el init_point correcto según el ambiente para evitar PXL03
-      const redirectUrl = isProduction ? result.init_point : result.sandbox_init_point;
+      // Usar el init_point correcto según el token (no según la URL)
+      const redirectUrl = isSandboxToken ? result.sandbox_init_point : result.init_point;
       
       if (redirectUrl) {
         console.log('🚀 Redirigiendo a Checkout Pro...');
-        console.log(`📱 Ambiente: ${isProduction ? 'PRODUCCIÓN' : 'SANDBOX'}`);
+        console.log(`📱 Ambiente: ${isSandboxToken ? 'SANDBOX' : 'PRODUCCIÓN'}`);
         console.log('📱 URL de redirección:', redirectUrl);
         
         // Usar window.location.assign para evitar bloqueos en móvil
         window.location.assign(redirectUrl);
       } else {
         console.error('❌ No se recibió URL de redirección para el ambiente actual');
-        console.error('❌ Ambiente:', isProduction ? 'PRODUCCIÓN' : 'SANDBOX');
+        console.error('❌ Ambiente:', isSandboxToken ? 'SANDBOX' : 'PRODUCCIÓN');
         console.error('❌ init_point:', result.init_point);
         console.error('❌ sandbox_init_point:', result.sandbox_init_point);
-        throw new Error(`No se recibió URL de redirección para ambiente ${isProduction ? 'producción' : 'sandbox'}`);
+        throw new Error(`No se recibió URL de redirección para ambiente ${isSandboxToken ? 'sandbox' : 'producción'}`);
       }
       
     } catch (error) {
