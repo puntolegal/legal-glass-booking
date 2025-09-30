@@ -61,14 +61,12 @@ const MercadoPagoOfficialButton: React.FC<MercadoPagoOfficialButtonProps> = ({
     try {
       setBackendStatus('checking');
       
-      // Verificar que las credenciales de MercadoPago estén configuradas usando configuración centralizada
+      // 🔧 OPTIMIZACIÓN: Verificación rápida y simple
+      console.log('🔍 Verificando backend MercadoPago...');
+      
+      // Verificar que las credenciales estén configuradas (verificación rápida)
       const { MERCADOPAGO_CONFIG } = await import('@/config/mercadopago');
       const publicKey = MERCADOPAGO_CONFIG.publicKey;
-      
-      console.log('🔍 DEBUG MercadoPago Backend Check:', {
-        publicKey: publicKey ? 'Configurado' : 'No configurado',
-        isProduction: import.meta.env.PROD || window.location.hostname === 'puntolegal.online'
-      });
       
       if (!publicKey) {
         setBackendStatus('unavailable');
@@ -76,45 +74,59 @@ const MercadoPagoOfficialButton: React.FC<MercadoPagoOfficialButtonProps> = ({
         return;
       }
       
-      // En producción, verificar que la función de Supabase esté disponible
+      // 🔧 OPTIMIZACIÓN: Verificación simplificada del backend
       const isProduction = import.meta.env.PROD || window.location.hostname === 'puntolegal.online';
       
       if (isProduction) {
-        // Verificar conectividad con función de Supabase
-        const { SUPABASE_CREDENTIALS } = await import('@/config/supabaseConfig');
+        // En producción, verificar backend directamente con timeout corto
         try {
-          const response = await fetch(`${SUPABASE_CREDENTIALS.URL}/functions/v1/create-mercadopago-preference`, {
-            method: 'OPTIONS',
-            headers: {
-              'Authorization': `Bearer ${SUPABASE_CREDENTIALS.PUBLISHABLE_KEY}`
-            }
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 segundos timeout
+          
+          const response = await fetch('https://api.puntolegal.online/health', {
+            method: 'GET',
+            signal: controller.signal
           });
+          
+          clearTimeout(timeoutId);
           
           if (response.ok) {
             setBackendStatus('available');
-            console.log('✅ Función de Supabase disponible para MercadoPago');
+            console.log('✅ Backend disponible para MercadoPago');
           } else {
             setBackendStatus('unavailable');
-            console.log('⚠️ Función de Supabase no disponible:', response.status);
+            console.log('⚠️ Backend no disponible:', response.status);
           }
         } catch (error) {
           setBackendStatus('unavailable');
-          console.log('⚠️ Error verificando función de Supabase:', error.message);
+          console.log('⚠️ Error verificando backend:', error.message);
         }
       } else {
-        // En desarrollo, verificar conectividad con Supabase
+        // En desarrollo, verificación rápida de Supabase
         const { supabase } = await import('@/integrations/supabase/client');
-        const { data, error } = await supabase
-          .from('reservas')
-          .select('id')
-          .limit(1);
         
-        if (error) {
+        try {
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 segundos timeout
+          
+          const { error } = await supabase
+            .from('reservas')
+            .select('id')
+            .limit(1)
+            .abortSignal(controller.signal);
+          
+          clearTimeout(timeoutId);
+          
+          if (error) {
+            setBackendStatus('unavailable');
+            console.log('⚠️ Error conectando con Supabase:', error.message);
+          } else {
+            setBackendStatus('available');
+            console.log('✅ Backend Supabase disponible para MercadoPago');
+          }
+        } catch (error) {
           setBackendStatus('unavailable');
-          console.log('⚠️ Error conectando con Supabase:', error.message);
-        } else {
-          setBackendStatus('available');
-          console.log('✅ Backend Supabase disponible para MercadoPago');
+          console.log('⚠️ Error verificando Supabase:', error.message);
         }
       }
     } catch (error) {
@@ -324,10 +336,10 @@ const MercadoPagoOfficialButton: React.FC<MercadoPagoOfficialButtonProps> = ({
                   ? 'text-red-800'
                   : 'text-yellow-800'
               }`}>
-                Backend MercadoPago: {
+                Sistema de Pago: {
                   backendStatus === 'unavailable'
                     ? 'No disponible'
-                    : 'Verificando...'
+                    : 'Inicializando...'
                 }
               </span>
             </div>
