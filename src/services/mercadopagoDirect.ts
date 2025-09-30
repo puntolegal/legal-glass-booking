@@ -52,12 +52,86 @@ export interface MercadoPagoPreferenceResponse {
 }
 
 // Crear preferencia directamente con la API de MercadoPago
+// Función de validación para prevenir errores PXI03
+const validatePreferenceData = (data: MercadoPagoPreferenceData): void => {
+  const errors: string[] = [];
+  
+  console.log('🔍 VALIDANDO DATOS DE PREFERENCIA (Prevención PXI03):');
+  
+  // Validar items
+  if (!data.items || data.items.length === 0) {
+    errors.push('Items requeridos');
+  } else {
+    data.items.forEach((item, index) => {
+      if (!item.title || item.title.trim() === '') {
+        errors.push(`Item ${index + 1}: Título requerido`);
+      }
+      if (!item.unit_price || item.unit_price <= 0) {
+        errors.push(`Item ${index + 1}: Precio debe ser mayor a 0`);
+      }
+      if (!item.quantity || item.quantity <= 0) {
+        errors.push(`Item ${index + 1}: Cantidad debe ser mayor a 0`);
+      }
+      if (!item.currency_id || item.currency_id !== 'CLP') {
+        errors.push(`Item ${index + 1}: Currency_id debe ser 'CLP'`);
+      }
+    });
+  }
+  
+  // Validar payer
+  if (!data.payer) {
+    errors.push('Payer requerido');
+  } else {
+    if (!data.payer.email || !data.payer.email.includes('@')) {
+      errors.push('Email del pagador inválido');
+    }
+    if (!data.payer.name || data.payer.name.trim() === '') {
+      errors.push('Nombre del pagador requerido');
+    }
+  }
+  
+  // Validar URLs de retorno
+  if (!data.back_urls) {
+    errors.push('Back URLs requeridas');
+  } else {
+    if (!data.back_urls.success || !data.back_urls.success.includes('puntolegal.online')) {
+      errors.push('URL de éxito inválida');
+    }
+    if (!data.back_urls.failure || !data.back_urls.failure.includes('puntolegal.online')) {
+      errors.push('URL de fallo inválida');
+    }
+    if (!data.back_urls.pending || !data.back_urls.pending.includes('puntolegal.online')) {
+      errors.push('URL de pendiente inválida');
+    }
+  }
+  
+  // Validar external_reference
+  if (!data.external_reference || data.external_reference.trim() === '') {
+    errors.push('External reference requerido');
+  }
+  
+  // Validar auto_return
+  if (data.auto_return !== 'approved') {
+    errors.push('Auto return debe ser "approved"');
+  }
+  
+  if (errors.length > 0) {
+    console.error('❌ ERROR PXI03 PREVENIDO - Datos inválidos:', errors);
+    throw new Error(`Datos inválidos para prevenir PXI03: ${errors.join(', ')}`);
+  }
+  
+  console.log('✅ Validación PXI03 exitosa - Datos válidos');
+};
+
 export async function createMercadoPagoPreferenceDirect(
   preferenceData: MercadoPagoPreferenceData
 ): Promise<MercadoPagoPreferenceResponse> {
   try {
     console.log('🚀 Creando preferencia DIRECTAMENTE con MercadoPago API...');
     console.log('📋 Datos de la preferencia:', preferenceData);
+
+    // 🔧 VALIDACIÓN PXI03: Validar datos antes de enviar
+    validatePreferenceData(preferenceData);
 
     // Usar token de acceso de MercadoPago desde variables de entorno
     const MERCADOPAGO_ACCESS_TOKEN = import.meta.env.VITE_MERCADOPAGO_ACCESS_TOKEN || 
@@ -79,6 +153,17 @@ export async function createMercadoPagoPreferenceDirect(
     if (!response.ok) {
       const errorText = await response.text();
       console.error('❌ Error API MercadoPago:', response.status, errorText);
+      
+      // 🔧 DETECCIÓN ESPECÍFICA DE ERROR PXI03
+      if (errorText.includes('PXI03') || errorText.includes('PXI')) {
+        console.error('🚨 ERROR PXI03 DETECTADO:', errorText);
+        console.error('📋 Datos que causaron el error:', preferenceData);
+        
+        return {
+          success: false,
+          error: `Error PXI03 detectado: ${errorText}. Datos validados pero rechazados por MercadoPago.`
+        };
+      }
       
       return {
         success: false,
