@@ -269,18 +269,30 @@ const MercadoPagoOfficialButton: React.FC<MercadoPagoOfficialButtonProps> = ({
       localStorage.setItem('paymentData', JSON.stringify(storedPaymentData));
       console.log('✅ Datos guardados en localStorage con external_reference:', reservation.id);
       
-      // Redirección correcta según brief: usar window.location.assign para móvil
-      const redirectUrl = result.init_point || result.sandbox_init_point;
+      // 🔧 CORRECCIÓN PXL03: Detectar ambiente correctamente para evitar mezcla
+      const isProduction = import.meta.env.MODE === 'production' || 
+                          window.location.hostname === 'www.puntolegal.online';
+      
+      console.log('🔍 Ambiente detectado:', isProduction ? 'PRODUCCIÓN' : 'SANDBOX');
+      console.log('🔍 init_point disponible:', !!result.init_point);
+      console.log('🔍 sandbox_init_point disponible:', !!result.sandbox_init_point);
+      
+      // Usar el init_point correcto según el ambiente para evitar PXL03
+      const redirectUrl = isProduction ? result.init_point : result.sandbox_init_point;
       
       if (redirectUrl) {
-        console.log('🚀 Redirigiendo a Checkout Pro oficial...');
+        console.log('🚀 Redirigiendo a Checkout Pro...');
+        console.log(`📱 Ambiente: ${isProduction ? 'PRODUCCIÓN' : 'SANDBOX'}`);
         console.log('📱 URL de redirección:', redirectUrl);
         
         // Usar window.location.assign para evitar bloqueos en móvil
         window.location.assign(redirectUrl);
       } else {
-        console.error('❌ No se recibió init_point ni sandbox_init_point');
-        throw new Error('No se recibió URL de redirección de MercadoPago');
+        console.error('❌ No se recibió URL de redirección para el ambiente actual');
+        console.error('❌ Ambiente:', isProduction ? 'PRODUCCIÓN' : 'SANDBOX');
+        console.error('❌ init_point:', result.init_point);
+        console.error('❌ sandbox_init_point:', result.sandbox_init_point);
+        throw new Error(`No se recibió URL de redirección para ambiente ${isProduction ? 'producción' : 'sandbox'}`);
       }
       
     } catch (error) {

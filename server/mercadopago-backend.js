@@ -73,6 +73,8 @@ app.post('/create-preference', async (req, res) => {
     };
     
     console.log('📤 Enviando a API oficial de MercadoPago...');
+    console.log('🔍 Token (primeros 20 chars):', MERCADOPAGO_ACCESS_TOKEN.substring(0, 20) + '...');
+    console.log('🔍 Ambiente detectado:', MERCADOPAGO_ACCESS_TOKEN.includes('TEST') ? 'SANDBOX' : 'PRODUCCIÓN');
     
     // Llamada oficial a la API de MercadoPago
     const response = await fetch('https://api.mercadopago.com/checkout/preferences', {
