@@ -114,6 +114,40 @@ export default function AgendamientoPage() {
     codigoConvenio: ''
   });
 
+  // Función para formatear RUT automáticamente
+  const formatRUT = (value: string) => {
+    // Eliminar todo excepto números y letras
+    const cleanValue = value.replace(/[^0-9kK]/g, '');
+    
+    // Si está vacío, retornar vacío
+    if (!cleanValue) return '';
+    
+    // Si solo tiene números (sin dígito verificador)
+    if (cleanValue.length <= 8) {
+      return cleanValue;
+    }
+    
+    // Si tiene 9 caracteres o más, formatear
+    if (cleanValue.length >= 9) {
+      const rut = cleanValue.slice(0, -1); // Todos excepto el último
+      const dv = cleanValue.slice(-1).toUpperCase(); // Último carácter (dígito verificador)
+      
+      // Formatear con puntos
+      const formattedRut = rut.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+      
+      // Retornar con guión
+      return `${formattedRut}-${dv}`;
+    }
+    
+    return cleanValue;
+  };
+
+  // Función para manejar cambios en el RUT
+  const handleRUTChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formattedRUT = formatRUT(e.target.value);
+    setFormData({...formData, rut: formattedRUT});
+  };
+
   // Verificar si es emergencia
   const isEmergency = plan === 'emergencia';
 
@@ -405,11 +439,14 @@ export default function AgendamientoPage() {
                           type="text"
                           required
                           value={formData.rut}
-                          onChange={(e) => setFormData({...formData, rut: e.target.value})}
+                          onChange={handleRUTChange}
                           className="w-full px-4 py-4 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all text-gray-900 dark:text-gray-100 text-base"
-                          placeholder="12.345.678-9"
+                          placeholder="12345678-9"
                           maxLength={12}
                         />
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                          Ingresa solo números y K, el formato se aplicará automáticamente
+                        </p>
                       </div>
                       
                       <div>
