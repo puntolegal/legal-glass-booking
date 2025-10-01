@@ -28,16 +28,10 @@
     "preview": "vite preview",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "docker:build": "docker build -t punto-legal-apuntes .",
-    "docker:run": "docker run -p 8080:80 punto-legal-apuntes",
     "env:check": "node scripts/validate-mercadopago-env.mjs",
     "mp:sanity": "node scripts/mp-sanity-check.mjs",
     "mp:test": "npm run env:check && npm run mp:sanity",
-    "docker:dev": "docker-compose up --build",
-    "supabase:security-fix": "node scripts/apply-security-fixes.js",
-    "ensure-mercadopago": "node scripts/ensure-mercadopago-running.js",
-    "mercadopago:start": "cd server && node mercadopago-backend.js",
-    "mercadopago:check": "curl -s http://localhost:3001/health"
+    "supabase:security-fix": "node scripts/apply-security-fixes.js"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
