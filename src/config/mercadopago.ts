@@ -44,7 +44,7 @@ export const MERCADOPAGO_CONFIG = {
   },
   
   // Información del entorno
-  environment: import.meta.env.PROD ? 'production' : 'sandbox'
+  environment: import.meta.env.MODE === 'production' ? 'production' : 'sandbox'
 };
 
 // Tipos de pago soportados
