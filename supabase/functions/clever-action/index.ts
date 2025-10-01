@@ -130,36 +130,170 @@ serve(async (req) => {
           to: [emailData.cliente_email],
           subject: `✅ Confirmación de Consulta - ${emailData.servicio_tipo}`,
           html: `
-            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-              <div style="background: linear-gradient(135deg, #f97316, #ea580c); color: white; padding: 20px; border-radius: 8px 8px 0 0;">
-                <h1 style="margin: 0; text-align: center;">✅ Consulta Confirmada</h1>
-              </div>
-              
-              <div style="background: #f8fafc; padding: 30px; border-radius: 0 0 8px 8px;">
-                <p style="font-size: 18px; margin-bottom: 20px;">Hola <strong>${emailData.cliente_nombre}</strong>,</p>
-                
-                <p>Tu consulta legal ha sido confirmada exitosamente. Aquí están los detalles:</p>
-                
-                <div style="background: white; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #f97316;">
-                  <h3 style="color: #f97316; margin-top: 0;">📋 Detalles de la Consulta</h3>
-                  <p><strong>Servicio:</strong> ${emailData.servicio_tipo}</p>
-                  <p><strong>Fecha:</strong> ${emailData.fecha}</p>
-                  <p><strong>Hora:</strong> ${emailData.hora}</p>
-                  <p><strong>Tipo:</strong> ${emailData.tipo_reunion}</p>
-                  <p><strong>Precio:</strong> $${emailData.servicio_precio}</p>
-                  <p><strong>Estado del pago:</strong> ${emailData.pago_estado}</p>
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="utf-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Confirmación de Cita - Punto Legal</title>
+                <style>
+                    body { 
+                        margin: 0; 
+                        padding: 0; 
+                        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+                        line-height: 1.6; 
+                        color: #333; 
+                        background-color: #f5f5f5;
+                    }
+                    .container { 
+                        max-width: 600px; 
+                        margin: 20px auto; 
+                        background: white;
+                        border-radius: 12px;
+                        overflow: hidden;
+                        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+                    }
+                    .header { 
+                        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                        color: white; 
+                        padding: 40px 30px; 
+                        text-align: center;
+                    }
+                    .header h1 {
+                        margin: 0;
+                        font-size: 28px;
+                        font-weight: 700;
+                    }
+                    .header p {
+                        margin: 10px 0 0 0;
+                        font-size: 16px;
+                        opacity: 0.9;
+                    }
+                    .content { 
+                        padding: 30px;
+                    }
+                    .info-box { 
+                        background: #f8f9ff; 
+                        padding: 25px; 
+                        margin: 25px 0; 
+                        border-radius: 10px; 
+                        border-left: 4px solid #667eea;
+                    }
+                    .info-box h3 {
+                        margin-top: 0;
+                        color: #667eea;
+                        font-size: 18px;
+                    }
+                    .info-row {
+                        display: flex;
+                        justify-content: space-between;
+                        padding: 8px 0;
+                        border-bottom: 1px solid #eee;
+                    }
+                    .info-row:last-child {
+                        border-bottom: none;
+                    }
+                    .info-label {
+                        font-weight: 600;
+                        color: #555;
+                    }
+                    .info-value {
+                        color: #333;
+                        text-align: right;
+                    }
+                    .highlight {
+                        background: linear-gradient(135deg, #667eea, #764ba2);
+                        color: white;
+                        padding: 2px 8px;
+                        border-radius: 4px;
+                        font-weight: 600;
+                    }
+                    .contact-box {
+                        background: #e8f4ff;
+                        border: 1px solid #b3d9ff;
+                        border-radius: 8px;
+                        padding: 20px;
+                        margin: 20px 0;
+                    }
+                    .footer { 
+                        background: #f8f9fa;
+                        padding: 25px;
+                        text-align: center; 
+                        color: #666; 
+                        font-size: 14px;
+                        border-top: 1px solid #eee;
+                    }
+                    .logo {
+                        font-size: 24px;
+                        font-weight: bold;
+                        margin-bottom: 10px;
+                    }
+                    @media (max-width: 600px) {
+                        .container { margin: 10px; }
+                        .header, .content { padding: 20px; }
+                        .info-row { flex-direction: column; text-align: left; }
+                        .info-value { text-align: left; margin-top: 5px; }
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <div class="header">
+                        <div class="logo">⚖️ Punto Legal</div>
+                        <h1>✅ Cita Confirmada</h1>
+                        <p>Tu consulta jurídica ha sido agendada exitosamente</p>
+                    </div>
+                    
+                    <div class="content">
+                        <p>Estimado/a <strong>${emailData.cliente_nombre}</strong>,</p>
+                        
+                        <p>Nos complace confirmar que tu cita ha sido agendada correctamente. A continuación, encontrarás todos los detalles de tu consulta jurídica:</p>
+                        
+                        <div class="info-box">
+                            <h3>📋 Detalles de tu Cita</h3>
+                            <div class="info-row">
+                                <span class="info-label">Servicio:</span>
+                                <span class="info-value highlight">${emailData.servicio_tipo}</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Fecha:</span>
+                                <span class="info-value">${emailData.fecha}</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Hora:</span>
+                                <span class="info-value">${emailData.hora}</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Tipo:</span>
+                                <span class="info-value">${emailData.tipo_reunion}</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Precio:</span>
+                                <span class="info-value highlight">$${emailData.servicio_precio}</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Estado del pago:</span>
+                                <span class="info-value">${emailData.pago_estado}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="contact-box">
+                            <h3>📞 Información de Contacto</h3>
+                            <p>Si tienes alguna pregunta o necesitas hacer cambios, no dudes en contactarnos:</p>
+                            <p><strong>📧 Email:</strong> ${ADMIN_EMAIL}</p>
+                            <p><strong>📱 Teléfono:</strong> +56962321883</p>
+                        </div>
+                        
+                        <p>¡Gracias por confiar en Punto Legal para tus necesidades jurídicas!</p>
+                    </div>
+                    
+                    <div class="footer">
+                        <p><strong>Punto Legal</strong> - Asesoría Jurídica Profesional</p>
+                        <p>📍 El Golf, Las Condes, Santiago | 🌐 puntolegal.online</p>
+                    </div>
                 </div>
-                
-                <p>Si tienes alguna pregunta o necesitas hacer cambios, no dudes en contactarnos.</p>
-                
-                <div style="text-align: center; margin: 30px 0;">
-                  <p style="color: #6b7280; font-size: 14px;">
-                    Punto Legal - Asesoría Jurídica Profesional<br>
-                    📧 ${ADMIN_EMAIL} | 📱 +56962321883
-                  </p>
-                </div>
-              </div>
-            </div>
+            </body>
+            </html>
           `
         })
       });
@@ -176,30 +310,181 @@ serve(async (req) => {
           to: [ADMIN_EMAIL],
           subject: `📅 Nueva Consulta Agendada - ${emailData.cliente_nombre}`,
           html: `
-            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-              <div style="background: linear-gradient(135deg, #1e40af, #1e3a8a); color: white; padding: 20px; border-radius: 8px 8px 0 0;">
-                <h1 style="margin: 0; text-align: center;">📅 Nueva Consulta Agendada</h1>
-              </div>
-              
-              <div style="background: #f8fafc; padding: 30px; border-radius: 0 0 8px 8px;">
-                <h3 style="color: #1e40af;">Información del Cliente</h3>
-                <p><strong>Nombre:</strong> ${emailData.cliente_nombre}</p>
-                <p><strong>Email:</strong> ${emailData.cliente_email}</p>
-                <p><strong>Teléfono:</strong> ${emailData.cliente_telefono}</p>
-                
-                <h3 style="color: #1e40af;">Detalles de la Consulta</h3>
-                <p><strong>Servicio:</strong> ${emailData.servicio_tipo}</p>
-                <p><strong>Fecha:</strong> ${emailData.fecha}</p>
-                <p><strong>Hora:</strong> ${emailData.hora}</p>
-                <p><strong>Tipo:</strong> ${emailData.tipo_reunion}</p>
-                <p><strong>Precio:</strong> $${emailData.servicio_precio}</p>
-                <p><strong>Estado del pago:</strong> ${emailData.pago_estado}</p>
-                
-                ${emailData.descripcion ? `<p><strong>Descripción:</strong> ${emailData.descripcion}</p>` : ''}
-                
-                <p><strong>ID de Reserva:</strong> ${booking_id}</p>
-              </div>
-            </div>
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="utf-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Nueva Reserva - Punto Legal Admin</title>
+                <style>
+                    body { 
+                        margin: 0; 
+                        padding: 0; 
+                        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+                        line-height: 1.6; 
+                        color: #333; 
+                        background-color: #f5f5f5;
+                    }
+                    .container { 
+                        max-width: 600px; 
+                        margin: 20px auto; 
+                        background: white;
+                        border-radius: 12px;
+                        overflow: hidden;
+                        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+                    }
+                    .header { 
+                        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); 
+                        color: white; 
+                        padding: 40px 30px; 
+                        text-align: center;
+                    }
+                    .urgent-badge {
+                        background: rgba(255,255,255,0.2);
+                        padding: 8px 16px;
+                        border-radius: 20px;
+                        font-size: 14px;
+                        margin-bottom: 15px;
+                        display: inline-block;
+                    }
+                    .content { padding: 30px; }
+                    .alert-box { 
+                        background: #fff3cd; 
+                        border: 1px solid #ffc107;
+                        border-left: 4px solid #ffc107;
+                        padding: 20px; 
+                        margin: 20px 0; 
+                        border-radius: 8px;
+                    }
+                    .info-box { 
+                        background: #f8f9ff; 
+                        padding: 25px; 
+                        margin: 25px 0; 
+                        border-radius: 10px; 
+                        border-left: 4px solid #f5576c;
+                    }
+                    .info-row {
+                        display: flex;
+                        justify-content: space-between;
+                        padding: 10px 0;
+                        border-bottom: 1px solid #eee;
+                    }
+                    .info-row:last-child { border-bottom: none; }
+                    .info-label { font-weight: 600; color: #555; }
+                    .info-value { color: #333; text-align: right; font-weight: 500; }
+                    .priority-high { background: #ffe6e6; border-left-color: #ff4757; }
+                    .actions-box {
+                        background: #e8f5e8;
+                        border: 1px solid #4caf50;
+                        border-radius: 8px;
+                        padding: 20px;
+                        margin: 20px 0;
+                    }
+                    .actions-box ul {
+                        margin: 10px 0;
+                        padding-left: 20px;
+                    }
+                    .actions-box li {
+                        margin: 8px 0;
+                        color: #2e7d32;
+                    }
+                    .footer { 
+                        background: #f8f9fa;
+                        padding: 25px;
+                        text-align: center; 
+                        color: #666; 
+                        font-size: 14px;
+                        border-top: 1px solid #eee;
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <div class="header">
+                        <div class="urgent-badge">🚨 ACCIÓN REQUERIDA</div>
+                        <h1>🔔 Nueva Reserva</h1>
+                        <p>Un cliente ha agendado una consulta jurídica</p>
+                    </div>
+                    
+                    <div class="content">
+                        <div class="alert-box">
+                            <h3>⚡ Nueva Reserva Registrada</h3>
+                            <p>Se ha registrado una nueva reserva que requiere tu atención inmediata.</p>
+                            <p><strong>Fecha de la cita:</strong> ${emailData.fecha} a las ${emailData.hora}</p>
+                        </div>
+                        
+                        <div class="info-box">
+                            <h3>👤 Información del Cliente</h3>
+                            <div class="info-row">
+                                <span class="info-label">Nombre:</span>
+                                <span class="info-value">${emailData.cliente_nombre}</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Email:</span>
+                                <span class="info-value">${emailData.cliente_email}</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Teléfono:</span>
+                                <span class="info-value">${emailData.cliente_telefono}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="info-box">
+                            <h3>📋 Detalles de la Consulta</h3>
+                            <div class="info-row">
+                                <span class="info-label">Servicio:</span>
+                                <span class="info-value">${emailData.servicio_tipo}</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Fecha:</span>
+                                <span class="info-value">${emailData.fecha}</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Hora:</span>
+                                <span class="info-value">${emailData.hora}</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Tipo:</span>
+                                <span class="info-value">${emailData.tipo_reunion}</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Precio:</span>
+                                <span class="info-value">$${emailData.servicio_precio}</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Estado del pago:</span>
+                                <span class="info-value">${emailData.pago_estado}</span>
+                            </div>
+                            ${emailData.descripcion ? `
+                            <div class="info-row">
+                                <span class="info-label">Descripción:</span>
+                                <span class="info-value">${emailData.descripcion}</span>
+                            </div>
+                            ` : ''}
+                            <div class="info-row">
+                                <span class="info-label">ID de Reserva:</span>
+                                <span class="info-value">${booking_id}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="actions-box">
+                            <h3>📋 Acciones Recomendadas</h3>
+                            <ul>
+                                <li>Contactar al cliente para confirmar detalles</li>
+                                <li>Preparar materiales necesarios para la consulta</li>
+                                <li>Agendar recordatorio 24 horas antes</li>
+                                <li>Verificar disponibilidad en tu calendario</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="footer">
+                        <p><strong>Punto Legal</strong> - Sistema de Administración</p>
+                        <p>📍 El Golf, Las Condes, Santiago | 🌐 puntolegal.online</p>
+                    </div>
+                </div>
+            </body>
+            </html>
           `
         })
       });
