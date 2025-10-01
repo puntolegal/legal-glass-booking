@@ -62,7 +62,7 @@ export type Database = {
           nombre: string
           precio: string
           recordatorio_enviado: boolean | null
-          rut: string
+          // rut: string // Campo eliminado en limpieza de esquema
           servicio: string
           telefono: string
           tipo_reunion: string | null
@@ -81,7 +81,7 @@ export type Database = {
           nombre: string
           precio: string
           recordatorio_enviado?: boolean | null
-          rut: string
+          // rut: string // Campo eliminado en limpieza de esquema
           servicio: string
           telefono: string
           tipo_reunion?: string | null
@@ -100,7 +100,7 @@ export type Database = {
           nombre?: string
           precio?: string
           recordatorio_enviado?: boolean | null
-          rut?: string
+          // rut?: string // Campo eliminado en limpieza de esquema
           servicio?: string
           telefono?: string
           tipo_reunion?: string | null

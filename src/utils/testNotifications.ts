@@ -85,7 +85,7 @@ export async function createTestReservation(): Promise<{success: boolean, messag
   try {
     const testData = {
       nombre: 'Test Usuario',
-      rut: '12345678-9',
+      // rut: '12345678-9', // Campo eliminado
       email: 'test@puntolegal.cl',
       telefono: '+56912345678',
       servicio: 'Consulta de Prueba',

@@ -150,7 +150,7 @@ const MercadoPagoOfficialButton: React.FC<MercadoPagoOfficialButtonProps> = ({
       console.log('💾 Creando reserva en la base de datos...');
       const reservationData = {
         nombre: paymentData.payer.name || 'Cliente',
-        rut: getMetadataString('client_rut', 'No especificado'),
+        // rut: getMetadataString('client_rut', 'No especificado'), // Campo eliminado
         email: paymentData.payer.email || 'cliente@ejemplo.com',
         telefono: paymentData.payer.phone || 'No especificado',
         fecha: getMetadataString('appointment_date', new Date().toISOString().split('T')[0]),
