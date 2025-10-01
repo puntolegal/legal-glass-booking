@@ -9,7 +9,8 @@ const APP_NAME = import.meta.env.VITE_APP_NAME || 'Punto Legal';
 export const MERCADOPAGO_CONFIG = {
   // Claves públicas para el frontend
   publicKey: MERCADOPAGO_PUBLIC_KEY,
-  accessToken: import.meta.env.VITE_MERCADOPAGO_ACCESS_TOKEN || '', // Solo para debugging
+  // ❌ REMOVIDO: accessToken no debe estar en el frontend
+  // accessToken: import.meta.env.VITE_MERCADOPAGO_ACCESS_TOKEN || '', // Solo para debugging
   
   // Configuración regional
   locale: 'es-CL',

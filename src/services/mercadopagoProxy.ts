@@ -66,7 +66,8 @@ export const createPreferenceViaProxy = async (paymentData: PaymentData): Promis
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${import.meta.env.VITE_MERCADOPAGO_ACCESS_TOKEN || ''}`,
+        // ❌ REMOVIDO: Authorization header no debe estar en el frontend
+        // 'Authorization': `Bearer ${import.meta.env.VITE_MERCADOPAGO_ACCESS_TOKEN || ''}`,
         'X-Requested-With': 'XMLHttpRequest'
       },
       body: JSON.stringify(preferenceData)

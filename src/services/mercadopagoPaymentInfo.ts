@@ -32,7 +32,8 @@ export async function getMercadoPagoPaymentInfo(paymentId: string): Promise<Paym
     console.log('🔍 Obteniendo información del pago desde MercadoPago:', paymentId);
 
     // Usar token de acceso de MercadoPago directamente
-    const MERCADOPAGO_ACCESS_TOKEN = import.meta.env.VITE_MERCADOPAGO_ACCESS_TOKEN;
+    // ❌ REMOVIDO: Access token no debe estar en el frontend
+    // const MERCADOPAGO_ACCESS_TOKEN = import.meta.env.VITE_MERCADOPAGO_ACCESS_TOKEN;
 
     const response = await fetch(`https://api.mercadopago.com/v1/payments/${paymentId}`, {
       method: 'GET',

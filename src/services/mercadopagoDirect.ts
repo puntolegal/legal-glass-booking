@@ -143,9 +143,10 @@ export async function createMercadoPagoPreferenceDirect(
     validatePreferenceData(preferenceData);
 
     // Usar token de acceso de MercadoPago desde variables de entorno
-    const MERCADOPAGO_ACCESS_TOKEN = import.meta.env.VITE_MERCADOPAGO_ACCESS_TOKEN || 
-                                    import.meta.env.MERCADOPAGO_ACCESS_TOKEN ||
-                                    import.meta.env.VITE_MERCADOPAGO_ACCESS_TOKEN;
+    // ❌ REMOVIDO: Access token no debe estar en el frontend
+    // const MERCADOPAGO_ACCESS_TOKEN = import.meta.env.VITE_MERCADOPAGO_ACCESS_TOKEN || 
+    //                                 import.meta.env.MERCADOPAGO_ACCESS_TOKEN ||
+    //                                 import.meta.env.VITE_MERCADOPAGO_ACCESS_TOKEN;
     
     console.log('🔑 Token de MercadoPago:', MERCADOPAGO_ACCESS_TOKEN ? '✅ Configurado' : '❌ Faltante');
 

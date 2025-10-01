@@ -77,7 +77,8 @@ export const simulatePaymentVerification = async (paymentId: string) => {
 export const getTestCredentials = () => {
   return {
     publicKey: import.meta.env.VITE_MERCADOPAGO_PUBLIC_KEY || '',
-    accessToken: import.meta.env.VITE_MERCADOPAGO_ACCESS_TOKEN || 'TEST-ACCESS-TOKEN'
+    // ❌ REMOVIDO: accessToken no debe estar en el frontend
+    // accessToken: import.meta.env.VITE_MERCADOPAGO_ACCESS_TOKEN || 'TEST-ACCESS-TOKEN'
   };
 };
 

@@ -22,8 +22,9 @@ export const MercadoPagoStatusChecker: React.FC<MercadoPagoStatusCheckerProps> =
       // Debug: Verificar variables de entorno
       console.log('🔍 DEBUG - Verificando variables de entorno:');
       console.log('import.meta.env:', import.meta.env);
-      console.log('VITE_MERCADOPAGO_ACCESS_TOKEN:', import.meta.env.VITE_MERCADOPAGO_ACCESS_TOKEN);
-      console.log('VITE_MERCADOPAGO_PUBLIC_KEY:', import.meta.env.VITE_MERCADOPAGO_PUBLIC_KEY);
+      // ❌ REMOVIDO: No exponer claves en logs
+      // console.log('VITE_MERCADOPAGO_ACCESS_TOKEN:', import.meta.env.VITE_MERCADOPAGO_ACCESS_TOKEN);
+      console.log('VITE_MERCADOPAGO_PUBLIC_KEY:', import.meta.env.VITE_MERCADOPAGO_PUBLIC_KEY ? 'Configurado' : 'No configurado');
       console.log('NODE_ENV:', import.meta.env.MODE);
       
       // Verificar que las credenciales de MercadoPago estén configuradas

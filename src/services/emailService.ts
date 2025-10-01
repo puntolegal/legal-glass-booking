@@ -3,7 +3,8 @@
  * Alternativa a la Edge Function para mayor confiabilidad
  */
 
-const RESEND_API_KEY = import.meta.env.VITE_RESEND_API_KEY || '';
+// ❌ REMOVIDO: RESEND_API_KEY no debe estar en el frontend
+// const RESEND_API_KEY = import.meta.env.VITE_RESEND_API_KEY || '';
 const MAIL_FROM = import.meta.env.VITE_MAIL_FROM || 'Punto Legal <team@puntolegal.online>';
 const ADMIN_EMAIL = import.meta.env.VITE_ADMIN_EMAIL || 'puntolegalelgolf@gmail.com';
 

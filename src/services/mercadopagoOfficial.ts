@@ -15,7 +15,8 @@ export interface MercadoPagoPreferenceData {
 // Credenciales oficiales de producción
 export const MERCADOPAGO_CREDENTIALS = {
   publicKey: import.meta.env.VITE_MERCADOPAGO_PUBLIC_KEY || '',
-  accessToken: import.meta.env.VITE_MERCADOPAGO_ACCESS_TOKEN || ''
+  // ❌ REMOVIDO: accessToken no debe estar en el frontend
+  // accessToken: import.meta.env.VITE_MERCADOPAGO_ACCESS_TOKEN || ''
 };
 
 // Crear preferencia siguiendo la documentación oficial exacta

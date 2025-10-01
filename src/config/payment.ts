@@ -3,7 +3,8 @@ export const PAYMENT_CONFIG = {
   // WebPay (Transbank) - Pasarela principal en Chile
   webpay: {
     commerceCode: import.meta.env.VITE_WEBPAY_COMMERCE_CODE || '597055555532',
-    apiKey: import.meta.env.VITE_WEBPAY_API_KEY || '',
+    // ❌ REMOVIDO: API key no debe estar en el frontend
+    // apiKey: import.meta.env.VITE_WEBPAY_API_KEY || '',
     environment: import.meta.env.VITE_WEBPAY_ENVIRONMENT || 'integration', // 'integration' | 'production'
     returnUrl: import.meta.env.VITE_WEBPAY_RETURN_URL || 'http://localhost:8080/payment/success',
     cancelUrl: import.meta.env.VITE_WEBPAY_CANCEL_URL || 'http://localhost:8080/payment/cancel',
@@ -12,7 +13,8 @@ export const PAYMENT_CONFIG = {
   // PayPal - Pasarela internacional
   paypal: {
     clientId: import.meta.env.VITE_PAYPAL_CLIENT_ID || '',
-    clientSecret: import.meta.env.VITE_PAYPAL_CLIENT_SECRET || '',
+    // ❌ REMOVIDO: Client secret no debe estar en el frontend
+    // clientSecret: import.meta.env.VITE_PAYPAL_CLIENT_SECRET || '',
     environment: import.meta.env.VITE_PAYPAL_ENVIRONMENT || 'sandbox', // 'sandbox' | 'production'
     currency: 'CLP',
   },

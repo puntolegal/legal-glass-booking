@@ -158,10 +158,16 @@ export const crearReserva = async (bookingData: BookingData): Promise<{
   try {
     console.log('💾 Insertando reserva en Supabase...');
     
+    // Validar longitud del teléfono antes de insertar
+    const telefonoValidado = bookingData.cliente.telefono?.trim() || '';
+    if (telefonoValidado.length > 50) {
+      console.warn('⚠️ Teléfono demasiado largo, truncando a 50 caracteres');
+    }
+    
     const reservaData = {
       nombre: bookingData.cliente.nombre,
       email: bookingData.cliente.email,
-      telefono: bookingData.cliente.telefono,
+      telefono: telefonoValidado.substring(0, 50), // Limitar a 50 caracteres
       rut: bookingData.cliente.rut || 'No especificado',
       servicio: bookingData.servicio.tipo,
       precio: bookingData.servicio.precio,
@@ -222,10 +228,16 @@ export const createReservationDirect = async (formData: any): Promise<{
   error?: string;
 }> => {
   try {
+    // Validar longitud del teléfono antes de insertar
+    const telefonoValidado = formData.telefono?.trim() || '';
+    if (telefonoValidado.length > 50) {
+      console.warn('⚠️ Teléfono demasiado largo, truncando a 50 caracteres');
+    }
+    
     const reservaData = {
       nombre: formData.nombre,
       email: formData.email,
-      telefono: formData.telefono,
+      telefono: telefonoValidado.substring(0, 50), // Limitar a 50 caracteres
       rut: formData.rut || 'No especificado',
       servicio: formData.servicio || 'Consulta General',
       precio: String(formData.precio || '15000'),

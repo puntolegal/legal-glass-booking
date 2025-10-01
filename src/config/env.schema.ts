@@ -15,8 +15,9 @@ export const EnvSchema = z.object({
   MP_WEBHOOK_URL: z.string().url().optional(),
 
   // MercadoPago - Frontend (público/cliente) - Vite
-  VITE_MP_PUBLIC_KEY_PROD: z.string().min(5).optional(),
-  VITE_MP_PUBLIC_KEY_TEST: z.string().min(5).optional(),
+  // ❌ REMOVIDO: Claves duplicadas, usar solo VITE_MERCADOPAGO_PUBLIC_KEY
+  // VITE_MP_PUBLIC_KEY_PROD: z.string().min(5).optional(),
+  // VITE_MP_PUBLIC_KEY_TEST: z.string().min(5).optional(),
 
   // URLs del sitio
   VITE_APP_BASE_URL: z.string().url().optional(),
@@ -52,28 +53,15 @@ export function getMercadoPagoEnv(): 'sandbox' | 'production' {
 
 // Función para obtener el Access Token correcto
 export function getMpAccessToken(): string {
-  const env = getMercadoPagoEnv();
-  
-  if (env === 'production') {
-    return import.meta.env.VITE_MP_ACCESS_TOKEN_PROD || 
-           'NO_TOKEN_CONFIGURADO';
-  } else {
-    return import.meta.env.VITE_MP_ACCESS_TOKEN_TEST || 
-           'TEST-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx';
-  }
+  // ❌ REMOVIDO: Access token no debe estar en el frontend
+  throw new Error('❌ MERCADOPAGO_ACCESS_TOKEN debe configurarse en el backend, no en el frontend');
 }
 
 // Función para obtener la Public Key correcta
 export function getMpPublicKey(): string {
-  const env = getMercadoPagoEnv();
-  
-  if (env === 'production') {
-    return import.meta.env.VITE_MP_PUBLIC_KEY_PROD || 
-           'APP_USR-ebca3c36-af6d-4e88-ac94-5e984ce6bf5e';
-  } else {
-    return import.meta.env.VITE_MP_PUBLIC_KEY_TEST || 
-           'TEST-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx';
-  }
+  // Usar solo la clave pública unificada
+  return import.meta.env.VITE_MERCADOPAGO_PUBLIC_KEY || 
+         'NO_PUBLIC_KEY_CONFIGURADO';
 }
 
 // Función para obtener URLs de retorno
