@@ -66,7 +66,7 @@ export async function createReservation(reservationData: ReservationInput): Prom
       descripcion: `Consulta ${reservationData.servicio} - Pago pendiente`,
       tipo_reunion: reservationData.tipo_reunion || 'online',
       estado: reservationData.estado || 'pendiente',
-      user_id: 'migration_placeholder', // Required field for RLS
+      // user_id: 'migration_placeholder', // Campo eliminado en limpieza de esquema
       recordatorio_enviado: false,
       webhook_sent: false,
       created_at: timestamp,

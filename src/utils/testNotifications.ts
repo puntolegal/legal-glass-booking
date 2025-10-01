@@ -101,7 +101,7 @@ export async function createTestReservation(): Promise<{success: boolean, messag
       .from('reservas')
       .insert([{
         ...testData,
-        user_id: 'migration_placeholder',
+        // user_id: 'migration_placeholder', // Campo eliminado
         estado: 'confirmada',
         recordatorio_enviado: false,
         webhook_sent: false

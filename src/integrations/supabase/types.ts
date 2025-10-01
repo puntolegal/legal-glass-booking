@@ -24,7 +24,7 @@ export type Database = {
           role: string
           telefono: string | null
           updated_at: string
-          user_id: string
+          // user_id: string // Campo eliminado en limpieza de esquema
         }
         Insert: {
           created_at?: string
@@ -35,7 +35,7 @@ export type Database = {
           role?: string
           telefono?: string | null
           updated_at?: string
-          user_id: string
+          // user_id: string // Campo eliminado en limpieza de esquema
         }
         Update: {
           created_at?: string
@@ -46,7 +46,7 @@ export type Database = {
           role?: string
           telefono?: string | null
           updated_at?: string
-          user_id?: string
+          // user_id?: string // Campo eliminado en limpieza de esquema
         }
         Relationships: []
       }
@@ -67,7 +67,7 @@ export type Database = {
           telefono: string
           tipo_reunion: string | null
           updated_at: string | null
-          user_id: string
+          // user_id: string // Campo eliminado en limpieza de esquema
           webhook_sent: boolean | null
         }
         Insert: {
@@ -86,7 +86,7 @@ export type Database = {
           telefono: string
           tipo_reunion?: string | null
           updated_at?: string | null
-          user_id: string
+          // user_id: string // Campo eliminado en limpieza de esquema
           webhook_sent?: boolean | null
         }
         Update: {
@@ -105,7 +105,7 @@ export type Database = {
           telefono?: string
           tipo_reunion?: string | null
           updated_at?: string | null
-          user_id?: string
+          // user_id?: string // Campo eliminado en limpieza de esquema
           webhook_sent?: boolean | null
         }
         Relationships: []

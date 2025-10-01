@@ -112,7 +112,7 @@ export async function quickDatabaseSetup(): Promise<{success: boolean; message: 
     for (const reserva of reservasPrueba) {
       const { error: reservaError } = await supabase
         .from('reservas')
-        .insert([{...reserva, user_id: 'migration_placeholder'}]);
+        .insert([{...reserva, /* user_id: 'migration_placeholder' */}]); // Campo eliminado
       
       if (reservaError) {
         console.warn('Error creando reserva de prueba:', reservaError);

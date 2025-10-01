@@ -168,7 +168,7 @@ export const crearReserva = async (bookingData: BookingData): Promise<{
       tipo_reunion: bookingData.servicio.tipoReunion || null,
       fecha: bookingData.servicio.fecha,
       hora: bookingData.servicio.hora,
-      user_id: 'migration_placeholder', // Required field for RLS
+      // user_id: 'migration_placeholder', // Campo eliminado en limpieza de esquema
       descripcion:
         bookingData.descripcion ||
         bookingData.motivoConsulta ||
@@ -232,7 +232,7 @@ export const createReservationDirect = async (formData: any): Promise<{
       tipo_reunion: formData.tipo_reunion || 'online',
       fecha: formData.fecha,
       hora: formData.hora,
-      user_id: 'migration_placeholder', // Required field for RLS
+      // user_id: 'migration_placeholder', // Campo eliminado en limpieza de esquema
       descripcion: formData.descripcion,
       estado: 'pendiente'
     };
