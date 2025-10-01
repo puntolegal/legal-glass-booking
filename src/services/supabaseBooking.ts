@@ -7,7 +7,7 @@ const mapDatabaseToReserva = (data: any): Reserva => ({
   nombre: data.nombre,
   email: data.email,
   telefono: data.telefono,
-  // rut: data.rut, // Columna eliminada en limpieza de esquema
+  rut: data.rut,
   servicio: data.servicio || '',
   precio: data.precio || '0',
   categoria: null, // No existe en la tabla actual
@@ -29,7 +29,7 @@ export interface BookingData {
     nombre: string;
     email: string;
     telefono: string;
-    // rut?: string; // Campo eliminado en limpieza de esquema
+    rut?: string;
   };
   servicio: {
     tipo: string;
@@ -55,7 +55,7 @@ export interface Reserva {
   nombre: string;
   email: string;
   telefono: string;
-  // rut: string | null; // Campo eliminado en limpieza de esquema
+  rut: string | null;
   servicio: string;
   precio: string;
   categoria?: string | null;
@@ -162,7 +162,7 @@ export const crearReserva = async (bookingData: BookingData): Promise<{
       nombre: bookingData.cliente.nombre,
       email: bookingData.cliente.email,
       telefono: bookingData.cliente.telefono,
-      // rut: bookingData.cliente.rut || 'No especificado', // Campo eliminado
+      rut: bookingData.cliente.rut || 'No especificado',
       servicio: bookingData.servicio.tipo,
       precio: bookingData.servicio.precio,
       tipo_reunion: bookingData.servicio.tipoReunion || null,
@@ -226,7 +226,7 @@ export const createReservationDirect = async (formData: any): Promise<{
       nombre: formData.nombre,
       email: formData.email,
       telefono: formData.telefono,
-      // rut: formData.rut || 'No especificado', // Campo eliminado
+      rut: formData.rut || 'No especificado',
       servicio: formData.servicio || 'Consulta General',
       precio: String(formData.precio || '15000'),
       tipo_reunion: formData.tipo_reunion || 'online',

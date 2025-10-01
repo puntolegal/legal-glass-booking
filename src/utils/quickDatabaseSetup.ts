@@ -77,7 +77,7 @@ export async function quickDatabaseSetup(): Promise<{success: boolean; message: 
     const reservasPrueba = [
       {
         nombre: 'Juan Pérez Test',
-        // rut: '12345678-9', // Campo eliminado
+        rut: '12345678-9',
         email: 'juan.test@puntolegal.cl',
         telefono: '+56912345678',
         servicio: 'Consulta laboral de prueba',
@@ -93,7 +93,7 @@ export async function quickDatabaseSetup(): Promise<{success: boolean; message: 
       },
       {
         nombre: 'María González Test',
-        // rut: '98765432-1', // Campo eliminado
+        rut: '98765432-1',
         email: 'maria.test@puntolegal.cl',
         telefono: '+56987654321',
         servicio: 'Constitución de sociedad (demo)',
@@ -158,7 +158,7 @@ export async function quickDatabaseSetup(): Promise<{success: boolean; message: 
         nombre: 'Cliente Prueba Notificación',
         email: NOTIFICATION_CONFIG.email.testRecipient || 'test@puntolegal.online',
         telefono: '+56912345678',
-        // rut: '11.111.111-1', // Campo eliminado
+        rut: '11.111.111-1',
         servicio: 'Consulta Demo',
         precio: '45000',
         

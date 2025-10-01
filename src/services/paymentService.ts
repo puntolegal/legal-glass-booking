@@ -7,7 +7,7 @@ export interface PaymentData {
     lastName: string;
     email: string;
     phone: string;
-    // rut: string; // Campo eliminado en limpieza de esquema
+    rut: string;
   };
   amount: number;
   currency: string;
@@ -150,7 +150,7 @@ export class PaymentService {
   }
 
   // Validar RUT chileno
-  private isValidRUT(rut: string): boolean { // Función obsoleta - campo eliminado
+  private isValidRUT(rut: string): boolean {
     // Eliminar puntos y guión
     const cleanRut = rut.replace(/\./g, '').replace(/-/g, '');
     
@@ -234,7 +234,7 @@ export const usePayment = () => {
           lastName: 'Test',
           email: 'test@example.com',
           phone: '+56912345678',
-          // rut: '12345678-9' // Campo eliminado
+          rut: '12345678-9'
         },
         amount,
         currency: 'CLP'

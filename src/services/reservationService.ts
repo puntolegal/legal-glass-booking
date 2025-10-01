@@ -8,7 +8,7 @@ export interface ReservationInput {
   nombre: string;
   email: string;
   telefono: string;
-  // rut?: string | null; // Campo eliminado en limpieza de esquema
+  rut?: string | null;
   servicio: string;
   precio: string | number;
   categoria?: string | null;
@@ -34,7 +34,7 @@ const mapToReservation = (data: any): Reservation => ({
   nombre: data.nombre ?? '',
   email: data.email ?? '',
   telefono: data.telefono ?? '',
-  // rut: data.rut ?? null, // Campo eliminado
+  rut: data.rut ?? null,
   servicio: data.servicio ?? '',
   precio: data.precio ?? '0',
   categoria: data.categoria ?? null,
@@ -58,7 +58,7 @@ export async function createReservation(reservationData: ReservationInput): Prom
       nombre: reservationData.nombre,
       email: reservationData.email,
       telefono: reservationData.telefono,
-      // rut: reservationData.rut || 'No especificado', // Campo eliminado
+      rut: reservationData.rut || 'No especificado',
       servicio: reservationData.servicio,
       precio: reservationData.precio.toString(),
       fecha: reservationData.fecha,
@@ -125,7 +125,7 @@ export async function confirmReservation(reservationId: string): Promise<{ succe
       nombre: updatedReservation.nombre,
       email: updatedReservation.email,
       telefono: updatedReservation.telefono,
-      // rut: updatedReservation.rut || 'No especificado', // Campo eliminado
+      rut: updatedReservation.rut || 'No especificado',
       servicio: updatedReservation.servicio,
       precio: String(updatedReservation.precio ?? ''),
       fecha: updatedReservation.fecha,

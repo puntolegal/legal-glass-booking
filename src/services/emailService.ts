@@ -24,7 +24,7 @@ interface BookingData {
   hora: string;
   tipo_reunion: string;
   descripcion?: string;
-  // rut?: string; // Campo eliminado en limpieza de esquema
+  rut?: string;
 }
 
 export async function sendResendEmail(emailData: EmailData): Promise<{ success: boolean; id?: string; error?: string }> {

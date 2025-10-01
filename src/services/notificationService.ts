@@ -42,7 +42,7 @@ const mapDataToReservaMockup = (data: any): Reserva => ({
   nombre: data.nombre ?? '',
   email: data.email ?? '',
   telefono: data.telefono ?? '',
-  // rut: data.rut ?? null, // Campo eliminado
+  rut: data.rut ?? null,
   servicio: data.servicio ?? '',
   precio: data.precio ?? '0',
   categoria: data.categoria ?? null,

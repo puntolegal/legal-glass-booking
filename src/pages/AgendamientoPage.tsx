@@ -108,6 +108,7 @@ export default function AgendamientoPage() {
     nombre: '',
     email: '',
     telefono: '',
+    rut: '',
     empresa: '',
     descripcion: '',
     codigoConvenio: ''
@@ -393,6 +394,21 @@ export default function AgendamientoPage() {
                           onChange={(e) => setFormData({...formData, telefono: e.target.value})}
                           className="w-full px-4 py-4 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all text-gray-900 dark:text-gray-100 text-base"
                           placeholder="+56 9 1234 5678"
+                        />
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                          RUT *
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          value={formData.rut}
+                          onChange={(e) => setFormData({...formData, rut: e.target.value})}
+                          className="w-full px-4 py-4 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all text-gray-900 dark:text-gray-100 text-base"
+                          placeholder="12.345.678-9"
+                          maxLength={12}
                         />
                       </div>
                       
