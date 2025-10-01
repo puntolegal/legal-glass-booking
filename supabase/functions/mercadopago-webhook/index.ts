@@ -113,12 +113,8 @@ serve(async (req) => {
       const { data: updatedReservation, error: updateError } = await supabase
         .from('reservas')
         .update({
-          pago_id: paymentInfo.id.toString(),
           pago_estado: paymentInfo.status,
-          pago_metodo: paymentInfo.payment_method_id || 'unknown',
-          preference_id: paymentInfo.preference_id || reservation.preference_id,
-          estado: paymentInfo.status === 'approved' ? 'confirmada' : 'pendiente',
-          webhook_sent: true
+          estado: paymentInfo.status === 'approved' ? 'confirmada' : 'pendiente'
         })
         .eq('id', reservation.id)
         .select()

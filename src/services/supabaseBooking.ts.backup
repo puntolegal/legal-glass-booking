@@ -48,7 +48,7 @@ export interface BookingData {
   };
   descripcion?: string;
   motivoConsulta?: string;
-  descripcion?: string;
+  notas?: string;
 }
 
 export interface Reserva {
@@ -173,7 +173,7 @@ export const crearReserva = async (bookingData: BookingData): Promise<{
       descripcion:
         bookingData.descripcion ||
         bookingData.motivoConsulta ||
-        bookingData.descripcion ||
+        bookingData.notas ||
         bookingData.servicio.descripcion ||
         'Consulta legal',
       estado: 'pendiente' as const

@@ -38,8 +38,8 @@ const ServicesSection = ({ title = "Elige el servicio legal que necesitas", serv
       title: "Punto Legal Familia",
       description: "Asesoría integral en divorcios, pensiones alimenticias y temas familiares.",
       features: ["Divorcios", "Pensiones alimenticias", "Mediación familiar"],
-      regularPrice: "$60.000",
-      promoPrice: "$30.000"
+      regularPrice: "$70.000",
+      promoPrice: "$35.000"
     },
     // Herencias y Sucesiones
     {

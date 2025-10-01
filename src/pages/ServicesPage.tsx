@@ -213,8 +213,8 @@ const SpecializedGrid: React.FC<{ onAgendarClick: (service: ServiceCard) => void
     {
       title: "Punto Legal Familia",
       description: "Asesoría integral en divorcios, pensiones alimenticias y temas familiares.",
-      price: "$30.000",
-      originalPrice: "$60.000",
+      price: "$35.000",
+      originalPrice: "$70.000",
       features: [
         "Divorcios",
         "Pensiones alimenticias",

@@ -47,7 +47,7 @@ const serviceCatalog = {
   'inmobiliario': { name: 'Punto Legal Inmobiliario', price: '27.500', category: 'Inmobiliario', originalPrice: '55.000', discount: '50% OFF' },
   
   // Familia
-  'familia': { name: 'Punto Legal Familia', price: '30.000', category: 'Familia', originalPrice: '60.000', discount: '50% OFF' },
+  'familia': { name: 'Punto Legal Familia', price: '35.000', category: 'Familia', originalPrice: '70.000', discount: '50% OFF' },
   
   // Laboral
   'laboral': { name: 'Punto Legal Laboral', price: '30.000', category: 'Laboral', originalPrice: '60.000', discount: '50% OFF' },

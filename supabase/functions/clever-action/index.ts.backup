@@ -96,16 +96,16 @@ serve(async (req) => {
 
     // Preparar datos para el email
     const emailData = {
-      nombre: reserva.nombre,
-      email: reserva.email,
-      telefono: reserva.telefono,
+      cliente_nombre: reserva.nombre,
+      cliente_email: reserva.email,
+      cliente_telefono: reserva.telefono,
       servicio_tipo: reserva.servicio,
-      precio: reserva.precio,
+      servicio_precio: reserva.precio,
       fecha: reserva.fecha,
       hora: reserva.hora,
       tipo_reunion: reserva.tipo_reunion || 'online',
       descripcion: reserva.descripcion,
-      pago_metodo: 'MercadoPago',
+      pago_metodo: reserva.pago_metodo || 'MercadoPago',
       pago_estado: reserva.pago_estado || 'aprobado',
       created_at: reserva.created_at
     };
@@ -127,7 +127,7 @@ serve(async (req) => {
         },
         body: JSON.stringify({
           from: MAIL_FROM,
-          to: [emailData.email],
+          to: [emailData.cliente_email],
           subject: `✅ Confirmación de Consulta - ${emailData.servicio_tipo}`,
           html: `
             <!DOCTYPE html>
@@ -245,7 +245,7 @@ serve(async (req) => {
                     </div>
                     
                     <div class="content">
-                        <p>Estimado/a <strong>${emailData.nombre}</strong>,</p>
+                        <p>Estimado/a <strong>${emailData.cliente_nombre}</strong>,</p>
                         
                         <p>Nos complace confirmar que tu cita ha sido agendada correctamente. A continuación, encontrarás todos los detalles de tu consulta jurídica:</p>
                         
@@ -269,7 +269,7 @@ serve(async (req) => {
                             </div>
                             <div class="info-row">
                                 <span class="info-label">Precio:</span>
-                                <span class="info-value highlight">$${emailData.precio}</span>
+                                <span class="info-value highlight">$${emailData.servicio_precio}</span>
                             </div>
                             <div class="info-row">
                                 <span class="info-label">Estado del pago:</span>
@@ -308,7 +308,7 @@ serve(async (req) => {
         body: JSON.stringify({
           from: MAIL_FROM,
           to: [ADMIN_EMAIL],
-          subject: `📅 Nueva Consulta Agendada - ${emailData.nombre}`,
+          subject: `📅 Nueva Consulta Agendada - ${emailData.cliente_nombre}`,
           html: `
             <!DOCTYPE html>
             <html>
@@ -417,15 +417,15 @@ serve(async (req) => {
                             <h3>👤 Información del Cliente</h3>
                             <div class="info-row">
                                 <span class="info-label">Nombre:</span>
-                                <span class="info-value">${emailData.nombre}</span>
+                                <span class="info-value">${emailData.cliente_nombre}</span>
                             </div>
                             <div class="info-row">
                                 <span class="info-label">Email:</span>
-                                <span class="info-value">${emailData.email}</span>
+                                <span class="info-value">${emailData.cliente_email}</span>
                             </div>
                             <div class="info-row">
                                 <span class="info-label">Teléfono:</span>
-                                <span class="info-value">${emailData.telefono}</span>
+                                <span class="info-value">${emailData.cliente_telefono}</span>
                             </div>
                         </div>
                         
@@ -449,7 +449,7 @@ serve(async (req) => {
                             </div>
                             <div class="info-row">
                                 <span class="info-label">Precio:</span>
-                                <span class="info-value">$${emailData.precio}</span>
+                                <span class="info-value">$${emailData.servicio_precio}</span>
                             </div>
                             <div class="info-row">
                                 <span class="info-label">Estado del pago:</span>
@@ -506,7 +506,7 @@ serve(async (req) => {
             success: true, 
             message: 'Emails enviados exitosamente',
             booking_id: booking_id,
-            email: emailData.email,
+            cliente_email: emailData.cliente_email,
             admin_email: ADMIN_EMAIL
           }),
           { 

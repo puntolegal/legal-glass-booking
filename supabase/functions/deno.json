@@ -1,11 +1,31 @@
 {
   "compilerOptions": {
+    "lib": ["deno.ns", "deno.window"],
+    "strict": true,
     "allowJs": true,
-    "lib": ["deno.window"],
-    "strict": true
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "isolatedModules": true,
+    "moduleResolution": "node",
+    "noEmit": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "target": "es2020"
   },
   "imports": {
-    "https://deno.land/std@0.168.0/": "https://deno.land/std@0.168.0/",
-    "https://esm.sh/": "https://esm.sh/"
+    "https://deno.land/std@0.168.0/http/server.ts": "https://deno.land/std@0.168.0/http/server.ts",
+    "https://esm.sh/@supabase/supabase-js@2": "https://esm.sh/@supabase/supabase-js@2"
+  },
+  "tasks": {
+    "start": "deno run --allow-net --allow-env --watch=static/,routes/ dev.ts"
+  },
+  "lint": {
+    "include": ["**/*.ts"],
+    "exclude": ["**/node_modules/**"]
+  },
+  "fmt": {
+    "include": ["**/*.ts"],
+    "exclude": ["**/node_modules/**"]
   }
 }

@@ -47,21 +47,21 @@ const sendEmailWithSupabase = async (emailData: {
     // Usar datos reales si están disponibles, sino datos genéricos
     const realBookingData = bookingData ? {
       id: bookingData.id,
-      nombre: bookingData.nombre,
-      email: bookingData.email,
-      telefono: bookingData.telefono || '',
-      servicio: bookingData.servicio,
-      precio: bookingData.precio,
+      cliente_nombre: bookingData.nombre,
+      cliente_email: bookingData.email,
+      cliente_telefono: bookingData.telefono || '',
+      servicio_tipo: bookingData.servicio,
+      servicio_precio: bookingData.precio,
       fecha: bookingData.fecha,
       hora: bookingData.hora,
       created_at: bookingData.created_at
     } : {
       id: `email_${Date.now()}`,
-      nombre: 'Cliente',
-      email: emailData.to[0],
-      telefono: '',
+      cliente_nombre: 'Cliente',
+      cliente_email: emailData.to[0],
+      cliente_telefono: '',
       servicio_tipo: 'Consulta Legal',
-      precio: '0',
+      servicio_precio: '0',
       fecha: new Date().toISOString().split('T')[0],
       hora: new Date().toTimeString().split(' ')[0],
       created_at: new Date().toISOString()
