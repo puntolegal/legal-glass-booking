@@ -55,9 +55,9 @@ const MobileMercadoPagoButton: React.FC<MobileMercadoPagoButtonProps> = ({
           }
         },
         back_urls: {
-          success: `https://www.puntolegal.online/payment-success?source=mercadopago`,
-          failure: `https://www.puntolegal.online/payment-failure?source=mercadopago`,
-          pending: `https://www.puntolegal.online/payment-pending?source=mercadopago`
+          success: `https://puntolegal.online/payment-success?source=mercadopago`,
+          failure: `https://puntolegal.online/payment-failure?source=mercadopago`,
+          pending: `https://puntolegal.online/payment-pending?source=mercadopago`
         },
         auto_return: 'approved' as const,
         external_reference: paymentData.metadata?.reservation_id || `PL-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
@@ -85,10 +85,11 @@ const MobileMercadoPagoButton: React.FC<MobileMercadoPagoButtonProps> = ({
         method: 'mercadopago_mobile_direct'
       }));
 
-      // Redirigir al Checkout Pro
+      // Redirigir al Checkout Pro (método móvil-compatible)
       console.log('🚀 Redirigiendo a MercadoPago...');
       if (result.init_point) {
-        window.location.href = result.init_point;
+        // Usar window.location.assign para evitar bloqueos en móvil
+        window.location.assign(result.init_point);
       } else {
         throw new Error('No se recibió init_point de MercadoPago');
       }

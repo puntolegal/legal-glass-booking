@@ -45,9 +45,9 @@ const MercadoPagoCheckoutButton: React.FC<CheckoutButtonProps> = ({
         
         // URLs de retorno
         back_urls: {
-          success: `https://www.puntolegal.online/payment-success?source=mercadopago`,
-          failure: `https://www.puntolegal.online/payment-failure?source=mercadopago`,
-          pending: `https://www.puntolegal.online/payment-pending?source=mercadopago`
+          success: `https://puntolegal.online/payment-success?source=mercadopago`,
+          failure: `https://puntolegal.online/payment-failure?source=mercadopago`,
+          pending: `https://puntolegal.online/payment-pending?source=mercadopago`
         },
         
         // Configuración adicional
