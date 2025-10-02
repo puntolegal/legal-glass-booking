@@ -22,22 +22,20 @@ export const RESEND_CONFIG = {
   }
 };
 
-// Verificar configuración
+// Verificar configuración (API key debe estar en edge functions)
 export const isResendConfigured = () => {
-  return !!RESEND_CONFIG.apiKey && RESEND_CONFIG.apiKey !== 'undefined';
+  // Note: RESEND_API_KEY debe configurarse en Supabase Edge Functions, no en el frontend
+  return true; // Siempre true porque se usa desde edge functions
 };
 
 // Debug de configuración
 export const debugResendConfig = () => {
   console.log('🔍 Resend Configuration Debug:');
-  console.log('API Key:', RESEND_CONFIG.apiKey ? 'Configurado' : 'No configurado');
   console.log('From:', RESEND_CONFIG.from);
   console.log('Admin Email:', RESEND_CONFIG.adminEmail);
   console.log('App URL:', RESEND_CONFIG.appUrl);
-  console.log('Is Configured:', isResendConfigured());
   
   return {
-    apiKey: RESEND_CONFIG.apiKey ? 'Configurado' : 'No configurado',
     from: RESEND_CONFIG.from,
     adminEmail: RESEND_CONFIG.adminEmail,
     appUrl: RESEND_CONFIG.appUrl,

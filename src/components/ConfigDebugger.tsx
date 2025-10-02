@@ -3,12 +3,10 @@ import { useEffect, useState } from 'react';
 
 interface ConfigStatus {
   mercadopago: {
-    accessToken: boolean;
     publicKey: boolean;
     configured: boolean;
   };
   resend: {
-    apiKey: boolean;
     from: boolean;
     adminEmail: boolean;
     configured: boolean;
@@ -38,13 +36,10 @@ export const ConfigDebugger = () => {
         
         const configStatus: ConfigStatus = {
           mercadopago: {
-            // ❌ REMOVIDO: No mostrar accessToken en debug
-            // accessToken: !!import.meta.env.VITE_MERCADOPAGO_ACCESS_TOKEN,
             publicKey: !!MERCADOPAGO_CONFIG.publicKey,
             configured: !!MERCADOPAGO_CONFIG.publicKey
           },
           resend: {
-            apiKey: !!RESEND_CONFIG.apiKey,
             from: !!RESEND_CONFIG.from,
             adminEmail: !!RESEND_CONFIG.adminEmail,
             configured: isResendConfigured()
@@ -110,7 +105,6 @@ export const ConfigDebugger = () => {
         </span>
         <br />
         <small>
-          Access Token: {config.mercadopago.accessToken ? '✅' : '❌'} | 
           Public Key: {config.mercadopago.publicKey ? '✅' : '❌'}
         </small>
       </div>
@@ -122,7 +116,6 @@ export const ConfigDebugger = () => {
         </span>
         <br />
         <small>
-          API Key: {config.resend.apiKey ? '✅' : '❌'} | 
           From: {config.resend.from ? '✅' : '❌'}
         </small>
       </div>

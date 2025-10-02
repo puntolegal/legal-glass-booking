@@ -48,6 +48,7 @@ export interface BookingData {
   };
   descripcion?: string;
   motivoConsulta?: string;
+  notas?: string;
 }
 
 export interface Reserva {

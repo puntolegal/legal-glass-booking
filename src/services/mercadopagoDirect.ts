@@ -142,24 +142,26 @@ export async function createMercadoPagoPreferenceDirect(
     // 🔧 VALIDACIÓN PXI03: Validar datos antes de enviar
     validatePreferenceData(preferenceData);
 
-    // Usar token de acceso de MercadoPago desde variables de entorno
-    // ❌ REMOVIDO: Access token no debe estar en el frontend
-    // const MERCADOPAGO_ACCESS_TOKEN = import.meta.env.VITE_MERCADOPAGO_ACCESS_TOKEN || 
-    //                                 import.meta.env.MERCADOPAGO_ACCESS_TOKEN ||
-    //                                 import.meta.env.VITE_MERCADOPAGO_ACCESS_TOKEN;
+    // ❌ ERROR: MERCADOPAGO_ACCESS_TOKEN debe usarse solo en Supabase Edge Functions
+    console.error('❌ createMercadoPagoPreferenceDirect debe llamarse desde Edge Function');
     
-    console.log('🔑 Token de MercadoPago:', MERCADOPAGO_ACCESS_TOKEN ? '✅ Configurado' : '❌ Faltante');
-
-    // Llamada directa a la API REST de MercadoPago
+    return {
+      success: false,
+      error: 'MercadoPago preference creation must be done from backend (Edge Function). Use Supabase Edge Function instead.'
+    };
+    
+    /* Esta función debe moverse a una Edge Function
     const response = await fetch('https://api.mercadopago.com/checkout/preferences', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${MERCADOPAGO_ACCESS_TOKEN}`
+        'Authorization': `Bearer ${MERCADOPAGO_ACCESS_TOKEN}` // Solo disponible en backend
       },
       body: JSON.stringify(preferenceData)
     });
+    */
 
+    /* Código debe ejecutarse en backend
     console.log('📤 Respuesta de MercadoPago:', response.status, response.statusText);
 
     if (!response.ok) {
@@ -212,12 +214,13 @@ export async function createMercadoPagoPreferenceDirect(
       live_mode: result.live_mode
     };
 
+    */
   } catch (error) {
     console.error('❌ Error creando preferencia directa:', error);
     
     return {
       success: false,
-      error: error.message
+      error: error instanceof Error ? error.message : 'Unknown error'
     };
   }
 }

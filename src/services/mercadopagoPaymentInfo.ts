@@ -31,18 +31,25 @@ export async function getMercadoPagoPaymentInfo(paymentId: string): Promise<Paym
   try {
     console.log('🔍 Obteniendo información del pago desde MercadoPago:', paymentId);
 
-    // Usar token de acceso de MercadoPago directamente
-    // ❌ REMOVIDO: Access token no debe estar en el frontend
-    // const MERCADOPAGO_ACCESS_TOKEN = import.meta.env.VITE_MERCADOPAGO_ACCESS_TOKEN;
-
+    // ❌ ERROR: Access token debe usarse solo en Supabase Edge Functions
+    console.error('❌ getMercadoPagoPaymentInfo debe llamarse desde Edge Function');
+    
+    return {
+      success: false,
+      error: 'Payment info must be fetched from backend (Edge Function)'
+    };
+    
+    /* Esta función debe moverse a una Edge Function
     const response = await fetch(`https://api.mercadopago.com/v1/payments/${paymentId}`, {
       method: 'GET',
       headers: {
-        'Authorization': `Bearer ${MERCADOPAGO_ACCESS_TOKEN}`,
+        'Authorization': `Bearer ${ACCESS_TOKEN}`, // Solo disponible en backend
         'Content-Type': 'application/json'
       }
     });
+    */
 
+    /* Código debe ejecutarse en backend
     console.log('📤 Respuesta de MercadoPago Payment API:', response.status, response.statusText);
 
     if (!response.ok) {
@@ -83,6 +90,7 @@ export async function getMercadoPagoPaymentInfo(paymentId: string): Promise<Paym
         }
       }
     };
+    */
 
   } catch (error) {
     console.error('❌ Error obteniendo información de pago:', error);

@@ -30,10 +30,18 @@ interface BookingData {
 
 export async function sendResendEmail(emailData: EmailData): Promise<{ success: boolean; id?: string; error?: string }> {
   try {
+    // ❌ ERROR: RESEND_API_KEY debe usarse solo en Supabase Edge Functions, no en frontend
+    console.error('❌ sendResendEmail debe llamarse desde Edge Function, no desde frontend');
+    return { 
+      success: false, 
+      error: 'Email service must be called from backend (Edge Function)' 
+    };
+    
+    /* Esta función debe moverse a una Edge Function
     const response = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${RESEND_API_KEY}`,
+        'Authorization': `Bearer ${RESEND_API_KEY}`, // Solo disponible en backend
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
@@ -43,14 +51,8 @@ export async function sendResendEmail(emailData: EmailData): Promise<{ success: 
         html: emailData.html,
       }),
     });
+    */
 
-    if (!response.ok) {
-      const error = await response.text();
-      throw new Error(`Resend error ${response.status}: ${error}`);
-    }
-
-    const result = await response.json();
-    return { success: true, id: result.id };
   } catch (error) {
     console.error('Error enviando email:', error);
     return { success: false, error: error instanceof Error ? error.message : 'Error desconocido' };

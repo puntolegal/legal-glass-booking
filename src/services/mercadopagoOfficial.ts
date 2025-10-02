@@ -65,16 +65,23 @@ export const createOfficialPreference = async (paymentData: MercadoPagoPreferenc
     
     console.log('📤 Enviando a API oficial de MercadoPago...');
     
-    // Llamada exacta a la API oficial
+    // ❌ ERROR: Access token debe usarse solo en Supabase Edge Functions
+    console.error('❌ createOfficialPreference debe llamarse desde Edge Function');
+    
+    throw new Error('MercadoPago preference creation must be done from backend (Edge Function)');
+    
+    /* Esta función debe moverse a una Edge Function
     const response = await fetch('https://api.mercadopago.com/checkout/preferences', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${MERCADOPAGO_CREDENTIALS.accessToken}`
+        'Authorization': `Bearer ${ACCESS_TOKEN}` // Solo disponible en backend
       },
       body: JSON.stringify(preferencePayload)
     });
+    */
     
+    /* Código debe ejecutarse en backend
     if (!response.ok) {
       const errorData = await response.json().catch(() => null);
       const errorText = await response.text().catch(() => 'Error desconocido');
@@ -100,6 +107,7 @@ export const createOfficialPreference = async (paymentData: MercadoPagoPreferenc
       preference_id: preferenceResult.id,
       init_point: preferenceResult.init_point
     };
+    */
     
   } catch (error) {
     console.error('❌ Error completo en creación de preferencia:', error);

@@ -74,7 +74,7 @@ const AdminPage = () => {
 
   const toggleUserStatus = async (userId: string, currentStatus: boolean) => {
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('profiles')
         .update({ is_active: !currentStatus })
         .eq('user_id', userId);
@@ -91,7 +91,7 @@ const AdminPage = () => {
 
   const changeUserRole = async (userId: string, newRole: 'admin' | 'abogado' | 'cliente') => {
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('profiles')
         .update({ role: newRole })
         .eq('user_id', userId);

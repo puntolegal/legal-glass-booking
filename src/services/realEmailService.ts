@@ -116,11 +116,15 @@ const sendEmailDirect = async (emailData: {
   html: string;
 }): Promise<any> => {
   try {
+    // ❌ ERROR: RESEND_API_KEY debe usarse solo en Supabase Edge Functions
+    console.error('❌ sendEmailDirect debe usar Edge Function en su lugar');
+    throw new Error('Direct email sending not allowed from frontend. Use Edge Function.');
+    
+    /* Esta función debe usar Edge Function
     const response = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
-        // ❌ REMOVIDO: Authorization header no debe estar en el frontend
-        // 'Authorization': `Bearer ${import.meta.env.VITE_RESEND_API_KEY}`,
+        'Authorization': `Bearer ${RESEND_API_KEY}`, // Solo disponible en backend
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
@@ -130,16 +134,7 @@ const sendEmailDirect = async (emailData: {
         html: emailData.html,
       }),
     });
-
-    if (!response.ok) {
-      const error = await response.text();
-      throw new Error(`Resend error ${response.status}: ${error}`);
-    }
-
-    const result = await response.json();
-    console.log('✅ Email enviado exitosamente con Resend directo:', result.id);
-    
-    return result;
+    */
 
   } catch (error) {
     console.error('❌ Error con envío directo:', error);
@@ -167,7 +162,6 @@ const sendEmailWithResend = async (emailData: {
     const { RESEND_CONFIG, isResendConfigured } = await import('@/config/resendConfig');
     
     console.log('🔍 Resend Config Debug:', {
-      apiKey: RESEND_CONFIG.apiKey ? 'Configurado' : 'No configurado',
       isConfigured: isResendConfigured(),
       from: RESEND_CONFIG.from,
       adminEmail: RESEND_CONFIG.adminEmail
