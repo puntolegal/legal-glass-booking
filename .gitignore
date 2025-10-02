@@ -7,7 +7,7 @@ pnpm-debug.log*
 lerna-debug.log*
 
 # Build outputs
-dist/
+# dist/ - REMOVIDO para Lovable (necesita el build en el repo)
 build/
 .vite/
 
@@ -84,7 +84,7 @@ jspm_packages/
 
 # Nuxt.js build / generate output
 .nuxt
-dist
+# dist - REMOVIDO para Lovable (necesita el build en el repo)
 
 # Storybook build outputs
 .out
