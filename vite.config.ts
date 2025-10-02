@@ -30,9 +30,13 @@ export default defineConfig(({ mode }) => ({
           router: ['react-router-dom'],
           ui: ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu', '@radix-ui/react-select'],
           animations: ['framer-motion'],
+          supabase: ['@supabase/supabase-js'],
+          mercadopago: ['@mercadopago/sdk-js', '@mercadopago/sdk-react'],
+          utils: ['date-fns', 'clsx', 'tailwind-merge'],
         },
       },
     },
+    chunkSizeWarningLimit: 1000,
   },
   base: "/",
 }));
