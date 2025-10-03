@@ -59,187 +59,91 @@ export default function PaymentSuccessPage() {
     try {
       console.log('🚀 INICIANDO PaymentSuccessPage - processPaymentSuccess');
       setIsProcessing(true);
-      setProcessingStatus('Procesando datos del pago...');
+      setProcessingStatus('Procesando pago...');
 
+      // 1. Obtener datos de la URL (fuente más confiable)
       const urlParams = new URLSearchParams(window.location.search);
-      const mercadopagoData = {
-        collection_id: urlParams.get('collection_id'),
-        collection_status: urlParams.get('collection_status'),
-        payment_id: urlParams.get('payment_id'),
-        status: urlParams.get('status'),
-        external_reference: urlParams.get('external_reference'),
-        payment_type: urlParams.get('payment_type'),
-        merchant_order_id: urlParams.get('merchant_order_id'),
-        preference_id: urlParams.get('preference_id'),
-        site_id: urlParams.get('site_id'),
-        processing_mode: urlParams.get('processing_mode'),
-        source: urlParams.get('source')
-      };
+      const external_reference = urlParams.get('external_reference');
+      const payment_id = urlParams.get('payment_id');
+      const status = urlParams.get('status') || urlParams.get('collection_status') || 'pending';
 
-      console.log('💳 Datos de MercadoPago:', mercadopagoData);
-      console.log('🌐 URL completa:', window.location.href);
+      console.log('💳 Datos de MercadoPago desde URL:');
+      console.log('   external_reference:', external_reference);
+      console.log('   payment_id:', payment_id);
+      console.log('   status:', status);
 
-      let normalizedStatus = (mercadopagoData.status || mercadopagoData.collection_status || '').toLowerCase();
-      const paymentIdFromUrl =
-        mercadopagoData.payment_id ||
-        mercadopagoData.collection_id ||
-        mercadopagoData.merchant_order_id ||
-        undefined;
-
-      const storedData = localStorage.getItem('paymentData');
-      const storedReservationId = localStorage.getItem('currentReservationId');
-      const storedExternalReference = localStorage.getItem('currentExternalReference');
-
-      let pendingPayment: PendingPaymentData | null = null;
-      if (storedData) {
-        try {
-          pendingPayment = parsePendingPaymentData(storedData);
-        } catch (parseError) {
-          console.warn('⚠️ No se pudo parsear paymentData desde localStorage:', parseError);
-        }
+      if (!external_reference) {
+        throw new Error('No se encontró la referencia de la reserva en la URL');
       }
 
-      console.log('📋 Datos de pago almacenados (fallback):', pendingPayment);
-      console.log('🔍 storedData raw:', storedData);
-      console.log('🔍 storedReservationId:', storedReservationId);
-      console.log('🔍 storedExternalReference:', storedExternalReference);
-      console.log('ℹ️ NOTA: localStorage es solo un fallback. Priorizando parámetros de URL.');
-
-      // PRIORIZAR parámetros de URL sobre localStorage
-      console.log('🔍 Buscando reserva usando parámetros de URL...');
-      console.log('🔍 external_reference de URL:', mercadopagoData.external_reference);
-      console.log('🔍 preference_id de URL:', mercadopagoData.preference_id);
-
-      // Crear lista de candidatos priorizando URL sobre localStorage
-      const candidateReservationIds = new Set<string>();
+      // 2. Buscar la reserva por external_reference
+      setProcessingStatus('Buscando reserva...');
+      console.log('🔍 Buscando reserva por external_reference:', external_reference);
       
-      // PRIMERO: Parámetros de URL (más confiables)
-      if (mercadopagoData.external_reference) {
-        candidateReservationIds.add(mercadopagoData.external_reference);
-        console.log('✅ Agregado external_reference de URL:', mercadopagoData.external_reference);
-      }
-      if (mercadopagoData.preference_id) {
-        candidateReservationIds.add(mercadopagoData.preference_id);
-        console.log('✅ Agregado preference_id de URL:', mercadopagoData.preference_id);
-      }
+      const result = await findReservaByCriteria({ external_reference });
       
-      // SEGUNDO: localStorage (como fallback)
-      [
-        pendingPayment?.reservationId,
-        pendingPayment?.id,
-        storedReservationId,
-        storedExternalReference
-      ]
-        .filter((value): value is string => typeof value === 'string' && value.trim().length > 0)
-        .forEach(value => {
-          candidateReservationIds.add(value);
-          console.log('📦 Agregado desde localStorage (fallback):', value);
-        });
-
-      let reserva: Reserva | undefined;
-      let mpPayment: any | null = null;
-
-      const fallbackEmail = pendingPayment?.email;
-
-      // Si tenemos payment_id, consultar la API (o mock) para obtener datos confiables
-      if (paymentIdFromUrl) {
-        setProcessingStatus('Consultando estado del pago en MercadoPago...');
-        try {
-          const paymentInfoResponse = await getMercadoPagoPaymentInfo(String(paymentIdFromUrl));
-          if (paymentInfoResponse.success && paymentInfoResponse.payment) {
-            mpPayment = paymentInfoResponse.payment;
-            if (mpPayment?.status) {
-              normalizedStatus = String(mpPayment.status).toLowerCase();
-            }
-          }
-        } catch (e) {
-          console.warn('⚠️ No se pudo obtener info del pago desde MercadoPago:', e);
-        }
+      if (!result.success || !result.reserva) {
+        throw new Error('No se encontró la reserva. Por favor contacta a soporte.');
       }
 
-      // PRIORIZAR búsqueda por parámetros de URL (más confiables)
-      
-      // 1. Buscar por external_reference de URL (más confiable)
-      if (!reserva && mercadopagoData.external_reference) {
-        setProcessingStatus('Buscando reserva por external_reference de URL...');
-        console.log('🔍 Buscando por external_reference:', mercadopagoData.external_reference);
-        const result = await findReservaByCriteria({ external_reference: mercadopagoData.external_reference });
-        if (result.success && result.reserva) {
-          reserva = result.reserva;
-          console.log('✅ Reserva encontrada por external_reference de URL');
-        } else {
-          console.log('❌ No se encontró reserva por external_reference de URL');
-        }
+      const reserva = result.reserva;
+      console.log('✅ Reserva encontrada:', reserva.id);
+
+      // 3. Actualizar estado del pago
+      setProcessingStatus('Actualizando estado del pago...');
+      const normalizedStatus = status.toLowerCase();
+      const isApproved = normalizedStatus === 'approved';
+
+      const updateResult = await updatePaymentStatus(reserva.id, {
+        estado: isApproved ? 'approved' : status,
+        id: payment_id || undefined,
+        externalReference: external_reference,
+        preferenceId: reserva.preference_id || undefined
+      });
+
+      if (!updateResult.success) {
+        console.error('❌ Error actualizando estado:', updateResult.error);
       }
 
-      // 2. Buscar por preference_id de URL (segunda opción más confiable)
-      if (!reserva && mercadopagoData.preference_id) {
-        setProcessingStatus('Buscando reserva por preference_id de URL...');
-        console.log('🔍 Buscando por preference_id:', mercadopagoData.preference_id);
-        const result = await findReservaByCriteria({ preference_id: mercadopagoData.preference_id });
-        if (result.success && result.reserva) {
-          reserva = result.reserva;
-          console.log('✅ Reserva encontrada por preference_id de URL');
-        } else {
-          console.log('❌ No se encontró reserva por preference_id de URL');
-        }
-      }
+      // 4. Enviar emails SIEMPRE si el pago es aprobado
+      let emailResult: EmailResult | null = null;
 
-      // 3. Fallback: buscar por localStorage y otros candidatos (solo si no se encontró por URL)
-      if (!reserva && candidateReservationIds.size > 0) {
-        console.log('🔍 Usando fallback: buscando por candidatos de localStorage...');
-        setProcessingStatus('Buscando por datos de localStorage (fallback)...');
+      if (isApproved) {
+        console.log('📧 Pago aprobado - enviando emails de confirmación...');
+        setProcessingStatus('Enviando emails de confirmación...');
         
-        for (const candidateId of candidateReservationIds) {
-          console.log(`🔍 Verificando candidato: ${candidateId}`);
-          setProcessingStatus(`Verificando reserva ${candidateId}...`);
-          
-          // Intentar buscar por external_reference primero
-          let result = await findReservaByCriteria({ external_reference: candidateId });
-          if (result.success && result.reserva) {
-            reserva = result.reserva;
-            console.log('✅ Reserva encontrada por external_reference (fallback)');
-            break;
-          }
-          
-          // Luego por preference_id
-          result = await findReservaByCriteria({ preference_id: candidateId });
-          if (result.success && result.reserva) {
-            reserva = result.reserva;
-            console.log('✅ Reserva encontrada por preference_id (fallback)');
-            break;
-          }
-          
-          // Finalmente por email (menos confiable)
-          result = await findReservaByCriteria({ email: candidateId });
-          if (result.success && result.reserva) {
-            reserva = result.reserva;
-            console.log('✅ Reserva encontrada por email (fallback)');
-            break;
-          }
+        const emailData: BookingEmailData = {
+          id: reserva.id,
+          nombre: reserva.nombre,
+          email: reserva.email,
+          telefono: reserva.telefono,
+          servicio: reserva.servicio,
+          precio: reserva.precio,
+          fecha: reserva.fecha,
+          hora: reserva.hora,
+          tipo_reunion: reserva.tipo_reunion || 'online',
+          descripcion: reserva.descripcion,
+          created_at: reserva.created_at || new Date().toISOString()
+        };
+
+        emailResult = await sendRealBookingEmails(emailData);
+        
+        if (emailResult.success) {
+          console.log('✅ Emails enviados exitosamente');
+          await supabase
+            .from('reservas')
+            .update({ email_enviado: true } as any)
+            .eq('id', reserva.id);
+        } else {
+          console.error('❌ Error enviando emails:', emailResult.error);
         }
+        
+        setProcessingStatus('¡Pago confirmado y emails enviados!');
+      } else {
+        setProcessingStatus('Pago registrado');
       }
 
-      if (!reserva && paymentIdFromUrl) {
-        setProcessingStatus('Buscando reserva por ID de pago...');
-        const result = await findReservaByCriteria({ email: paymentIdFromUrl });
-        if (result.success && result.reserva) {
-          reserva = result.reserva;
-        }
-      }
-
-      if (!reserva && fallbackEmail) {
-        setProcessingStatus('Buscando reserva por email...');
-        const result = await findReservaByCriteria({ email: fallbackEmail });
-        if (result.success && result.reserva) {
-          reserva = result.reserva;
-        }
-      }
-
-      if (!reserva) {
-        throw new Error('No se encontró la reserva asociada al pago. Contacta a soporte con el comprobante.');
-      }
-
+      // 5. Formatear precio para mostrar
       const parseAmount = (value: unknown): number | undefined => {
         if (value === null || value === undefined) return undefined;
         if (typeof value === 'number' && !Number.isNaN(value)) return value;
@@ -252,151 +156,38 @@ export default function PaymentSuccessPage() {
         return undefined;
       };
 
-      const paymentAmount =
-        (mpPayment && parseAmount(mpPayment.transaction_amount)) ??
-        parseAmount(pendingPayment?.price) ??
-        parseAmount(pendingPayment?.priceFormatted) ??
-        parseAmount(reserva.precio);
-
+      const paymentAmount = parseAmount(reserva.precio) || 35000;
       const currencyFormatter = new Intl.NumberFormat('es-CL');
-      const fallbackReservationAmount = parseAmount(reserva.precio);
-      const formattedAmount = paymentAmount !== undefined
-        ? currencyFormatter.format(paymentAmount)
-        : pendingPayment
-          ? ensurePriceFormatted(pendingPayment)
-          : fallbackReservationAmount !== undefined
-            ? currencyFormatter.format(fallbackReservationAmount)
-            : '—';
+      const formattedAmount = currencyFormatter.format(paymentAmount);
 
-      setProcessingStatus('Actualizando estado del pago en la base de datos...');
-
-      const updateResult = await updatePaymentStatus(reserva.id, {
-        estado: normalizedStatus || mercadopagoData.status || 'pending',
-        id: paymentIdFromUrl || undefined,
-        externalReference: (mpPayment?.external_reference || mercadopagoData.external_reference || reserva.external_reference || reserva.id) as string,
-        preferenceId: (mpPayment?.preference_id || mpPayment?.order?.id || mercadopagoData.preference_id || reserva.preference_id || undefined) as string
-      });
-
-      if (!updateResult.success) {
-        throw new Error(updateResult.error || 'No se pudo actualizar el estado del pago.');
-      }
-
-      const updatedReservation = reserva;
-      const isApproved = normalizedStatus === 'approved';
-
-      let emailResult: EmailResult | null = null;
-
-      if (isApproved) {
-        // Verificar si los emails ya fueron enviados para evitar duplicación
-        if (updatedReservation.email_enviado) {
-          console.log('📧 Emails ya enviados previamente - evitando duplicación');
-          emailResult = {
-            success: true,
-            message: 'Emails ya enviados previamente'
-          };
-        } else if (updateResult.success) {
-          console.log('📧 Enviando emails de confirmación...');
-          setProcessingStatus('Enviando emails de confirmación...');
-          const emailData: BookingEmailData = {
-            id: updatedReservation.id,
-            nombre: updatedReservation.nombre,
-            email: updatedReservation.email,
-            telefono: updatedReservation.telefono,
-            servicio: updatedReservation.servicio || pendingPayment?.service || 'Consulta General',
-            precio:
-              typeof updatedReservation.precio === 'string'
-                ? updatedReservation.precio
-                : paymentAmount?.toString() || '35000',
-            fecha: updatedReservation.fecha,
-            hora: updatedReservation.hora,
-            tipo_reunion: updatedReservation.tipo_reunion || pendingPayment?.tipo_reunion || 'online',
-            descripcion: updatedReservation.descripcion || pendingPayment?.description,
-            created_at: updatedReservation.created_at
-          };
-
-          emailResult = await sendRealBookingEmails(emailData);
-          
-          if (emailResult.success) {
-            console.log('✅ Emails enviados exitosamente desde flujo principal');
-            // Marcar que los emails fueron enviados
-            await supabase
-              .from('reservas')
-              .update({ email_enviado: true } as any)
-              .eq('id', updatedReservation.id);
-          } else {
-            console.error('❌ Error enviando emails:', emailResult.error);
-          }
-        } else {
-          setProcessingStatus('Pago aprobado, enviando emails de respaldo...');
-          const emailData: BookingEmailData = {
-            id: updatedReservation.id,
-            nombre: updatedReservation.nombre,
-            email: updatedReservation.email,
-            telefono: updatedReservation.telefono,
-            servicio: updatedReservation.servicio || pendingPayment?.service || 'Consulta General',
-            precio:
-              typeof updatedReservation.precio === 'string'
-                ? updatedReservation.precio
-                : paymentAmount?.toString() || '35000',
-            fecha: updatedReservation.fecha,
-            hora: updatedReservation.hora,
-            tipo_reunion: updatedReservation.tipo_reunion || pendingPayment?.tipo_reunion,
-            descripcion: updatedReservation.descripcion || undefined,
-            pago_metodo: 'MercadoPago',
-            pago_estado: 'aprobado',
-            created_at: updatedReservation.created_at || new Date().toISOString()
-          };
-
-          console.log('📧 Enviando emails de respaldo via Resend:', emailData);
-          emailResult = await sendRealBookingEmails(emailData);
-          
-          // Marcar como enviado para evitar futuras duplicaciones
-          if (emailResult.success) {
-            console.log('✅ Emails enviados exitosamente - marcando como enviado');
-            const { updateReservation } = await import('@/services/supabaseBooking');
-            await updateReservation(updatedReservation.id, {
-              email_enviado: true
-            } as any);
-          }
-        }
-        setProcessingStatus('¡Pago aprobado y reserva confirmada!');
-      } else {
-        setProcessingStatus('Pago registrado, pendiente de confirmación final por Mercado Pago.');
-      }
-
+      // 6. Preparar datos para mostrar en la UI
       setPaymentData({
-        reservation: updatedReservation,
+        reservation: reserva,
         mercadopagoData: {
-          ...mercadopagoData,
-          status: normalizedStatus || mercadopagoData.status,
-          payment_id: paymentIdFromUrl || mercadopagoData.payment_id,
-          collection_status: mercadopagoData.collection_status || normalizedStatus
+          payment_id,
+          status: normalizedStatus,
+          external_reference,
+          collection_status: status
         },
         emailResult,
         cliente: {
-          nombre: pendingPayment?.nombre || updatedReservation.nombre || 'Cliente',
-          email: pendingPayment?.email || updatedReservation.email || 'No especificado',
-          telefono: pendingPayment?.telefono || updatedReservation.telefono || 'No especificado'
+          nombre: reserva.nombre,
+          email: reserva.email,
+          telefono: reserva.telefono
         },
         servicio: {
-          tipo: pendingPayment?.service || updatedReservation.servicio || 'Consulta General',
-          precio:
-            paymentAmount ??
-            pendingPayment?.price ??
-            updatedReservation.precio ??
-            '35000',
-          categoria: pendingPayment?.category || 'General'
+          tipo: reserva.servicio,
+          precio: paymentAmount,
+          categoria: 'General'
         },
-        fecha: pendingPayment?.fecha || updatedReservation.fecha,
-        hora: pendingPayment?.hora || updatedReservation.hora,
-        tipo_reunion: pendingPayment?.tipo_reunion || updatedReservation.tipo_reunion,
-        price:
-          paymentAmount ??
-          pendingPayment?.price ??
-          updatedReservation.precio,
+        fecha: reserva.fecha,
+        hora: reserva.hora,
+        tipo_reunion: reserva.tipo_reunion,
+        price: paymentAmount,
         priceFormatted: formattedAmount
       });
 
+      // 7. Limpiar localStorage
       localStorage.removeItem('paymentData');
       localStorage.removeItem('pendingPayment');
       localStorage.removeItem('currentReservationId');
