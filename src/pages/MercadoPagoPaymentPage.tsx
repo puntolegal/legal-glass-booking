@@ -303,13 +303,17 @@ export default function MercadoPagoPaymentPage() {
                         phone: customerPhone
                       },
                       metadata: {
-                        reservation_id: paymentData.id,
+                        reservation_id: paymentData.reservaId || paymentData.id,
+                        external_reference: paymentData.external_reference || paymentData.reservaId,
                         service_name: paymentData.service,
+                        service_category: paymentData.category,
                         appointment_date: paymentData.fecha || paymentData.date,
                         appointment_time: paymentData.hora || paymentData.time,
+                        meeting_type: paymentData.tipo_reunion || 'online',
                         client_name: customerName,
                         client_email: customerEmail,
                         client_phone: customerPhone,
+                        client_rut: (paymentData as any).rut || 'No especificado',
                         codigo_convenio: paymentData.codigoConvenio || null,
                         descuento_convenio: paymentData.descuentoConvenio || false,
                         precio_original: paymentData.originalPrice || null,

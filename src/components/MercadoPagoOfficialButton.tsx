@@ -148,58 +148,19 @@ const MercadoPagoOfficialButton: React.FC<MercadoPagoOfficialButtonProps> = ({
         console.log('⚠️ Backend marcado como no disponible, intentando de todas formas...');
       }
 
-      // Crear reserva en la base de datos primero
-      console.log('💾 Creando reserva en la base de datos...');
-      const reservationData = {
-        nombre: paymentData.payer.name || 'Cliente',
-        rut: getMetadataString('client_rut', 'No especificado'),
-        email: paymentData.payer.email || 'cliente@ejemplo.com',
-        telefono: paymentData.payer.phone || 'No especificado',
-        fecha: getMetadataString('appointment_date', new Date().toISOString().split('T')[0]),
-        hora: getMetadataString('appointment_time', '10:00'),
-        servicio: getMetadataString('service_name', 'Consulta General'),
-        precio: paymentData.amount.toString(),
-        estado: 'pendiente' as const
-      };
+      // 🔧 CORRECCIÓN: Usar la reserva YA CREADA en lugar de crear una nueva
+      const existingReservationId = getMetadataString('reservation_id');
+      const existingExternalReference = getMetadataString('external_reference');
+      
+      if (!existingReservationId) {
+        throw new Error('No se encontró ID de reserva. La reserva debe crearse antes de procesar el pago.');
+      }
+      
+      console.log('✅ Usando reserva existente:', existingReservationId);
+      console.log('✅ External reference:', existingExternalReference);
 
-      const reservation = await createReservation(reservationData);
-      console.log('✅ Reserva creada:', reservation.id);
-
-      // Persistir identificadores clave para recuperar la reserva al volver de Mercado Pago
-      localStorage.setItem('currentReservationId', reservation.id);
-      localStorage.setItem('currentExternalReference', reservation.id);
-
-      // Guardar datos en localStorage para PaymentSuccessPage
-      const paymentDataForStorage: PendingPaymentData = {
-        id: reservation.id,
-        reservationId: reservation.id,
-        external_reference: reservation.id,
-        nombre: paymentData.payer.name || 'Cliente',
-        email: paymentData.payer.email || 'cliente@ejemplo.com',
-        telefono: paymentData.payer.phone || 'No especificado',
-        service: getMetadataString('service_name', paymentData.description) || paymentData.description || 'Consulta General',
-        category: getMetadataString('service_category', 'General') || 'General',
-        description: paymentData.description,
-        price: paymentData.amount,
-        priceFormatted: new Intl.NumberFormat('es-CL').format(paymentData.amount),
-        originalPrice: getMetadataNumber('precio_original'),
-        fecha: getMetadataString('appointment_date', new Date().toISOString().split('T')[0])!,
-        hora: getMetadataString('appointment_time', '10:00')!,
-        date: getMetadataString('appointment_date', new Date().toISOString().split('T')[0])!, // For compatibility
-        time: getMetadataString('appointment_time', '10:00')!, // For compatibility
-        tipo_reunion: getMetadataString('meeting_type', 'online') || 'online',
-        codigoConvenio: getMetadataString('codigo_convenio') || null,
-        descuentoConvenio: getMetadataBoolean('descuento_convenio'),
-        porcentajeDescuento: getMetadataString('porcentaje_descuento') || null,
-        method: 'mercadopago_official',
-        preferenceId: null,
-        timestamp: Date.now()
-      };
-
-      localStorage.setItem('paymentData', JSON.stringify(paymentDataForStorage));
-      console.log('💾 Datos guardados en localStorage para PaymentSuccessPage');
-      console.log('🔍 paymentDataForStorage:', paymentDataForStorage);
-      console.log('🔍 localStorage paymentData:', localStorage.getItem('paymentData'));
+      // Los identificadores ya están en localStorage desde AgendamientoPage
+      console.log('💾 Usando datos existentes de localStorage');
 
       // Usar backend para crear preferencia (patrón correcto según brief)
       console.log('🚀 Creando preferencia via backend...');
@@ -223,7 +184,7 @@ const MercadoPagoOfficialButton: React.FC<MercadoPagoOfficialButtonProps> = ({
             phone: paymentData.payer.phone || '',
             date: getMetadataString('appointment_date', new Date().toISOString().split('T')[0]),
             time: getMetadataString('appointment_time', '10:00'),
-            external_reference: reservation.id
+            external_reference: existingExternalReference || existingReservationId
           }
         })
       });
@@ -260,27 +221,28 @@ const MercadoPagoOfficialButton: React.FC<MercadoPagoOfficialButtonProps> = ({
         throw new Error('Init Point no recibido');
       }
       
-      // Actualizar la reserva con el preference_id para poder encontrarla después
+      // 🔧 CORRECCIÓN: Solo actualizar preference_id (external_reference ya está configurado)
       try {
         const { updateReservation } = await import('@/services/supabaseBooking');
-        await updateReservation(reservation.id, {
-          preference_id: result.preference_id,
-          external_reference: reservation.id // Usar el ID de la reserva como external_reference consistente
+        await updateReservation(existingReservationId, {
+          preference_id: result.preference_id
         });
         console.log('✅ Reserva actualizada con preference_id:', result.preference_id);
-        console.log('✅ External reference configurado como:', reservation.id);
       } catch (updateError) {
         console.warn('⚠️ No se pudo actualizar la reserva con preference_id:', updateError);
       }
 
-      // Guardar datos del pago en UNA SOLA clave para evitar conflictos
-      const storedPaymentData: PendingPaymentData = {
-        ...paymentDataForStorage,
-        preferenceId: result.preference_id ?? null,
-        externalReference: reservation.id // Agregar external_reference para consistencia
-      };
-      localStorage.setItem('paymentData', JSON.stringify(storedPaymentData));
-      console.log('✅ Datos guardados en localStorage con external_reference:', reservation.id);
+      // Actualizar localStorage con el preference_id (mantener datos existentes)
+      const existingPaymentData = localStorage.getItem('paymentData');
+      if (existingPaymentData) {
+        const parsedData = JSON.parse(existingPaymentData);
+        const updatedPaymentData = {
+          ...parsedData,
+          preferenceId: result.preference_id ?? null
+        };
+        localStorage.setItem('paymentData', JSON.stringify(updatedPaymentData));
+        console.log('✅ localStorage actualizado con preference_id:', result.preference_id);
+      }
       
       // 🔧 CORRECCIÓN PXI03: Detectar ambiente según el token usado (no según URL)
       // El token determina si es sandbox o producción, no la URL

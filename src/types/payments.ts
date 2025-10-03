@@ -1,6 +1,7 @@
 export interface PendingPaymentData {
   id: string;
   reservationId?: string;
+  reservaId?: string; // Alias para compatibilidad
   external_reference?: string;
   externalReference?: string; // Alias para consistencia
   nombre: string;
