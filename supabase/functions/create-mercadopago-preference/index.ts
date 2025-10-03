@@ -47,6 +47,17 @@ serve(async (req) => {
         }
       )
     }
+    
+    // CRÍTICO: external_reference es OBLIGATORIO
+    if (!paymentData.external_reference) {
+      return new Response(
+        JSON.stringify({ success: false, error: 'external_reference es obligatorio' }),
+        { 
+          status: 400, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      )
+    }
 
     console.log('🚀 Creando preferencia oficial...', paymentData)
     
@@ -91,12 +102,12 @@ serve(async (req) => {
       },
       // Usar APP_URL para generar back_urls dinámicas según el ambiente
       back_urls: {
-        success: `${APP_URL}/payment-success?source=mercadopago&external_reference=${paymentData.external_reference || `PL-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`}`,
-        failure: `${APP_URL}/payment-failure?source=mercadopago&external_reference=${paymentData.external_reference || `PL-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`}`,
-        pending: `${APP_URL}/payment-pending?source=mercadopago&external_reference=${paymentData.external_reference || `PL-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`}`
+        success: `${APP_URL}/payment-success?external_reference=${paymentData.external_reference}`,
+        failure: `${APP_URL}/payment-failure?external_reference=${paymentData.external_reference}`,
+        pending: `${APP_URL}/payment-pending?external_reference=${paymentData.external_reference}`
       },
       auto_return: 'approved',
-      external_reference: paymentData.external_reference || `PL-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      external_reference: paymentData.external_reference,
       notification_url: `https://qrgelocijmwnxcckxbdg.supabase.co/functions/v1/mercadopago-webhook`,
       metadata: {
         client_name: paymentData.name,

@@ -25,6 +25,7 @@ import WeeklyDatePicker from '../components/WeeklyDatePicker';
 import BankTransferCard3D from '../components/BankTransferCard3D';
 import ServiceIcon from '../components/ServiceIcon';
 import { createBookingWithRealEmail, type BookingData } from '@/services/supabaseBooking';
+import { supabase } from '@/integrations/supabase/client';
 import { createOfflineBookingWithEmail, type OfflineBookingData } from '@/services/offlineBooking';
 import { sendRealBookingEmails, type BookingEmailData } from '@/services/realEmailService';
 import { getReservationsByDate, isTimeSlotAvailable } from '@/services/reservationService';
@@ -774,13 +775,20 @@ export default function AgendamientoPage() {
                             
                             if (isSupabaseAvailable) {
                               const result = await createBookingWithRealEmail(bookingData);
-                              if (result.success) {
-                            localStorage.setItem('paymentData', JSON.stringify({
-                              ...paymentData,
-                              reservaId: result.reserva?.id
-                            }));
-                            window.location.href = '/mercadopago';
-                          } else {
+                              if (result.success && result.reserva) {
+                                // CRÍTICO: Actualizar external_reference = reserva.id
+                                await supabase
+                                  .from('reservas')
+                                  .update({ external_reference: result.reserva.id })
+                                  .eq('id', result.reserva.id);
+                                
+                                localStorage.setItem('paymentData', JSON.stringify({
+                                  ...paymentData,
+                                  reservaId: result.reserva.id,
+                                  external_reference: result.reserva.id
+                                }));
+                                window.location.href = '/mercadopago';
+                              } else {
                                 alert('Error al crear la consulta. Por favor intenta nuevamente.');
                               }
                             } else {
@@ -816,9 +824,49 @@ export default function AgendamientoPage() {
                             alert('Error al procesar la consulta. Por favor intenta nuevamente.');
                           }
                         } else {
-                          // Proceder al pago
-                          localStorage.setItem('paymentData', JSON.stringify(paymentData));
-                          window.location.href = '/mercadopago';
+                          // Crear reserva primero para obtener el ID
+                          try {
+                            const bookingData: BookingData = {
+                              cliente: {
+                                nombre: formData.nombre,
+                                email: formData.email,
+                                telefono: formData.telefono,
+                                rut: formData.rut
+                              },
+                              servicio: {
+                                tipo: service.name,
+                                precio: precioFinal,
+                                categoria: service.category,
+                                tipoReunion: selectedMeetingType,
+                                fecha: selectedDate,
+                                hora: selectedTime,
+                                descripcion: formData.descripcion
+                              }
+                            };
+                            
+                            const result = await createBookingWithRealEmail(bookingData);
+                            
+                            if (result.success && result.reserva) {
+                              // CRÍTICO: Actualizar external_reference = reserva.id
+                              await supabase
+                                .from('reservas')
+                                .update({ external_reference: result.reserva.id })
+                                .eq('id', result.reserva.id);
+                              
+                              // Proceder al pago con external_reference
+                              localStorage.setItem('paymentData', JSON.stringify({
+                                ...paymentData,
+                                reservaId: result.reserva.id,
+                                external_reference: result.reserva.id
+                              }));
+                              window.location.href = '/mercadopago';
+                            } else {
+                              alert('Error al crear la reserva. Por favor intenta nuevamente.');
+                            }
+                          } catch (error) {
+                            console.error('Error creando reserva:', error);
+                            alert('Error al procesar. Por favor intenta nuevamente.');
+                          }
                         }
                       }}
                       disabled={!selectedDate || !selectedTime}

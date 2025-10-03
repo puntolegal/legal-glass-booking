@@ -455,7 +455,7 @@ export const getReservaById = async (id: string): Promise<{
   }
 };
 
-// Add missing findReservaByCriteria function
+// Búsqueda simplificada con prioridad clara
 export const findReservaByCriteria = async (criteria: {
   external_reference?: string;
   preference_id?: string;
@@ -466,111 +466,51 @@ export const findReservaByCriteria = async (criteria: {
   error?: string;
 }> => {
   try {
-    console.log('🔍 findReservaByCriteria - Criterios recibidos:', criteria);
+    console.log('🔍 Buscando reserva con:', criteria);
     
-    // Si solo hay un criterio, usar búsqueda simple
-    const criteriaCount = Object.values(criteria).filter(v => v).length;
-    
-    if (criteriaCount === 1) {
-      let result: any;
-      
-      if (criteria.external_reference) {
-        console.log('🔍 Buscando por external_reference:', criteria.external_reference);
-        result = await (supabase as any)
-          .from('reservas')
-          .select('*')
-          .eq('external_reference', criteria.external_reference)
-          .maybeSingle();
-      } else if (criteria.preference_id) {
-        console.log('🔍 Buscando por preference_id:', criteria.preference_id);
-        result = await (supabase as any)
-          .from('reservas')
-          .select('*')
-          .eq('preference_id', criteria.preference_id)
-          .maybeSingle();
-      } else if (criteria.email) {
-        console.log('🔍 Buscando por email:', criteria.email);
-        result = await (supabase as any)
-          .from('reservas')
-          .select('*')
-          .eq('email', criteria.email)
-          .maybeSingle();
-      }
-      
-      if (result?.error) {
-        console.error('❌ Error en búsqueda simple:', result.error.message);
-        return { success: false, error: result.error.message };
-      }
-      
-      if (!result?.data) {
-        console.log('❌ No se encontró reserva con criterio único');
-        return { success: false, error: 'Reserva no encontrada' };
-      }
-      
-      console.log('✅ Reserva encontrada con criterio único:', result.data.id);
-      return { success: true, reserva: mapDatabaseToReserva(result.data) };
-    }
-    
-    // Si hay múltiples criterios o criterio complejo, usar búsqueda múltiple
-    // Si hay múltiples criterios, buscar por cada uno por separado
-    console.log('🔍 Múltiples criterios - buscando por separado...');
-    
-    // 1. Buscar por external_reference primero (más confiable)
+    // PRIORIDAD 1: external_reference (99% de los casos)
     if (criteria.external_reference) {
-      console.log('🔍 Intentando por external_reference:', criteria.external_reference);
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from('reservas')
         .select('*')
         .eq('external_reference', criteria.external_reference)
         .maybeSingle();
       
       if (error) {
-        console.error('❌ Error buscando por external_reference:', error.message);
-      } else if (data) {
-        console.log('✅ Encontrado por external_reference:', data.id);
+        console.error('❌ Error buscando por external_reference:', error);
+        return { success: false, error: error.message };
+      }
+      
+      if (data) {
+        console.log('✅ Reserva encontrada por external_reference');
         return { success: true, reserva: mapDatabaseToReserva(data) };
       }
     }
     
-    // 2. Buscar por preference_id
+    // PRIORIDAD 2: preference_id (fallback)
     if (criteria.preference_id) {
-      console.log('🔍 Intentando por preference_id:', criteria.preference_id);
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from('reservas')
         .select('*')
         .eq('preference_id', criteria.preference_id)
         .maybeSingle();
       
       if (error) {
-        console.error('❌ Error buscando por preference_id:', error.message);
-      } else if (data) {
-        console.log('✅ Encontrado por preference_id:', data.id);
-        return { success: true, reserva: mapDatabaseToReserva(data) };
+        console.error('❌ Error buscando por preference_id:', error);
+        return { success: false, error: error.message };
       }
-    }
-    
-    // 3. Buscar por email
-    if (criteria.email) {
-      console.log('🔍 Intentando por email:', criteria.email);
-      const { data, error } = await supabase
-        .from('reservas')
-        .select('*')
-        .eq('email', criteria.email)
-        .maybeSingle();
       
-      if (error) {
-        console.error('❌ Error buscando por email:', error.message);
-      } else if (data) {
-        console.log('✅ Encontrado por email:', data.id);
+      if (data) {
+        console.log('✅ Reserva encontrada por preference_id');
         return { success: true, reserva: mapDatabaseToReserva(data) };
       }
     }
     
-    console.log('❌ No se encontró reserva con ningún criterio');
+    console.log('❌ Reserva no encontrada');
     return { success: false, error: 'Reserva no encontrada' };
     
   } catch (error) {
-    console.error('❌ Error general en findReservaByCriteria:', error);
+    console.error('❌ Error en findReservaByCriteria:', error);
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Error desconocido'
