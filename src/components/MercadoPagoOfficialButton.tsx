@@ -141,9 +141,11 @@ const MercadoPagoOfficialButton: React.FC<MercadoPagoOfficialButtonProps> = ({
       console.log('🚀 Iniciando Checkout Pro OFICIAL...');
       console.log('📋 Datos del pago:', paymentData);
       
-      // Verificar backend antes de proceder
-      if (backendStatus !== 'available') {
-        throw new Error('Backend no disponible. Ejecuta: cd server && npm install && npm start');
+      // 🔧 NO BLOQUEAR: Intentar crear la preferencia incluso si el check inicial falló
+      if (backendStatus === 'checking') {
+        console.log('⚠️ Backend aún verificándose, intentando de todas formas...');
+      } else if (backendStatus === 'unavailable') {
+        console.log('⚠️ Backend marcado como no disponible, intentando de todas formas...');
       }
 
       // Crear reserva en la base de datos primero
@@ -364,25 +366,20 @@ const MercadoPagoOfficialButton: React.FC<MercadoPagoOfficialButtonProps> = ({
       {/* Botón principal */}
       <motion.button
         onClick={handleOfficialCheckout}
-        disabled={isLoading || backendStatus !== 'available'}
+        disabled={isLoading}
         className="w-full bg-[#009EE3] hover:bg-[#0084C7] text-white font-semibold py-4 px-6 rounded-xl transition-all duration-200 flex items-center justify-center space-x-3 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
-        whileHover={{ scale: backendStatus === 'available' ? 1.02 : 1 }}
-        whileTap={{ scale: backendStatus === 'available' ? 0.98 : 1 }}
+        whileHover={{ scale: 1.02 }}
+        whileTap={{ scale: 0.98 }}
       >
         {isLoading ? (
           <>
             <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-            <span>Creando preferencia oficial...</span>
-          </>
-        ) : backendStatus === 'unavailable' ? (
-          <>
-            <AlertTriangle className="h-5 w-5" />
-            <span>Backend requerido</span>
+            <span>Procesando...</span>
           </>
         ) : (
           <>
             <CreditCard className="h-5 w-5" />
-            <span>Pagar</span>
+            <span>Pagar con Mercado Pago</span>
             <ExternalLink className="h-4 w-4" />
           </>
         )}

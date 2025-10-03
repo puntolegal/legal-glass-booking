@@ -132,9 +132,14 @@ serve(async (req) => {
         console.log('📧 Enviando emails de confirmación...');
         
         try {
+          const EDGE_ADMIN_TOKEN = Deno.env.get('EDGE_ADMIN_TOKEN') || 'puntolegal-admin-token-2025';
+          
           const emailResponse = await supabase.functions.invoke('clever-action', {
             body: {
               booking_id: updatedReservation.id
+            },
+            headers: {
+              'x-admin-token': EDGE_ADMIN_TOKEN
             }
           });
 

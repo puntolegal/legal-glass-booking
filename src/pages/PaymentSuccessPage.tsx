@@ -61,28 +61,122 @@ export default function PaymentSuccessPage() {
       setIsProcessing(true);
       setProcessingStatus('Procesando pago...');
 
-      // 1. Obtener datos de la URL (fuente más confiable)
+      // 1. Obtener datos de la URL y localStorage (fuentes múltiples con prioridad)
       const urlParams = new URLSearchParams(window.location.search);
       const external_reference = urlParams.get('external_reference');
-      const payment_id = urlParams.get('payment_id');
+      const preference_id = urlParams.get('preference_id');
+      const payment_id = urlParams.get('payment_id') || urlParams.get('collection_id');
       const status = urlParams.get('status') || urlParams.get('collection_status') || 'pending';
 
       console.log('💳 Datos de MercadoPago desde URL:');
       console.log('   external_reference:', external_reference);
+      console.log('   preference_id:', preference_id);
       console.log('   payment_id:', payment_id);
       console.log('   status:', status);
 
-      if (!external_reference) {
-        throw new Error('No se encontró la referencia de la reserva en la URL');
+      // Obtener datos de localStorage como fallback
+      const storedPaymentData = localStorage.getItem('paymentData');
+      const parsedStoredData = storedPaymentData ? JSON.parse(storedPaymentData) : null;
+      console.log('💾 Datos en localStorage:', parsedStoredData);
+
+      // 2. Determinar la estrategia de búsqueda (priorizar external_reference)
+      let searchCriteria = null;
+      
+      if (external_reference) {
+        searchCriteria = { external_reference };
+        console.log('🔍 Estrategia: Buscar por external_reference');
+      } else if (preference_id) {
+        searchCriteria = { preference_id };
+        console.log('🔍 Estrategia: Buscar por preference_id (fallback)');
+      } else if (payment_id) {
+        console.log('🔍 Estrategia: Buscar por payment_id (último recurso)');
+        searchCriteria = { payment_id };
+      } else if (parsedStoredData?.reservationId) {
+        searchCriteria = { external_reference: parsedStoredData.reservationId };
+        console.log('🔍 Estrategia: Usar reservationId de localStorage');
+      } else {
+        throw new Error('No se encontraron parámetros para buscar la reserva');
       }
 
-      // 2. Buscar la reserva por external_reference
+      // 3. Buscar la reserva con los criterios determinados
       setProcessingStatus('Buscando reserva...');
-      console.log('🔍 Buscando reserva por external_reference:', external_reference);
+      console.log('🔍 Buscando reserva con criterios:', searchCriteria);
       
-      const result = await findReservaByCriteria({ external_reference });
+      const result = await findReservaByCriteria(searchCriteria);
       
       if (!result.success || !result.reserva) {
+        console.warn('⚠️ No se encontró reserva en BD, usando datos de localStorage');
+        
+        // Si no hay reserva en BD pero hay datos en localStorage y el pago fue aprobado
+        if (parsedStoredData && status.toLowerCase() === 'approved') {
+          console.log('💾 Usando datos de localStorage para mostrar y enviar emails');
+          
+          // Enviar emails con los datos disponibles
+          const emailData: BookingEmailData = {
+            id: parsedStoredData.reservationId || 'pending',
+            nombre: parsedStoredData.nombre || 'Cliente',
+            email: parsedStoredData.email || '',
+            telefono: parsedStoredData.telefono || '',
+            servicio: parsedStoredData.service || 'Consulta Legal',
+            precio: parsedStoredData.price?.toString() || '0',
+            fecha: parsedStoredData.fecha || parsedStoredData.date || new Date().toISOString().split('T')[0],
+            hora: parsedStoredData.hora || parsedStoredData.time || '10:00',
+            tipo_reunion: parsedStoredData.tipo_reunion || 'online',
+            descripcion: parsedStoredData.description,
+            created_at: new Date().toISOString()
+          };
+
+          const emailResult = await sendRealBookingEmails(emailData);
+          console.log('📧 Resultado envío emails desde localStorage:', emailResult);
+
+          // Mostrar datos desde localStorage
+          const parseAmount = (value: unknown): number | undefined => {
+            if (value === null || value === undefined) return undefined;
+            if (typeof value === 'number' && !Number.isNaN(value)) return value;
+            if (typeof value === 'string') {
+              const cleaned = value.replace(/[^0-9]/g, '');
+              if (!cleaned) return undefined;
+              const parsed = Number(cleaned);
+              return Number.isNaN(parsed) ? undefined : parsed;
+            }
+            return undefined;
+          };
+
+          const paymentAmount = parseAmount(parsedStoredData.price) || 35000;
+          const currencyFormatter = new Intl.NumberFormat('es-CL');
+          const formattedAmount = currencyFormatter.format(paymentAmount);
+
+          setPaymentData({
+            reservation: null as any,
+            mercadopagoData: {
+              payment_id,
+              status: status.toLowerCase(),
+              external_reference: external_reference || parsedStoredData.reservationId,
+              collection_status: status
+            },
+            emailResult,
+            cliente: {
+              nombre: parsedStoredData.nombre || 'Cliente',
+              email: parsedStoredData.email || '',
+              telefono: parsedStoredData.telefono || ''
+            },
+            servicio: {
+              tipo: parsedStoredData.service || 'Consulta Legal',
+              precio: paymentAmount,
+              categoria: parsedStoredData.category || 'General'
+            },
+            fecha: parsedStoredData.fecha || parsedStoredData.date || new Date().toISOString().split('T')[0],
+            hora: parsedStoredData.hora || parsedStoredData.time || '10:00',
+            tipo_reunion: parsedStoredData.tipo_reunion,
+            price: paymentAmount,
+            priceFormatted: formattedAmount
+          });
+
+          setIsProcessing(false);
+          setIsLoading(false);
+          return;
+        }
+        
         throw new Error('No se encontró la reserva. Por favor contacta a soporte.');
       }
 
