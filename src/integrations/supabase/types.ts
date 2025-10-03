@@ -24,7 +24,7 @@ export type Database = {
           role: string
           telefono: string | null
           updated_at: string
-          // user_id: string // Campo eliminado en limpieza de esquema
+          user_id: string
         }
         Insert: {
           created_at?: string
@@ -35,7 +35,7 @@ export type Database = {
           role?: string
           telefono?: string | null
           updated_at?: string
-          // user_id: string // Campo eliminado en limpieza de esquema
+          user_id: string
         }
         Update: {
           created_at?: string
@@ -46,7 +46,7 @@ export type Database = {
           role?: string
           telefono?: string | null
           updated_at?: string
-          // user_id?: string // Campo eliminado en limpieza de esquema
+          user_id?: string
         }
         Relationships: []
       }
@@ -55,57 +55,171 @@ export type Database = {
           created_at: string | null
           descripcion: string | null
           email: string
+          email_enviado: boolean | null
+          email_enviado_at: string | null
           estado: string | null
+          external_reference: string | null
           fecha: string
           hora: string
           id: string
           nombre: string
+          pago_estado: string | null
           precio: string
-          recordatorio_enviado: boolean | null
-          rut: string
+          rut: string | null
           servicio: string
           telefono: string
           tipo_reunion: string | null
           updated_at: string | null
-          // user_id: string // Campo eliminado en limpieza de esquema
-          webhook_sent: boolean | null
         }
         Insert: {
           created_at?: string | null
           descripcion?: string | null
           email: string
+          email_enviado?: boolean | null
+          email_enviado_at?: string | null
           estado?: string | null
+          external_reference?: string | null
           fecha: string
           hora: string
           id?: string
           nombre: string
+          pago_estado?: string | null
           precio: string
-          recordatorio_enviado?: boolean | null
-          rut: string
+          rut?: string | null
           servicio: string
           telefono: string
           tipo_reunion?: string | null
           updated_at?: string | null
-          // user_id: string // Campo eliminado en limpieza de esquema
-          webhook_sent?: boolean | null
         }
         Update: {
           created_at?: string | null
           descripcion?: string | null
           email?: string
+          email_enviado?: boolean | null
+          email_enviado_at?: string | null
           estado?: string | null
+          external_reference?: string | null
           fecha?: string
           hora?: string
           id?: string
           nombre?: string
+          pago_estado?: string | null
           precio?: string
-          recordatorio_enviado?: boolean | null
-          rut?: string
+          rut?: string | null
           servicio?: string
           telefono?: string
           tipo_reunion?: string | null
           updated_at?: string | null
-          // user_id?: string // Campo eliminado en limpieza de esquema
+        }
+        Relationships: []
+      }
+      reservas_backup: {
+        Row: {
+          categoria: string | null
+          cliente_email: string | null
+          cliente_nombre: string | null
+          cliente_telefono: string | null
+          created_at: string | null
+          descripcion: string | null
+          email: string | null
+          email_enviado: boolean | null
+          email_enviado_at: string | null
+          estado: string | null
+          external_reference: string | null
+          fecha: string | null
+          fecha_agendada: string | null
+          hora: string | null
+          hora_agendada: string | null
+          id: string | null
+          motivo_consulta: string | null
+          nombre: string | null
+          notas: string | null
+          pago_estado: string | null
+          pago_id: string | null
+          pago_metodo: string | null
+          precio: string | null
+          preference_id: string | null
+          recordatorio_enviado: boolean | null
+          rut: string | null
+          servicio: string | null
+          servicio_nombre: string | null
+          servicio_precio: number | null
+          telefono: string | null
+          tipo_reunion: string | null
+          updated_at: string | null
+          user_id: string | null
+          webhook_sent: boolean | null
+        }
+        Insert: {
+          categoria?: string | null
+          cliente_email?: string | null
+          cliente_nombre?: string | null
+          cliente_telefono?: string | null
+          created_at?: string | null
+          descripcion?: string | null
+          email?: string | null
+          email_enviado?: boolean | null
+          email_enviado_at?: string | null
+          estado?: string | null
+          external_reference?: string | null
+          fecha?: string | null
+          fecha_agendada?: string | null
+          hora?: string | null
+          hora_agendada?: string | null
+          id?: string | null
+          motivo_consulta?: string | null
+          nombre?: string | null
+          notas?: string | null
+          pago_estado?: string | null
+          pago_id?: string | null
+          pago_metodo?: string | null
+          precio?: string | null
+          preference_id?: string | null
+          recordatorio_enviado?: boolean | null
+          rut?: string | null
+          servicio?: string | null
+          servicio_nombre?: string | null
+          servicio_precio?: number | null
+          telefono?: string | null
+          tipo_reunion?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+          webhook_sent?: boolean | null
+        }
+        Update: {
+          categoria?: string | null
+          cliente_email?: string | null
+          cliente_nombre?: string | null
+          cliente_telefono?: string | null
+          created_at?: string | null
+          descripcion?: string | null
+          email?: string | null
+          email_enviado?: boolean | null
+          email_enviado_at?: string | null
+          estado?: string | null
+          external_reference?: string | null
+          fecha?: string | null
+          fecha_agendada?: string | null
+          hora?: string | null
+          hora_agendada?: string | null
+          id?: string | null
+          motivo_consulta?: string | null
+          nombre?: string | null
+          notas?: string | null
+          pago_estado?: string | null
+          pago_id?: string | null
+          pago_metodo?: string | null
+          precio?: string | null
+          preference_id?: string | null
+          recordatorio_enviado?: boolean | null
+          rut?: string | null
+          servicio?: string | null
+          servicio_nombre?: string | null
+          servicio_precio?: number | null
+          telefono?: string | null
+          tipo_reunion?: string | null
+          updated_at?: string | null
+          user_id?: string | null
           webhook_sent?: boolean | null
         }
         Relationships: []
