@@ -90,9 +90,9 @@ serve(async (req) => {
         }
       },
       back_urls: {
-        success: `https://puntolegal.online/payment-success?source=mercadopago`,
-        failure: `https://puntolegal.online/payment-failure?source=mercadopago`,
-        pending: `https://puntolegal.online/payment-pending?source=mercadopago`
+        success: `https://puntolegal.online/payment-success?source=mercadopago&external_reference=${paymentData.external_reference || `PL-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`}`,
+        failure: `https://puntolegal.online/payment-failure?source=mercadopago&external_reference=${paymentData.external_reference || `PL-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`}`,
+        pending: `https://puntolegal.online/payment-pending?source=mercadopago&external_reference=${paymentData.external_reference || `PL-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`}`
       },
       auto_return: 'approved',
       external_reference: paymentData.external_reference || `PL-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,

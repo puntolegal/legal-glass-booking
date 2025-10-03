@@ -202,15 +202,14 @@ const MercadoPagoOfficialButton: React.FC<MercadoPagoOfficialButtonProps> = ({
       // Usar backend para crear preferencia (patrón correcto según brief)
       console.log('🚀 Creando preferencia via backend...');
       
-      // Usar backend según entorno (desarrollo vs producción)
-      const backendUrl = import.meta.env.MODE === 'development' 
-        ? 'http://localhost:3001' 
-        : 'https://qrgelocijmwnxcckxbdg.supabase.co/functions/v1'; // Supabase Edge Functions
+      // Usar Supabase Edge Function directamente (siempre producción)
+      const backendUrl = 'https://qrgelocijmwnxcckxbdg.supabase.co/functions/v1';
       
       const response = await fetch(`${backendUrl}/create-mercadopago-preference`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFyZ2Vsb2Npam13bnhjY2t4YmRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc4MDI0MjksImV4cCI6MjA3MzM3ODQyOX0.0q_3bb8bKR8VVZZAK_hYvhvLSTaU1ioQzmO5fKALjbI'
         },
         body: JSON.stringify({
           paymentData: {
