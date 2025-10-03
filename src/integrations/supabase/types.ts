@@ -65,11 +65,14 @@ export type Database = {
           nombre: string
           pago_estado: string | null
           precio: string
+          preference_id: string | null
+          recordatorio_enviado: boolean | null
           rut: string | null
           servicio: string
           telefono: string
           tipo_reunion: string | null
           updated_at: string | null
+          webhook_sent: boolean | null
         }
         Insert: {
           created_at?: string | null
@@ -85,11 +88,14 @@ export type Database = {
           nombre: string
           pago_estado?: string | null
           precio: string
+          preference_id?: string | null
+          recordatorio_enviado?: boolean | null
           rut?: string | null
           servicio: string
           telefono: string
           tipo_reunion?: string | null
           updated_at?: string | null
+          webhook_sent?: boolean | null
         }
         Update: {
           created_at?: string | null
@@ -105,11 +111,14 @@ export type Database = {
           nombre?: string
           pago_estado?: string | null
           precio?: string
+          preference_id?: string | null
+          recordatorio_enviado?: boolean | null
           rut?: string | null
           servicio?: string
           telefono?: string
           tipo_reunion?: string | null
           updated_at?: string | null
+          webhook_sent?: boolean | null
         }
         Relationships: []
       }
