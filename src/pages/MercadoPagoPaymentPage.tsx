@@ -276,7 +276,8 @@ export default function MercadoPagoPaymentPage() {
                         phone: customerPhone
                       },
                       metadata: {
-                        reservation_id: paymentData.id,
+                        reservation_id: paymentData.reservaId,
+                        external_reference: paymentData.external_reference || paymentData.reservaId,
                         service_name: paymentData.service,
                         appointment_date: paymentData.fecha || paymentData.date,
                         appointment_time: paymentData.hora || paymentData.time,

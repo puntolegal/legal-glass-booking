@@ -109,7 +109,7 @@ export default function PaymentFailurePage() {
             <div className="grid md:grid-cols-2 gap-4 text-sm">
               <div className="flex items-center gap-2">
                 <span className="font-medium">📧 Email:</span>
-                <span className="text-blue-600">contacto@puntolegal.online</span>
+                <span className="text-blue-600">puntolegalelgolf@gmail.com</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="font-medium">📱 WhatsApp:</span>

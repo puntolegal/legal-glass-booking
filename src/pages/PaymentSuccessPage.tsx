@@ -91,9 +91,10 @@ export default function PaymentSuccessPage() {
       } else if (payment_id) {
         console.log('🔍 Estrategia: Buscar por payment_id (último recurso)');
         searchCriteria = { payment_id };
-      } else if (parsedStoredData?.reservationId) {
-        searchCriteria = { external_reference: parsedStoredData.reservationId };
-        console.log('🔍 Estrategia: Usar reservationId de localStorage');
+      } else if (parsedStoredData?.external_reference || parsedStoredData?.reservaId || parsedStoredData?.reservationId) {
+        const localRef = parsedStoredData.external_reference || parsedStoredData.reservaId || parsedStoredData.reservationId;
+        searchCriteria = { external_reference: localRef };
+        console.log('🔍 Estrategia: Usar external_reference/reservaId de localStorage');
       } else {
         throw new Error('No se encontraron parámetros para buscar la reserva');
       }
@@ -603,7 +604,7 @@ export default function PaymentSuccessPage() {
               <div className="text-sm text-yellow-700 space-y-2">
                 <p>• Puedes cerrar esta ventana con tranquilidad, guardaremos tu reserva automáticamente.</p>
                 <p>• Si el pago cambia a aprobado recibirás un email de confirmación y WhatsApp de respaldo.</p>
-                <p>• Ante cualquier duda escríbenos a <a href="mailto:contacto@puntolegal.online" className="underline">contacto@puntolegal.online</a>.</p>
+                <p>• Ante cualquier duda escríbenos a <a href="mailto:puntolegalelgolf@gmail.com" className="underline">puntolegalelgolf@gmail.com</a>.</p>
               </div>
             </motion.div>
           )}
