@@ -2,3 +2,6 @@ project_id = "qrgelocijmwnxcckxbdg"
 
 [functions.create-mercadopago-preference]
 verify_jwt = false
+
+[functions.mercadopago-webhook]
+verify_jwt = false

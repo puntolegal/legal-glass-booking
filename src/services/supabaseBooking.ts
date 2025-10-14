@@ -208,9 +208,25 @@ export const crearReserva = async (bookingData: BookingData): Promise<{
 
     console.log('✅ Reserva creada exitosamente:', reserva.id);
 
+    // CRÍTICO: Actualizar external_reference = id para que siempre esté disponible
+    const { error: updateError } = await supabase
+      .from('reservas')
+      .update({ external_reference: reserva.id })
+      .eq('id', reserva.id);
+
+    if (updateError) {
+      console.warn('⚠️ Error actualizando external_reference:', updateError);
+      // No fallar la operación por esto, solo loguearlo
+    } else {
+      console.log('✅ external_reference actualizado:', reserva.id);
+    }
+
     return {
       success: true,
-      reserva: mapDatabaseToReserva(reserva)
+      reserva: {
+        ...mapDatabaseToReserva(reserva),
+        external_reference: reserva.id // Asegurar que el campo esté en el objeto retornado
+      }
     };
 
   } catch (error) {

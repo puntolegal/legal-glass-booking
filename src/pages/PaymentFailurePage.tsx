@@ -1,10 +1,63 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { XCircle, ArrowLeft, RefreshCw, Home, CreditCard } from 'lucide-react';
 import SEO from '../components/SEO';
+import { supabase } from '@/integrations/supabase/client';
 
 export default function PaymentFailurePage() {
+  const [searchParams] = useSearchParams();
+  const [checking, setChecking] = useState(true);
+  
+  useEffect(() => {
+    // Auto-redirect si el pago realmente fue aprobado
+    const checkPaymentStatus = async () => {
+      try {
+        const externalRef = searchParams.get('external_reference');
+        const status = searchParams.get('status');
+        
+        // Si el status dice que fue aprobado, redirigir
+        if (status === 'approved' && externalRef) {
+          console.log('🔄 Pago aprobado detectado, redirigiendo a success...');
+          window.location.href = `/payment-success?external_reference=${externalRef}`;
+          return;
+        }
+        
+        // Verificar en la base de datos si la reserva fue confirmada
+        if (externalRef) {
+          const { data: reserva } = await supabase
+            .from('reservas')
+            .select('estado, pago_estado')
+            .eq('external_reference', externalRef)
+            .maybeSingle();
+          
+          if (reserva && (reserva.estado === 'confirmada' || reserva.pago_estado === 'approved')) {
+            console.log('🔄 Reserva confirmada detectada en BD, redirigiendo...');
+            window.location.href = `/payment-success?external_reference=${externalRef}`;
+            return;
+          }
+        }
+      } catch (error) {
+        console.error('Error verificando estado:', error);
+      } finally {
+        setChecking(false);
+      }
+    };
+    
+    checkPaymentStatus();
+  }, [searchParams]);
+  
+  if (checking) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-red-50 via-rose-50 to-pink-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-500 mx-auto mb-4"></div>
+          <p className="text-gray-600">Verificando estado del pago...</p>
+        </div>
+      </div>
+    );
+  }
+  
   return (
     <>
       <SEO 
