@@ -721,6 +721,9 @@ export default function AgendamientoPage() {
                             ? (service as any).price
                             : Number((service as any).price) || null;
 
+                          // Generar external_reference con formato MercadoPago
+                          const externalReference = `PL-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
                           const paymentData: PendingPaymentData = {
                             id: Date.now().toString(),
                             nombre: formData.nombre,
@@ -777,16 +780,16 @@ export default function AgendamientoPage() {
                             if (isSupabaseAvailable) {
                               const result = await createBookingWithRealEmail(bookingData);
                               if (result.success && result.reserva) {
-                                // CRÍTICO: Actualizar external_reference = reserva.id
+                                // CRÍTICO: Actualizar external_reference con formato MercadoPago
                                 await supabase
                                   .from('reservas')
-                                  .update({ external_reference: result.reserva.id })
+                                  .update({ external_reference: externalReference })
                                   .eq('id', result.reserva.id);
                                 
                                 localStorage.setItem('paymentData', JSON.stringify({
                                   ...paymentData,
                                   reservaId: result.reserva.id,
-                                  external_reference: result.reserva.id
+                                  external_reference: externalReference
                                 }));
                                 window.location.href = '/mercadopago';
                               } else {
@@ -848,17 +851,17 @@ export default function AgendamientoPage() {
                             const result = await createBookingWithRealEmail(bookingData);
                             
                             if (result.success && result.reserva) {
-                              // CRÍTICO: Actualizar external_reference = reserva.id
+                              // CRÍTICO: Actualizar external_reference con formato MercadoPago
                               await supabase
                                 .from('reservas')
-                                .update({ external_reference: result.reserva.id })
+                                .update({ external_reference: externalReference })
                                 .eq('id', result.reserva.id);
                               
                               // Proceder al pago con external_reference
                               localStorage.setItem('paymentData', JSON.stringify({
                                 ...paymentData,
                                 reservaId: result.reserva.id,
-                                external_reference: result.reserva.id
+                                external_reference: externalReference
                               }));
                               window.location.href = '/mercadopago';
                             } else {

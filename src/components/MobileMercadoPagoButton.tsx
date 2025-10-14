@@ -60,7 +60,7 @@ const MobileMercadoPagoButton: React.FC<MobileMercadoPagoButtonProps> = ({
           pending: `https://puntolegal.online/payment-pending?source=mercadopago`
         },
         auto_return: 'approved' as const,
-        external_reference: paymentData.metadata?.reservation_id || `PL-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        external_reference: paymentData.metadata?.external_reference || paymentData.metadata?.reservation_id || `PL-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         notification_url: `https://qrgelocijmwnxcckxbdg.supabase.co/functions/v1/mercadopago-webhook`,
         metadata: {
           client_name: paymentData.payer.name,
