@@ -754,7 +754,8 @@ export default function AgendamientoPage() {
                               cliente: {
                                 nombre: formData.nombre,
                                 email: formData.email,
-                                telefono: formData.telefono
+                                telefono: formData.telefono,
+                                rut: formData.rut
                               },
                               servicio: {
                                 tipo: service.name,

@@ -604,7 +604,7 @@ export default function PaymentSuccessPage() {
               <div className="text-sm text-yellow-700 space-y-2">
                 <p>• Puedes cerrar esta ventana con tranquilidad, guardaremos tu reserva automáticamente.</p>
                 <p>• Si el pago cambia a aprobado recibirás un email de confirmación y WhatsApp de respaldo.</p>
-                <p>• Ante cualquier duda escríbenos a <a href="mailto:puntolegalelgolf@gmail.com" className="underline">puntolegalelgolf@gmail.com</a>.</p>
+                <p>• Ante cualquier duda escríbenos a <a href="mailto:puntolegalelgolf@gmail.com" className="text-blue-600 hover:text-blue-700 underline">puntolegalelgolf@gmail.com</a> o llámanos al <a href="tel:+56962321883" className="text-blue-600 hover:text-blue-700 underline">+569 6232 1883</a>.</p>
               </div>
             </motion.div>
           )}
@@ -637,6 +637,41 @@ export default function PaymentSuccessPage() {
                   <span className="text-xs font-bold text-green-600">3</span>
                 </div>
                 <p className="text-gray-700">Te enviaremos el link de la videollamada o la dirección de la oficina</p>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Información de contacto */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.7 }}
+            className="bg-gray-50 border border-gray-200 rounded-xl p-6 mb-8"
+          >
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">
+              ¿Necesitas ayuda?
+            </h3>
+            <p className="text-gray-700 mb-4">
+              Si tienes alguna duda o necesitas modificar tu reserva, no dudes en contactarnos.
+            </p>
+            <div className="grid md:grid-cols-2 gap-4 text-sm">
+              <div className="flex items-center gap-2">
+                <span className="font-medium">📧 Email:</span>
+                <a 
+                  href="mailto:puntolegalelgolf@gmail.com"
+                  className="text-blue-600 hover:text-blue-700 underline"
+                >
+                  puntolegalelgolf@gmail.com
+                </a>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="font-medium">📱 WhatsApp:</span>
+                <a 
+                  href="tel:+56962321883"
+                  className="text-blue-600 hover:text-blue-700 underline"
+                >
+                  +569 6232 1883
+                </a>
               </div>
             </div>
           </motion.div>

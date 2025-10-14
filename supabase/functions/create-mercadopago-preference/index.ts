@@ -25,7 +25,9 @@ serve(async (req) => {
     
     // Obtener credenciales de MercadoPago desde variables de entorno
     const MERCADOPAGO_ACCESS_TOKEN = Deno.env.get('MERCADOPAGO_ACCESS_TOKEN')
-    const APP_URL = Deno.env.get('APP_URL') || 'https://puntolegal.online'
+    const APP_URL_RAW = Deno.env.get('APP_URL') || 'puntolegal.online'
+    // Asegurar que APP_URL no incluya el protocolo (se agregará después)
+    const APP_URL = APP_URL_RAW.replace(/^https?:\/\//, '')
     
     console.log('🔑 MercadoPago Access Token:', MERCADOPAGO_ACCESS_TOKEN ? 'Configurado desde variables de entorno' : 'NO CONFIGURADO');
     
@@ -100,12 +102,12 @@ serve(async (req) => {
           number: '12345678-9' // Placeholder - se puede mejorar con datos reales
         }
       },
-      // Usar APP_URL para generar back_urls dinámicas según el ambiente
-      back_urls: {
-        success: `${APP_URL}/payment-success?external_reference=${paymentData.external_reference}`,
-        failure: `${APP_URL}/payment-failure?external_reference=${paymentData.external_reference}`,
-        pending: `${APP_URL}/payment-pending?external_reference=${paymentData.external_reference}`
-      },
+    // Usar APP_URL para generar back_urls dinámicas según el ambiente
+    back_urls: {
+      success: `https://${APP_URL}/payment-success?external_reference=${paymentData.external_reference}`,
+      failure: `https://${APP_URL}/payment-failure?external_reference=${paymentData.external_reference}`,
+      pending: `https://${APP_URL}/payment-pending?external_reference=${paymentData.external_reference}`
+    },
       auto_return: 'approved',
       external_reference: paymentData.external_reference,
       notification_url: `https://qrgelocijmwnxcckxbdg.supabase.co/functions/v1/mercadopago-webhook`,

@@ -93,11 +93,27 @@ export default function PaymentFailurePage() {
             </div>
           </motion.div>
 
-          {/* Información de contacto */}
+          {/* Información importante - Reserva registrada */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6 }}
+            className="bg-green-50 border border-green-200 rounded-xl p-6 mb-8"
+          >
+            <h3 className="text-lg font-semibold text-green-900 mb-4">
+              ✅ Tu consulta fue registrada
+            </h3>
+            <p className="text-green-800">
+              Aunque hubo un problema con el pago, <strong>tu consulta se registró exitosamente en nuestro sistema</strong>. 
+              Nuestro equipo revisará tu caso y se pondrá en contacto contigo a la brevedad para coordinar el pago y confirmar tu cita.
+            </p>
+          </motion.div>
+
+          {/* Información de contacto */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.7 }}
             className="bg-gray-50 border border-gray-200 rounded-xl p-6 mb-8"
           >
             <h3 className="text-lg font-semibold text-gray-900 mb-4">
@@ -109,11 +125,21 @@ export default function PaymentFailurePage() {
             <div className="grid md:grid-cols-2 gap-4 text-sm">
               <div className="flex items-center gap-2">
                 <span className="font-medium">📧 Email:</span>
-                <span className="text-blue-600">puntolegalelgolf@gmail.com</span>
+                <a 
+                  href="mailto:puntolegalelgolf@gmail.com"
+                  className="text-blue-600 hover:text-blue-700 underline"
+                >
+                  puntolegalelgolf@gmail.com
+                </a>
               </div>
               <div className="flex items-center gap-2">
                 <span className="font-medium">📱 WhatsApp:</span>
-                <span className="text-blue-600">+56 9 1234 5678</span>
+                <a 
+                  href="tel:+56962321883"
+                  className="text-blue-600 hover:text-blue-700 underline"
+                >
+                  +569 6232 1883
+                </a>
               </div>
             </div>
           </motion.div>
