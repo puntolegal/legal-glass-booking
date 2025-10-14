@@ -23,6 +23,21 @@ serve(async (req) => {
     return new Response('ok', { headers: corsHeaders })
   }
 
+  // Validar configuración crítica
+  if (!MERCADOPAGO_ACCESS_TOKEN) {
+    console.error('❌ MERCADOPAGO_ACCESS_TOKEN no configurado');
+    return new Response(
+      JSON.stringify({ 
+        success: false, 
+        error: 'Webhook no configurado correctamente' 
+      }),
+      { 
+        status: 503, // Service Unavailable
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+      }
+    );
+  }
+
   // Validar que el webhook viene de MercadoPago usando la clave secreta
   const signature = req.headers.get('x-signature');
   const timestamp = req.headers.get('x-request-id');
@@ -62,16 +77,65 @@ serve(async (req) => {
       const paymentId = webhookData.data.id;
       console.log('💳 Procesando pago:', paymentId);
       
+      // Detectar pruebas de MercadoPago
+      if (paymentId === '123456' || webhookData.live_mode === false) {
+        console.log('🧪 Notificación de prueba detectada, respondiendo OK');
+        return new Response(
+          JSON.stringify({ 
+            success: true, 
+            message: 'Webhook de prueba recibido correctamente',
+            test: true
+          }),
+          { 
+            status: 200, 
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+          }
+        );
+      }
+      
       // PASO 1: Obtener información del pago desde MercadoPago
-      const paymentResponse = await fetch(`https://api.mercadopago.com/v1/payments/${paymentId}`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${MERCADOPAGO_ACCESS_TOKEN}`,
-          'Content-Type': 'application/json'
-        }
-      });
+      let paymentResponse;
+      try {
+        paymentResponse = await fetch(`https://api.mercadopago.com/v1/payments/${paymentId}`, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${MERCADOPAGO_ACCESS_TOKEN}`,
+            'Content-Type': 'application/json'
+          }
+        });
+      } catch (fetchError) {
+        console.error('❌ Error de red llamando a MercadoPago:', fetchError);
+        return new Response(
+          JSON.stringify({ 
+            success: false, 
+            error: 'Error de conexión con MercadoPago',
+            details: fetchError.message
+          }),
+          { 
+            status: 502, // Bad Gateway
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+          }
+        );
+      }
 
       if (!paymentResponse.ok) {
+        console.error(`❌ MercadoPago respondió con error: ${paymentResponse.status}`);
+        
+        // Si es 404, el pago no existe (puede ser test o pago muy antiguo)
+        if (paymentResponse.status === 404) {
+          return new Response(
+            JSON.stringify({ 
+              success: false, 
+              error: 'Pago no encontrado en MercadoPago',
+              paymentId
+            }),
+            { 
+              status: 404, 
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+            }
+          );
+        }
+        
         throw new Error(`Error obteniendo información del pago: ${paymentResponse.status}`);
       }
 
