@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nueva Reserva - Punto Legal</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6; 
+            color: #1d1d1f;
+            background-color: #f5f5f7;
+            padding: 40px 20px;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+        .header { 
+            background: #1d1d1f;
+            color: #ffffff;
+            padding: 48px 40px;
+            text-align: center;
+        }
+        .header h1 { 
+            font-size: 28px;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+            margin-bottom: 8px;
+        }
+        .header p {
+            font-size: 17px;
+            color: #a1a1a6;
+            font-weight: 400;
+        }
+        .content {
+            padding: 40px;
+        }
+        .greeting {
+            font-size: 22px;
+            font-weight: 600;
+            color: #1d1d1f;
+            margin-bottom: 16px;
+        }
+        .intro-text {
+            font-size: 17px;
+            color: #86868b;
+            margin-bottom: 32px;
+            line-height: 1.5;
+        }
+        .section-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #86868b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin: 32px 0 16px 0;
+        }
+        .detail-card {
+            background: #f5f5f7;
+            border-radius: 12px;
+            padding: 24px;
+            margin: 16px 0;
+        }
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #e5e5e7;
+        }
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+        .detail-label {
+            font-size: 15px;
+            color: #86868b;
+            font-weight: 500;
+        }
+        .detail-value {
+            font-size: 15px;
+            color: #1d1d1f;
+            font-weight: 600;
+            text-align: right;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        .status-confirmed {
+            background: #d4edda;
+            color: #155724;
+        }
+        .divider {
+            height: 1px;
+            background: #e5e5e7;
+            margin: 32px 0;
+        }
+        .footer {
+            background: #f5f5f7;
+            padding: 32px 40px;
+            text-align: center;
+        }
+        .footer-brand {
+            font-size: 17px;
+            font-weight: 600;
+            color: #1d1d1f;
+            margin-bottom: 8px;
+        }
+        .footer-contact {
+            font-size: 13px;
+            color: #86868b;
+            line-height: 1.8;
+        }
+        @media only screen and (max-width: 600px) {
+            .content {
+                padding: 24px 20px;
+            }
+            .header {
+                padding: 32px 20px;
+            }
+            .detail-row {
+                flex-direction: column;
+                gap: 4px;
+            }
+            .detail-value {
+                text-align: left;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">
+            <h1>Nueva Reserva</h1>
+            <p>Se ha agendado una nueva consulta</p>
+        </div>
+        
+        <div class="content">
+            <div class="greeting">Hola Equipo,</div>
+            <p class="intro-text">
+                Se ha registrado una nueva reserva en el sistema. A continuación encontrarás todos los detalles.
+            </p>
+            
+            <div class="status-badge status-confirmed">Confirmada</div>
+            
+            <div class="section-title">Información del Cliente</div>
+            <div class="detail-card">
+                <div class="detail-row">
+                    <span class="detail-label">Nombre</span>
+                    <span class="detail-value">{{1.cliente.nombre}}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Email</span>
+                    <span class="detail-value">{{1.cliente.email}}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Teléfono</span>
+                    <span class="detail-value">{{1.cliente.telefono}}</span>
+                </div>
+            </div>
+            
+            <div class="section-title">Detalles de la Consulta</div>
+            <div class="detail-card">
+                <div class="detail-row">
+                    <span class="detail-label">Servicio</span>
+                    <span class="detail-value">{{1.servicio.tipo}}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Fecha</span>
+                    <span class="detail-value">{{1.servicio.fecha}}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Hora</span>
+                    <span class="detail-value">{{1.servicio.hora}}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Duración</span>
+                    <span class="detail-value">45 minutos</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Valor</span>
+                    <span class="detail-value">${{1.servicio.precio}}</span>
+                </div>
+            </div>
+            
+            <div class="section-title">Información Técnica</div>
+            <div class="detail-card">
+                <div class="detail-row">
+                    <span class="detail-label">ID de Reserva</span>
+                    <span class="detail-value">{{1.reserva.id}}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Código de Seguimiento</span>
+                    <span class="detail-value">{{1.reserva.tracking_code}}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Estado de Pago</span>
+                    <span class="detail-value">{{1.pago.estado}}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Método de Pago</span>
+                    <span class="detail-value">{{1.pago.metodo}}</span>
+                </div>
+            </div>
+            
+            <div class="divider"></div>
+            
+            <p class="intro-text">
+                Recuerda preparar la documentación necesaria y enviar un recordatorio al cliente 24 horas antes de la cita.
+            </p>
+        </div>
+        
+        <div class="footer">
+            <div class="footer-brand">Punto Legal</div>
+            <div class="footer-contact">
+                Sistema de Gestión de Reservas
+            </div>
+        </div>
+    </div>
+</body>
+</html>

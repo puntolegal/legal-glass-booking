@@ -1,303 +1,501 @@
-// Supabase Edge Function para enviar emails automáticos
-// Archivo: supabase/functions/send-booking-email/index.ts
+import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { Resend } from "npm:resend@2.0.0";
 
-import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
 const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+};
+
+interface BookingEmailRequest {
+  reservationId: string;
+  nombre: string;
+  email: string;
+  telefono: string;
+  servicio: string;
+  precio: string;
+  fecha: string;
+  hora: string;
+  pagoEstado: string;
+  pagoMetodo: string;
+  trackingCode: string;
+  googleMeetLink: string;
 }
 
-interface BookingData {
-  cliente: {
-    nombre: string;
-    email: string;
-    telefono: string;
-  };
-  servicio: {
-    tipo: string;
-    precio: string;
-    fecha: string;
-    hora: string;
-  };
-  pago?: {
-    metodo: string;
-    estado: string;
-    id?: string;
-  };
-}
+// Plantilla HTML para el cliente
+const getClientEmailTemplate = (data: BookingEmailRequest) => `
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirmación de Consulta - Punto Legal</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6; 
+            color: #1d1d1f;
+            background-color: #f5f5f7;
+            padding: 40px 20px;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+        .header { 
+            background: #1d1d1f;
+            color: #ffffff;
+            padding: 48px 40px;
+            text-align: center;
+        }
+        .header h1 { 
+            font-size: 28px;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+            margin-bottom: 8px;
+        }
+        .header p {
+            font-size: 17px;
+            color: #a1a1a6;
+            font-weight: 400;
+        }
+        .content {
+            padding: 40px;
+        }
+        .greeting {
+            font-size: 22px;
+            font-weight: 600;
+            color: #1d1d1f;
+            margin-bottom: 16px;
+        }
+        .intro-text {
+            font-size: 17px;
+            color: #86868b;
+            margin-bottom: 32px;
+            line-height: 1.5;
+        }
+        .detail-card {
+            background: #f5f5f7;
+            border-radius: 12px;
+            padding: 24px;
+            margin: 24px 0;
+        }
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #e5e5e7;
+        }
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+        .detail-label {
+            font-size: 15px;
+            color: #86868b;
+            font-weight: 500;
+        }
+        .detail-value {
+            font-size: 15px;
+            color: #1d1d1f;
+            font-weight: 600;
+            text-align: right;
+        }
+        .meet-link {
+            background: #0071e3;
+            color: #ffffff;
+            text-decoration: none;
+            padding: 14px 24px;
+            border-radius: 8px;
+            display: inline-block;
+            margin: 24px 0;
+            font-size: 15px;
+            font-weight: 600;
+            transition: background 0.2s ease;
+        }
+        .divider {
+            height: 1px;
+            background: #e5e5e7;
+            margin: 32px 0;
+        }
+        .footer-text {
+            font-size: 15px;
+            color: #86868b;
+            line-height: 1.6;
+            margin-top: 24px;
+        }
+        .footer {
+            background: #f5f5f7;
+            padding: 32px 40px;
+            text-align: center;
+        }
+        .footer-brand {
+            font-size: 17px;
+            font-weight: 600;
+            color: #1d1d1f;
+            margin-bottom: 8px;
+        }
+        .footer-contact {
+            font-size: 13px;
+            color: #86868b;
+            line-height: 1.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">
+            <h1>Consulta Confirmada</h1>
+            <p>Tu asesoría ha sido agendada exitosamente</p>
+        </div>
+        
+        <div class="content">
+            <div class="greeting">Hola ${data.nombre},</div>
+            <p class="intro-text">
+                Hemos confirmado tu consulta legal. A continuación encontrarás todos los detalles de tu cita.
+            </p>
+            
+            <div class="detail-card">
+                <div class="detail-row">
+                    <span class="detail-label">Servicio</span>
+                    <span class="detail-value">${data.servicio}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Fecha</span>
+                    <span class="detail-value">${data.fecha}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Hora</span>
+                    <span class="detail-value">${data.hora}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Duración</span>
+                    <span class="detail-value">45 minutos</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Inversión</span>
+                    <span class="detail-value">$${data.precio}</span>
+                </div>
+            </div>
+            
+            <a href="${data.googleMeetLink}" class="meet-link" target="_blank">Unirse a la videollamada</a>
+            
+            <div class="divider"></div>
+            
+            <p class="footer-text">
+                Recibirás un recordatorio 24 horas antes de tu consulta. Si necesitas reagendar o tienes alguna pregunta, no dudes en contactarnos.
+            </p>
+            
+            <p class="footer-text" style="font-size: 13px; margin-top: 16px;">
+                Código de seguimiento: <strong>${data.trackingCode}</strong>
+            </p>
+        </div>
+        
+        <div class="footer">
+            <div class="footer-brand">Punto Legal</div>
+            <div class="footer-contact">
+                puntolegalelgolf@gmail.com<br>
+                +56 9 6232 1883
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+`;
 
-serve(async (req) => {
-  // Handle CORS
-  if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders })
+// Plantilla HTML para el admin
+const getAdminEmailTemplate = (data: BookingEmailRequest) => `
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nueva Reserva - Punto Legal</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6; 
+            color: #1d1d1f;
+            background-color: #f5f5f7;
+            padding: 40px 20px;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+        .header { 
+            background: #1d1d1f;
+            color: #ffffff;
+            padding: 48px 40px;
+            text-align: center;
+        }
+        .header h1 { 
+            font-size: 28px;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+            margin-bottom: 8px;
+        }
+        .header p {
+            font-size: 17px;
+            color: #a1a1a6;
+            font-weight: 400;
+        }
+        .content {
+            padding: 40px;
+        }
+        .greeting {
+            font-size: 22px;
+            font-weight: 600;
+            color: #1d1d1f;
+            margin-bottom: 16px;
+        }
+        .intro-text {
+            font-size: 17px;
+            color: #86868b;
+            margin-bottom: 32px;
+            line-height: 1.5;
+        }
+        .section-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #86868b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin: 32px 0 16px 0;
+        }
+        .detail-card {
+            background: #f5f5f7;
+            border-radius: 12px;
+            padding: 24px;
+            margin: 16px 0;
+        }
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #e5e5e7;
+        }
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+        .detail-label {
+            font-size: 15px;
+            color: #86868b;
+            font-weight: 500;
+        }
+        .detail-value {
+            font-size: 15px;
+            color: #1d1d1f;
+            font-weight: 600;
+            text-align: right;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            background: #d4edda;
+            color: #155724;
+        }
+        .divider {
+            height: 1px;
+            background: #e5e5e7;
+            margin: 32px 0;
+        }
+        .footer {
+            background: #f5f5f7;
+            padding: 32px 40px;
+            text-align: center;
+        }
+        .footer-brand {
+            font-size: 17px;
+            font-weight: 600;
+            color: #1d1d1f;
+            margin-bottom: 8px;
+        }
+        .footer-contact {
+            font-size: 13px;
+            color: #86868b;
+            line-height: 1.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">
+            <h1>Nueva Reserva</h1>
+            <p>Se ha agendado una nueva consulta</p>
+        </div>
+        
+        <div class="content">
+            <div class="greeting">Hola Equipo,</div>
+            <p class="intro-text">
+                Se ha registrado una nueva reserva en el sistema. A continuación encontrarás todos los detalles.
+            </p>
+            
+            <div class="status-badge">Confirmada</div>
+            
+            <div class="section-title">Información del Cliente</div>
+            <div class="detail-card">
+                <div class="detail-row">
+                    <span class="detail-label">Nombre</span>
+                    <span class="detail-value">${data.nombre}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Email</span>
+                    <span class="detail-value">${data.email}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Teléfono</span>
+                    <span class="detail-value">${data.telefono}</span>
+                </div>
+            </div>
+            
+            <div class="section-title">Detalles de la Consulta</div>
+            <div class="detail-card">
+                <div class="detail-row">
+                    <span class="detail-label">Servicio</span>
+                    <span class="detail-value">${data.servicio}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Fecha</span>
+                    <span class="detail-value">${data.fecha}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Hora</span>
+                    <span class="detail-value">${data.hora}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Duración</span>
+                    <span class="detail-value">45 minutos</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Valor</span>
+                    <span class="detail-value">$${data.precio}</span>
+                </div>
+            </div>
+            
+            <div class="section-title">Información Técnica</div>
+            <div class="detail-card">
+                <div class="detail-row">
+                    <span class="detail-label">ID de Reserva</span>
+                    <span class="detail-value">${data.reservationId}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Código de Seguimiento</span>
+                    <span class="detail-value">${data.trackingCode}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Estado de Pago</span>
+                    <span class="detail-value">${data.pagoEstado}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Método de Pago</span>
+                    <span class="detail-value">${data.pagoMetodo}</span>
+                </div>
+            </div>
+            
+            <div class="divider"></div>
+            
+            <p class="intro-text">
+                Recuerda preparar la documentación necesaria y enviar un recordatorio al cliente 24 horas antes de la cita.
+            </p>
+        </div>
+        
+        <div class="footer">
+            <div class="footer-brand">Punto Legal</div>
+            <div class="footer-contact">
+                Sistema de Gestión de Reservas
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+`;
+
+const handler = async (req: Request): Promise<Response> => {
+  // Handle CORS preflight requests
+  if (req.method === "OPTIONS") {
+    return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { bookingData }: { bookingData: BookingData } = await req.json()
-    
-    console.log('📧 Enviando emails para reserva:', bookingData)
+    const bookingData: BookingEmailRequest = await req.json();
 
-    // Configurar cliente de Supabase
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!
-    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
-    const supabase = createClient(supabaseUrl, supabaseKey)
+    console.log("📧 Enviando emails para reserva:", bookingData.reservationId);
 
-    // 1. EMAIL AL ADMINISTRADOR (tú)
-    const adminEmailData = {
-      to: ['puntolegalelgolf@gmail.com'],
-      subject: `🔔 Nueva Consulta Legal - ${bookingData.cliente.nombre}`,
-      html: generateAdminEmailHTML(bookingData)
-    }
+    const mailFrom = Deno.env.get("MAIL_FROM") || "Punto Legal <puntolegalelgolf@gmail.com>";
+    const adminEmail = Deno.env.get("ADMIN_EMAIL") || "puntolegalelgolf@gmail.com";
 
-    // 2. EMAIL AL CLIENTE
-    const clientEmailData = {
-      to: [bookingData.cliente.email],
-      subject: `✅ Consulta Confirmada - Punto Legal`,
-      html: generateClientEmailHTML(bookingData)
-    }
+    // Enviar email al cliente
+    console.log("📧 Enviando email al cliente:", bookingData.email);
+    const clientEmailResponse = await resend.emails.send({
+      from: mailFrom,
+      to: [bookingData.email],
+      subject: `Consulta Confirmada - ${bookingData.trackingCode}`,
+      html: getClientEmailTemplate(bookingData),
+    });
 
-    // Enviar emails usando Supabase Auth (método nativo)
-    const adminResult = await sendEmail(supabase, adminEmailData)
-    const clientResult = await sendEmail(supabase, clientEmailData)
+    console.log("✅ Email cliente enviado:", clientEmailResponse);
 
-    // 3. Guardar en base de datos
-    const { data: reservation, error: dbError } = await supabase
-      .from('reservas')
-      .insert({
-        cliente_nombre: bookingData.cliente.nombre,
-        cliente_email: bookingData.cliente.email,
-        cliente_telefono: bookingData.cliente.telefono,
-        servicio_tipo: bookingData.servicio.tipo,
-        servicio_precio: bookingData.servicio.precio,
-        fecha: bookingData.servicio.fecha,
-        hora: bookingData.servicio.hora,
-        pago_metodo: bookingData.pago?.metodo || 'pendiente',
-        pago_estado: bookingData.pago?.estado || 'pendiente',
-        pago_id: bookingData.pago?.id,
-        estado: 'confirmada',
-        created_at: new Date().toISOString()
-      })
-      .select()
-      .single()
+    // Enviar email al admin
+    console.log("📧 Enviando email al admin:", adminEmail);
+    const adminEmailResponse = await resend.emails.send({
+      from: mailFrom,
+      to: [adminEmail],
+      subject: `Nueva Reserva - ${bookingData.nombre}`,
+      html: getAdminEmailTemplate(bookingData),
+    });
 
-    if (dbError) {
-      console.error('❌ Error guardando en BD:', dbError)
-      throw dbError
-    }
+    console.log("✅ Email admin enviado:", adminEmailResponse);
 
     return new Response(
       JSON.stringify({
         success: true,
-        message: 'Emails enviados y reserva guardada exitosamente',
-        reservation_id: reservation.id,
-        emails_sent: {
-          admin: adminResult.success,
-          client: clientResult.success
-        }
+        clientEmailId: clientEmailResponse.id,
+        adminEmailId: adminEmailResponse.id,
       }),
       {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 200,
-      },
-    )
-
-  } catch (error) {
-    console.error('❌ Error en función de email:', error)
-    
-    return new Response(
-      JSON.stringify({
-        success: false,
-        error: error instanceof Error ? error.message : 'Error desconocido'
-      }),
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 500,
-      },
-    )
-  }
-})
-
-// Función para enviar email usando Supabase
-async function sendEmail(supabase: any, emailData: any) {
-  try {
-    // Usar Supabase Auth para enviar emails
-    const { data, error } = await supabase.auth.admin.generateLink({
-      type: 'invite',
-      email: emailData.to[0],
-      options: {
-        data: {
-          custom_email: true,
-          subject: emailData.subject,
-          html: emailData.html
-        }
+        headers: {
+          "Content-Type": "application/json",
+          ...corsHeaders,
+        },
       }
-    })
-
-    if (error) throw error
-
-    return { success: true, data }
-  } catch (error) {
-    console.error('❌ Error enviando email:', error)
-    return { success: false, error: error instanceof Error ? error.message : 'Error desconocido' }
+    );
+  } catch (error: any) {
+    console.error("❌ Error enviando emails:", error);
+    return new Response(
+      JSON.stringify({ error: error.message }),
+      {
+        status: 500,
+        headers: { "Content-Type": "application/json", ...corsHeaders },
+      }
+    );
   }
-}
+};
 
-// Plantilla HTML para email del administrador
-function generateAdminEmailHTML(booking: BookingData): string {
-  return `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <meta charset="utf-8">
-      <title>Nueva Consulta Legal</title>
-      <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; }
-        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 10px 10px 0 0; text-align: center; }
-        .content { background: white; padding: 30px; border-radius: 0 0 10px 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .info-box { background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #667eea; }
-        .highlight { color: #667eea; font-weight: bold; }
-        .footer { text-align: center; margin-top: 30px; color: #666; font-size: 14px; }
-      </style>
-    </head>
-    <body>
-      <div class="container">
-        <div class="header">
-          <h1>🔔 Nueva Consulta Legal</h1>
-          <p>Se ha registrado una nueva consulta en Punto Legal</p>
-        </div>
-        
-        <div class="content">
-          <h2>📋 Detalles del Cliente</h2>
-          <div class="info-box">
-            <p><strong>👤 Nombre:</strong> <span class="highlight">${booking.cliente.nombre}</span></p>
-            <p><strong>📧 Email:</strong> <span class="highlight">${booking.cliente.email}</span></p>
-            <p><strong>📱 Teléfono:</strong> <span class="highlight">${booking.cliente.telefono}</span></p>
-          </div>
-          
-          <h2>⚖️ Detalles del Servicio</h2>
-          <div class="info-box">
-            <p><strong>🏷️ Tipo:</strong> <span class="highlight">${booking.servicio.tipo}</span></p>
-            <p><strong>💰 Precio:</strong> <span class="highlight">$${booking.servicio.precio}</span></p>
-            <p><strong>📅 Fecha:</strong> <span class="highlight">${booking.servicio.fecha}</span></p>
-            <p><strong>🕐 Hora:</strong> <span class="highlight">${booking.servicio.hora}</span></p>
-          </div>
-          
-          ${booking.pago ? `
-          <h2>💳 Información de Pago</h2>
-          <div class="info-box">
-            <p><strong>💳 Método:</strong> <span class="highlight">${booking.pago.metodo}</span></p>
-            <p><strong>📊 Estado:</strong> <span class="highlight">${booking.pago.estado}</span></p>
-            ${booking.pago.id ? `<p><strong>🆔 ID Pago:</strong> <span class="highlight">${booking.pago.id}</span></p>` : ''}
-          </div>
-          ` : ''}
-          
-          <div style="background: #e3f2fd; padding: 20px; border-radius: 8px; margin: 20px 0; text-align: center;">
-            <h3>📞 Próximos Pasos</h3>
-            <p>Contacta al cliente para confirmar los detalles y agendar la reunión.</p>
-            <a href="https://wa.me/56${booking.cliente.telefono.replace(/[^0-9]/g, '')}" 
-               style="background: #25d366; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block; margin: 10px;">
-              💬 Contactar por WhatsApp
-            </a>
-          </div>
-        </div>
-        
-        <div class="footer">
-          <p>📧 Email automático generado por Punto Legal</p>
-          <p>🕐 ${new Date().toLocaleString('es-CL')}</p>
-        </div>
-      </div>
-    </body>
-    </html>
-  `
-}
-
-// Plantilla HTML para email del cliente
-function generateClientEmailHTML(booking: BookingData): string {
-  return `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <meta charset="utf-8">
-      <title>Consulta Confirmada - Punto Legal</title>
-      <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; }
-        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 10px 10px 0 0; text-align: center; }
-        .content { background: white; padding: 30px; border-radius: 0 0 10px 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .success-box { background: #d4edda; border: 1px solid #c3e6cb; color: #155724; padding: 20px; border-radius: 8px; margin: 20px 0; text-align: center; }
-        .info-box { background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; }
-        .highlight { color: #667eea; font-weight: bold; }
-        .footer { text-align: center; margin-top: 30px; color: #666; font-size: 14px; }
-      </style>
-    </head>
-    <body>
-      <div class="container">
-        <div class="header">
-          <h1>✅ Consulta Confirmada</h1>
-          <p>Hola ${booking.cliente.nombre}, tu consulta ha sido registrada exitosamente</p>
-        </div>
-        
-        <div class="content">
-          <div class="success-box">
-            <h2>🎉 ¡Perfecto!</h2>
-            <p>Hemos recibido tu solicitud de consulta legal. Nos pondremos en contacto contigo pronto.</p>
-          </div>
-          
-          <h2>📋 Resumen de tu Consulta</h2>
-          <div class="info-box">
-            <p><strong>⚖️ Servicio:</strong> <span class="highlight">${booking.servicio.tipo}</span></p>
-            <p><strong>💰 Precio:</strong> <span class="highlight">$${booking.servicio.precio}</span></p>
-            <p><strong>📅 Fecha solicitada:</strong> <span class="highlight">${booking.servicio.fecha}</span></p>
-            <p><strong>🕐 Hora solicitada:</strong> <span class="highlight">${booking.servicio.hora}</span></p>
-          </div>
-          
-          ${booking.pago?.estado === 'approved' ? `
-          <div style="background: #d4edda; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #28a745;">
-            <h3>✅ Pago Confirmado</h3>
-            <p>Tu pago de <strong>$${booking.servicio.precio}</strong> ha sido procesado exitosamente.</p>
-            <p><strong>Método:</strong> ${booking.pago.metodo}</p>
-          </div>
-          ` : ''}
-          
-          <h2>📞 Próximos Pasos</h2>
-          <div class="info-box">
-            <p><strong>1.</strong> Revisaremos tu solicitud</p>
-            <p><strong>2.</strong> Te contactaremos para confirmar fecha y hora</p>
-            <p><strong>3.</strong> Te enviaremos el enlace de la reunión virtual</p>
-          </div>
-          
-          <div style="background: #e3f2fd; padding: 20px; border-radius: 8px; margin: 20px 0; text-align: center;">
-            <h3>💬 ¿Tienes preguntas?</h3>
-            <p>No dudes en contactarnos si necesitas ayuda</p>
-            <a href="https://wa.me/56962321883" 
-               style="background: #25d366; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block; margin: 10px;">
-              📱 WhatsApp: +56 9 6232 1883
-            </a>
-            <br>
-            <a href="mailto:puntolegalelgolf@gmail.com" 
-               style="background: #667eea; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block; margin: 10px;">
-              📧 puntolegalelgolf@gmail.com
-            </a>
-          </div>
-        </div>
-        
-        <div class="footer">
-          <p><strong>Punto Legal</strong> - Asesoría Legal Profesional</p>
-          <p>El Golf, Las Condes, Santiago</p>
-          <p>🕐 ${new Date().toLocaleString('es-CL')}</p>
-        </div>
-      </div>
-    </body>
-    </html>
-  `
-}
-
-/* Para deployar esta función:
-1. Instalar Supabase CLI: npm install -g supabase
-2. Login: supabase login
-3. Deploy: supabase functions deploy send-booking-email
-4. Configurar variables de entorno en Supabase Dashboard
-*/
+serve(handler);
