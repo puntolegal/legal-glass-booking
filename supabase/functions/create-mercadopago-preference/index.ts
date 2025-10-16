@@ -102,11 +102,12 @@ serve(async (req) => {
           number: '12345678-9' // Placeholder - se puede mejorar con datos reales
         }
       },
-    // Usar APP_URL para generar back_urls dinámicas según el ambiente
+    // CRÍTICO: back_urls SIN query parameters (MercadoPago puede rechazarlas)
+    // El external_reference se recupera via API de MercadoPago al regresar
     back_urls: {
-      success: `https://${APP_URL}/payment-success?external_reference=${paymentData.external_reference}`,
-      failure: `https://${APP_URL}/payment-failure?external_reference=${paymentData.external_reference}`,
-      pending: `https://${APP_URL}/payment-pending?external_reference=${paymentData.external_reference}`
+      success: `https://${APP_URL}/payment-success?source=mercadopago`,
+      failure: `https://${APP_URL}/payment-failure?source=mercadopago`,
+      pending: `https://${APP_URL}/payment-pending?source=mercadopago`
     },
       auto_return: 'approved',
       external_reference: paymentData.external_reference,
