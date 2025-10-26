@@ -112,6 +112,12 @@ export const PremiumMobileDock: React.FC<PremiumMobileDockProps> = ({ className 
     }
   ];
 
+  // Ocultar dock en páginas que tienen su propio sistema de navegación flotante
+  const hideDockRoutes = ['/servicios/familia'];
+  if (hideDockRoutes.includes(location.pathname)) {
+    return null;
+  }
+
   return (
     <>
       {/* Dock Principal - Estilo iOS Premium Optimizado */}
