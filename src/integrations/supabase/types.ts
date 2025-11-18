@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      leads_quiz: {
+        Row: {
+          created_at: string | null
+          email: string
+          id: string
+          name: string
+          plan_recommended: string | null
+          quiz_answers: Json
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          id?: string
+          name: string
+          plan_recommended?: string | null
+          quiz_answers: Json
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          email?: string
+          id?: string
+          name?: string
+          plan_recommended?: string | null
+          quiz_answers?: Json
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
