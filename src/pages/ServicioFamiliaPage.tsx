@@ -93,7 +93,7 @@ const packages = [
       'Apoyo psicológico básico',
       'Seguimiento 3 meses',
       'WhatsApp horario laboral',
-      '🎁 Upgrade gratis si no hay acuerdo'
+      'Upgrade sin costo adicional incluido'
     ],
     popular: false
   },
@@ -115,7 +115,7 @@ const packages = [
       'WhatsApp prioritario (respuesta en 4h)',
       'Portal del cliente online',
       'Seguimiento 6 meses',
-      '🎁 Apelación incluida sin costo'
+      'Apelación incluida sin costo adicional'
     ],
     popular: true
   },
