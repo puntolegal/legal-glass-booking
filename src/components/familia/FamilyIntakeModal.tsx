@@ -181,16 +181,16 @@ const FamilyIntakeModal: React.FC<FamilyIntakeModalProps> = ({
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
               transition={{ type: 'spring', duration: 0.5, bounce: 0.3 }}
               className="w-full max-w-2xl min-h-[600px] sm:min-h-[500px] max-h-[90vh] my-auto
-                         bg-slate-900/95 backdrop-blur-xl rounded-3xl border border-slate-700/50 
-                         shadow-2xl shadow-black/50 flex flex-col overflow-hidden relative"
+                         bg-slate-900 border border-slate-700 
+                         shadow-2xl flex flex-col overflow-hidden relative rounded-2xl"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Header */}
-              <div className={`relative p-6 border-b border-slate-700/50 flex-shrink-0 bg-gradient-to-r ${getPlanColor()}/5`}>
+              <div className="relative p-6 border-b border-slate-700 flex-shrink-0 bg-slate-800/50">
                 <button
                   onClick={onClose}
-                  className="absolute right-4 top-4 p-2 rounded-full bg-slate-800/50 hover:bg-slate-700/50 
-                           transition-colors duration-200 z-10 border border-slate-700/50"
+                  className="absolute right-4 top-4 p-2 rounded-full bg-slate-800 hover:bg-slate-700 
+                           transition-colors duration-200 z-10 border border-slate-700"
                   aria-label="Cerrar modal"
                 >
                   <X className="w-5 h-5 text-slate-300" />
@@ -203,12 +203,12 @@ const FamilyIntakeModal: React.FC<FamilyIntakeModalProps> = ({
                   className="pr-8"
                 >
                   <div className="flex items-center gap-2 mb-2">
-                    <div className={`px-3 py-1 rounded-full bg-gradient-to-r ${getPlanColor()} text-white text-xs font-bold`}>
+                    <div className={`px-3 py-1 rounded-full bg-gradient-to-r ${getPlanColor()} text-white text-xs font-bold shadow-lg`}>
                       {planName}
                     </div>
-                    <span className="text-slate-400 text-sm">• {planPrice}</span>
+                    <span className="text-slate-500 text-sm">• {planPrice}</span>
                   </div>
-                  <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">
+                  <h2 className="text-2xl md:text-3xl font-bold text-slate-100 mb-2">
                     Cuéntanos más sobre tu situación
                   </h2>
                   <p className="text-slate-400">
@@ -219,9 +219,9 @@ const FamilyIntakeModal: React.FC<FamilyIntakeModalProps> = ({
 
               {/* Progress bar */}
               {currentStep >= 0 && currentStep <= 5 && (
-                <div className="h-1 bg-slate-800 flex-shrink-0">
+                <div className="h-1 bg-slate-800/50 flex-shrink-0 border-b border-slate-700">
                   <motion.div
-                    className={`h-full bg-gradient-to-r ${getPlanColor()}`}
+                    className={`h-full bg-gradient-to-r ${getPlanColor()} shadow-lg`}
                     initial={{ width: 0 }}
                     animate={{ width: `${((currentStep + 1) / 6) * 100}%` }}
                     transition={{ duration: 0.3 }}
@@ -242,20 +242,20 @@ const FamilyIntakeModal: React.FC<FamilyIntakeModalProps> = ({
                       className="flex flex-col items-center justify-center text-center py-8"
                     >
                       <motion.div
-                        animate={{ scale: [1, 1.1, 1] }}
+                        animate={{ scale: [1, 1.05, 1] }}
                         transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                        className={`w-24 h-24 bg-gradient-to-br ${getPlanColor()}/20 rounded-full 
-                                   flex items-center justify-center mb-6 shadow-lg shadow-${getPlanAccent()}-500/20`}
+                        className="w-24 h-24 bg-slate-800 border-2 border-pink-500/30 rounded-full 
+                                   flex items-center justify-center mb-6 shadow-xl"
                       >
-                        <Shield className={`w-12 h-12 text-${getPlanAccent()}-400`} />
+                        <Shield className="w-12 h-12 text-pink-400" />
                       </motion.div>
 
-                      <h3 className="text-3xl font-bold text-white mb-4 max-w-lg">
+                      <h3 className="text-3xl font-bold text-slate-100 mb-4 max-w-lg">
                         Antes de agendar, recopilemos algunos datos
                       </h3>
-                      <p className="text-xl text-slate-300 mb-8 max-w-md leading-relaxed">
-                        Esto nos permite <span className={`text-${getPlanAccent()}-400 font-semibold`}>preparar tu consulta</span> y 
-                        <span className={`text-${getPlanAccent()}-400 font-semibold`}> maximizar el valor</span> de tu primera sesión.
+                      <p className="text-xl text-slate-400 mb-8 max-w-md leading-relaxed">
+                        Esto nos permite <span className="text-pink-400 font-semibold">preparar tu consulta</span> y 
+                        <span className="text-pink-400 font-semibold"> maximizar el valor</span> de tu primera sesión.
                       </p>
 
                       <div className="grid gap-3 mb-8 text-left max-w-md">
@@ -271,20 +271,21 @@ const FamilyIntakeModal: React.FC<FamilyIntakeModalProps> = ({
                             transition={{ delay: 0.2 + idx * 0.1 }}
                             className="flex items-center gap-3"
                           >
-                            <CheckCircle className={`w-5 h-5 text-${getPlanAccent()}-400`} />
-                            <span className="text-slate-300">{benefit}</span>
+                            <CheckCircle className="w-5 h-5 text-pink-400" />
+                            <span className="text-slate-400">{benefit}</span>
                           </motion.div>
                         ))}
                       </div>
 
                       <motion.button
                         onClick={() => setCurrentStep(0)}
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        className={`w-full max-w-md py-5 px-8 rounded-xl font-bold text-lg text-white 
-                                   bg-gradient-to-r ${getPlanColor()} 
-                                   shadow-2xl shadow-${getPlanAccent()}-500/40 transition-all duration-200
-                                   flex items-center justify-center gap-3`}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        className="w-full max-w-md py-5 px-8 rounded-xl font-bold text-lg text-white 
+                                   bg-gradient-to-r from-pink-500 to-rose-600 
+                                   hover:from-pink-600 hover:to-rose-700
+                                   shadow-xl transition-all duration-200
+                                   flex items-center justify-center gap-3"
                       >
                         Comenzar
                         <ArrowRight className="w-6 h-6" />
@@ -301,7 +302,7 @@ const FamilyIntakeModal: React.FC<FamilyIntakeModalProps> = ({
                       exit={{ opacity: 0, x: -20 }}
                       className="space-y-6"
                     >
-                      <h3 className="text-xl font-semibold text-white mb-6">
+                      <h3 className="text-xl font-semibold text-slate-100 mb-6">
                         Primero, tus datos de contacto
                       </h3>
 
@@ -313,9 +314,9 @@ const FamilyIntakeModal: React.FC<FamilyIntakeModalProps> = ({
                             value={formData.nombre}
                             onChange={(e) => handleInputChange('nombre', e.target.value)}
                             placeholder="Juan Pérez González"
-                            className="w-full p-4 rounded-2xl bg-slate-800/60 border border-slate-700/50 
-                                     text-white placeholder-slate-500 focus:outline-none focus:border-pink-500/50
-                                     transition-all"
+                            className="w-full p-4 rounded-xl bg-slate-800 border border-slate-700 
+                                     text-slate-200 placeholder-slate-500 focus:outline-none focus:border-pink-500
+                                     hover:border-slate-600 transition-all"
                           />
                         </div>
 
@@ -326,9 +327,9 @@ const FamilyIntakeModal: React.FC<FamilyIntakeModalProps> = ({
                             value={formData.email}
                             onChange={(e) => handleInputChange('email', e.target.value)}
                             placeholder="juan@email.com"
-                            className="w-full p-4 rounded-2xl bg-slate-800/60 border border-slate-700/50 
-                                     text-white placeholder-slate-500 focus:outline-none focus:border-pink-500/50
-                                     transition-all"
+                            className="w-full p-4 rounded-xl bg-slate-800 border border-slate-700 
+                                     text-slate-200 placeholder-slate-500 focus:outline-none focus:border-pink-500
+                                     hover:border-slate-600 transition-all"
                           />
                         </div>
 
@@ -339,9 +340,9 @@ const FamilyIntakeModal: React.FC<FamilyIntakeModalProps> = ({
                             value={formData.telefono}
                             onChange={(e) => handleInputChange('telefono', e.target.value)}
                             placeholder="+56 9 1234 5678"
-                            className="w-full p-4 rounded-2xl bg-slate-800/60 border border-slate-700/50 
-                                     text-white placeholder-slate-500 focus:outline-none focus:border-pink-500/50
-                                     transition-all"
+                            className="w-full p-4 rounded-xl bg-slate-800 border border-slate-700 
+                                     text-slate-200 placeholder-slate-500 focus:outline-none focus:border-pink-500
+                                     hover:border-slate-600 transition-all"
                           />
                         </div>
                       </div>
@@ -356,9 +357,10 @@ const FamilyIntakeModal: React.FC<FamilyIntakeModalProps> = ({
                         }}
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
-                        className={`w-full py-4 px-6 rounded-xl font-semibold text-white 
-                                   bg-gradient-to-r ${getPlanColor()} 
-                                   shadow-lg transition-all duration-200`}
+                        className="w-full py-4 px-6 rounded-xl font-semibold text-white 
+                                   bg-gradient-to-r from-pink-500 to-rose-600 
+                                   hover:from-pink-600 hover:to-rose-700
+                                   shadow-lg transition-all duration-200"
                       >
                         Continuar
                       </motion.button>
@@ -373,7 +375,7 @@ const FamilyIntakeModal: React.FC<FamilyIntakeModalProps> = ({
                       animate={{ opacity: 1, x: 0 }}
                       exit={{ opacity: 0, x: -20 }}
                     >
-                      <h3 className="text-xl font-semibold text-white mb-6">
+                      <h3 className="text-xl font-semibold text-slate-100 mb-6">
                         ¿Qué servicio necesitas principalmente?
                       </h3>
                       
@@ -390,11 +392,11 @@ const FamilyIntakeModal: React.FC<FamilyIntakeModalProps> = ({
                               whileHover={{ scale: 1.02, x: 3 }}
                               whileTap={{ scale: 0.98 }}
                               onClick={() => handleOptionSelect('servicio', option.value)}
-                              className={`w-full p-4 rounded-2xl border transition-all duration-200 
+                              className={`w-full p-4 rounded-xl border transition-all duration-200 
                                        text-left flex items-center gap-4 group relative overflow-hidden
                                        ${clickedButton === optionKey 
-                                         ? `border-${getPlanAccent()}-500 shadow-lg shadow-${getPlanAccent()}-500/30` 
-                                         : `bg-slate-800/50 border-slate-700/50 hover:border-${getPlanAccent()}-500/40`
+                                         ? 'border-pink-500 bg-slate-800/80 shadow-lg' 
+                                         : 'bg-slate-800 border-slate-700 hover:border-slate-600 hover:bg-slate-800/80'
                                        }`}
                             >
                               {clickedButton === optionKey && (
@@ -402,14 +404,14 @@ const FamilyIntakeModal: React.FC<FamilyIntakeModalProps> = ({
                                   initial={{ x: '-120%' }}
                                   animate={{ x: '120%' }}
                                   transition={{ duration: 0.6 }}
-                                  className={`absolute inset-0 bg-gradient-to-r from-transparent via-${getPlanAccent()}-500/15 to-transparent`}
+                                  className="absolute inset-0 bg-gradient-to-r from-transparent via-pink-500/15 to-transparent"
                                 />
                               )}
                               
-                              <div className={`p-3 rounded-full bg-gradient-to-br ${getPlanColor()}/20 transition-colors relative`}>
-                                <Icon className={`w-6 h-6 text-${getPlanAccent()}-400`} />
+                              <div className="p-3 rounded-full bg-pink-500/10 border border-pink-500/20 transition-colors relative">
+                                <Icon className="w-6 h-6 text-pink-400" />
                               </div>
-                              <span className="text-white font-medium relative">{option.label}</span>
+                              <span className="text-slate-200 font-medium relative">{option.label}</span>
                             </motion.button>
                           );
                         })}
@@ -417,7 +419,7 @@ const FamilyIntakeModal: React.FC<FamilyIntakeModalProps> = ({
 
                       <button
                         onClick={() => setCurrentStep(0)}
-                        className="mt-6 flex items-center gap-2 text-white/60 hover:text-white transition-colors"
+                        className="mt-6 flex items-center gap-2 text-slate-500 hover:text-slate-300 transition-colors"
                       >
                         <ChevronLeft className="w-4 h-4" />
                         Volver
@@ -433,7 +435,7 @@ const FamilyIntakeModal: React.FC<FamilyIntakeModalProps> = ({
                       animate={{ opacity: 1, x: 0 }}
                       exit={{ opacity: 0, x: -20 }}
                     >
-                      <h3 className="text-xl font-semibold text-white mb-6">
+                      <h3 className="text-xl font-semibold text-slate-100 mb-6">
                         ¿Qué tipo de bienes están involucrados?
                       </h3>
                       
@@ -477,7 +479,7 @@ const FamilyIntakeModal: React.FC<FamilyIntakeModalProps> = ({
 
                       <button
                         onClick={() => setCurrentStep(1)}
-                        className="mt-6 flex items-center gap-2 text-white/60 hover:text-white transition-colors"
+                        className="mt-6 flex items-center gap-2 text-slate-500 hover:text-slate-300 transition-colors"
                       >
                         <ChevronLeft className="w-4 h-4" />
                         Volver
@@ -493,7 +495,7 @@ const FamilyIntakeModal: React.FC<FamilyIntakeModalProps> = ({
                       animate={{ opacity: 1, x: 0 }}
                       exit={{ opacity: 0, x: -20 }}
                     >
-                      <h3 className="text-xl font-semibold text-white mb-6">
+                      <h3 className="text-xl font-semibold text-slate-100 mb-6">
                         ¿Hay alguna empresa involucrada?
                       </h3>
                       
@@ -537,7 +539,7 @@ const FamilyIntakeModal: React.FC<FamilyIntakeModalProps> = ({
 
                       <button
                         onClick={() => setCurrentStep(2)}
-                        className="mt-6 flex items-center gap-2 text-white/60 hover:text-white transition-colors"
+                        className="mt-6 flex items-center gap-2 text-slate-500 hover:text-slate-300 transition-colors"
                       >
                         <ChevronLeft className="w-4 h-4" />
                         Volver
@@ -553,7 +555,7 @@ const FamilyIntakeModal: React.FC<FamilyIntakeModalProps> = ({
                       animate={{ opacity: 1, x: 0 }}
                       exit={{ opacity: 0, x: -20 }}
                     >
-                      <h3 className="text-xl font-semibold text-white mb-6">
+                      <h3 className="text-xl font-semibold text-slate-100 mb-6">
                         ¿Hay elementos internacionales en tu caso?
                       </h3>
                       
@@ -597,7 +599,7 @@ const FamilyIntakeModal: React.FC<FamilyIntakeModalProps> = ({
 
                       <button
                         onClick={() => setCurrentStep(3)}
-                        className="mt-6 flex items-center gap-2 text-white/60 hover:text-white transition-colors"
+                        className="mt-6 flex items-center gap-2 text-slate-500 hover:text-slate-300 transition-colors"
                       >
                         <ChevronLeft className="w-4 h-4" />
                         Volver
@@ -616,39 +618,39 @@ const FamilyIntakeModal: React.FC<FamilyIntakeModalProps> = ({
                       <motion.div
                         animate={{ scale: [1, 1.05, 1] }}
                         transition={{ duration: 2, repeat: Infinity }}
-                        className={`w-20 h-20 bg-gradient-to-br ${getPlanColor()}/20 rounded-full 
-                                   flex items-center justify-center mx-auto shadow-lg`}
+                        className="w-20 h-20 bg-slate-800 border-2 border-pink-500/30 rounded-full 
+                                   flex items-center justify-center mx-auto shadow-xl"
                       >
-                        <Sparkles className={`w-10 h-10 text-${getPlanAccent()}-400`} />
+                        <Sparkles className="w-10 h-10 text-pink-400" />
                       </motion.div>
 
                       <div>
-                        <h3 className="text-2xl font-bold text-white mb-3">
+                        <h3 className="text-2xl font-bold text-slate-100 mb-3">
                           ¡Perfecto! Ya tenemos todo listo
                         </h3>
-                        <p className="text-slate-300">
+                        <p className="text-slate-400">
                           Procederemos a agendar tu {planName} por {planPrice}
                         </p>
                       </div>
 
-                      <div className="bg-slate-800/50 rounded-2xl p-6 border border-slate-700/50">
-                        <h4 className="font-semibold text-white mb-4">Resumen de tu caso:</h4>
+                      <div className="bg-slate-800 border border-slate-700 rounded-xl p-6">
+                        <h4 className="font-semibold text-slate-100 mb-4">Resumen de tu caso:</h4>
                         <div className="space-y-2 text-sm text-left">
                           <div className="flex justify-between">
                             <span className="text-slate-400">Servicio:</span>
-                            <span className="text-white">{servicioOptions.find(o => o.value === formData.servicio)?.label}</span>
+                            <span className="text-slate-200">{servicioOptions.find(o => o.value === formData.servicio)?.label}</span>
                           </div>
                           <div className="flex justify-between">
                             <span className="text-slate-400">Bienes:</span>
-                            <span className="text-white">{bienesOptions.find(o => o.value === formData.bienes)?.label}</span>
+                            <span className="text-slate-200">{bienesOptions.find(o => o.value === formData.bienes)?.label}</span>
                           </div>
                           <div className="flex justify-between">
                             <span className="text-slate-400">Empresa:</span>
-                            <span className="text-white">{empresaOptions.find(o => o.value === formData.empresa)?.label}</span>
+                            <span className="text-slate-200">{empresaOptions.find(o => o.value === formData.empresa)?.label}</span>
                           </div>
                           <div className="flex justify-between">
                             <span className="text-slate-400">Internacional:</span>
-                            <span className="text-white">{internacionalOptions.find(o => o.value === formData.internacional)?.label}</span>
+                            <span className="text-slate-200">{internacionalOptions.find(o => o.value === formData.internacional)?.label}</span>
                           </div>
                         </div>
                       </div>
@@ -658,11 +660,12 @@ const FamilyIntakeModal: React.FC<FamilyIntakeModalProps> = ({
                         disabled={isLoading}
                         whileHover={!isLoading ? { scale: 1.02 } : {}}
                         whileTap={!isLoading ? { scale: 0.98 } : {}}
-                        className={`w-full py-5 px-6 rounded-xl font-bold text-lg text-white 
-                                   bg-gradient-to-r ${getPlanColor()} 
-                                   shadow-2xl transition-all duration-200 
+                        className="w-full py-5 px-6 rounded-xl font-bold text-lg text-white 
+                                   bg-gradient-to-r from-pink-500 to-rose-600 
+                                   hover:from-pink-600 hover:to-rose-700
+                                   shadow-xl transition-all duration-200 
                                    disabled:opacity-50 disabled:cursor-not-allowed
-                                   flex items-center justify-center gap-3`}
+                                   flex items-center justify-center gap-3"
                       >
                         {isLoading ? (
                           <>
@@ -679,7 +682,7 @@ const FamilyIntakeModal: React.FC<FamilyIntakeModalProps> = ({
 
                       <button
                         onClick={() => setCurrentStep(4)}
-                        className="text-white/60 hover:text-white transition-colors text-sm flex items-center gap-2 mx-auto"
+                        className="text-slate-500 hover:text-slate-300 transition-colors text-sm flex items-center gap-2 mx-auto"
                       >
                         <ChevronLeft className="w-4 h-4" />
                         Volver

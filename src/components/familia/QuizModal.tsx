@@ -239,17 +239,16 @@ const QuizModal: React.FC<QuizModalProps> = ({ isOpen, onClose }) => {
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
               transition={{ type: 'spring', duration: 0.5, bounce: 0.3 }}
               className="w-full max-w-2xl min-h-[600px] sm:min-h-[500px] max-h-[90vh] my-auto
-                         bg-slate-900/95 backdrop-blur-xl rounded-3xl border border-slate-700/50 
-                         shadow-2xl shadow-black/50
-                         flex flex-col overflow-hidden relative"
+                         bg-slate-900 border border-slate-700 
+                         shadow-2xl flex flex-col overflow-hidden relative rounded-2xl"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Header */}
-              <div className="relative p-6 border-b border-slate-700/50 flex-shrink-0 bg-gradient-to-r from-pink-500/5 to-rose-500/5">
+              <div className="relative p-6 border-b border-slate-700 flex-shrink-0 bg-slate-800/50">
                 <button
                   onClick={onClose}
-                  className="absolute right-4 top-4 p-2 rounded-full bg-slate-800/50 hover:bg-slate-700/50 
-                           transition-colors duration-200 z-10 border border-slate-700/50"
+                  className="absolute right-4 top-4 p-2 rounded-full bg-slate-800 hover:bg-slate-700 
+                           transition-colors duration-200 z-10 border border-slate-700"
                   aria-label="Cerrar modal"
                 >
                   <X className="w-5 h-5 text-slate-300" />
@@ -261,7 +260,7 @@ const QuizModal: React.FC<QuizModalProps> = ({ isOpen, onClose }) => {
                   transition={{ delay: 0.1 }}
                   className="pr-8"
                 >
-                  <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">
+                  <h2 className="text-2xl md:text-3xl font-bold text-slate-100 mb-2">
                     ¿Qué nivel de protección legal necesitas realmente?
                   </h2>
                   <p className="text-slate-400">
@@ -272,9 +271,9 @@ const QuizModal: React.FC<QuizModalProps> = ({ isOpen, onClose }) => {
 
               {/* Progress bar */}
               {!showResult && currentStep >= 0 && currentStep < questions.length && (
-                <div className="h-1 bg-slate-800 flex-shrink-0">
+                <div className="h-1 bg-slate-800/50 flex-shrink-0 border-b border-slate-700">
                   <motion.div
-                    className="h-full bg-gradient-to-r from-pink-500 to-rose-500"
+                    className="h-full bg-gradient-to-r from-pink-500 to-rose-500 shadow-lg"
                     initial={{ width: 0 }}
                     animate={{ width: `${((currentStep + 1) / questions.length) * 100}%` }}
                     transition={{ duration: 0.3 }}
@@ -296,18 +295,18 @@ const QuizModal: React.FC<QuizModalProps> = ({ isOpen, onClose }) => {
                       className="flex flex-col items-center justify-center text-center py-8"
                     >
                       <motion.div
-                        animate={{ scale: [1, 1.1, 1] }}
+                        animate={{ scale: [1, 1.05, 1] }}
                         transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                        className="w-24 h-24 bg-gradient-to-br from-pink-500/20 to-rose-500/20 rounded-full 
-                                 flex items-center justify-center mb-6 shadow-lg shadow-pink-500/20"
+                        className="w-24 h-24 bg-slate-800 border-2 border-pink-500/30 rounded-full 
+                                 flex items-center justify-center mb-6 shadow-xl"
                       >
                         <Heart className="w-12 h-12 text-pink-400" />
                       </motion.div>
 
-                      <h3 className="text-3xl font-bold text-white mb-4 max-w-lg">
+                      <h3 className="text-3xl font-bold text-slate-100 mb-4 max-w-lg">
                         Sabemos que este es un momento difícil
                       </h3>
-                      <p className="text-xl text-slate-300 mb-8 max-w-md leading-relaxed">
+                      <p className="text-xl text-slate-400 mb-8 max-w-md leading-relaxed">
                         Estamos aquí para darte <span className="text-pink-400 font-semibold">claridad</span> y 
                         <span className="text-pink-400 font-semibold"> tranquilidad</span>.
                       </p>
@@ -326,19 +325,19 @@ const QuizModal: React.FC<QuizModalProps> = ({ isOpen, onClose }) => {
                             className="flex items-center gap-3"
                           >
                             <CheckCircle className="w-5 h-5 text-green-400" />
-                            <span className="text-slate-300">{benefit}</span>
+                            <span className="text-slate-400">{benefit}</span>
                           </motion.div>
                         ))}
                       </div>
 
                       <motion.button
                         onClick={() => setCurrentStep(0)}
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
                         className="w-full max-w-md py-5 px-8 rounded-xl font-bold text-lg text-white 
                                  bg-gradient-to-r from-pink-500 to-rose-600 
                                  hover:from-pink-600 hover:to-rose-700 
-                                 shadow-2xl shadow-pink-500/40 transition-all duration-200
+                                 shadow-xl transition-all duration-200
                                  flex items-center justify-center gap-3"
                       >
                         Comenzar mi diagnóstico
@@ -356,7 +355,7 @@ const QuizModal: React.FC<QuizModalProps> = ({ isOpen, onClose }) => {
                       exit={{ opacity: 0, x: -20 }}
                       transition={{ duration: 0.3 }}
                     >
-                      <h3 className="text-xl font-semibold text-white mb-6">
+                      <h3 className="text-xl font-semibold text-slate-100 mb-6">
                         {questions[currentStep].question}
                       </h3>
                       
@@ -378,11 +377,11 @@ const QuizModal: React.FC<QuizModalProps> = ({ isOpen, onClose }) => {
                               }}
                               whileHover={{ scale: 1.02, x: 3 }}
                               whileTap={{ scale: 0.98 }}
-                              className={`w-full p-4 rounded-2xl bg-slate-800/50 border transition-all duration-200 
+                              className={`w-full p-4 rounded-xl border transition-all duration-200 
                                        text-left flex items-center gap-4 group relative overflow-hidden
                                        ${clickedButton === option.value 
-                                         ? 'border-pink-500 shadow-lg shadow-pink-500/30' 
-                                         : 'border-slate-700/50 hover:bg-slate-700/50 hover:border-pink-500/30'
+                                         ? 'border-pink-500 bg-slate-800/80 shadow-lg' 
+                                         : 'bg-slate-800 border-slate-700 hover:bg-slate-800/80 hover:border-slate-600'
                                        }`}
                             >
                               {clickedButton === option.value && (
@@ -394,11 +393,11 @@ const QuizModal: React.FC<QuizModalProps> = ({ isOpen, onClose }) => {
                                 />
                               )}
                               
-                              <div className="p-3 rounded-full bg-gradient-to-br from-pink-500/20 to-rose-500/20 
-                                            group-hover:from-pink-500/30 group-hover:to-rose-500/30 transition-colors relative">
+                              <div className="p-3 rounded-full bg-pink-500/10 border border-pink-500/20 
+                                            group-hover:bg-pink-500/15 transition-colors relative">
                                 <Icon className="w-6 h-6 text-pink-400" />
                               </div>
-                              <span className="text-white font-medium relative">{option.label}</span>
+                              <span className="text-slate-200 font-medium relative">{option.label}</span>
                             </motion.button>
                           );
                         })}
@@ -406,12 +405,12 @@ const QuizModal: React.FC<QuizModalProps> = ({ isOpen, onClose }) => {
                       
                       {currentStep > 0 && (
                         <button
-                          onClick={() => setCurrentStep(currentStep - 1)}
-                          className="mt-6 flex items-center gap-2 text-white/60 hover:text-white transition-colors"
-                        >
-                          <ChevronLeft className="w-4 h-4" />
-                          Volver
-                        </button>
+                        onClick={() => setCurrentStep(currentStep - 1)}
+                        className="mt-6 flex items-center gap-2 text-slate-500 hover:text-slate-300 transition-colors"
+                      >
+                        <ChevronLeft className="w-4 h-4" />
+                        Volver
+                      </button>
                       )}
                     </motion.div>
                   )}
@@ -427,22 +426,22 @@ const QuizModal: React.FC<QuizModalProps> = ({ isOpen, onClose }) => {
                       className="space-y-6"
                     >
                       <div className="text-center space-y-3">
-                        <div className="w-16 h-16 bg-gradient-to-br from-pink-500 to-rose-600 rounded-full flex items-center justify-center mx-auto shadow-lg shadow-pink-500/30">
-                          <Sparkles className="w-8 h-8 text-white" />
+                        <div className="w-16 h-16 bg-slate-800 border-2 border-pink-500/30 rounded-full flex items-center justify-center mx-auto shadow-xl">
+                          <Sparkles className="w-8 h-8 text-pink-400" />
                         </div>
-                        <h3 className="text-2xl font-bold text-white">
+                        <h3 className="text-2xl font-bold text-slate-100">
                           ¡Último paso! ¿A qué correo enviamos tu estrategia?
                         </h3>
                       </div>
 
                       <form onSubmit={handleEmailSubmit} className="space-y-4">
                         <div className="relative">
-                          <div className="w-full p-4 rounded-2xl bg-slate-800/60 border border-slate-700/50 flex items-center gap-3 transition-all focus-within:border-pink-500 focus-within:bg-slate-700/60">
+                          <div className="w-full p-4 rounded-xl bg-slate-800 border border-slate-700 flex items-center gap-3 transition-all focus-within:border-pink-500 focus-within:bg-slate-800/80">
                             <input
                               type="email"
                               value={email}
                               onChange={(e) => setEmail(e.target.value)}
-                              className="flex-1 bg-transparent text-white placeholder-white/40 text-lg focus:outline-none"
+                              className="flex-1 bg-transparent text-slate-200 placeholder-slate-500 text-lg focus:outline-none"
                               placeholder="Escribe tu correo aquí"
                               required
                             />
@@ -451,7 +450,7 @@ const QuizModal: React.FC<QuizModalProps> = ({ isOpen, onClose }) => {
                               whileHover={!isLoading ? { scale: 1.05 } : {}}
                               whileTap={!isLoading ? { scale: 0.96 } : {}}
                               disabled={isLoading}
-                              className="w-12 h-12 rounded-full flex items-center justify-center bg-gradient-to-br from-pink-500 to-rose-600 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-pink-500/30"
+                              className="w-12 h-12 rounded-full flex items-center justify-center bg-gradient-to-br from-pink-500 to-rose-600 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
                             >
                               {isLoading ? (
                                 <Loader2 className="w-5 h-5 text-white animate-spin" />
@@ -475,21 +474,20 @@ const QuizModal: React.FC<QuizModalProps> = ({ isOpen, onClose }) => {
                       transition={{ duration: 0.3 }}
                     >
                       <div className="text-center mb-8">
-                        <div className="w-16 h-16 bg-gradient-to-br from-pink-500 to-rose-600 rounded-full 
-                                      flex items-center justify-center mx-auto mb-4 shadow-lg shadow-pink-500/30">
-                          <Gift className="w-8 h-8 text-white" />
+                        <div className="w-16 h-16 bg-slate-800 border-2 border-pink-500/30 rounded-full 
+                                      flex items-center justify-center mx-auto mb-4 shadow-xl">
+                          <Gift className="w-8 h-8 text-pink-400" />
                         </div>
-                        <h3 className="text-2xl font-bold text-white mb-2">
+                        <h3 className="text-2xl font-bold text-slate-100 mb-2">
                           Tu Plan Recomendado
                         </h3>
                       </div>
                       
-                      <div className="bg-gradient-to-br from-pink-500/10 to-rose-500/10 border border-pink-500/20 
-                                    rounded-2xl p-6 mb-6">
-                        <h4 className="text-xl font-bold text-white mb-2">
+                      <div className="bg-slate-800 border border-slate-700 rounded-xl p-6 mb-6">
+                        <h4 className="text-xl font-bold text-slate-100 mb-2">
                           {recommendation.title}
                         </h4>
-                        <p className="text-slate-300 mb-6">
+                        <p className="text-slate-400 mb-6">
                           {recommendation.reason}
                         </p>
                       </div>
@@ -502,14 +500,14 @@ const QuizModal: React.FC<QuizModalProps> = ({ isOpen, onClose }) => {
                           }}
                           className="w-full py-4 px-6 rounded-xl font-semibold text-white bg-gradient-to-r 
                                    from-pink-500 to-rose-600 hover:from-pink-600 hover:to-rose-700 
-                                   transition-all duration-200 text-center shadow-lg shadow-pink-500/30"
+                                   transition-all duration-200 text-center shadow-lg"
                         >
                           Agendar Mi Consulta con Descuento
                         </button>
                         
                         <button
                           onClick={resetQuiz}
-                          className="w-full py-3 px-6 rounded-xl font-medium text-white/70 hover:text-white 
+                          className="w-full py-3 px-6 rounded-xl font-medium text-slate-500 hover:text-slate-300 
                                    transition-colors"
                         >
                           Hacer el Quiz Nuevamente
