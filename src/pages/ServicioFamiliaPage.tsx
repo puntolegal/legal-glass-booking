@@ -582,7 +582,7 @@ export default function ServicioFamiliaPage() {
           </div>
         </div>
 
-        {/* Hero + Contador + Planes EN UNO - Conversión Inmediata */}
+        {/* Hero + Consulta Estratégica + Planes - Look iOS */}
         <section className="relative pt-6 md:pt-12 pb-8 md:pb-16 overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-r from-pink-500/10 via-transparent to-rose-500/10" />
           
@@ -599,15 +599,68 @@ export default function ServicioFamiliaPage() {
                 <span className="text-xs md:text-sm font-medium text-rose-600">Especialistas en Derecho de Familia</span>
               </div>
               
-              <h1 className="text-2xl md:text-5xl font-bold mb-3 md:mb-4 bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent leading-tight px-2">
+              <h1 className="text-2xl md:text-5xl font-bold mb-4 md:mb-6 bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent leading-tight px-2">
                 Tu familia, protegida con estrategia y empatía
               </h1>
+
+              {/* Consulta Estratégica Premium - CTA Prominente */}
+              <div className="max-w-2xl mx-auto mb-6 md:mb-8">
+                <div className="relative rounded-3xl">
+                  <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-pink-500/20 via-rose-500/20 to-pink-600/20 blur-xl" />
+                  <div className="absolute inset-0 rounded-3xl p-[1px] bg-gradient-to-br from-white/60 via-pink-200/40 to-rose-200/60">
+                    <div className="h-full w-full bg-white/80 dark:bg-slate-900/70 backdrop-blur-md rounded-3xl" />
+                  </div>
+                  
+                  <div className="relative p-6 md:p-8">
+                    <div className="flex items-center justify-center gap-2 mb-3">
+                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-pink-500 to-rose-600 flex items-center justify-center shadow-lg">
+                        <Sparkles className="w-5 h-5 text-white" />
+                      </div>
+                      <div className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white px-3 py-1.5 rounded-full shadow-lg text-xs font-bold">
+                        50% OFF CYBER
+                      </div>
+                    </div>
+
+                    <h3 className="text-xl md:text-2xl font-bold mb-2 bg-gradient-to-r from-pink-500 to-rose-600 bg-clip-text text-transparent">
+                      Consulta Estratégica Premium
+                    </h3>
+                    <p className="text-sm md:text-base text-muted-foreground mb-4">
+                      Análisis completo de tu caso + hoja de ruta + 100% reembolsable si contratas un plan
+                    </p>
+
+                    <div className="flex flex-col sm:flex-row gap-3 items-center justify-center mb-4">
+                      <div className="text-center">
+                        <div className="text-sm text-muted-foreground line-through mb-1">$300.000</div>
+                        <div className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-pink-500 to-rose-600 bg-clip-text text-transparent">
+                          $150.000
+                        </div>
+                      </div>
+                    </div>
+
+                    <Link
+                      to="/agendamiento?plan=consulta-estrategica-familia"
+                      className="block w-full py-4 bg-gradient-to-r from-pink-500 to-rose-600 text-white rounded-2xl font-bold hover:shadow-2xl hover:shadow-rose-500/30 transition-all duration-300 flex items-center justify-center gap-2 text-base md:text-lg"
+                      style={{
+                        boxShadow: '0 8px 24px rgba(244, 63, 94, 0.4)'
+                      }}
+                    >
+                      <Calendar className="w-5 h-5" />
+                      Agendar Consulta Estratégica
+                    </Link>
+
+                    <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground mt-3">
+                      <CheckCircle className="w-4 h-4 text-rose-500" />
+                      <span>Reembolso completo si contratas cualquier plan</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
               
-              {/* Contador INTEGRADO en Hero */}
-              <div className="max-w-lg mx-auto mb-4 md:mb-6">
-                <div className="relative rounded-2xl">
-                  <div className="absolute inset-0 rounded-2xl p-[1px] bg-gradient-to-br from-white/60 via-pink-200/40 to-rose-200/60">
-                    <div className="h-full w-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl rounded-2xl" />
+              {/* Contador CYBER */}
+              <div className="max-w-lg mx-auto mb-6">
+                <div className="relative rounded-3xl">
+                  <div className="absolute inset-0 rounded-3xl p-[1px] bg-gradient-to-br from-white/60 via-pink-200/40 to-rose-200/60">
+                    <div className="h-full w-full bg-white/90 dark:bg-slate-900/80 backdrop-blur-xl rounded-3xl" />
                   </div>
                   
                   <div className="relative p-4 md:p-6">
@@ -619,37 +672,42 @@ export default function ServicioFamiliaPage() {
                     </div>
                     
                     <h3 className="text-sm md:text-lg font-bold text-center mb-3 bg-gradient-to-r from-pink-500 to-rose-600 bg-clip-text text-transparent">
-                      Termina en:
+                      Oferta termina en:
                     </h3>
                     
                     <CountdownTimer />
                     
                     <div className="flex items-center justify-center gap-2 text-xs md:text-sm text-muted-foreground mt-3">
                       <AlertCircle className="w-4 h-4 text-rose-500" />
-                      <span>Solo <strong className="text-rose-600">8 cupos</strong> este mes</span>
+                      <span>Solo <strong className="text-rose-600">8 cupos</strong> disponibles este mes</span>
                     </div>
-                </div>
+                  </div>
                 </div>
               </div>
             </motion.div>
 
-            {/* PLANES EN EL HERO - Inmediatos */}
-            <div className="grid md:grid-cols-3 gap-4 md:gap-6 max-w-7xl mx-auto mb-6 md:mb-8">
+            {/* PLANES - Look iOS Glassmorphism */}
+            <div className="grid md:grid-cols-3 gap-4 md:gap-6 max-w-7xl mx-auto">
               {packages.map((pkg, index) => (
                 <motion.div
                   key={index}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.15 }}
+                  transition={{ delay: index * 0.1 }}
                   className={pkg.popular ? 'md:scale-105' : ''}
                 >
-                  <div className="relative rounded-2xl">
-                    <div className={`absolute inset-0 rounded-2xl p-[1px] ${
+                  <div className="relative rounded-3xl h-full">
+                    {/* Glow effect para el más popular */}
+                    {pkg.popular && (
+                      <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-pink-500/20 via-rose-500/20 to-pink-600/20 blur-xl" />
+                    )}
+                    
+                    <div className={`absolute inset-0 rounded-3xl p-[1px] ${
                       pkg.popular
-                        ? 'bg-gradient-to-br from-pink-400/50 via-rose-400/50 to-pink-400/50'
-                        : 'bg-gradient-to-br from-white/40 via-gray-200/30 to-white/40 dark:from-gray-700/40'
+                        ? 'bg-gradient-to-br from-pink-400/60 via-rose-400/60 to-pink-400/60'
+                        : 'bg-gradient-to-br from-white/50 via-gray-200/30 to-white/50 dark:from-gray-700/50'
                     }`}>
-                      <div className="h-full w-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl rounded-2xl" />
+                      <div className="h-full w-full bg-white/80 dark:bg-slate-900/70 backdrop-blur-md rounded-3xl" />
                     </div>
                     
                     <div className="relative p-5 md:p-8">
@@ -693,13 +751,19 @@ export default function ServicioFamiliaPage() {
                       
                       <Link
                         to={`/agendamiento?plan=${pkg.id}`}
-                        className={`block w-full text-center py-2.5 md:py-3 px-4 rounded-xl font-bold transition-all text-xs md:text-base ${
+                        className={`block w-full text-center py-3 md:py-4 px-4 rounded-2xl font-bold transition-all duration-300 text-sm md:text-base ${
                           pkg.popular
-                            ? 'bg-gradient-to-r from-pink-500 to-rose-600 text-white hover:from-pink-600 hover:to-rose-700 shadow-xl shadow-rose-500/30'
-                            : 'bg-pink-100 dark:bg-pink-950/30 text-rose-700 dark:text-rose-400 hover:bg-pink-200'
+                            ? 'bg-gradient-to-r from-pink-500 to-rose-600 text-white hover:shadow-2xl hover:shadow-rose-500/40'
+                            : 'bg-white/60 dark:bg-slate-800/60 border border-pink-200/50 dark:border-pink-900/50 text-rose-700 dark:text-rose-400 hover:bg-white/80 dark:hover:bg-slate-800/80 backdrop-blur-sm'
                         }`}
+                        style={pkg.popular ? {
+                          boxShadow: '0 8px 24px rgba(244, 63, 94, 0.3)'
+                        } : undefined}
                       >
-                        Elegir {pkg.shortName}
+                        <div className="flex items-center justify-center gap-2">
+                          <Calendar className="w-4 h-4" />
+                          Elegir {pkg.shortName}
+                        </div>
                       </Link>
                   </div>
                   </div>
@@ -707,18 +771,28 @@ export default function ServicioFamiliaPage() {
               ))}
             </div>
 
-            {/* Botón ¿Qué plan necesito? debajo de los planes */}
-            <div className="text-center">
-              <button
-                onClick={() => setShowQuiz(true)}
-                className="inline-flex items-center gap-2 bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border-2 border-pink-200 dark:border-pink-800 text-foreground px-6 md:px-8 py-3 md:py-4 rounded-xl font-semibold hover:bg-white dark:hover:bg-slate-800 transition-all shadow-lg"
-              >
-                <Sparkles className="w-5 h-5" />
-                ¿Qué plan necesito?
-              </button>
-              <p className="text-xs md:text-sm text-muted-foreground mt-3">
-                Responde 3 preguntas y te recomendamos el plan ideal
-              </p>
+            {/* Botón Quiz - Look iOS */}
+            <div className="text-center mt-8">
+              <div className="max-w-md mx-auto">
+                <div className="relative rounded-3xl">
+                  <div className="absolute inset-0 rounded-3xl p-[1px] bg-gradient-to-br from-white/50 via-gray-200/30 to-white/50">
+                    <div className="h-full w-full bg-white/70 dark:bg-slate-900/60 backdrop-blur-md rounded-3xl" />
+                  </div>
+                  
+                  <div className="relative p-6">
+                    <p className="text-sm text-muted-foreground mb-4">
+                      ¿No sabes cuál plan necesitas?
+                    </p>
+                    <button
+                      onClick={() => setShowQuiz(true)}
+                      className="w-full py-4 bg-white/80 dark:bg-slate-800/80 border border-pink-200/50 dark:border-pink-900/50 text-rose-700 dark:text-rose-400 rounded-2xl font-bold hover:bg-white dark:hover:bg-slate-800 backdrop-blur-sm transition-all duration-300 flex items-center justify-center gap-2"
+                    >
+                      <Sparkles className="w-5 h-5" />
+                      Descubre tu plan ideal en 2 minutos
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </section>
