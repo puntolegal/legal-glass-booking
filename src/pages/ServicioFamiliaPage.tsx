@@ -7,6 +7,9 @@ import {
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import SEO from '../components/SEO'
+import CountdownTimer from "@/components/familia/CountdownTimer"
+import QuizModal from "@/components/familia/QuizModal"
+import FamilyIntakeModal from "@/components/familia/FamilyIntakeModal"
 
 const services = [
   {
@@ -546,6 +549,17 @@ const QuizModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }
 
 export default function ServicioFamiliaPage() {
   const [showQuiz, setShowQuiz] = useState(false)
+  const [isIntakeOpen, setIsIntakeOpen] = useState(false)
+  const [selectedPlan, setSelectedPlan] = useState<{
+    type: 'integral' | 'premium' | 'elite';
+    name: string;
+    price: string;
+  } | null>(null)
+
+  const handlePlanSelect = (type: 'integral' | 'premium' | 'elite', name: string, price: string) => {
+    setSelectedPlan({ type, name, price })
+    setIsIntakeOpen(true)
+  }
 
   return (
     <>
@@ -749,8 +763,12 @@ export default function ServicioFamiliaPage() {
                         )}
                       </ul>
                       
-                      <Link
-                        to={`/agendamiento?plan=${pkg.id}`}
+                      <button
+                        onClick={() => handlePlanSelect(
+                          pkg.id.replace('familia-', '') as 'integral' | 'premium' | 'elite',
+                          pkg.name,
+                          `${pkg.price} (antes ${pkg.originalPrice})`
+                        )}
                         className={`block w-full text-center py-3 md:py-4 px-4 rounded-2xl font-bold transition-all duration-300 text-sm md:text-base ${
                           pkg.popular
                             ? 'bg-gradient-to-r from-pink-500 to-rose-600 text-white hover:shadow-2xl hover:shadow-rose-500/40'
@@ -764,7 +782,7 @@ export default function ServicioFamiliaPage() {
                           <Calendar className="w-4 h-4" />
                           Elegir {pkg.shortName}
                         </div>
-                      </Link>
+                      </button>
                   </div>
                   </div>
                 </motion.div>
