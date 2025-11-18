@@ -19,40 +19,54 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Tema Claro - Estilo App Motion Premium */
-    --background: 30 20% 96%; /* #f7f5f3 - Beige/gris muy claro */
-    --foreground: 0 0% 15%; /* #262626 - Gris oscuro suave */
-    --card: 0 0% 100%; /* #ffffff - Blanco puro para cards */
-    --card-foreground: 0 0% 20%; /* #333333 - Gris oscuro para texto en cards */
+    /* PALETA PROFESIONAL - Confianza y Credibilidad */
+    --background: 0 0% 100%; /* #ffffff - Blanco puro profesional */
+    --foreground: 220 40% 18%; /* Navy 900 - Títulos principales */
+    --card: 0 0% 100%; /* #ffffff - Cards limpios */
+    --card-foreground: 220 35% 25%; /* Navy 800 - Texto en cards */
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 20%;
+    --popover-foreground: 220 35% 25%;
 
-    --primary: 20 95% 55%; /* #ff6b35 - Naranja más sofisticado */
+    /* PRIMARIOS - Profesionalismo */
+    --primary: 35 88% 48%; /* Amber 600 - CTA profesional */
     --primary-foreground: 0 0% 100%;
-    --secondary: 30 10% 94%; /* #f3f1ef - Gris/beige secundario */
-    --secondary-foreground: 0 0% 30%;
-    --muted: 30 10% 92%; /* #ebe9e7 - Gris muted */
-    --muted-foreground: 0 0% 45%; /* #737373 - Texto muted */
-    --accent: 20 90% 60%; /* #ff8052 - Naranja accent más suave */
+    --secondary: 220 12% 96%; /* Slate 100 - Fondo sutil */
+    --secondary-foreground: 220 40% 18%;
+    --muted: 220 10% 92%; /* Slate 200 - Elementos muted */
+    --muted-foreground: 220 12% 55%; /* Slate 500 - Texto secundario */
+    --accent: 35 90% 55%; /* Amber 500 - Acento hover */
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 92%; /* #ebebeb - Bordes muy sutiles */
-    --input: 0 0% 95%; /* #f2f2f2 - Inputs claros */
-    --ring: 20 95% 55%;
+    --destructive: 350 88% 52%; /* Rose 600 - Alertas */
+    --destructive-foreground: 0 0% 100%;
+    --border: 220 10% 92%; /* Slate 200 - Bordes profesionales */
+    --input: 220 12% 96%; /* Slate 100 - Inputs sutiles */
+    --ring: 35 88% 48%;
 
-    /* Variables CSS Premium Unificadas - Modo Claro */
-    --accent-start: 20 95% 55%; /* #ff6b35 */
-    --accent-end: 15 90% 50%; /* #e85a2c */
-    --neon-shadow: 20 95% 55% / 0.15; /* Sombras más sutiles */
+    /* COLORES PROFESIONALES ADICIONALES */
+    --navy-950: 220 40% 12%;
+    --navy-900: 220 40% 18%;
+    --navy-800: 220 35% 25%;
+    --navy-700: 220 30% 32%;
+    --slate-700: 220 18% 35%;
+    --slate-600: 220 15% 45%;
+    --slate-500: 220 12% 55%;
+    --slate-400: 220 10% 65%;
+    --slate-50: 220 15% 98%;
+    --slate-100: 220 12% 96%;
+    --slate-200: 220 10% 92%;
+    --amber-600: 35 88% 48%;
+    --amber-500: 35 90% 55%;
+    --emerald-600: 150 65% 42%;
+    --emerald-100: 150 60% 95%;
+    --emerald-700: 150 65% 35%;
+    --rose-600: 350 88% 52%;
     
-    /* Glassmorphism Premium - Modo Claro */
-    --glass-bg: 255 255 255 / 0.7; /* Más transparente */
-    --glass-border: 255 255 255 / 0.5;
-    --glass-blur: 16px; /* Blur más sutil */
-    --glass-intense: 255 255 255 / 0.85;
-    --glass-glow: 20 95% 55% / 0.1;
+    /* GLASSMORPHISM SUTIL PROFESIONAL */
+    --glass-bg: 255 255 255 / 0.94;
+    --glass-border: 255 255 255 / 0.12;
+    --glass-blur: 16px;
+    --glass-shadow: 0 0 0 / 0.06;
     
     /* Gradientes Premium - Modo Claro */
     --gradient-primary: linear-gradient(135deg, hsl(20 95% 55%), hsl(15 90% 50%));
