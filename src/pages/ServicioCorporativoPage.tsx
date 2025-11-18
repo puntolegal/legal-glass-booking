@@ -123,12 +123,13 @@ export default function ServicioCorporativoPage() {
               </div>
               
               <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent">
-                Potencia tu Empresa con Asesoría Legal Experta
+                Asesoría Legal Corporativa
               </h1>
               
-              <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
-                Desde la constitución hasta operaciones complejas de M&A, somos tu socio estratégico 
-                para el crecimiento empresarial con seguridad jurídica total.
+              <p className="text-xl md:text-2xl text-muted-foreground mb-8 leading-relaxed">
+                Constituimos empresas en <strong className="text-primary">18 horas</strong>, 
+                estructuramos operaciones que ahorran <strong className="text-primary">hasta $20M</strong> en contingencias, 
+                y acompañamos procesos de M&A superiores a <strong className="text-primary">$50M USD</strong>.
               </p>
               
               <div className="flex flex-wrap gap-4 justify-center">
