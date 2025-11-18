@@ -1,7 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { Resend } from "npm:resend@2.0.0";
 
-const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
+const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -452,31 +451,55 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Enviar email al cliente
     console.log("📧 Enviando email al cliente:", bookingData.email);
-    const clientEmailResponse = await resend.emails.send({
-      from: mailFrom,
-      to: [bookingData.email],
-      subject: `Consulta Confirmada - ${bookingData.trackingCode}`,
-      html: getClientEmailTemplate(bookingData),
+    const clientEmailResponse = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${RESEND_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        from: mailFrom,
+        to: [bookingData.email],
+        subject: `Consulta Confirmada - ${bookingData.trackingCode}`,
+        html: getClientEmailTemplate(bookingData),
+      }),
     });
 
-    console.log("✅ Email cliente enviado:", clientEmailResponse);
+    if (!clientEmailResponse.ok) {
+      throw new Error(`Error enviando email al cliente: ${await clientEmailResponse.text()}`);
+    }
+
+    const clientData = await clientEmailResponse.json();
+    console.log("✅ Email cliente enviado:", clientData);
 
     // Enviar email al admin
     console.log("📧 Enviando email al admin:", adminEmail);
-    const adminEmailResponse = await resend.emails.send({
-      from: mailFrom,
-      to: [adminEmail],
-      subject: `Nueva Reserva - ${bookingData.nombre}`,
-      html: getAdminEmailTemplate(bookingData),
+    const adminEmailResponse = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${RESEND_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        from: mailFrom,
+        to: [adminEmail],
+        subject: `Nueva Reserva - ${bookingData.nombre}`,
+        html: getAdminEmailTemplate(bookingData),
+      }),
     });
 
-    console.log("✅ Email admin enviado:", adminEmailResponse);
+    if (!adminEmailResponse.ok) {
+      throw new Error(`Error enviando email al admin: ${await adminEmailResponse.text()}`);
+    }
+
+    const adminData = await adminEmailResponse.json();
+    console.log("✅ Email admin enviado:", adminData);
 
     return new Response(
       JSON.stringify({
         success: true,
-        clientEmailId: clientEmailResponse.id,
-        adminEmailId: adminEmailResponse.id,
+        clientEmailId: clientData.id,
+        adminEmailId: adminData.id,
       }),
       {
         status: 200,

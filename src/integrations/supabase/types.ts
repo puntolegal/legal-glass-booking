@@ -14,6 +14,48 @@ export type Database = {
   }
   public: {
     Tables: {
+      family_quiz_responses: {
+        Row: {
+          bienes: string | null
+          contacted: boolean | null
+          created_at: string | null
+          email: string
+          empresa: string | null
+          id: string
+          internacional: string | null
+          nombre: string | null
+          recommended_plan: string
+          servicio: string
+          status: string | null
+        }
+        Insert: {
+          bienes?: string | null
+          contacted?: boolean | null
+          created_at?: string | null
+          email: string
+          empresa?: string | null
+          id?: string
+          internacional?: string | null
+          nombre?: string | null
+          recommended_plan: string
+          servicio: string
+          status?: string | null
+        }
+        Update: {
+          bienes?: string | null
+          contacted?: boolean | null
+          created_at?: string | null
+          email?: string
+          empresa?: string | null
+          id?: string
+          internacional?: string | null
+          nombre?: string | null
+          recommended_plan?: string
+          servicio?: string
+          status?: string | null
+        }
+        Relationships: []
+      }
       leads_quiz: {
         Row: {
           created_at: string | null
