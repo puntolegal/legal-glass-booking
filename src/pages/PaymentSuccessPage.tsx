@@ -57,7 +57,7 @@ export default function PaymentSuccessPage() {
 
   const processPaymentSuccess = async () => {
     try {
-      console.log('🚀 INICIANDO PaymentSuccessPage - processPaymentSuccess');
+      console.log('INICIANDO PaymentSuccessPage - processPaymentSuccess');
       setIsProcessing(true);
       setProcessingStatus('Procesando pago...');
 

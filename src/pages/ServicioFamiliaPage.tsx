@@ -654,11 +654,11 @@ export default function ServicioFamiliaPage() {
                     
                     <div className="relative p-5 md:p-8">
                       {pkg.popular && (
-                        <div className="absolute -top-2 md:-top-3 left-1/2 -translate-x-1/2">
-                          <div className="bg-gradient-to-r from-pink-500 to-rose-600 text-white px-3 md:px-5 py-1 md:py-1.5 rounded-full text-[10px] md:text-xs font-bold shadow-xl shadow-rose-500/30">
-                            ⭐ Más Popular
+                          <div className="absolute -top-2 md:-top-3 left-1/2 -translate-x-1/2">
+                            <div className="bg-gradient-to-r from-amber-600 to-amber-500 text-white px-3 md:px-5 py-1 md:py-1.5 rounded-full text-[10px] md:text-xs font-bold shadow-xl">
+                              <span className="uppercase tracking-wide">Más Popular</span>
+                            </div>
                           </div>
-                        </div>
                       )}
                       
                       <div className="text-center mb-4 md:mb-6">
@@ -797,9 +797,10 @@ export default function ServicioFamiliaPage() {
                     ))}
                   </div>
                   
-                  <div className="bg-rose-50 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-800 rounded-xl p-3 md:p-4 mb-4">
-                    <p className="text-xs md:text-sm font-medium text-rose-800 dark:text-rose-200 text-center">
-                      💎 Se descuenta 100% si contratas un plan
+                  <div className="bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800 rounded-xl p-3 md:p-4 mb-4">
+                    <p className="text-xs md:text-sm font-medium text-emerald-800 dark:text-emerald-200 text-center flex items-center justify-center gap-2">
+                      <CheckCircle className="w-4 h-4" />
+                      <span>Se descuenta 100% si contratas un plan</span>
                     </p>
                   </div>
                   

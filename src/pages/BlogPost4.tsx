@@ -318,7 +318,10 @@ const BlogPost4 = () => {
                 </div>
 
                 <div className="bg-gradient-to-r from-orange-500/10 to-red-500/10 rounded-xl p-6 mb-6 border border-orange-500/20">
-                  <h4 className="font-bold text-foreground mb-3">🚀 ¿Tu Caso es Similar?</h4>
+                  <h4 className="font-bold text-foreground mb-3 flex items-center gap-2">
+                    <TrendingUp className="w-5 h-5 text-orange-600" />
+                    ¿Tu Caso es Similar?
+                  </h4>
                   <p className="text-muted-foreground mb-4">
                     Si fuiste despedido injustificadamente, no estás solo. Nuestro equipo de abogados especializados puede ayudarte a obtener la compensación que mereces.
                   </p>
