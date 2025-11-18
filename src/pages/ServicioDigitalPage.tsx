@@ -97,7 +97,7 @@ export default function ServicioDigitalPage() {
               
               <div className="flex flex-wrap gap-4 justify-center">
                 <Link
-                  to="/contacto"
+                  to="/agendamiento?plan=startup-legal"
                   className="px-8 py-4 bg-primary text-white rounded-xl font-semibold hover:bg-primary/90 transition-all duration-300 shadow-lg hover:shadow-xl"
                 >
                   Consulta Digital
@@ -734,7 +734,7 @@ export default function ServicioDigitalPage() {
                 
                 <div className="flex flex-wrap gap-4 justify-center">
                   <Link
-                    to="/contacto"
+                    to="/agendamiento?plan=startup-legal"
                     className="px-8 py-4 bg-white text-primary rounded-xl font-semibold hover:bg-white/90 transition-all duration-300 shadow-lg hover:shadow-xl"
                   >
                     Consulta Digital

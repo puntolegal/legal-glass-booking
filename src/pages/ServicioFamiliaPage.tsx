@@ -984,11 +984,11 @@ export default function ServicioFamiliaPage() {
                   Consulta $150k
                 </Link>
                 <Link
-                  to="/contacto"
+                  to="/agendamiento?plan=familia"
                   className="px-6 md:px-8 py-3 md:py-4 bg-white/10 backdrop-blur-sm border border-white/30 text-white rounded-xl font-semibold hover:bg-white/20 flex items-center justify-center gap-2 text-sm md:text-base"
                 >
                   <Shield className="w-5 h-5" />
-                  Contacto
+                  Agendar Consulta
                 </Link>
               </div>
             </div>
