@@ -64,6 +64,33 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				navy: {
+					'950': 'hsl(var(--navy-950))',
+					'900': 'hsl(var(--navy-900))',
+					'800': 'hsl(var(--navy-800))',
+					'700': 'hsl(var(--navy-700))'
+				},
+				slate: {
+					'50': 'hsl(var(--slate-50))',
+					'100': 'hsl(var(--slate-100))',
+					'200': 'hsl(var(--slate-200))',
+					'400': 'hsl(var(--slate-400))',
+					'500': 'hsl(var(--slate-500))',
+					'600': 'hsl(var(--slate-600))',
+					'700': 'hsl(var(--slate-700))'
+				},
+				amber: {
+					'500': 'hsl(var(--amber-500))',
+					'600': 'hsl(var(--amber-600))'
+				},
+				emerald: {
+					'100': 'hsl(var(--emerald-100))',
+					'600': 'hsl(var(--emerald-600))',
+					'700': 'hsl(var(--emerald-700))'
+				},
+				rose: {
+					'600': 'hsl(var(--rose-600))'
 				}
 			},
 			borderRadius: {
