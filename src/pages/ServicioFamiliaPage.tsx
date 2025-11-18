@@ -137,7 +137,7 @@ const packages = [
       'Apoyo psicológico ilimitado',
       'WhatsApp 24/7 (incluye fines de semana)',
       'Seguimiento 12 meses + 1 modificación gratis',
-      '🎁 Hasta Corte Suprema incluido'
+      'Representación hasta Corte Suprema incluida'
     ],
     popular: false
   }
