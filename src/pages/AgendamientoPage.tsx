@@ -40,7 +40,7 @@ const serviceCatalog = {
   
   // Corporativo
   'basico': { name: 'Corporativo Básico', price: '350.000', category: 'Corporativo' },
-  'premium': { name: 'Corporativo Premium', price: '800.000', category: 'Corporativo' },
+  'corporativo-premium': { name: 'Corporativo Premium', price: '800.000', category: 'Corporativo' },
   'enterprise': { name: 'Corporativo Enterprise', price: '1.500.000', category: 'Corporativo' },
   'corporativo': { name: 'Asesoría Corporativa', price: '35.000', category: 'Corporativo', note: 'Consulta especializada' },
   
@@ -52,8 +52,7 @@ const serviceCatalog = {
   'familia': { name: 'Punto Legal Familia', price: '35.000', category: 'Familia', originalPrice: '70.000', discount: '50% OFF' },
   'integral': { name: 'Protección Familiar Integral', price: '550.000', category: 'Familia', originalPrice: '1.100.000', discount: '50% OFF CYBER' },
   'familia-integral': { name: 'Protección Familiar Integral', price: '550.000', category: 'Familia', originalPrice: '1.100.000', discount: '50% OFF CYBER' },
-  'premium': { name: 'Defensa Familiar Premium', price: '1.100.000', category: 'Familia', originalPrice: '2.200.000', discount: '50% OFF CYBER' },
-  'familia-premium': { name: 'Defensa Familiar Premium', price: '1.100.000', category: 'Familia', originalPrice: '2.200.000', discount: '50% OFF CYBER' },
+  'familia-premium-plan': { name: 'Defensa Familiar Premium', price: '1.100.000', category: 'Familia', originalPrice: '2.200.000', discount: '50% OFF CYBER' },
   'elite': { name: 'Blindaje Familiar Elite', price: '1.700.000', category: 'Familia', originalPrice: '3.400.000', discount: '50% OFF CYBER' },
   'familia-elite': { name: 'Blindaje Familiar Elite', price: '1.700.000', category: 'Familia', originalPrice: '3.400.000', discount: '50% OFF CYBER' },
   

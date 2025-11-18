@@ -284,6 +284,9 @@ const CountdownTimer = () => {
 const QuizModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
   const [step, setStep] = useState(1)
   const [answers, setAnswers] = useState<any>({})
+  const [email, setEmail] = useState('')
+  const [nombre, setNombre] = useState('')
+  const [isSaving, setIsSaving] = useState(false)
 
   useEffect(() => {
     if (isOpen) {
@@ -308,6 +311,37 @@ const QuizModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }
       return 'premium'
     }
     return 'integral'
+  }
+
+  const saveToSupabase = async () => {
+    setIsSaving(true)
+    try {
+      const { supabase } = await import('@/integrations/supabase/client')
+      const recommendation = getRecommendation()
+      
+      const { error } = await supabase
+        .from('family_quiz_responses')
+        .insert({
+          email,
+          nombre: nombre || null,
+          servicio: answers.servicio || 'no_especificado',
+          bienes: answers.bienes || null,
+          empresa: answers.empresa || null,
+          internacional: answers.internacional || null,
+          recommended_plan: recommendation
+        })
+      
+      if (error) {
+        console.error('Error guardando respuesta:', error)
+      } else {
+        console.log('✅ Respuesta guardada exitosamente')
+      }
+    } catch (error) {
+      console.error('Error guardando en Supabase:', error)
+    } finally {
+      setIsSaving(false)
+      setStep(5) // Pasar al resultado
+    }
   }
 
   const planDetails = {
@@ -422,7 +456,62 @@ const QuizModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }
           </div>
         )}
 
-        {step === 4 && (() => {
+        {step === 4 && (
+          <div className="space-y-4">
+            <div className="text-center mb-6">
+              <h4 className="text-xl font-bold mb-2">¡Casi listo! 🎯</h4>
+              <p className="text-sm text-muted-foreground">
+                Ingresa tu email para recibir tu plan recomendado personalizado
+              </p>
+            </div>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  Nombre (opcional)
+                </label>
+                <input
+                  type="text"
+                  value={nombre}
+                  onChange={(e) => setNombre(e.target.value)}
+                  placeholder="Tu nombre"
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-rose-500 focus:outline-none transition-colors"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  Email <span className="text-rose-600">*</span>
+                </label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="tu@email.com"
+                  required
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-rose-500 focus:outline-none transition-colors"
+                />
+              </div>
+              
+              <button
+                onClick={saveToSupabase}
+                disabled={!email || isSaving}
+                className="w-full bg-gradient-to-r from-pink-500 to-rose-600 text-white py-4 rounded-xl font-semibold hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isSaving ? 'Guardando...' : 'Ver Mi Plan Recomendado'}
+              </button>
+              
+              <button
+                onClick={() => setStep(3)}
+                className="block w-full text-center py-2 text-sm text-muted-foreground hover:text-foreground"
+              >
+                Volver
+              </button>
+            </div>
+          </div>
+        )}
+
+        {step === 5 && (() => {
           const recommendation = getRecommendation()
           const plan = planDetails[recommendation as keyof typeof planDetails]
           
