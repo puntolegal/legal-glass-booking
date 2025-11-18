@@ -92,6 +92,40 @@ const serviceCatalog = {
   // Penal Económico
   'penal-economico': { name: 'Punto Legal Penal Económico', price: '45.000', category: 'Penal Económico', originalPrice: '90.000', discount: '50% OFF' },
   
+  // Penal - Planes Específicos
+  'consulta-urgente-penal': { name: 'Consulta Urgente Penal', price: '180.000', category: 'Penal', originalPrice: '360.000', discount: '50% OFF' },
+  'defensa-esencial': { name: 'Defensa Penal Esencial', price: '650.000', category: 'Penal', originalPrice: '1.300.000', discount: '50% OFF' },
+  'defensa-premium': { name: 'Defensa Penal Premium', price: '1.200.000', category: 'Penal', originalPrice: '2.400.000', discount: '50% OFF' },
+  'defensa-elite': { name: 'Defensa Penal Elite', price: '2.500.000', category: 'Penal', originalPrice: '5.000.000', discount: '50% OFF' },
+  'defensa-urgente': { name: 'Defensa Penal Urgente', price: '180.000', category: 'Penal', originalPrice: '360.000', discount: '50% OFF' },
+  
+  // Inmobiliario - Planes Específicos
+  'comprador-seguro': { name: 'Comprador Seguro', price: '450.000', category: 'Inmobiliario', originalPrice: '900.000', discount: '50% OFF' },
+  'inversionista-pro': { name: 'Inversionista Pro', price: '850.000', category: 'Inmobiliario', originalPrice: '1.700.000', discount: '50% OFF' },
+  'desarrollador-elite': { name: 'Desarrollador Elite', price: '2.500.000', category: 'Inmobiliario', originalPrice: '5.000.000', discount: '50% OFF' },
+  
+  // Civil - Planes Específicos
+  'civil-evaluacion': { name: 'Evaluación Civil', price: '120.000', category: 'Civil', originalPrice: '240.000', discount: '50% OFF' },
+  'cobranza-express': { name: 'Cobranza Express', price: '280.000', category: 'Civil', originalPrice: '560.000', discount: '50% OFF' },
+  'litigios-premium': { name: 'Litigios Civil Premium', price: '950.000', category: 'Civil', originalPrice: '1.900.000', discount: '50% OFF' },
+  'corporativo-civil': { name: 'Civil Corporativo', price: '1.200.000', category: 'Civil', originalPrice: '2.400.000', discount: '50% OFF' },
+  
+  // Digital/Tecnológico - Planes Específicos
+  'startup-legal': { name: 'Startup Legal', price: '380.000', category: 'Digital', originalPrice: '760.000', discount: '50% OFF' },
+  'ecommerce-pro': { name: 'E-commerce Pro', price: '580.000', category: 'Digital', originalPrice: '1.160.000', discount: '50% OFF' },
+  'tech-enterprise': { name: 'Tech Enterprise', price: '1.200.000', category: 'Digital', originalPrice: '2.400.000', discount: '50% OFF' },
+  
+  // Penal Económico - Planes Específicos
+  'penal-economico-urgente': { name: 'Penal Económico Urgente', price: '250.000', category: 'Penal Económico', originalPrice: '500.000', discount: '50% OFF' },
+  'defensa-corporativa-urgente': { name: 'Defensa Corporativa Urgente', price: '500.000', category: 'Penal Económico', originalPrice: '1.000.000', discount: '50% OFF' },
+  
+  // Tributario - Planes Específicos
+  'planificacion-tributaria': { name: 'Planificación Tributaria', price: '180.000', category: 'Tributario', originalPrice: '360.000', discount: '50% OFF' },
+  
+  // Laboral - Planes Específicos
+  'trabajador': { name: 'Defensa Trabajador', price: '150.000', category: 'Laboral', originalPrice: '300.000', discount: '50% OFF' },
+  'empresa-laboral': { name: 'Defensa Empresa Laboral', price: '450.000', category: 'Laboral', originalPrice: '900.000', discount: '50% OFF' },
+  
   // Otros servicios
   'civil': { name: 'Derecho Civil', price: '45.000', category: 'Civil' },
   'penal': { name: 'Derecho Penal', price: '65.000', category: 'Penal' },
