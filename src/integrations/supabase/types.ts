@@ -56,39 +56,6 @@ export type Database = {
         }
         Relationships: []
       }
-      leads_quiz: {
-        Row: {
-          created_at: string | null
-          email: string
-          id: string
-          name: string
-          plan_recommended: string | null
-          quiz_answers: Json
-          status: string | null
-          updated_at: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          email: string
-          id?: string
-          name: string
-          plan_recommended?: string | null
-          quiz_answers: Json
-          status?: string | null
-          updated_at?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          email?: string
-          id?: string
-          name?: string
-          plan_recommended?: string | null
-          quiz_answers?: Json
-          status?: string | null
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
       profiles: {
         Row: {
           created_at: string
@@ -308,6 +275,76 @@ export type Database = {
         }
         Relationships: []
       }
+      apuntes_audits: {
+        Row: {
+          id: string
+          note_id: string
+          auditor_id: string
+          auditor_name: string
+          audited_at: string
+          comments: string | null
+          status: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          note_id: string
+          auditor_id: string
+          auditor_name: string
+          audited_at?: string
+          comments?: string | null
+          status?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          note_id?: string
+          auditor_id?: string
+          auditor_name?: string
+          audited_at?: string
+          comments?: string | null
+          status?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      leads_quiz: {
+        Row: {
+          id: string
+          name: string
+          email: string
+          quiz_answers: Json
+          plan_recommended: string | null
+          status: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          name: string
+          email: string
+          quiz_answers: Json
+          plan_recommended?: string | null
+          status?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          name?: string
+          email?: string
+          quiz_answers?: Json
+          plan_recommended?: string | null
+          status?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+>>>>>>> bb1da85 (feat: Agregar tabla apuntes_audits a Supabase y actualizar tipos TypeScript)
     }
     Views: {
       [_ in never]: never
