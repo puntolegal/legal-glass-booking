@@ -270,21 +270,3 @@ Este conjunto de commits representa una **refactorización significativa** del f
 **¡El sistema está ahora más robusto, eficiente y confiable!** 🎉🚀✨
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

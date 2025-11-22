@@ -20,7 +20,6 @@ import {
   MessageSquare
 } from 'lucide-react';
 import SEO from '../components/SEO';
-import GlassLayout from '@/components/layout/GlassLayout';
 
 interface BlogPost {
   id: string;
@@ -368,7 +367,15 @@ export default function BlogPage() {
   const featuredPosts = blogPosts.filter(post => post.featured);
 
   return (
-    <GlassLayout>
+    <>
+      <SEO 
+        title="Blog Legal - Punto Legal"
+        description="Artículos especializados en derecho laboral, corporativo, familia, inmobiliario y más. Mantente informado con nuestros expertos legales."
+        keywords="blog legal, derecho chile, artículos jurídicos, asesoría legal, punto legal"
+      />
+      
+      <div className="min-h-screen bg-gradient-to-b from-background to-background/50 pt-20">
+        {/* Hero Section */}
         <section className="py-16 border-b border-white/10">
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto text-center">
@@ -649,6 +656,7 @@ export default function BlogPage() {
             </div>
           </div>
         </section>
-    </GlassLayout>
+      </div>
+    </>
   );
 } 

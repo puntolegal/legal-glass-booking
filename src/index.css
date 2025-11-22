@@ -1,59 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Merriweather:wght@300;400;700&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-/* 🎨 Atelier Legal - Paper & Glass Design System */
-
-/* Textura de Papel Base */
-.bg-paper-texture {
-  background-color: #FAFAF9; /* Stone 50 */
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
-}
-
-/* Textura de papel global sutil */
-.paper-noise {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  opacity: 0.02;
-  z-index: 0;
-  mix-blend-mode: multiply;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-}
-
-/* Tipografía Serif para títulos legales */
-@layer base {
-  .font-serif {
-    font-family: 'Playfair Display', 'Merriweather', 'Georgia', serif;
-  }
-}
-
-/* 🎨 iOS Glass Laboratory - Animaciones */
-@keyframes blob {
-  0%, 100% {
-    transform: translate(0, 0) scale(1);
-  }
-  33% {
-    transform: translate(30px, -50px) scale(1.1);
-  }
-  66% {
-    transform: translate(-20px, 20px) scale(0.9);
-  }
-}
-
-.animate-blob {
-  animation: blob 7s ease-in-out infinite;
-}
-
-.animation-delay-2000 {
-  animation-delay: 2s;
-}
-
-.animation-delay-4000 {
-  animation-delay: 4s;
-}
 
 /* Estilos para scrollbar personalizada */
 .scrollbar-hide {
@@ -250,11 +198,6 @@ All colors MUST be HSL.
   .dark body::after {
     background: radial-gradient(circle, hsl(16 80% 45% / 0.2) 0%, hsl(22 85% 55% / 0.12) 50%, hsl(30 70% 60% / 0.06) 80%, transparent 100%);
   }
-}
-
-.bg-noise {
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
-  pointer-events: none;
 }
 
 @layer components {

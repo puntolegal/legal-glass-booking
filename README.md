@@ -1,448 +1,183 @@
-# 🏛️ Punto Legal - Plataforma Legal Premium
+# Supabase CLI
 
-> Startup legal chilena que democratiza el acceso a la justicia con tecnología de clase mundial
+[![Coverage Status](https://coveralls.io/repos/github/supabase/cli/badge.svg?branch=main)](https://coveralls.io/github/supabase/cli?branch=main) [![Bitbucket Pipelines](https://img.shields.io/bitbucket/pipelines/supabase-cli/setup-cli/master?style=flat-square&label=Bitbucket%20Canary)](https://bitbucket.org/supabase-cli/setup-cli/pipelines) [![Gitlab Pipeline Status](https://img.shields.io/gitlab/pipeline-status/sweatybridge%2Fsetup-cli?label=Gitlab%20Canary)
+](https://gitlab.com/sweatybridge/setup-cli/-/pipelines)
 
-[![Build Status](https://img.shields.io/badge/build-passing-brightgreen)]()
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.5-blue)]()
-[![React](https://img.shields.io/badge/React-18-61dafb)]()
-[![License](https://img.shields.io/badge/license-MIT-blue)]()
-[![Lighthouse](https://img.shields.io/badge/Lighthouse-98%2F100-success)]()
+[Supabase](https://supabase.io) is an open source Firebase alternative. We're building the features of Firebase using enterprise-grade open source tools.
 
----
+This repository contains all the functionality for Supabase CLI.
 
-## 🚀 Descripción
+- [x] Running Supabase locally
+- [x] Managing database migrations
+- [x] Creating and deploying Supabase Functions
+- [x] Generating types directly from your database schema
+- [x] Making authenticated HTTP requests to [Management API](https://supabase.com/docs/reference/api/introduction)
 
-**Punto Legal** es una plataforma web moderna que conecta clientes con servicios legales especializados. Combina una experiencia de usuario premium inspirada en iOS 2025 con arquitectura de software de élite para maximizar la conversión en servicios de alto valor.
+## Getting started
 
-### ✨ Características Principales
+### Install the CLI
 
-- 🎯 **Sistema de Agendamiento Premium** con 3 pasos optimizados para conversión
-- 📚 **Plataforma de Apuntes Gamificada** para estudiantes de Derecho
-- 💳 **Integración con MercadoPago** para pagos seguros
-- 🎨 **Diseño Glassmorphism** con modo oscuro completo
-- ♿ **Accesibilidad WCAG 2.1 AA** (Lighthouse: 98/100)
-- ⚡ **Performance Optimizada** (Code splitting, lazy loading, caché)
-- 📱 **Responsive Design** mobile-first
-
----
-
-## 🛠️ Tecnologías Clave
-
-### Core Stack
-- **React 18** - UI library con Concurrent Features
-- **TypeScript 5.5** - Type safety en strict mode
-- **Vite** - Build tool ultra-rápido
-- **Tailwind CSS** - Utility-first CSS framework
-
-### State Management
-- **Context API** - Estado global
-- **React Hook Form** - Formularios optimizados (-60% re-renders)
-
-### UI/UX
-- **Framer Motion** - Animaciones premium 60fps
-- **Lucide React** - Iconos modernos y ligeros
-- **Sonner** - Toast notifications elegantes
-
-### Backend & Integrations
-- **Supabase** - Backend as a Service (PostgreSQL + Auth)
-- **MercadoPago** - Procesador de pagos
-- **Resend** - Servicio de emails transaccionales
-
-### SEO & Meta
-- **React Helmet Async** - Meta tags dinámicos
-- **Sitemap** - SEO optimization
-
-### Quality & Testing
-- **Vitest** - Unit testing framework
-- **React Testing Library** - Component testing
-- **Lighthouse CI** - Auditorías automatizadas
-- **Husky** - Git hooks
-- **ESLint + Prettier** - Code quality
-
----
-
-## 🏗️ Arquitectura de Élite
-
-### Filosofía de Diseño
-
-1. **Configuración sobre Lógica Condicional**
-   - Layouts definidos en `layoutConfig.ts`
-   - Sistema declarativo y escalable
-
-2. **Accesibilidad First**
-   - ARIA attributes completos
-   - Navegación por teclado 100%
-   - WCAG 2.1 Level AA compliant
-
-3. **Performance Obsessiva**
-   - Code splitting automático
-   - Lazy loading de componentes
-   - Caché inteligente (5 min)
-   - Bundle inicial: -45%
-
-4. **Conversión por Diseño**
-   - ConversionSidebar estratégica
-   - ProgressBar visual
-   - Validación en tiempo real
-   - Sin distracciones (layout de foco)
-
-### Estructura del Proyecto
-
-```
-src/
-├── components/
-│   ├── agendamiento/           # Sistema de agendamiento premium
-│   │   ├── ConversionSidebar   # Columna de confianza
-│   │   ├── ProgressBar         # Indicador de pasos
-│   │   ├── steps/              # 3 pasos modulares
-│   │   └── ui/                 # Componentes atómicos
-│   └── layout/                 # Sistema de layouts
-│       ├── MainLayout          # Orquestador central
-│       └── footers/            # Footers modulares
-├── config/
-│   └── layoutConfig.ts         # Configuración declarativa
-├── contexts/                   # State management
-├── hooks/                      # Custom hooks
-├── utils/                      # Helper functions
-└── types/                      # TypeScript interfaces
-```
-
----
-
-## 🚦 Cómo Empezar
-
-### Requisitos Previos
-
-- Node.js 18+ 
-- npm o yarn
-- Git
-
-### Instalación
+Available via [NPM](https://www.npmjs.com) as dev dependency. To install:
 
 ```bash
-# Clonar el repositorio
-git clone https://github.com/tu-org/legal-glass-booking.git
-cd legal-glass-booking
-
-# Instalar dependencias
-npm install
-
-# Configurar variables de entorno
-cp .env.example .env
-# Editar .env con tus credenciales de Supabase y MercadoPago
-
-# Iniciar servidor de desarrollo
-npm run dev
+npm i supabase --save-dev
 ```
 
-### Scripts Disponibles
+To install the beta release channel:
 
 ```bash
-npm run dev          # Servidor de desarrollo (http://localhost:5173)
-npm run build        # Build de producción
-npm run preview      # Preview del build
-npm run lint         # Ejecutar ESLint
-npm run type-check   # Verificar TypeScript
-npm run test         # Ejecutar tests (Vitest)
-npm run test:ui      # UI de tests
-npm run lighthouse   # Auditoría de Lighthouse
+npm i supabase@beta --save-dev
 ```
 
----
-
-## 📊 Métricas de Calidad
-
-### Lighthouse Scores
-
-| Categoría | Score | Status |
-|-----------|-------|--------|
-| Performance | 94/100 | ✅ Excelente |
-| Accessibility | 98/100 | ✅ Excelente |
-| Best Practices | 100/100 | ✅ Perfecto |
-| SEO | 100/100 | ✅ Perfecto |
-
-### Core Web Vitals
-
-| Métrica | Valor | Target | Status |
-|---------|-------|--------|--------|
-| LCP (Largest Contentful Paint) | 1.4s | < 2.5s | ✅ |
-| FID (First Input Delay) | 45ms | < 100ms | ✅ |
-| CLS (Cumulative Layout Shift) | 0.02 | < 0.1 | ✅ |
-
-### Bundle Size
-
-| Asset | Tamaño | Gzip | Status |
-|-------|--------|------|--------|
-| index.js | 2.1 MB | 720 KB | ✅ Optimizado |
-| CSS | 273 KB | 37 KB | ✅ |
-
----
-
-## 🎯 Sistema de Layouts
-
-### Layout Types
-
-| Ruta | Tipo | Header | Footer | Características |
-|------|------|--------|--------|----------------|
-| `/agendamiento` | Focus | ❌ | ❌ | Sin distracciones, conversión máxima |
-| `/apuntes/*` | Apuntes | ✅ | ✅ | Header que se oculta, footer premium |
-| `/servicios/familia` | Default | ✅ | ❌ | Footer propio integrado |
-| Resto | Default | ✅ | ✅ | Layout estándar |
-
-### Cómo Agregar un Nuevo Layout
-
-```typescript
-// 1. Configurar en src/config/layoutConfig.ts
-{
-  pathPrefix: '/nueva-seccion',
-  config: {
-    type: 'custom',
-    showHeader: true,
-    showFooter: true,
-    headerVariant: 'default',
-    footerVariant: 'custom',
-    seoConfig: {
-      titleSuffix: 'Nueva Sección',
-      defaultDescription: 'Descripción SEO'
-    }
-  }
-}
-
-// 2. Crear componente (si es necesario)
-// src/components/layout/footers/CustomFooter.tsx
-
-// 3. Actualizar despachador
-// src/components/Footer.tsx
-if (variant === 'custom') return <CustomFooter />;
-```
-
-**Listo!** No necesitas tocar ningún otro archivo.
-
----
-
-## 🎨 Flujo de Agendamiento
-
-### Experiencia del Usuario
+When installing with yarn 4, you need to disable experimental fetch with the following nodejs config.
 
 ```
-Paso 1: Tus Datos (Validación en tiempo real)
-  ↓
-Paso 2: Elige Horario (Tarjetas visuales + calendario)
-  ↓
-Paso 3: Confirma Pago (Resumen + MercadoPago)
-  ↓
-Confirmación ✓
+NODE_OPTIONS=--no-experimental-fetch yarn add supabase
 ```
 
-### Componentes Destacados
+> **Note**
+For Bun versions below v1.0.17, you must add `supabase` as a [trusted dependency](https://bun.sh/guides/install/trusted) before running `bun add -D supabase`.
 
-- **ConversionSidebar** - Garantía, testimonios, stats (sticky)
-- **ProgressBar** - 3 pasos visuales con animación
-- **Step3_Payment** - CTA gradiente pink-rose
-- **TimeSlotPicker** - Skeleton loaders + animaciones stagger
+<details>
+  <summary><b>macOS</b></summary>
 
-### Conversión Optimizada
+  Available via [Homebrew](https://brew.sh). To install:
 
-| Elemento | Impacto |
-|----------|---------|
-| Layout de foco | +20% engagement |
-| ConversionSidebar | +40% confianza |
-| ProgressBar visual | +25% completación |
-| Validación tiempo real | +35% menos errores |
-| **Total esperado** | **+50-75%** |
+  ```sh
+  brew install supabase/tap/supabase
+  ```
 
----
+  To install the beta release channel:
+  
+  ```sh
+  brew install supabase/tap/supabase-beta
+  brew link --overwrite supabase-beta
+  ```
+  
+  To upgrade:
 
-## 🧪 Testing
+  ```sh
+  brew upgrade supabase
+  ```
+</details>
 
-### Ejecutar Tests
+<details>
+  <summary><b>Windows</b></summary>
+
+  Available via [Scoop](https://scoop.sh). To install:
+
+  ```powershell
+  scoop bucket add supabase https://github.com/supabase/scoop-bucket.git
+  scoop install supabase
+  ```
+
+  To upgrade:
+
+  ```powershell
+  scoop update supabase
+  ```
+</details>
+
+<details>
+  <summary><b>Linux</b></summary>
+
+  Available via [Homebrew](https://brew.sh) and Linux packages.
+
+  #### via Homebrew
+
+  To install:
+
+  ```sh
+  brew install supabase/tap/supabase
+  ```
+
+  To upgrade:
+
+  ```sh
+  brew upgrade supabase
+  ```
+
+  #### via Linux packages
+
+  Linux packages are provided in [Releases](https://github.com/supabase/cli/releases). To install, download the `.apk`/`.deb`/`.rpm`/`.pkg.tar.zst` file depending on your package manager and run the respective commands.
+
+  ```sh
+  sudo apk add --allow-untrusted <...>.apk
+  ```
+
+  ```sh
+  sudo dpkg -i <...>.deb
+  ```
+
+  ```sh
+  sudo rpm -i <...>.rpm
+  ```
+
+  ```sh
+  sudo pacman -U <...>.pkg.tar.zst
+  ```
+</details>
+
+<details>
+  <summary><b>Other Platforms</b></summary>
+
+  You can also install the CLI via [go modules](https://go.dev/ref/mod#go-install) without the help of package managers.
+
+  ```sh
+  go install github.com/supabase/cli@latest
+  ```
+
+  Add a symlink to the binary in `$PATH` for easier access:
+
+  ```sh
+  ln -s "$(go env GOPATH)/bin/cli" /usr/bin/supabase
+  ```
+
+  This works on other non-standard Linux distros.
+</details>
+
+<details>
+  <summary><b>Community Maintained Packages</b></summary>
+
+  Available via [pkgx](https://pkgx.sh/). Package script [here](https://github.com/pkgxdev/pantry/blob/main/projects/supabase.com/cli/package.yml).
+  To install in your working directory:
+
+  ```bash
+  pkgx install supabase
+  ```
+
+  Available via [Nixpkgs](https://nixos.org/). Package script [here](https://github.com/NixOS/nixpkgs/blob/master/pkgs/development/tools/supabase-cli/default.nix).
+</details>
+
+### Run the CLI
 
 ```bash
-# Unit tests
-npm run test
-
-# Tests en watch mode
-npm run test:watch
-
-# Coverage report
-npm run test:coverage
-
-# UI interactiva
-npm run test:ui
+supabase bootstrap
 ```
 
-### Cobertura Objetivo
-
-- Lines: > 80%
-- Functions: > 80%
-- Branches: > 75%
-- Statements: > 80%
-
----
-
-## 📚 Documentación
-
-### Guías Disponibles
-
-1. **[ARQUITECTURA_REFACTORIZACION.md](./ARQUITECTURA_REFACTORIZACION.md)**
-   - Visión general del sistema
-   - Estructura de archivos
-   - Flujos del usuario
-
-2. **[GUIA_USO_LAYOUTS.md](./GUIA_USO_LAYOUTS.md)**
-   - Cómo usar el sistema de layouts
-   - Casos de uso prácticos
-   - Troubleshooting
-
-3. **[OPTIMIZACIONES_ELITE.md](./OPTIMIZACIONES_ELITE.md)**
-   - Detalles técnicos
-   - Métricas antes/después
-   - Patrones aplicados
-
-4. **[DEPLOYMENT_CHECKLIST.md](./DEPLOYMENT_CHECKLIST.md)**
-   - Lista pre-deploy
-   - Comandos de despliegue
-   - Monitoreo post-deploy
-
----
-
-## 🚀 Despliegue
-
-### Vercel (Recomendado)
+Or using npx:
 
 ```bash
-# Instalar Vercel CLI
-npm i -g vercel
-
-# Deploy
-vercel --prod
+npx supabase bootstrap
 ```
 
-### Netlify
+The bootstrap command will guide you through the process of setting up a Supabase project using one of the [starter](https://github.com/supabase-community/supabase-samples/blob/main/samples.json) templates.
 
-```bash
-# Build
-npm run build
+## Docs
 
-# Deploy
-netlify deploy --prod --dir=dist
+Command & config reference can be found [here](https://supabase.com/docs/reference/cli/about).
+
+## Breaking changes
+
+We follow semantic versioning for changes that directly impact CLI commands, flags, and configurations.
+
+However, due to dependencies on other service images, we cannot guarantee that schema migrations, seed.sql, and generated types will always work for the same CLI major version. If you need such guarantees, we encourage you to pin a specific version of CLI in package.json.
+
+## Developing
+
+To run from source:
+
+```sh
+# Go >= 1.22
+go run . help
 ```
-
-### Variables de Entorno Requeridas
-
-```env
-VITE_SUPABASE_URL=tu_supabase_url
-VITE_SUPABASE_ANON_KEY=tu_supabase_key
-VITE_MERCADOPAGO_PUBLIC_KEY=tu_mp_public_key
-VITE_RESEND_API_KEY=tu_resend_key
-```
-
----
-
-## 🤝 Contribuir
-
-### Workflow de Desarrollo
-
-1. Crear rama feature: `git checkout -b feature/nueva-funcionalidad`
-2. Desarrollar con `npm run dev`
-3. Ejecutar tests: `npm run test`
-4. Commit (Husky ejecutará lint automáticamente)
-5. Push y crear Pull Request
-
-### Estándares de Código
-
-- ✅ TypeScript strict mode
-- ✅ ESLint + Prettier configurados
-- ✅ Pre-commit hooks activos
-- ✅ Tests requeridos para nuevas features
-- ✅ Lighthouse CI en PR
-
----
-
-## 📈 Roadmap
-
-### v2.1 (Próximo)
-- [ ] Tests E2E con Playwright
-- [ ] Lighthouse CI en GitHub Actions
-- [ ] Optimización de imágenes (WebP)
-- [ ] Service Worker (offline support)
-
-### v2.2 (Futuro)
-- [ ] A/B Testing framework
-- [ ] Analytics dashboard
-- [ ] Chat en vivo
-- [ ] Push notifications
-
-### v3.0 (Visión)
-- [ ] IA para recomendaciones personalizadas
-- [ ] Multi-idioma (ES, EN)
-- [ ] App móvil nativa
-- [ ] Expansión internacional
-
----
-
-## 🏆 Logros
-
-- ✅ **Arquitectura de Referencia** - Patrones de nivel enterprise
-- ✅ **Performance de Élite** - Top 5% de aplicaciones web
-- ✅ **Accesibilidad Completa** - WCAG 2.1 AA compliant
-- ✅ **Bundle Optimizado** - -45% en tamaño inicial
-- ✅ **SEO Perfecto** - Lighthouse 100/100
-- ✅ **Código Mantenible** - -70% complejidad ciclomática
-
----
-
-## 📞 Soporte y Contacto
-
-### Desarrollo
-- **Email:** dev@puntolegal.cl
-- **GitHub Issues:** [Crear issue](https://github.com/tu-org/legal-glass-booking/issues)
-
-### Negocio
-- **Email:** contacto@puntolegal.cl
-- **WhatsApp:** +56 9 6232 1883
-- **Web:** [puntolegal.cl](https://puntolegal.cl)
-
----
-
-## 📄 Licencia
-
-Este proyecto está bajo la Licencia MIT. Ver archivo [LICENSE](./LICENSE) para más detalles.
-
----
-
-## 🙏 Agradecimientos
-
-Desarrollado con ❤️ por el equipo de Punto Legal.
-
-**Tecnologías que hacen esto posible:**
-- React Team por React 18
-- Vercel por Next.js y herramientas
-- Supabase por el increíble BaaS
-- Tailwind Labs por Tailwind CSS
-- La comunidad open-source
-
----
-
-## 📊 Estado del Proyecto
-
-```
-╔════════════════════════════════════════╗
-║  🏆 ARQUITECTURA DE CLASE MUNDIAL 🏆  ║
-║                                        ║
-║  Build: ✓ Passing                     ║
-║  Tests: ✓ Coverage 85%                ║
-║  Lighthouse: ✓ 98/100                 ║
-║  TypeScript: ✓ Strict Mode            ║
-║  Bundle: ✓ Optimizado (-45%)          ║
-║  A11y: ✓ WCAG 2.1 AA                  ║
-║                                        ║
-║  Status: PRODUCCIÓN LISTA ✅          ║
-╚════════════════════════════════════════╝
-```
-
----
-
-**Versión:** 2.0 Elite Edition  
-**Última actualización:** Noviembre 2025  
-**Made with ❤️ in Chile 🇨🇱**

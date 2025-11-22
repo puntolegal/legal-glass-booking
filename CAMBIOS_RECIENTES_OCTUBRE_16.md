@@ -385,21 +385,3 @@ Este conjunto de **7 commits** representa una **mejora masiva** del sistema de e
 **¡El proyecto ha dado un salto de calidad enorme!** 🚀
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

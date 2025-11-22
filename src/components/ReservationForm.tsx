@@ -252,11 +252,11 @@ const ReservationForm = ({
   if (isModal) {
     return (
       <div 
-        className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto"
+        className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-start justify-center p-2 sm:p-4 overflow-y-auto"
         onClick={onClose}
       >
         <div 
-          className="w-full max-w-4xl max-h-[90vh] overflow-y-auto relative"
+          className="w-full max-w-4xl my-4 sm:my-8 mt-16 sm:mt-4 relative"
           onClick={(e) => e.stopPropagation()}
         >
           {formContent}

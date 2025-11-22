@@ -1,5 +1,3 @@
-// RUTA: src/App.tsx
-
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
@@ -7,12 +5,16 @@ import { SidebarProvider } from '@/contexts/SidebarContext';
 import { GamificationProvider } from '@/contexts/GamificationContext';
 import { ConceptNavigationProvider } from '@/contexts/ConceptNavigationContext';
 import { AccessibilityProvider } from '@/contexts/AccessibilityContext';
-import { AuthProvider } from '@/contexts/AuthContext';
+import Header from '@/components/Header';
+import Sidebar from '@/components/Sidebar';
+import Footer from '@/components/Footer';
 import ScrollToTop from '@/components/ScrollToTop';
 import ErrorBoundary from '@/components/ErrorBoundary';
+import PageTransition from '@/components/PageTransition';
 import AccessibilityPanel from '@/components/AccessibilityPanel';
-import MainLayout from '@/components/layout/MainLayout';
-import { Toaster } from '@/components/ui/sonner';
+import { MobileLayout } from '@/components/MobileLayout';
+// import ConfigDebugger from '@/components/ConfigDebugger';
+import { useLocation } from 'react-router-dom';
 
 // Pages
 import Index from '@/pages/Index';
@@ -31,7 +33,6 @@ import PrivacyPolicy from '@/pages/PrivacyPolicy';
 import TermsOfService from '@/pages/TermsOfService';
 import TestPage from '@/pages/TestPage';
 import ApuntesHome from './pages/ApuntesHome';
-import AmandaLogin from '@/pages/AmandaLogin';
 
 // Service Pages
 import ServicioCorporativoPage from '@/pages/ServicioCorporativoPage';
@@ -43,8 +44,6 @@ import ServicioFamiliaPage from '@/pages/ServicioFamiliaPage';
 import ServicioPenalPage from '@/pages/ServicioPenalPage';
 import ServicioTributarioPage from '@/pages/ServicioTributarioPage';
 import ServicioPenalEconomicoPage from '@/pages/ServicioPenalEconomicoPage';
-import PagoDiagnosticoIA from '@/pages/PagoDiagnosticoIA';
-import DiagnosticoIniciar from '@/pages/DiagnosticoIniciar';
 
 // Blog Posts
 import BlogPost1 from '@/pages/BlogPost1';
@@ -63,23 +62,67 @@ import BlogTributario3 from '@/pages/BlogTributario3';
 // Apuntes
 import ApuntesIndex from '@/pages/apuntes/index';
 import ApunteDetail from '@/pages/apuntes/ApunteDetail';
-import AuditoriaPage from '@/pages/apuntes/AuditoriaPage';
 
-function App() {
+// Layout específico para Apuntes
+const ApuntesLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
-    <HelmetProvider>
-      <ErrorBoundary>
-        <AuthProvider>
-          <AccessibilityProvider>
-            <GamificationProvider>
-              <ConceptNavigationProvider>
-                <SidebarProvider>
-                  <Router>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50 dark:from-gray-950 dark:via-blue-950 dark:to-indigo-950">
+      <ScrollToTop />
+      {children}
+    </div>
+  );
+};
+
+// Layout principal para el resto de la aplicación
+const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  return (
+    <div className="min-h-dvh bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900 dark:to-slate-800 pb-[env(safe-area-inset-bottom)] pt-[env(safe-area-inset-top)]">
       <ScrollToTop />
       
+      {/* Desktop Layout */}
+      <div className="hidden lg:flex">
+        <Sidebar />
+        <div className="flex-1 flex flex-col">
+          <Header />
+          <main className="flex-1">
+            <PageTransition>
+              {children}
+            </PageTransition>
+          </main>
+          <Footer />
+        </div>
+      </div>
+
+      {/* Mobile Layout */}
+      <div className="lg:hidden">
+        <MobileLayout>
+          <PageTransition>
+            {children}
+          </PageTransition>
+        </MobileLayout>
+      </div>
+    </div>
+  );
+};
+
+// Layout específico para páginas de pago (sin header/footer)
+const PaymentLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900 dark:to-slate-800">
+      <ScrollToTop />
+      {children}
+    </div>
+  );
+};
+
+// Componente para determinar el layout según la ruta
+const LayoutWrapper: React.FC = () => {
+  const location = useLocation();
+  const isApuntesRoute = location.pathname.startsWith('/apuntes');
+  const isPaymentRoute = ['/pago', '/payment', '/mercadopago', '/payment-success', '/payment-failure', '/payment-pending'].includes(location.pathname);
+
+  const routes = (
     <Routes>
-                    {/* Todas las rutas envueltas en MainLayout */}
-                    <Route element={<MainLayout />}>
       <Route path="/" element={<Index />} />
       <Route path="/servicios" element={<ServicesPage />} />
       <Route path="/blog" element={<BlogPage />} />
@@ -92,14 +135,12 @@ function App() {
       <Route path="/payment-pending" element={<PaymentPendingPage />} />
       <Route path="/admin" element={<AdminPage />} />
       <Route path="/auth" element={<AuthPage />} />
-      <Route path="/amanda" element={<AmandaLogin />} />
       <Route path="/privacy-policy" element={<PrivacyPolicy />} />
       <Route path="/terms-of-service" element={<TermsOfService />} />
       <Route path="/test" element={<TestPage />} />
       
       {/* Apuntes Routes */}
       <Route path="/apuntes/home" element={<ApuntesHome />} />
-      <Route path="/apuntes/auditoria" element={<AuditoriaPage />} />
       <Route path="/apuntes" element={<ApuntesIndex />} />
       <Route path="/apuntes/:slug" element={<ApunteDetail />} />
       
@@ -111,10 +152,6 @@ function App() {
       <Route path="/servicios/civil" element={<ServicioCivilPage />} />
       <Route path="/servicios/familia" element={<ServicioFamiliaPage />} />
       <Route path="/servicios/penal" element={<ServicioPenalPage />} />
-                      
-                      {/* Diagnóstico Routes */}
-                      <Route path="/pago/diagnostico-ia" element={<PagoDiagnosticoIA />} />
-                      <Route path="/diagnostico/iniciar" element={<DiagnosticoIniciar />} />
       <Route path="/servicios/tributario" element={<ServicioTributarioPage />} />
       <Route path="/servicios/penal-economico" element={<ServicioPenalEconomicoPage />} />
       
@@ -133,17 +170,37 @@ function App() {
       <Route path="/blog/tributario-3" element={<BlogTributario3 />} />
       
       <Route path="*" element={<NotFound />} />
-                    </Route>
     </Routes>
-                  
+  );
+
+  if (isApuntesRoute) {
+    return <ApuntesLayout>{routes}</ApuntesLayout>;
+  }
+
+  if (isPaymentRoute) {
+    return <PaymentLayout>{routes}</PaymentLayout>;
+  }
+
+  return <MainLayout>{routes}</MainLayout>;
+};
+
+function App() {
+  return (
+    <HelmetProvider>
+      <ErrorBoundary>
+        <AccessibilityProvider>
+          <GamificationProvider>
+            <ConceptNavigationProvider>
+              <SidebarProvider>
+                <Router>
+                  <LayoutWrapper />
                   <AccessibilityPanel />
-                  <Toaster />
+                  {/* <ConfigDebugger /> */}
                 </Router>
               </SidebarProvider>
             </ConceptNavigationProvider>
           </GamificationProvider>
         </AccessibilityProvider>
-      </AuthProvider>
       </ErrorBoundary>
     </HelmetProvider>
   );
