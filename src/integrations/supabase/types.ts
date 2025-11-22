@@ -344,7 +344,6 @@ export type Database = {
         }
         Relationships: []
       }
->>>>>>> bb1da85 (feat: Agregar tabla apuntes_audits a Supabase y actualizar tipos TypeScript)
     }
     Views: {
       [_ in never]: never
