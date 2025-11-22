@@ -372,13 +372,30 @@ const ApuntesHeader: React.FC<ApuntesHeaderProps> = ({
                 >
                   {isMenuOpen ? <X className="w-3.5 h-3.5" /> : <Menu className="w-3.5 h-3.5" />}
                 </button>
+                {/* Botones para usuarios no autenticados */}
                 {!isAuthenticated && (
-                  <button
-                    onClick={() => setShowAccessModal(true)}
-                    className="sm:hidden h-8 px-2.5 rounded-full border border-white/25 text-[9px] uppercase tracking-[0.3em] text-slate-600 dark:text-slate-200 flex-shrink-0"
-                  >
-                    AG
-                  </button>
+                  <div className="flex items-center gap-1.5 sm:gap-2">
+                    {/* Botón Acceso - Para usuarios nuevos */}
+                    <button
+                      onClick={() => {
+                        // TODO: Navegar a página de registro/login de usuarios
+                        // Por ahora, mostrar modal de acceso
+                        setShowAccessModal(true);
+                      }}
+                      className="h-8 px-2.5 sm:px-3 rounded-full border border-indigo-500/30 dark:border-indigo-500/20 bg-indigo-500/10 dark:bg-indigo-500/10 text-[9px] sm:text-[10px] uppercase tracking-[0.3em] sm:tracking-[0.4em] text-indigo-700 dark:text-indigo-300 hover:bg-indigo-500/20 dark:hover:bg-indigo-500/15 transition-all flex-shrink-0"
+                    >
+                      <span className="hidden xs:inline">Acceso</span>
+                      <UserCircle className="w-3.5 h-3.5 xs:hidden" />
+                    </button>
+                    {/* Botón Staff - Para mesa de auditores */}
+                    <button
+                      onClick={() => setShowAccessModal(true)}
+                      className="h-8 px-2.5 sm:px-3 rounded-full border border-white/30 dark:border-white/10 text-[9px] sm:text-[10px] uppercase tracking-[0.3em] sm:tracking-[0.4em] text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-white/20 dark:hover:bg-white/10 transition-all flex-shrink-0"
+                    >
+                      <span className="hidden xs:inline">Staff</span>
+                      <Shield className="w-3.5 h-3.5 xs:hidden" strokeWidth={1.5} />
+                    </button>
+                  </div>
                 )}
                 {isAuthenticated ? (
                   <div className="relative amanda-dropdown-container">
