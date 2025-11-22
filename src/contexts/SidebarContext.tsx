@@ -30,7 +30,8 @@ export const SidebarProvider: React.FC<SidebarProviderProps> = ({ children }) =>
     const checkScreenSize = () => {
       const desktop = window.innerWidth >= 1024; // lg breakpoint
       setIsDesktop(desktop);
-      setIsOpen(desktop); // Open by default on desktop, closed on mobile
+      // Keep sidebar closed by default on all screen sizes
+      // User can open it manually if they want
     };
 
     // Delay initial check to ensure DOM is ready

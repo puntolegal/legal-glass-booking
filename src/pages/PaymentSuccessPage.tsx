@@ -320,6 +320,17 @@ export default function PaymentSuccessPage() {
     cancelled: 'cancelado'
   };
   const readablePaymentStatus = statusDictionary[String(visiblePaymentStatus).toLowerCase() ?? ''] || visiblePaymentStatus;
+  const clientName = paymentData?.reservation?.nombre || paymentData?.cliente?.nombre || 'Cliente';
+  const clientEmail = paymentData?.reservation?.email || paymentData?.cliente?.email || 'No especificado';
+  const clientPhone = paymentData?.reservation?.telefono || paymentData?.cliente?.telefono || 'No especificado';
+  const serviceName = paymentData?.reservation?.servicio || paymentData?.servicio?.tipo || 'Consulta Legal';
+  const serviceDate = paymentData?.reservation?.fecha
+    ? new Date(paymentData.reservation.fecha).toLocaleDateString('es-CL')
+    : paymentData?.fecha
+    ? new Date(paymentData.fecha).toLocaleDateString('es-CL')
+    : 'No especificada';
+  const serviceTime = `${paymentData?.reservation?.hora || paymentData?.hora || '10:00'} hrs`;
+  const totalFormatted = paymentData?.priceFormatted ? `$${paymentData.priceFormatted}` : 'Confirmado';
 
   if (isLoading) {
     return (

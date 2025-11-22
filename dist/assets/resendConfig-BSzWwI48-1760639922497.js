@@ -1,1 +1,0 @@
-const n={from:"Punto Legal <team@puntolegal.online>",adminEmail:"puntolegalelgolf@gmail.com",appUrl:"https://www.puntolegal.online",appName:"Punto Legal",templates:{bookingConfirmation:"booking-confirmation",paymentConfirmation:"payment-confirmation",adminNotification:"admin-notification"}},o=()=>!0;export{n as RESEND_CONFIG,n as default,o as isResendConfigured};

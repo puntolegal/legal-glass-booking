@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useAuth } from './AuthContext';
 
 // Tipos para el sistema de gamificación
 interface Medal {
@@ -146,39 +147,67 @@ const AVAILABLE_MEDALS: Omit<Medal, 'unlockedAt'>[] = [
 // Milestones para puntos (progresión más realista)
 const MILESTONES = [50, 100, 200, 350, 500, 700, 1000, 1500, 2000, 3000];
 
-export const GamificationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [progress, setProgress] = useState<Progress>(() => {
-    const saved = localStorage.getItem('gamification-progress');
+const createEmptyProgress = (): Progress => ({
+  notesRead: 0,
+  totalPoints: 0,
+  currentStreak: 0,
+  longestStreak: 0,
+  lastReadDate: null,
+  categoriesCompleted: [],
+  medals: [],
+  readNotes: new Set(),
+  dailyNotesRead: {}
+});
+
+const hydrateProgress = (payload: any): Progress => ({
+  notesRead: payload?.notesRead || 0,
+  totalPoints: payload?.totalPoints || 0,
+  currentStreak: payload?.currentStreak || 0,
+  longestStreak: payload?.longestStreak || 0,
+  lastReadDate: payload?.lastReadDate || null,
+  categoriesCompleted: payload?.categoriesCompleted || [],
+  medals: payload?.medals || [],
+  readNotes: new Set(payload?.readNotes || []),
+  dailyNotesRead: payload?.dailyNotesRead || {}
+});
+
+const loadProgress = (storageKey: string): Progress => {
+  try {
+    const saved = localStorage.getItem(storageKey);
     if (saved) {
       const parsed = JSON.parse(saved);
-      // Convertir readNotes de array a Set si es necesario
-      return {
-        ...parsed,
-        readNotes: new Set(parsed.readNotes || []),
-        dailyNotesRead: parsed.dailyNotesRead || {}
-      };
+      return hydrateProgress(parsed);
     }
-    return {
-      notesRead: 0,
-      totalPoints: 0,
-      currentStreak: 0,
-      longestStreak: 0,
-      lastReadDate: null,
-      categoriesCompleted: [],
-      medals: [],
-      readNotes: new Set(),
-      dailyNotesRead: {}
-    };
+  } catch (error) {
+    console.warn('No se pudo cargar el progreso gamificado:', error);
+  }
+  return createEmptyProgress();
+};
+
+export const GamificationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { user } = useAuth();
+  const storageKey = user ? `gamification-progress-${user.id}` : 'gamification-progress';
+  const [progress, setProgress] = useState<Progress>(() => {
+    if (typeof window === 'undefined') {
+      return createEmptyProgress();
+    }
+    return loadProgress(storageKey);
   });
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    setProgress(loadProgress(storageKey));
+  }, [storageKey]);
 
   // Guardar progreso en localStorage
   useEffect(() => {
+    if (typeof window === 'undefined') return;
     const progressToSave = {
       ...progress,
       readNotes: Array.from(progress.readNotes)
     };
-    localStorage.setItem('gamification-progress', JSON.stringify(progressToSave));
-  }, [progress]);
+    localStorage.setItem(storageKey, JSON.stringify(progressToSave));
+  }, [progress, storageKey]);
 
   // Verificar streak diario
   useEffect(() => {
@@ -406,17 +435,10 @@ export const GamificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
   // Resetear progreso
   const resetProgress = () => {
-    setProgress({
-      notesRead: 0,
-      totalPoints: 0,
-      currentStreak: 0,
-      longestStreak: 0,
-      lastReadDate: null,
-      categoriesCompleted: [],
-      medals: [],
-      readNotes: new Set(),
-      dailyNotesRead: {}
-    });
+    setProgress(createEmptyProgress());
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem(storageKey);
+    }
   };
 
   return (

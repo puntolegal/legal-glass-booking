@@ -1,15 +1,34 @@
-import { motion } from 'framer-motion'
-import { useState, useEffect } from 'react'
-import { 
-  Heart, Users, Baby, Scale, FileText, Home, CheckCircle, Star, Clock, Award, 
-  ArrowRight, Calendar, Shield, Sparkles, AlertCircle, TrendingUp, 
-  DollarSign, Zap, X, ChevronLeft, Ban
-} from 'lucide-react'
-import { Link } from 'react-router-dom'
-import SEO from '../components/SEO'
-import CountdownTimer from "@/components/familia/CountdownTimer"
-import QuizModal from "@/components/familia/QuizModal"
-import FamilyIntakeModal from "@/components/familia/FamilyIntakeModal"
+import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useEffect } from 'react';
+import {
+  Heart,
+  Users,
+  Baby,
+  FileText,
+  Home,
+  CheckCircle,
+  Shield,
+  Sparkles,
+  AlertCircle,
+  TrendingUp,
+  DollarSign,
+  Zap,
+  X,
+  Ban,
+  Plus,
+  Minus,
+  Scale
+} from 'lucide-react';
+import { Link } from 'react-router-dom';
+import SEO from '../components/SEO';
+import DecisionHelperModal from '../components/DecisionHelperModal';
+import Header from '../components/Header';
+import QuizModal from '../components/QuizModal';
+import PremiumHeroCard from '@/components/PremiumHeroCard';
+import SecondaryOfferCard from '@/components/SecondaryOfferCard';
+import ToolCard from '@/components/ToolCard';
+import FloatingIcon from '@/components/ui/FloatingIcon';
+import GlassCard from '@/components/ui/GlassCard';
 
 const services = [
   {
@@ -48,7 +67,7 @@ const services = [
     description: 'Procesos de adopción y designación de tutores.',
     features: ['Adopción simple y plena', 'Tutela y curaduría', 'Guarda del menor', 'Autorización judicial']
   }
-]
+];
 
 const testimonials = [
   {
@@ -69,14 +88,14 @@ const testimonials = [
     content: 'Obtuve la custodia de mi nieta gracias a su excelente trabajo. Son especialistas reales en derecho de familia.',
     rating: 5
   }
-]
+];
 
 const stats = [
   { number: '2,400+', label: 'Familias asesoradas' },
   { number: '92%', label: 'Casos exitosos' },
   { number: '15d', label: 'Tiempo promedio tramitación' },
   { number: '24/7', label: 'Soporte en crisis' }
-]
+];
 
 const packages = [
   {
@@ -87,6 +106,8 @@ const packages = [
     originalPrice: '$1.100.000',
     discount: '50%',
     description: 'Común acuerdo + pensión',
+    context: 'Ideal para acuerdos en buen pie y procesos colaborativos.',
+    color: 'from-sky-500 to-cyan-600', // Adjusted color
     features: [
       'Divorcio de común acuerdo completo',
       'Regulación pensión + visitas',
@@ -96,7 +117,7 @@ const packages = [
       'Apoyo psicológico básico',
       'Seguimiento 3 meses',
       'WhatsApp horario laboral',
-      'Upgrade sin costo si no hay acuerdo'
+      '🎁 Upgrade gratis si no hay acuerdo'
     ],
     popular: false
   },
@@ -108,6 +129,8 @@ const packages = [
     originalPrice: '$2.200.000',
     discount: '50%',
     description: 'Contencioso + equipo completo',
+    context: 'Diseñado para defensas contenciosas con un equipo completo detrás.',
+    color: 'from-pink-500 to-rose-600',
     features: [
       'Todo lo del plan Integral +',
       'Divorcio contencioso (audiencias ilimitadas)',
@@ -118,7 +141,7 @@ const packages = [
       'WhatsApp prioritario (respuesta en 4h)',
       'Portal del cliente online',
       'Seguimiento 6 meses',
-      'Apelación incluida sin costo adicional'
+      '🎁 Apelación incluida sin costo'
     ],
     popular: true
   },
@@ -130,6 +153,8 @@ const packages = [
     originalPrice: '$3.400.000',
     discount: '50%',
     description: 'Casos complejos + internacional',
+    context: 'Pensado para casos complejos, patrimonio familiar o alcance internacional.',
+    color: 'from-purple-600 to-indigo-700',
     features: [
       'Todo lo del plan Premium +',
       'Casos con componente internacional',
@@ -140,16 +165,45 @@ const packages = [
       'Apoyo psicológico ilimitado',
       'WhatsApp 24/7 (incluye fines de semana)',
       'Seguimiento 12 meses + 1 modificación gratis',
-      'Hasta Corte Suprema incluido'
+      '🎁 Hasta Corte Suprema incluido'
     ],
     popular: false
   }
-]
+];
+
+const planVisuals = {
+  'familia-integral': {
+    chip: 'border-sky-400/40 bg-sky-500/15 text-sky-100',
+    iconColor: 'text-sky-200',
+    iconRing: 'border-sky-400/40 bg-sky-500/10',
+    buttonGradient: 'from-sky-400 via-cyan-400 to-emerald-400',
+    buttonShadow: 'shadow-[0_22px_50px_rgba(14,165,233,0.35)]',
+    glow: 'from-sky-400/25 via-emerald-400/10 to-transparent',
+    border: 'border-sky-400/20',
+  },
+  'familia-premium': {
+    chip: 'border-rose-400/40 bg-rose-500/15 text-rose-100',
+    iconColor: 'text-pink-200',
+    iconRing: 'border-rose-400/40 bg-rose-500/10',
+    buttonGradient: 'from-pink-500 via-rose-500 to-amber-400',
+    buttonShadow: 'shadow-[0_24px_55px_rgba(236,72,153,0.45)]',
+    glow: 'from-rose-500/30 via-pink-500/10 to-transparent',
+    border: 'border-rose-400/25',
+  },
+  'familia-elite': {
+    chip: 'border-purple-400/40 bg-purple-500/15 text-purple-100',
+    iconColor: 'text-purple-200',
+    iconRing: 'border-purple-400/40 bg-purple-500/10',
+    buttonGradient: 'from-purple-600 via-indigo-600 to-blue-500',
+    buttonShadow: 'shadow-[0_24px_55px_rgba(99,102,241,0.45)]',
+    glow: 'from-violet-500/25 via-indigo-500/10 to-transparent',
+    border: 'border-indigo-400/20',
+  },
+} as const;
 
 const successCases = [
   {
     amount: '$22M',
-    color: 'from-emerald-500 to-green-600',
     case: 'Compensación económica recuperada',
     client: 'Claudia M., 41 años',
     plan: 'Premium',
@@ -157,7 +211,6 @@ const successCases = [
   },
   {
     amount: '65%',
-    color: 'from-blue-500 to-cyan-600',
     case: 'Aumento en pensión alimenticia',
     client: 'Patricia R., 35 años',
     plan: 'Integral',
@@ -165,13 +218,12 @@ const successCases = [
   },
   {
     amount: '100%',
-    color: 'from-purple-500 to-pink-600',
     case: 'Custodia completa obtenida',
     client: 'María S., 38 años',
     plan: 'Elite',
     icon: Heart
   }
-]
+];
 
 const whyDifferent = [
   {
@@ -198,7 +250,7 @@ const whyDifferent = [
     description: 'Abogado + apoyo psicológico trabajando para ti.',
     gradient: 'from-rose-500 to-pink-600'
   }
-]
+];
 
 const faq = [
   {
@@ -219,485 +271,536 @@ const faq = [
   },
   {
     question: '¿Qué incluye la Consulta Estratégica Premium?',
-    answer: 'Reunión de 2 horas con abogado especializado, análisis completo de tu caso, estrategia legal personalizada y recomendación del plan ideal. Si contratas cualquier plan, los $150.000 se descuentan del total.'
+    answer: 'Reunión de 1 hora con abogado especializado, análisis completo de tu caso, estrategia legal personalizada y recomendación del plan ideal. Si contratas cualquier plan, los $150.000 se descuentan del total.'
   }
-]
+];
+
+// Contador Auto-renovable
+const CountdownTimer = () => {
+  const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+
+  useEffect(() => {
+    const getTargetDate = () => {
+      const stored = localStorage.getItem('cyber_familia_end_date');
+      if (stored) {
+        const targetDate = new Date(stored);
+        if (targetDate.getTime() < Date.now()) {
+          const newTarget = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000);
+          localStorage.setItem('cyber_familia_end_date', newTarget.toISOString());
+          return newTarget;
+        }
+        return targetDate;
+      } else {
+        const newTarget = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000);
+        localStorage.setItem('cyber_familia_end_date', newTarget.toISOString());
+        return newTarget;
+      }
+    };
+
+    const calculateTimeLeft = () => {
+      const target = getTargetDate();
+      const difference = target.getTime() - Date.now();
+      if (difference > 0) {
+        return {
+          days: Math.floor(difference / (1000 * 60 * 60 * 24)),
+          hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
+          minutes: Math.floor((difference / 1000 / 60) % 60),
+          seconds: Math.floor((difference / 1000) % 60)
+        };
+      }
+      return { days: 3, hours: 0, minutes: 0, seconds: 0 };
+    };
+
+    setTimeLeft(calculateTimeLeft());
+    const timer = setInterval(() => setTimeLeft(calculateTimeLeft()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  return (
+    <div className="flex justify-center gap-2 md:gap-4">
+      {[
+        { value: String(timeLeft.days).padStart(2, '0'), label: 'Días' },
+        { value: String(timeLeft.hours).padStart(2, '0'), label: 'Horas' },
+        { value: String(timeLeft.minutes).padStart(2, '0'), label: 'Min' },
+        { value: String(timeLeft.seconds).padStart(2, '0'), label: 'Seg' }
+      ].map((item, i) => (
+        <div key={i} className="text-center">
+          <div className="bg-gradient-to-br from-pink-500 to-rose-600 text-white rounded-xl md:rounded-2xl p-2 md:p-3 shadow-xl shadow-rose-500/25 min-w-[45px] md:min-w-[70px]">
+            <div className="text-xl md:text-3xl font-bold tabular-nums">{item.value}</div>
+          </div>
+          <div className="text-[9px] md:text-xs text-muted-foreground mt-1 font-medium">{item.label}</div>
+        </div>
+      ))}
+    </div>
+  );
+};
 
 export default function ServicioFamiliaPage() {
-  const [showQuiz, setShowQuiz] = useState(false)
-  const [isIntakeOpen, setIsIntakeOpen] = useState(false)
-  const [selectedPlan, setSelectedPlan] = useState<{
-    type: 'integral' | 'premium' | 'elite';
-    name: string;
-    price: string;
-  } | null>(null)
+  const [showQuiz, setShowQuiz] = useState(false);
+  const [showEliteModal, setShowEliteModal] = useState(false);
+  const [showExitModal, setShowExitModal] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState<any>(null);
+  const [isHelperModalOpen, setIsHelperModalOpen] = useState(false);
 
-  const handlePlanSelect = (type: 'integral' | 'premium' | 'elite', name: string, price: string) => {
-    setSelectedPlan({ type, name, price })
-    setIsIntakeOpen(true)
-  }
+  const openHelperModal = (plan: any) => {
+    setSelectedPlan(plan);
+    setIsHelperModalOpen(true);
+  };
 
   return (
     <>
-      <SEO 
-        title="Derecho de Familia Premium - Divorcios | Punto Legal"
-        description="Protección familiar integral. Divorcios, pensiones, custodia. Planes desde $550k. CYBER 50% OFF."
+      <SEO
+        title="Derecho de Familia: Divorcios, Pensiones, Custodia | Punto Legal Chile"
+        description="Abogado especialista en Familia. Obtén tu Diagnóstico de Pensión por $6.990 o agenda tu Pack de Inicio. Consulta aquí."
       />
-      
-      <div className="min-h-screen bg-gradient-to-b from-background to-background/95 relative pb-24">
-        {/* Patrón de fondo */}
-        <div className="fixed inset-0 opacity-[0.03] pointer-events-none">
-          <div className="absolute inset-0" style={{
-            backgroundImage: `radial-gradient(circle at 1px 1px, rgb(236 72 153 / 0.1) 1px, transparent 1px)`,
-            backgroundSize: '40px 40px'
-          }} />
+
+      <div className="min-h-screen bg-slate-900 text-slate-300 antialiased relative">
+        <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
+          <div className="absolute top-[-20rem] left-[-20rem] w-[50rem] h-[50rem] bg-gradient-radial from-pink-500/10 via-slate-900/0 to-transparent blur-3xl"></div>
+          <div className="absolute bottom-[-20rem] right-[-20rem] w-[50rem] h-[50rem] bg-gradient-radial from-sky-500/10 via-slate-900/0 to-transparent blur-3xl"></div>
         </div>
 
-        {/* Header Móvil Sticky */}
-        <div className="lg:hidden sticky top-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl border-b border-white/20">
-          <div className="container mx-auto px-4 py-3">
-            <div className="flex items-center justify-between">
-              <a href="https://puntolegal.online" className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground">
-                <ChevronLeft className="w-5 h-5" />
-                Volver
-              </a>
-              <div className="flex items-center gap-2">
-                <Heart className="w-4 h-4 text-rose-600" />
-                <span className="text-sm font-semibold">Familia</span>
-              </div>
-              <a href="https://puntolegal.online" className="p-2 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg">
-                <Home className="w-5 h-5 text-muted-foreground" />
-              </a>
-            </div>
-          </div>
-        </div>
+        <Header />
+        <div className="h-20" />
 
-        {/* Hero + Consulta Estratégica + Planes - Look iOS */}
-        <section className="relative pt-6 md:pt-12 pb-8 md:pb-16 overflow-hidden">
+        {/* HERO */}
+        <section className="relative pt-10 md:pt-14 pb-10 md:pb-16 overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-r from-pink-500/10 via-transparent to-rose-500/10" />
-          
           <div className="container mx-auto px-4 relative z-10">
-            {/* Hero Compacto */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
-              className="text-center max-w-5xl mx-auto mb-6 md:mb-8"
+              className="text-center max-w-5xl mx-auto"
             >
-              <div className="inline-flex items-center gap-2 bg-pink-500/10 rounded-full px-3 md:px-4 py-1.5 md:py-2 mb-3 md:mb-4 backdrop-blur-sm border border-pink-200/50">
-                <Heart className="w-4 h-4 md:w-5 md:h-5 text-rose-600" />
-                <span className="text-xs md:text-sm font-medium text-rose-600">Especialistas en Derecho de Familia</span>
+              <div className="inline-flex items-center gap-2 bg-slate-800/50 rounded-full px-4 py-1.5 mb-4 border border-slate-700">
+                <Heart className="w-5 h-5 text-pink-400" />
+                <span className="text-sm font-medium text-slate-300">Abogado Especialista en Derecho de Familia</span>
               </div>
-              
-              <h1 className="text-2xl md:text-5xl font-bold mb-4 md:mb-6 bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent leading-tight px-2">
-                Tu familia, protegida con estrategia y empatía
+              <h1 className="text-4xl sm:text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white to-slate-400 leading-tight mb-4">
+                Tu tranquilidad familiar, nuestra prioridad legal
               </h1>
-
-              {/* Consulta Estratégica Premium - CTA Prominente */}
-              <div className="max-w-2xl mx-auto mb-6 md:mb-8">
-                <div className="relative rounded-3xl">
-                  <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-pink-500/20 via-rose-500/20 to-pink-600/20 blur-xl" />
-                  <div className="absolute inset-0 rounded-3xl p-[1px] bg-gradient-to-br from-white/60 via-pink-200/40 to-rose-200/60">
-                    <div className="h-full w-full bg-white/80 dark:bg-slate-900/70 backdrop-blur-md rounded-3xl" />
-                  </div>
-                  
-                  <div className="relative p-6 md:p-8">
-                    <div className="flex items-center justify-center gap-2 mb-3">
-                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-pink-500 to-rose-600 flex items-center justify-center shadow-lg">
-                        <Sparkles className="w-5 h-5 text-white" />
-                      </div>
-                      <div className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white px-3 py-1.5 rounded-full shadow-lg text-xs font-bold">
-                        50% OFF CYBER
-                      </div>
-                    </div>
-
-                    <h3 className="text-xl md:text-2xl font-bold mb-2 bg-gradient-to-r from-pink-500 to-rose-600 bg-clip-text text-transparent">
-                      Consulta Estratégica Premium
-                    </h3>
-                    <p className="text-sm md:text-base text-muted-foreground mb-4">
-                      Análisis completo de tu caso + hoja de ruta + 100% reembolsable si contratas un plan
-                    </p>
-
-                    <div className="flex flex-col sm:flex-row gap-3 items-center justify-center mb-4">
-                      <div className="text-center">
-                        <div className="text-sm text-muted-foreground line-through mb-1">$300.000</div>
-                        <div className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-pink-500 to-rose-600 bg-clip-text text-transparent">
-                          $150.000
-                        </div>
-                      </div>
-                    </div>
-
-                    <Link
-                      to="/agendamiento?plan=consulta-estrategica-familia"
-                      className="block w-full py-4 bg-gradient-to-r from-pink-500 to-rose-600 text-white rounded-2xl font-bold hover:shadow-2xl hover:shadow-rose-500/30 transition-all duration-300 flex items-center justify-center gap-2 text-base md:text-lg"
-                      style={{
-                        boxShadow: '0 8px 24px rgba(244, 63, 94, 0.4)'
-                      }}
-                    >
-                      <Calendar className="w-5 h-5" />
-                      Agendar Consulta Estratégica
-                    </Link>
-
-                    <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground mt-3">
-                      <CheckCircle className="w-4 h-4 text-rose-500" />
-                      <span>Reembolso completo si contratas cualquier plan</span>
+              <p className="mt-6 max-w-2xl mx-auto text-lg text-slate-400">
+                Enfrentar un problema familiar es difícil. Te damos claridad y defensa legal para proteger tu futuro.
+              </p>
+              <div className="max-w-lg mx-auto mt-8">
+                <div className="relative p-4 md:p-6 bg-slate-800/50 border border-slate-700 rounded-2xl">
+                  <div className="flex justify-center mb-3">
+                    <div className="inline-flex items-center gap-2 bg-gradient-to-r from-pink-500 to-rose-500 text-white px-3 md:px-4 py-1 md:py-1.5 rounded-full shadow-lg text-xs md:text-sm font-bold">
+                      <Sparkles className="w-4 h-4" />
+                      HASTA 50% OFF (Cyber Extendido)
                     </div>
                   </div>
-                </div>
-              </div>
-              
-              {/* Contador CYBER */}
-              <div className="max-w-lg mx-auto mb-6">
-                <div className="relative rounded-3xl">
-                  <div className="absolute inset-0 rounded-3xl p-[1px] bg-gradient-to-br from-white/60 via-pink-200/40 to-rose-200/60">
-                    <div className="h-full w-full bg-white/90 dark:bg-slate-900/80 backdrop-blur-xl rounded-3xl" />
-                  </div>
-                  
-                  <div className="relative p-4 md:p-6">
-                    <div className="flex justify-center mb-3">
-                      <div className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white px-3 md:px-4 py-1 md:py-1.5 rounded-full shadow-lg text-xs md:text-sm font-bold">
-                        <Sparkles className="w-4 h-4" />
-                        50% OFF CYBER
-                      </div>
-                    </div>
-                    
-                    <h3 className="text-sm md:text-lg font-bold text-center mb-3 bg-gradient-to-r from-pink-500 to-rose-600 bg-clip-text text-transparent">
-                      Oferta termina en:
-                    </h3>
-                    
-                    <CountdownTimer />
-                    
-                    <div className="flex items-center justify-center gap-2 text-xs md:text-sm text-muted-foreground mt-3">
-                      <AlertCircle className="w-4 h-4 text-rose-500" />
-                      <span>Solo <strong className="text-rose-600">8 cupos</strong> disponibles este mes</span>
-                    </div>
+                  <h3 className="text-sm md:text-lg font-bold text-center mb-3 bg-gradient-to-r from-pink-400 to-rose-500 bg-clip-text text-transparent">
+                    Termina en:
+                  </h3>
+                  <CountdownTimer />
+                  <div className="flex items-center justify-center gap-2 text-xs md:text-sm text-slate-500 mt-3">
+                    <AlertCircle className="w-4 h-4 text-pink-500" />
+                    <span>Cupos limitados este mes</span>
                   </div>
                 </div>
               </div>
             </motion.div>
+          </div>
+        </section>
 
-            {/* PLANES - Look iOS Glassmorphism */}
-            <div className="grid md:grid-cols-3 gap-4 md:gap-6 max-w-7xl mx-auto">
-              {packages.map((pkg, index) => (
+        {/* SECCIÓN “Guía de caminos” */}
+        <section className="relative overflow-hidden border-t border-slate-800/60 bg-slate-950 py-14 md:py-20">
+          <div className="absolute inset-0 bg-gradient-to-b from-slate-900 via-slate-950 to-slate-950" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(14,165,233,0.12),_transparent_55%)]" />
+          <div className="container relative z-10 mx-auto px-4">
+            <div className="mx-auto max-w-3xl text-center">
+              <span className="mb-4 inline-flex items-center justify-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1 text-[11px] font-semibold uppercase tracking-[0.35em] text-slate-300">
+                <Sparkles className="h-3.5 w-3.5 text-sky-300" />
+                3 caminos diseñados para ti
+              </span>
+              <h2 className="text-3xl font-bold text-white md:text-4xl">
+                Encuentra tu camino hacia la tranquilidad
+              </h2>
+              <p className="mt-4 text-lg text-slate-400">
+                Hemos diseñado rutas claras para cada etapa del proceso familiar. Parte gratis, avanza con IA o agenda directo con tu abogado especializado.
+              </p>
+            </div>
+
+            <div className="relative mt-12 rounded-[32px] border border-white/10 bg-slate-950/60 p-4 shadow-2xl shadow-black/40 md:p-8">
+              <FloatingIcon
+                icon={Sparkles}
+                className="hidden md:block -left-4 top-8 opacity-30 blur-3xl"
+                size={120}
+                colorClass="from-sky-500/25 to-purple-500/30"
+              />
+              <FloatingIcon
+                icon={Zap}
+                className="hidden md:block right-12 -bottom-6 opacity-30 blur-3xl"
+                size={150}
+                colorClass="from-pink-500/20 to-amber-500/25"
+              />
+
+              <div className="relative z-10 grid items-stretch gap-6 md:grid-cols-3 md:gap-8">
+                {/* Izquierda: Diagnóstico Gratis */}
+                <div className="order-1">
+                  <ToolCard
+                    icon={Sparkles}
+                    title="Descubre tu Plan Ideal"
+                    description="¿No tienes claro por dónde empezar? Responde 3 preguntas y recibe una recomendación de plan <strong>gratis</strong> y sin compromiso."
+                    context="Ideal si estás explorando opciones o necesitas claridad inicial."
+                    price="$0"
+                    ctaText="Empezar el Quiz Gratis"
+                    onClick={() => setShowQuiz(true)}
+                    badge="Empieza aquí si tienes dudas"
+                  />
+                </div>
+
+                {/* Centro: Diagnóstico IA */}
+                <div className="order-3 md:order-2">
+                  <SecondaryOfferCard
+                    icon={Zap}
+                    title="Diagnóstico de Pensión IA"
+                    description="Obtén un <strong>Diagnóstico de Pensión 100% automatizado</strong>, entrenado por tu abogado, y recibe un PDF con <strong>montos estimados y riesgos clave</strong> en menos de 3 minutos."
+                    context="Perfecto cuando necesitas una estimación concreta para decidir rápido."
+                    price="$6.990"
+                    priceDetails="Precio Normal: $13.990 (50% OFF Cyber)"
+                    ctaText="Obtener Claridad Ahora"
+                    href="/pago/diagnostico-ia"
+                    badge="Para una respuesta inmediata"
+                  />
+                </div>
+
+                {/* Derecha: Estrategia Personalizada */}
+                <div className="order-2 md:order-3">
+                  <PremiumHeroCard
+                    title="Consulta Estratégica con Abogado"
+                    description="Agenda 1 hora de trabajo <strong>directo con tu abogado especialista</strong> para ordenar tu caso, definir un <strong>Plan de Acción claro</strong> y saber exactamente qué hacer en los próximos 30 días."
+                    context="Para quienes quieren acompañamiento completo, ejecución y seguimiento experto."
+                    price="$150.000"
+                    priceTag="Consulta preferente Cyber"
+                    originalPrice="$300.000"
+                    priceDetails="Se descuenta íntegramente del plan final y asegura prioridad en agenda."
+                    deliverableLabel="PDF + asesoría"
+                    ctaText="Agendar Pack con Garantía"
+                    href="/agendamiento?plan=consulta-estrategica-familia"
+                    testimonial={{
+                      quote: 'En 1 hora me dio más claridad que meses de incertidumbre. Valió cada peso.',
+                      author: 'Conztanza M., Las Condes',
+                    }}
+                    highlightLabel="El Camino Directo al Éxito"
+                  />
+                </div>
+              </div>
+
+              <div className="relative z-10 mt-8 flex flex-col items-center gap-4 text-xs text-slate-400 md:flex-row md:justify-between">
+                <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.3em] text-slate-300">
+                  <Shield className="h-3.5 w-3.5 text-pink-400" />
+                  Garantía Cyber 50%
+                </div>
+                <p className="text-center text-slate-500 md:text-left">
+                  Promoción renovable cada 72 horas según disponibilidad. Cupos limitados por agenda.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* SECCIÓN “Servicios” */}
+        <section className="py-10 md:py-14">
+          <div className="container mx-auto px-4">
+            <h2 className="text-2xl md:text-3xl font-bold text-center mb-10 md:mb-12 text-slate-200">
+              Te representamos en todas las áreas del Derecho de Familia
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 max-w-5xl mx-auto">
+              {services.map((service, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: index * 0.05 }}
+                >
+                  <div className="bg-slate-900/60 border border-slate-800 p-5 md:p-6 rounded-3xl h-full shadow-md shadow-slate-950/40 hover:border-pink-500/40 transition-colors">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="w-9 h-9 rounded-2xl bg-slate-800/80 flex items-center justify-center">
+                        <service.icon className="w-5 h-5 text-pink-400" />
+                      </div>
+                      <h3 className="text-sm md:text-base font-semibold md:font-bold text-slate-100 tracking-tight">
+                        {service.title}
+                      </h3>
+                    </div>
+                    <p className="text-xs md:text-sm text-slate-400 leading-relaxed mb-3">
+                      {service.description}
+                    </p>
+                    <p className="text-[11px] md:text-xs text-slate-500">
+                      <span className="text-slate-400">Incluye: </span>
+                      <span className="text-slate-300">{service.features.slice(0, 2).join(' · ')}</span>
+                      {service.features.length > 2 && <span className="text-pink-400"> · y más</span>}
+                    </p>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* SECCIÓN “¿Por qué Punto Legal…?” */}
+        <section className="py-12 md:py-16 bg-slate-900/60">
+          <div className="container mx-auto px-4 max-w-5xl">
+            <h2 className="text-2xl md:text-3xl font-bold text-center mb-10 text-white">
+              ¿Por qué somos diferentes?
+            </h2>
+            <div className="grid md:grid-cols-2 gap-4 md:gap-6">
+              {whyDifferent.slice(0, 2).map((item, i) => (
+                <div key={i}>
+                  <div className="relative rounded-3xl h-full border border-slate-800 bg-slate-900/60 p-6 text-left shadow-md shadow-slate-950/40">
+                    <div className="flex justify-start mb-4">
+                      <div className={`w-11 h-11 bg-gradient-to-br ${item.gradient} rounded-2xl flex items-center justify-center shadow-lg`}>
+                        <item.icon className="w-6 h-6 text-white" />
+                      </div>
+                    </div>
+                    <h3 className="text-base md:text-lg font-semibold md:font-bold mb-2 text-slate-100">
+                      {item.title}
+                    </h3>
+                    <p className="text-sm text-slate-400 leading-relaxed">
+                      {item.description}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* TESTIMONIOS */}
+        <section className="py-10 md:py-14">
+          <div className="container mx-auto px-4">
+            <h2 className="text-2xl md:text-3xl font-bold text-center mb-12 text-white">
+              Familias que recuperaron su tranquilidad 💬
+            </h2>
+            <div className="grid md:grid-cols-3 gap-6 md:gap-8">
+              {testimonials.map((testimonial, index) => (
                 <motion.div
                   key={index}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1 }}
-                  className={pkg.popular ? 'md:scale-105' : ''}
                 >
-                  <div className="relative rounded-3xl h-full">
-                    {/* Glow effect para el más popular */}
-                    {pkg.popular && (
-                      <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-pink-500/20 via-rose-500/20 to-pink-600/20 blur-xl" />
-                    )}
-                    
-                    <div className={`absolute inset-0 rounded-3xl p-[1px] ${
-                      pkg.popular
-                        ? 'bg-gradient-to-br from-pink-400/60 via-rose-400/60 to-pink-400/60'
-                        : 'bg-gradient-to-br from-white/50 via-gray-200/30 to-white/50 dark:from-gray-700/50'
-                    }`}>
-                      <div className="h-full w-full bg-white/80 dark:bg-slate-900/70 backdrop-blur-md rounded-3xl" />
-                    </div>
-                    
-                    <div className="relative p-5 md:p-8">
-                      {pkg.popular && (
-                        <div className="absolute -top-2 md:-top-3 left-1/2 -translate-x-1/2">
-                          <div className="bg-gradient-to-r from-pink-500 to-rose-600 text-white px-3 md:px-5 py-1 md:py-1.5 rounded-full text-[10px] md:text-xs font-bold shadow-xl shadow-rose-500/30">
-                            ⭐ Más Popular
-                          </div>
-                        </div>
-                      )}
-                      
-                      <div className="text-center mb-4 md:mb-6">
-                        <h3 className="text-base md:text-2xl font-bold mb-1 md:mb-2">{pkg.shortName}</h3>
-                        <p className="text-[10px] md:text-xs text-muted-foreground mb-2 md:mb-4">{pkg.description}</p>
-                        
-                        <div className="mb-1 md:mb-2">
-                          <span className="text-xs md:text-base text-gray-500 line-through">{pkg.originalPrice}</span>
-                        </div>
-                        <div className="text-2xl md:text-4xl font-bold bg-gradient-to-r from-pink-500 to-rose-600 bg-clip-text text-transparent mb-2">
-                          {pkg.price}
-                        </div>
-                        
-                        <div className="inline-block bg-gradient-to-r from-amber-500 to-orange-500 text-white px-2 md:px-3 py-0.5 md:py-1 rounded-full text-[10px] md:text-xs font-bold">
-                          {pkg.discount} OFF
-                        </div>
+                  <div className="bg-slate-900/60 border border-slate-800 p-6 rounded-3xl h-full shadow-md shadow-slate-950/40">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-slate-800/90 border border-slate-700">
+                        <span className="text-xs" aria-hidden="true">
+                          ⭐️⭐️⭐️⭐️⭐️
+                        </span>
+                        <span className="text-[11px] font-medium text-slate-200">
+                          Experiencia verificada
+                        </span>
                       </div>
-                      
-                      <ul className="space-y-1.5 md:space-y-2 mb-4 md:mb-6 min-h-[120px] md:min-h-[200px]">
-                        {pkg.features.slice(0, 5).map((feature, i) => (
-                          <li key={i} className="flex items-start gap-2">
-                            <CheckCircle className="w-3 h-3 md:w-4 md:h-4 text-rose-500 flex-shrink-0 mt-0.5" />
-                            <span className="text-[10px] md:text-xs leading-tight">{feature}</span>
-                          </li>
-                        ))}
-                        {pkg.features.length > 5 && (
-                          <li className="text-[10px] md:text-xs text-muted-foreground italic">
-                            +{pkg.features.length - 5} beneficios más
-                          </li>
-                        )}
-                      </ul>
-                      
-                      <button
-                        onClick={() => handlePlanSelect(
-                          pkg.id.replace('familia-', '') as 'integral' | 'premium' | 'elite',
-                          pkg.name,
-                          `${pkg.price} (antes ${pkg.originalPrice})`
-                        )}
-                        className={`block w-full text-center py-3 md:py-4 px-4 rounded-2xl font-bold transition-all duration-300 text-sm md:text-base ${
-                          pkg.popular
-                            ? 'bg-gradient-to-r from-pink-500 to-rose-600 text-white hover:shadow-2xl hover:shadow-rose-500/40'
-                            : 'bg-white/60 dark:bg-slate-800/60 border border-pink-200/50 dark:border-pink-900/50 text-rose-700 dark:text-rose-400 hover:bg-white/80 dark:hover:bg-slate-800/80 backdrop-blur-sm'
-                        }`}
-                        style={pkg.popular ? {
-                          boxShadow: '0 8px 24px rgba(244, 63, 94, 0.3)'
-                        } : undefined}
-                      >
-                        <div className="flex items-center justify-center gap-2">
-                          <Calendar className="w-4 h-4" />
-                          Elegir {pkg.shortName}
-                        </div>
-                      </button>
-                  </div>
+                      <span className="text-[11px] text-slate-500">
+                        {testimonial.role}
+                      </span>
+                    </div>
+                    <p className="text-sm md:text-base text-slate-300 mb-4 italic leading-relaxed">
+                      “{testimonial.content}”
+                    </p>
+                    <p className="text-sm font-semibold text-slate-100">
+                      {testimonial.name}
+                    </p>
                   </div>
                 </motion.div>
               ))}
             </div>
+          </div>
+        </section>
 
-            {/* Botón Quiz - Look iOS */}
-            <div className="text-center mt-8">
-              <div className="max-w-md mx-auto">
-                <div className="relative rounded-3xl">
-                  <div className="absolute inset-0 rounded-3xl p-[1px] bg-gradient-to-br from-white/50 via-gray-200/30 to-white/50">
-                    <div className="h-full w-full bg-white/70 dark:bg-slate-900/60 backdrop-blur-md rounded-3xl" />
-                  </div>
-                  
-                  <div className="relative p-6">
-                    <p className="text-sm text-muted-foreground mb-4">
-                      ¿No sabes cuál plan necesitas?
-                    </p>
-                    <button
-                      onClick={() => setShowQuiz(true)}
-                      className="w-full py-4 bg-white/80 dark:bg-slate-800/80 border border-pink-200/50 dark:border-pink-900/50 text-rose-700 dark:text-rose-400 rounded-2xl font-bold hover:bg-white dark:hover:bg-slate-800 backdrop-blur-sm transition-all duration-300 flex items-center justify-center gap-2"
+        {/* CASOS DE ÉXITO */}
+        <section className="py-12 md:py-16 bg-slate-900/70">
+          <div className="container mx-auto px-4 max-w-5xl">
+            <h2 className="text-2xl md:text-3xl font-bold text-center mb-12 text-white">
+              Resultados que hablan por sí solos
+            </h2>
+            <div className="grid md:grid-cols-3 gap-4 md:gap-6">
+              {successCases.map((c, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.05 }}
+                >
+                  <div className="bg-slate-900/60 border border-slate-800 p-5 rounded-3xl h-full shadow-md shadow-slate-950/40 text-left">
+                    <c.icon
+                      className={`w-8 h-8 mb-3 ${
+                        c.plan === 'Premium'
+                          ? 'text-pink-400'
+                          : c.plan === 'Integral'
+                          ? 'text-sky-400'
+                          : 'text-purple-400'
+                      }`}
+                    />
+                    <div
+                      className={`text-2xl md:text-3xl font-bold mb-1 ${
+                        c.plan === 'Premium'
+                          ? 'text-pink-400'
+                          : c.plan === 'Integral'
+                          ? 'text-sky-400'
+                          : 'text-purple-400'
+                      }`}
                     >
-                      <Sparkles className="w-5 h-5" />
-                      Descubre tu plan ideal en 2 minutos
-                    </button>
+                      {c.amount}
+                    </div>
+                    <div className="font-semibold mb-2 text-slate-100">
+                      {c.case}
+                    </div>
+                    <div className="text-[11px] md:text-xs text-slate-500">
+                      {c.client} (Plan {c.plan})
+                    </div>
                   </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Stats */}
-        <section className="py-8 md:py-12 bg-gradient-to-r from-pink-50/50 to-rose-50/50 dark:from-pink-950/10 dark:to-rose-950/10">
-          <div className="container mx-auto px-4">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
-              {stats.map((stat, index) => (
-                <div key={index} className="text-center">
-                  <div className="text-2xl md:text-4xl font-bold text-rose-600 mb-1">{stat.number}</div>
-                  <div className="text-[10px] md:text-sm text-muted-foreground">{stat.label}</div>
-                  </div>
+                </motion.div>
               ))}
             </div>
           </div>
         </section>
 
-        {/* Por qué somos diferentes */}
-        <section className="py-12 md:py-16 bg-gradient-to-r from-pink-50/30 to-rose-50/30 dark:from-pink-950/10 dark:to-rose-950/10">
-          <div className="container mx-auto px-4">
-            <h2 className="text-2xl md:text-4xl font-bold text-center mb-6 md:mb-12">¿Por qué elegirnos?</h2>
+        {/* PACKAGES (Planes completos) */}
+        <section className="py-12 md:py-16 bg-slate-900/80 border-t border-slate-800 relative overflow-hidden">
+          <div className="container mx-auto px-4 relative z-10">
+            <h2 className="text-3xl md:text-4xl font-bold text-center mb-4 text-white">
+              Planes de Protección Integral
+            </h2>
+            <p className="text-lg text-slate-400 text-center mb-10 md:mb-16 max-w-2xl mx-auto">
+              Cuando buscas una solución completa y representación total, estos son nuestros planes de servicio.
+            </p>
+            <FloatingIcon
+              icon={Shield}
+              className="hidden lg:block left-6 top-8 opacity-20 blur-3xl"
+              size={150}
+              colorClass="from-purple-500/20 to-indigo-500/25"
+            />
+            <FloatingIcon
+              icon={Heart}
+              className="hidden lg:block right-10 bottom-0 opacity-25 blur-2xl"
+              size={140}
+              colorClass="from-pink-500/20 to-rose-500/25"
+            />
+            <div className="grid lg:grid-cols-3 gap-8 max-w-6xl mx-auto items-start relative z-10">
+              {packages.map((pkg, index) => {
+                const visuals = planVisuals[pkg.id as keyof typeof planVisuals];
+                const ButtonIcon = pkg.id === 'familia-elite' ? Scale : Sparkles;
+                const buttonLabel =
+                  pkg.id === 'familia-elite'
+                    ? 'Blindaje Elite Personalizado'
+                    : pkg.id === 'familia-premium'
+                    ? 'Elegir Plan Premium (Recomendado)'
+                    : 'Elegir Plan Integral';
 
-            <div className="grid md:grid-cols-4 gap-4 md:gap-6">
-              {whyDifferent.map((item, i) => (
-                <div key={i}>
-                  <div className="relative rounded-2xl h-full">
-                    <div className="absolute inset-0 rounded-2xl p-[1px] bg-gradient-to-br from-white/40 via-gray-200/20 to-white/40">
-                      <div className="h-full w-full bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl rounded-2xl" />
-                    </div>
-                    
-                    <div className="relative p-4 md:p-6">
-                      <div className={`w-10 h-10 md:w-14 md:h-14 bg-gradient-to-br ${item.gradient} rounded-xl flex items-center justify-center mb-3 md:mb-4 shadow-lg`}>
-                        <item.icon className="w-5 h-5 md:w-7 md:h-7 text-white" />
-                      </div>
-                      
-                      <h3 className="text-sm md:text-lg font-bold mb-1 md:mb-2">{item.title}</h3>
-                      <p className="text-xs md:text-sm text-muted-foreground leading-relaxed">{item.description}</p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Consulta Estratégica */}
-        <section id="consulta-section" className="py-12 md:py-16 relative">
-          <div className="container mx-auto px-4">
-            <div className="max-w-3xl mx-auto">
-              <div className="relative rounded-2xl">
-                <div className="absolute inset-0 rounded-2xl p-[1px] bg-gradient-to-br from-white/40 via-gray-200/30 to-white/40">
-                  <div className="h-full w-full bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl rounded-2xl" />
-                </div>
-                
-                <div className="relative p-5 md:p-8">
-                  <div className="text-center mb-4 md:mb-6">
-                    <div className="inline-flex items-center gap-2 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 px-3 md:px-4 py-1 md:py-1.5 rounded-full text-xs md:text-sm font-bold mb-3 border border-amber-200/50">
-                      50% OFF
-                    </div>
-                    
-                    <h3 className="text-lg md:text-3xl font-bold mb-2 md:mb-3">Consulta Estratégica Premium</h3>
-                    
-                    <div className="flex items-center justify-center gap-2 md:gap-3 mb-3">
-                      <span className="text-2xl md:text-4xl font-bold text-rose-600">$150.000</span>
-                      <span className="text-base md:text-xl text-gray-500 line-through">$300.000</span>
-                    </div>
-                  </div>
-                  
-                  <div className="grid md:grid-cols-2 gap-2 md:gap-3 text-xs md:text-sm mb-4 md:mb-6">
-                    {['Análisis completo con abogado', 'Estrategia personalizada', 'Recomendación de plan', '100% reembolsable'].map((item, i) => (
-                      <div key={i} className="flex items-start gap-2">
-                        <CheckCircle className="w-4 h-4 text-rose-500 flex-shrink-0 mt-0.5" />
-                        <span>{item}</span>
-                      </div>
-                    ))}
-                  </div>
-                  
-                  <div className="bg-rose-50 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-800 rounded-xl p-3 md:p-4 mb-4">
-                    <p className="text-xs md:text-sm font-medium text-rose-800 dark:text-rose-200 text-center">
-                      💎 Se descuenta 100% si contratas un plan
-                    </p>
-                  </div>
-                  
-                  <Link
-                    to="/agendamiento?plan=consulta-estrategica-familia"
-                    className="block w-full bg-rose-600 text-white text-center py-2.5 md:py-3 rounded-xl font-semibold hover:bg-rose-700 transition-all shadow-lg text-sm md:text-base"
+                return (
+                  <motion.div
+                    key={pkg.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                    className={`relative ${pkg.popular ? 'lg:scale-105 z-10' : ''}`}
                   >
-                    Agendar Consulta
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
+                    <GlassCard
+                      className={`relative flex h-full flex-col overflow-hidden ${visuals.border} bg-slate-950/80 p-8 backdrop-blur-3xl ${
+                        pkg.popular ? 'ring-2 ring-pink-500/35 shadow-[0_30px_80px_rgba(236,72,153,0.25)]' : 'shadow-[0_20px_60px_rgba(15,23,42,0.45)]'
+                      }`}
+                    >
+                      <div className={`pointer-events-none absolute inset-0 bg-gradient-to-br ${visuals.glow}`} />
+                      <div className="pointer-events-none absolute -right-10 top-0 h-40 w-40 rounded-full bg-white/10 blur-[120px]" />
 
-        {/* Casos de Éxito */}
-        <section className="py-12 md:py-16 bg-gradient-to-r from-pink-50/30 to-rose-50/30 dark:from-pink-950/10 dark:to-rose-950/10">
-          <div className="container mx-auto px-4">
-            <div className="text-center mb-6 md:mb-12">
-              <div className="inline-flex items-center gap-2 bg-pink-500/10 px-3 md:px-4 py-1.5 md:py-2 rounded-full mb-3 border border-pink-200/50">
-                <Award className="w-4 h-4 md:w-5 md:h-5 text-rose-600" />
-                <span className="text-xs md:text-sm font-semibold text-rose-600">Resultados Reales</span>
-              </div>
-              <h2 className="text-2xl md:text-4xl font-bold mb-2 md:mb-4">Casos de Éxito</h2>
-              <p className="text-sm md:text-lg text-muted-foreground">Resultados verificados de clientes reales</p>
-            </div>
-
-            <div className="grid md:grid-cols-3 gap-4 md:gap-6 max-w-6xl mx-auto">
-              {successCases.map((item, i) => (
-                <div key={i}>
-                  <div className="relative rounded-2xl">
-                    <div className="absolute inset-0 rounded-2xl p-[1px] bg-gradient-to-br from-white/40 via-gray-200/20 to-white/40">
-                      <div className="h-full w-full bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl rounded-2xl" />
-                    </div>
-                    
-                    <div className="relative p-4 md:p-6">
-                      <div className={`w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br ${item.color} rounded-xl flex items-center justify-center mb-3 shadow-lg`}>
-                        <item.icon className="w-5 h-5 md:w-6 md:h-6 text-white" />
-                      </div>
-                      
-                      <div className={`text-3xl md:text-5xl font-bold mb-2 md:mb-3 bg-gradient-to-br ${item.color} bg-clip-text text-transparent`}>
-                        {item.amount}
-                      </div>
-                      
-                      <p className="text-xs md:text-sm font-medium mb-3 text-foreground">{item.case}</p>
-                      
-                      <div className="pt-3 border-t border-current/10">
-                        <p className="text-xs text-muted-foreground mb-1">{item.client}</p>
-                        <div className="inline-flex items-center gap-1 bg-white/60 px-2 py-1 rounded-full">
-                          <Star className="w-3 h-3 text-amber-500 fill-amber-500" />
-                          <span className="text-xs font-medium">{item.plan}</span>
+                      <div className="relative z-10 flex h-full flex-col">
+                        <div className="flex flex-col items-center gap-3 text-center">
+                          <span
+                            className={`rounded-full border px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.3em] ${
+                              visuals.chip
+                            }`}
+                          >
+                            {pkg.discount} OFF
+                          </span>
+                          {pkg.popular && (
+                            <span className="rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.3em] text-pink-100">
+                              Más elegido
+                            </span>
+                          )}
                         </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
 
-        {/* Servicios Especializados */}
-        <section className="py-12 md:py-16 relative">
-          <div className="container mx-auto px-4">
-            <h2 className="text-2xl md:text-4xl font-bold text-center mb-6 md:mb-12">Áreas Especializadas</h2>
-
-            <div className="grid md:grid-cols-3 gap-4 md:gap-6">
-              {services.map((service, index) => (
-                <div key={index}>
-                  <div className="relative rounded-2xl">
-                    <div className="absolute inset-0 rounded-2xl p-[1px] bg-gradient-to-br from-white/40 via-gray-200/20 to-white/40">
-                      <div className="h-full w-full bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl rounded-2xl" />
-                    </div>
-                    
-                    <div className="relative p-5 md:p-6">
-                      <div className="w-12 h-12 md:w-14 md:h-14 bg-gradient-to-r from-pink-500 to-rose-600 rounded-xl flex items-center justify-center mb-3 md:mb-4 shadow-lg">
-                        <service.icon className="w-6 h-6 md:w-7 md:h-7 text-white" />
-                      </div>
-                      
-                      <h3 className="text-base md:text-lg font-bold mb-2 md:mb-3">{service.title}</h3>
-                      <p className="text-xs md:text-sm text-muted-foreground mb-3 md:mb-4">{service.description}</p>
-                      
-                      <ul className="space-y-1.5 md:space-y-2">
-                        {service.features.map((feature, i) => (
-                          <li key={i} className="flex items-center gap-2 text-xs md:text-sm">
-                            <CheckCircle className="w-3 h-3 md:w-4 md:h-4 text-rose-500 flex-shrink-0" />
-                            <span>{feature}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Testimoniales */}
-        <section className="py-12 md:py-16 bg-gradient-to-r from-pink-50/30 to-rose-50/30 dark:from-pink-950/10 dark:to-rose-950/10">
-          <div className="container mx-auto px-4">
-            <h2 className="text-2xl md:text-4xl font-bold text-center mb-6 md:mb-12">Familias que Confiaron en Nosotros</h2>
-
-            <div className="grid md:grid-cols-3 gap-4 md:gap-6">
-              {testimonials.map((testimonial, index) => (
-                <div key={index}>
-                  <div className="relative rounded-2xl">
-                    <div className="absolute inset-0 rounded-2xl p-[1px] bg-gradient-to-br from-white/40 via-gray-200/20 to-white/40">
-                      <div className="h-full w-full bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl rounded-2xl" />
-                    </div>
-                    
-                    <div className="relative p-5 md:p-6">
-                      <div className="flex items-center gap-1 mb-3">
-                    {[...Array(testimonial.rating)].map((_, i) => (
-                          <Star key={i} className="w-4 h-4 md:w-5 md:h-5 fill-yellow-400 text-yellow-400" />
-                    ))}
-                  </div>
-                  
-                      <p className="text-xs md:text-sm text-muted-foreground mb-4 italic">"{testimonial.content}"</p>
-                  
-                  <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-r from-pink-500 to-rose-600 rounded-full flex items-center justify-center shadow-lg">
-                          <span className="text-white font-semibold text-sm md:text-lg">{testimonial.name.charAt(0)}</span>
-                    </div>
-                    <div>
-                          <div className="font-semibold text-sm md:text-base">{testimonial.name}</div>
-                          <div className="text-xs md:text-sm text-muted-foreground">{testimonial.role}</div>
+                        <div className="mt-5">
+                          <p className="text-xs uppercase tracking-[0.4em] text-slate-500">Plan {pkg.shortName}</p>
+                          <h3 className="mt-1 text-2xl font-bold text-white">{pkg.name}</h3>
+                          <p className="mt-2 text-slate-300">{pkg.description}</p>
+                          {pkg.context && (
+                            <p className="text-sm text-slate-400">
+                              {pkg.context}
+                            </p>
+                          )}
                         </div>
+
+                        <div className="mt-6 rounded-2xl border border-white/10 bg-white/5 p-5">
+                          <div className="flex items-end justify-between gap-4">
+                            <div>
+                              <p className="text-[11px] uppercase tracking-[0.35em] text-slate-400">Inversión preferente</p>
+                              <div className="text-4xl font-bold text-white">{pkg.price}</div>
+                            </div>
+                            <span className="text-sm font-semibold text-white/70">
+                              Nivel {pkg.id === 'familia-integral' ? '1' : pkg.id === 'familia-premium' ? '2' : '3'}
+                            </span>
+                          </div>
+                          <p className="mt-2 text-sm text-slate-400">
+                            <span className="text-slate-500">Valor normal:</span>{' '}
+                            <span className="line-through">{pkg.originalPrice}</span>
+                          </p>
+                        </div>
+
+                        <ul className="mt-6 space-y-3 text-sm flex-1">
+                          {pkg.features.map((feature) => {
+                            const isBonus = feature.includes('🎁');
+                            const cleanFeature = feature.replace('🎁 ', '');
+
+                            return (
+                              <li key={feature} className="flex items-start gap-3">
+                                <div
+                                  className={`mt-1 flex h-7 w-7 items-center justify-center rounded-full border ${visuals.iconRing}`}
+                                >
+                                  <CheckCircle className={`h-4 w-4 ${visuals.iconColor}`} />
+                                </div>
+                                <span className="text-slate-200">{cleanFeature}</span>
+                                {isBonus && (
+                                  <span className="ml-auto text-[10px] uppercase tracking-[0.3em] text-amber-300">
+                                    Bonus
+                                  </span>
+                                )}
+                              </li>
+                            );
+                          })}
+                        </ul>
+
+                        <button
+                          onClick={() => openHelperModal(pkg)}
+                          className={`group mt-8 inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-white/10 bg-gradient-to-r ${visuals.buttonGradient} px-5 py-3.5 text-base font-semibold uppercase tracking-wide text-white ${visuals.buttonShadow} transition-transform hover:scale-[1.02]`}
+                        >
+                          <ButtonIcon className="h-5 w-5" />
+                          <span>{buttonLabel}</span>
+                        </button>
                       </div>
-                    </div>
+                    </GlassCard>
+                  </motion.div>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+
+        {/* STATS */}
+        <section className="py-8 md:py-10 bg-slate-900">
+          <div className="container mx-auto px-4 max-w-5xl">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {stats.map((stat, index) => (
+                <div
+                  key={index}
+                  className="rounded-3xl border border-slate-700/80 bg-slate-900/60 px-4 py-3 text-center shadow-sm shadow-slate-950/30"
+                >
+                  <div className="text-2xl md:text-3xl font-bold text-slate-100 mb-1">
+                    {stat.number}
+                  </div>
+                  <div className="text-[11px] md:text-xs text-slate-500 uppercase tracking-wide">
+                    {stat.label}
                   </div>
                 </div>
               ))}
@@ -707,86 +810,128 @@ export default function ServicioFamiliaPage() {
 
         {/* FAQ */}
         <section className="py-12 md:py-16">
-          <div className="container mx-auto px-4">
-            <h2 className="text-2xl md:text-4xl font-bold text-center mb-6 md:mb-12">Preguntas Frecuentes</h2>
-
-            <div className="max-w-4xl mx-auto space-y-4 md:space-y-6">
+          <div className="container mx-auto px-4 max-w-3xl">
+            <h2 className="text-2xl md:text-3xl font-bold text-white text-center mb-12">Resolvemos tus dudas</h2>
+            <div className="space-y-0">
               {faq.map((item, index) => (
-                <div key={index}>
-                  <div className="relative rounded-2xl">
-                    <div className="absolute inset-0 rounded-2xl p-[1px] bg-gradient-to-br from-white/40 via-gray-200/20 to-white/40">
-                      <div className="h-full w-full bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl rounded-2xl" />
-                    </div>
-                    
-                    <div className="relative p-5 md:p-8">
-                      <h3 className="text-sm md:text-lg font-bold mb-2 md:mb-4">{item.question}</h3>
-                      <p className="text-xs md:text-base text-muted-foreground leading-relaxed">{item.answer}</p>
-                    </div>
-                  </div>
-                </div>
+                <FaqItem key={index} item={item} />
               ))}
             </div>
           </div>
         </section>
 
-        {/* CTA Final */}
-        <section className="py-12 md:py-16 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-r from-pink-500 to-rose-600" />
-          <div className="absolute inset-0 bg-black/20" />
-          
-          <div className="container mx-auto px-4 relative z-10">
-            <div className="text-center max-w-3xl mx-auto">
-              <h2 className="text-2xl md:text-4xl font-bold text-white mb-4 md:mb-6">
-                ¿Necesitas Asesoría Urgente?
-              </h2>
-              <p className="text-sm md:text-xl text-white/90 mb-6 md:mb-8">
-                Nuestros especialistas están listos para proteger a tu familia.
-              </p>
-              
-              <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                <Link
-                  to="/agendamiento?plan=consulta-estrategica-familia"
-                  className="px-6 md:px-8 py-3 md:py-4 bg-white text-rose-600 rounded-xl font-semibold hover:bg-gray-50 shadow-2xl flex items-center justify-center gap-2 text-sm md:text-base"
-                >
-                  <Calendar className="w-5 h-5" />
-                  Consulta $150k
-                </Link>
-                <Link
-                  to="/agendamiento?plan=familia"
-                  className="px-6 md:px-8 py-3 md:py-4 bg-white/10 backdrop-blur-sm border border-white/30 text-white rounded-xl font-semibold hover:bg-white/20 flex items-center justify-center gap-2 text-sm md:text-base"
-                >
-                  <Shield className="w-5 h-5" />
-                  Agendar Consulta
-                </Link>
+        {/* CTA FINAL */}
+        <section className="pb-20 sm:pb-28">
+          <div className="container mx-auto px-6">
+            <div className="relative bg-gradient-to-r from-pink-600 to-sky-600 rounded-2xl p-12 text-center overflow-hidden">
+              <div className="absolute top-0 left-0 w-full h-full bg-slate-900/30 mix-blend-multiply"></div>
+              <div className="relative z-10">
+                <h2 className="text-3xl sm:text-4xl font-bold text-white">¿Listo/a para recuperar tu tranquilidad?</h2>
+                <p className="mt-4 max-w-2xl mx-auto text-lg text-pink-100">No dejes que las dudas te paralicen. Elige el primer paso que te acomode hoy.</p>
+                <div className="mt-8 flex flex-col md:flex-row justify-center items-center gap-4">
+                  <Link
+                    to="/pago/diagnostico-ia"
+                    className="bg-white/10 border border-white/30 text-white font-bold py-3 px-8 rounded-lg hover:bg-white/20 transition-all w-full md:w-auto"
+                  >
+                    Obtener Diagnóstico Inmediato ($6.990)
+                  </Link>
+                  <Link
+                    to="/agendamiento?plan=consulta-estrategica-familia"
+                    className="bg-white text-pink-600 font-bold py-3 px-8 rounded-lg hover:bg-pink-50 transition-transform hover:scale-105 inline-block shadow-lg w-full md:w-auto"
+                  >
+                    Agendar Pack de Inicio (Garantizado)
+                  </Link>
+                </div>
               </div>
             </div>
           </div>
         </section>
+
+        <footer className="border-t border-slate-800 py-8">
+          <div className="container mx-auto px-6 text-center text-slate-500">
+            <p>&copy; {new Date().getFullYear()} Punto Legal Online. Todos los derechos reservados.</p>
+            <p className="text-xs mt-2">La información en este sitio es referencial y no constituye asesoría legal. <a href="#empezar" className="text-pink-400 hover:text-pink-300 underline">Agenda una consulta</a> para evaluar tu caso.</p>
+          </div>
+        </footer>
       </div>
 
-      {/* Quiz Modal */}
       <QuizModal isOpen={showQuiz} onClose={() => setShowQuiz(false)} />
-      
-      {/* Family Intake Modal */}
-      {selectedPlan && (
-        <FamilyIntakeModal
-          isOpen={isIntakeOpen}
-          onClose={() => {
-            setIsIntakeOpen(false);
-            setSelectedPlan(null);
-          }}
-          planType={selectedPlan.type}
-          planName={selectedPlan.name}
-          planPrice={selectedPlan.price}
-        />
-      )}
-
-      <style>{`
-        @keyframes shimmer {
-          0%, 100% { transform: translateX(-100%); }
-          50% { transform: translateX(100%); }
-        }
-      `}</style>
+      <AnimatePresence>
+        {isHelperModalOpen && selectedPlan && (
+          <DecisionHelperModal
+            isOpen={isHelperModalOpen}
+            onClose={() => setIsHelperModalOpen(false)}
+            plan={selectedPlan}
+          />
+        )}
+      </AnimatePresence>
+      <EliteModal isOpen={showEliteModal} onClose={() => setShowEliteModal(false)} />
+      <ExitIntentModal isOpen={showExitModal} onClose={() => setShowExitModal(false)} />
     </>
   );
 }
+
+const FaqItem: React.FC<{ item: { question: string; answer: string } }> = ({ item }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  return (
+    <div className="border-b border-slate-700">
+      <button
+        className="w-full flex justify-between items-center text-left py-4 focus:outline-none"
+        onClick={() => setIsOpen(!isOpen)}
+      >
+        <h3 className="text-lg font-medium text-slate-200 hover:text-pink-400 transition-colors pr-4">{item.question}</h3>
+        <motion.div animate={{ rotate: isOpen ? 45 : 0 }} transition={{ duration: 0.2 }}>
+          {isOpen ? <Minus className="text-pink-400 h-5 w-5 flex-shrink-0" /> : <Plus className="text-slate-400 h-5 w-5 flex-shrink-0" />}
+        </motion.div>
+      </button>
+      <AnimatePresence initial={false}>
+        {isOpen && (
+          <motion.div
+            key="content"
+            initial="collapsed"
+            animate="open"
+            exit="collapsed"
+            variants={{
+              open: { opacity: 1, height: 'auto' },
+              collapsed: { opacity: 0, height: 0 }
+            }}
+            transition={{ duration: 0.3, ease: [0.04, 0.62, 0.23, 0.98] }}
+            className="overflow-hidden"
+          >
+            <p className="pb-4 text-slate-400 pr-6">{item.answer}</p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+};
+
+const EliteModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
+  if (!isOpen) return null;
+  return (
+    <div className="fixed inset-0 bg-black/50 z-[100] flex items-center justify-center p-4">
+      <div className="bg-white dark:bg-slate-900 p-8 rounded-xl max-w-md w-full relative">
+        <button onClick={onClose} className="absolute top-4 right-4 text-muted-foreground hover:text-foreground">
+          <X size={20} />
+        </button>
+        <h3 className="text-xl font-bold mb-4">Modal Elite (Próximamente)</h3>
+        <p className="text-muted-foreground">Formulario para Nombre y Teléfono irá aquí.</p>
+      </div>
+    </div>
+  );
+};
+
+const ExitIntentModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
+  if (!isOpen) return null;
+  return (
+    <div className="fixed inset-0 bg-black/50 z-[100] flex items-center justify-center p-4">
+      <div className="bg-white dark:bg-slate-900 p-8 rounded-xl max-w-md w-full relative">
+        <button onClick={onClose} className="absolute top-4 right-4 text-muted-foreground hover:text-foreground">
+          <X size={20} />
+        </button>
+        <h3 className="text-xl font-bold mb-4">¡Espera! (Modal Salida Próximamente)</h3>
+        <p className="text-muted-foreground">Oferta de Lead Magnet (PDF Gratis) a cambio de email irá aquí.</p>
+      </div>
+    </div>
+  );
+};

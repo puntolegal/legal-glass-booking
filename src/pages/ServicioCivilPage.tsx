@@ -97,7 +97,7 @@ export default function ServicioCivilPage() {
               
               <div className="flex flex-wrap gap-4 justify-center">
                 <Link
-                  to="/agendamiento?plan=civil-evaluacion"
+                  to="/contacto"
                   className="px-8 py-4 bg-primary text-white rounded-xl font-semibold hover:bg-primary/90 transition-all duration-300 shadow-lg hover:shadow-xl"
                 >
                   Evaluar mi Caso

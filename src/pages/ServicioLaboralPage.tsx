@@ -287,10 +287,10 @@ export default function ServicioLaboralPage() {
                 Agendar Consulta
               </Link>
               <Link
-                to="/agendamiento?plan=laboral"
+                to="/contacto"
                 className="px-8 py-4 bg-orange-600 text-white rounded-xl font-semibold hover:bg-orange-700 transition-all duration-300 shadow-lg hover:shadow-xl border border-white/20"
               >
-                Agendar Ahora
+                Contactar Ahora
               </Link>
             </div>
           </motion.div>
