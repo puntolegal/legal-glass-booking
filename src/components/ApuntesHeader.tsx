@@ -425,10 +425,10 @@ const ApuntesHeader: React.FC<ApuntesHeaderProps> = ({
                 ) : (
                   <button
                     onClick={() => setShowAccessModal(true)}
-                    className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-full border border-white/30 text-[10px] uppercase tracking-[0.4em] text-slate-500 hover:text-slate-800"
+                    className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 rounded-full border border-white/30 dark:border-white/10 text-[9px] sm:text-[10px] uppercase tracking-[0.3em] sm:tracking-[0.4em] text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-white/20 dark:hover:bg-white/10 transition-all"
                   >
-                    <UserCircle className="w-4 h-4" />
-                    Staff
+                    <UserCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                    <span className="hidden xs:inline">Staff</span>
                   </button>
                 )}
               </div>
