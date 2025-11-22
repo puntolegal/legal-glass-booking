@@ -51,23 +51,37 @@ const AmandaAccessModal: React.FC<AmandaAccessModalProps> = ({ open, onClose }) 
     setError('Credenciales inválidas. Verifica tu nombre y clave.');
   };
 
+  // Prevenir scroll del body cuando el modal está abierto
+  useEffect(() => {
+    if (open) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [open]);
+
   return (
     <AnimatePresence>
       {open && (
         <motion.div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-sm px-4 py-4 sm:py-6"
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 dark:bg-slate-950/90 backdrop-blur-md px-4 py-4 sm:py-6"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           onClick={onClose}
+          style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}
         >
           <motion.div
             initial={{ scale: 0.95, opacity: 0, y: 20 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.95, opacity: 0, y: 20 }}
             transition={{ duration: 0.25, type: 'spring', stiffness: 300, damping: 30 }}
-            className="relative w-full max-w-md max-h-[95vh] sm:max-h-[90vh] overflow-y-auto rounded-[24px] sm:rounded-[28px] border border-white/20 dark:border-white/15 bg-gradient-to-br from-slate-900/95 via-slate-800/95 to-slate-900/95 dark:from-slate-950/95 dark:via-slate-900/95 dark:to-slate-950/95 backdrop-blur-xl p-5 sm:p-6 md:p-8 text-white shadow-2xl"
+            className="relative w-full max-w-md max-h-[95vh] sm:max-h-[90vh] overflow-y-auto rounded-[24px] sm:rounded-[28px] border border-white/30 dark:border-white/20 bg-gradient-to-br from-slate-800 via-slate-900 to-slate-800 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 backdrop-blur-xl p-5 sm:p-6 md:p-8 text-white shadow-2xl"
             onClick={(e) => e.stopPropagation()}
+            style={{ zIndex: 101 }}
           >
             <button
               onClick={onClose}
