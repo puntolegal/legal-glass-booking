@@ -457,13 +457,34 @@ const ApuntesHeader: React.FC<ApuntesHeaderProps> = ({
                     </button>
                   </div>
                 ) : (
-                  <button
-                    onClick={() => setShowAccessModal(true)}
-                    className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 rounded-full border border-white/30 dark:border-white/10 text-[9px] sm:text-[10px] uppercase tracking-[0.3em] sm:tracking-[0.4em] text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-white/20 dark:hover:bg-white/10 transition-all"
-                  >
-                    <UserCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                    <span className="hidden xs:inline">Staff</span>
-                  </button>
+                  <div className="flex items-center gap-1.5 sm:gap-2">
+                    {/* Botón Acceso - Para usuarios nuevos */}
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        // TODO: Navegar a página de registro/login de usuarios
+                        // Por ahora, mostrar modal de acceso
+                        setShowAccessModal(true);
+                      }}
+                      className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 rounded-full border border-indigo-500/30 dark:border-indigo-500/20 bg-indigo-500/10 dark:bg-indigo-500/10 text-[9px] sm:text-[10px] uppercase tracking-[0.3em] sm:tracking-[0.4em] text-indigo-700 dark:text-indigo-300 hover:bg-indigo-500/20 dark:hover:bg-indigo-500/15 active:scale-95 transition-all cursor-pointer"
+                    >
+                      <UserCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4" strokeWidth={1.5} />
+                      <span className="hidden sm:inline">Acceso</span>
+                    </button>
+                    {/* Botón Staff - Para mesa de auditores */}
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setShowAccessModal(true);
+                      }}
+                      className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 rounded-full border border-white/30 dark:border-white/10 text-[9px] sm:text-[10px] uppercase tracking-[0.3em] sm:tracking-[0.4em] text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-white/20 dark:hover:bg-white/10 active:scale-95 transition-all cursor-pointer"
+                    >
+                      <Shield className="w-3.5 h-3.5 sm:w-4 sm:h-4" strokeWidth={1.5} />
+                      <span className="hidden sm:inline">Staff</span>
+                    </button>
+                  </div>
                 )}
               </div>
             </div>
