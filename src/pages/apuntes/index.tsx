@@ -186,19 +186,19 @@ const ApuntesIndex: React.FC = () => {
       />
 
       {/* Contenido Principal con Márgenes Amplios - Asegurar que no quede oculto por el header */}
-      <div className="pt-20 sm:pt-24 md:pt-28 lg:pt-32 pb-12 px-4 md:px-8 lg:px-12 max-w-7xl mx-auto relative z-10">
+      <div className="pt-24 sm:pt-28 md:pt-32 lg:pt-36 pb-12 px-4 md:px-8 lg:px-12 max-w-7xl mx-auto relative z-10">
         {/* Hero Section */}
         <div className="mb-12 text-center md:text-left">
-          <div className="flex flex-col md:flex-row items-center md:items-start gap-6 mb-6">
-            <div className="text-7xl md:text-8xl">🎓</div>
-            <div className="flex-1">
-              <div className="flex items-center gap-3 mb-2">
-                <p className="text-xs uppercase tracking-[0.5em] text-slate-500 dark:text-slate-400 font-semibold">Punto Legal · Colección Magistral</p>
+          <div className="flex flex-col md:flex-row items-center md:items-start gap-4 sm:gap-6 mb-6">
+            <div className="text-6xl sm:text-7xl md:text-8xl flex-shrink-0">🎓</div>
+            <div className="flex-1 w-full">
+              <div className="flex items-center justify-center md:justify-start gap-3 mb-2">
+                <p className="text-[10px] sm:text-xs uppercase tracking-[0.4em] sm:tracking-[0.5em] text-slate-500 dark:text-slate-400 font-semibold text-center md:text-left">Punto Legal · Colección Magistral</p>
               </div>
-              <h1 className="text-4xl md:text-6xl font-serif font-bold text-[#1d1d1f] dark:text-white mb-4 tracking-tight">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-serif font-bold text-[#1d1d1f] dark:text-white mb-3 sm:mb-4 tracking-tight text-center md:text-left">
                 Sistema de Apuntes
               </h1>
-              <p className="text-lg md:text-xl text-slate-600 dark:text-slate-300 max-w-2xl leading-relaxed">
+              <p className="text-base sm:text-lg md:text-xl text-slate-600 dark:text-slate-300 max-w-2xl leading-relaxed text-center md:text-left mx-auto md:mx-0">
                 {isCurator 
                   ? `Panel de Auditoría. ${auditStats.pending} notas pendientes de revisión.`
                   : `Gestiona tu conocimiento legal. ${safeProgress.totalPoints > 0 ? 'Tu progreso es excelente.' : 'Comienza tu sesión de estudio hoy.'}`
