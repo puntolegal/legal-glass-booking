@@ -16,7 +16,8 @@ import {
   UserCircle,
   Users,
   ChevronRight,
-  ArrowLeft
+  ArrowLeft,
+  Shield
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import DarkModeToggle from './DarkModeToggle';
