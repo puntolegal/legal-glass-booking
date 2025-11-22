@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
+import {
   BookOpen, 
   Award, 
   Lightbulb, 
@@ -55,11 +55,11 @@ interface ParsedSection {
   importance?: 'low' | 'medium' | 'high' | 'critical';
 }
 
-const ApuntesContent: React.FC<ApuntesContentProps> = ({ 
-  content, 
-  noteId, 
-  category, 
-  onConceptClick 
+const ApuntesContent: React.FC<ApuntesContentProps> = ({
+  content,
+  noteId,
+  category,
+  onConceptClick
 }) => {
   const [parsedContent, setParsedContent] = useState<any>(null);
   const [readingProgress, setReadingProgress] = useState(0);
@@ -72,8 +72,8 @@ const ApuntesContent: React.FC<ApuntesContentProps> = ({
 
   useEffect(() => {
     if (content) {
-      const parsed = parseObsidianContent(content);
-      setParsedContent(parsed);
+    const parsed = parseObsidianContent(content);
+    setParsedContent(parsed);
     }
   }, [content]);
 
@@ -98,7 +98,7 @@ const ApuntesContent: React.FC<ApuntesContentProps> = ({
       // Solo dar puntos por secciones importantes
       if (points >= 10) {
         setEarnedPoints(prev => prev + points);
-        triggerPointsAnimation(points);
+      triggerPointsAnimation(points);
       }
     }
   };
@@ -121,10 +121,10 @@ const ApuntesContent: React.FC<ApuntesContentProps> = ({
     } else {
       // Navegar a la nota del concepto
       const slug = concept.toLowerCase()
-        .replace(/\s+/g, '-')
-        .replace(/[^\w-]/g, '')
-        .replace(/^-+|-+$/g, '');
-      navigate(`/apuntes/${slug}`);
+      .replace(/\s+/g, '-')
+      .replace(/[^\w-]/g, '')
+      .replace(/^-+|-+$/g, '');
+    navigate(`/apuntes/${slug}`);
     }
   };
 
@@ -154,7 +154,7 @@ const ApuntesContent: React.FC<ApuntesContentProps> = ({
               </div>
             </div>
           </div>
-          
+
           {/* Contador de puntos con diseño premium */}
           <div className="relative flex items-center space-x-2">
             <div className="flex items-center space-x-2 px-3 py-1 bg-gradient-to-r from-amber-100 to-yellow-100 dark:from-amber-900/30 dark:to-yellow-900/30 rounded-full border border-amber-200 dark:border-amber-800">
@@ -162,8 +162,8 @@ const ApuntesContent: React.FC<ApuntesContentProps> = ({
               <span className="text-sm font-semibold text-amber-800 dark:text-amber-200">
                 {earnedPoints}
               </span>
-            </div>
-            
+          </div>
+
             {/* Animación de puntos ganados */}
             <AnimatePresence>
               {showPointsAnimation && (
@@ -189,7 +189,7 @@ const ApuntesContent: React.FC<ApuntesContentProps> = ({
             transition={{ duration: 0.6, ease: "easeOut" }}
           >
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer" />
-          </motion.div>
+      </motion.div>
         </div>
       </div>
 
@@ -228,7 +228,7 @@ const ApuntesContent: React.FC<ApuntesContentProps> = ({
                   <div className="flex items-center space-x-2 flex-1 min-w-0">
                     <div className="w-2 h-2 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full flex-shrink-0" />
                     <span className="text-sm font-medium text-gray-700 dark:text-gray-300 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors truncate">
-                      {concept}
+                {concept}
                     </span>
                   </div>
                   <ArrowRight className="w-3 h-3 text-gray-400 group-hover:text-blue-500 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-1 group-hover:translate-x-0 flex-shrink-0" />
@@ -338,7 +338,7 @@ function renderEnhancedSection(
 
   switch (section.type) {
     case 'title':
-      return (
+  return (
         <div className="relative text-center py-12 mb-8">
           <motion.div
             initial={{ scale: 0.8, opacity: 0 }}
@@ -365,7 +365,7 @@ function renderEnhancedSection(
           {showViewedIndicator && (
             <div className="absolute top-2 right-2 p-1 bg-green-500 rounded-full shadow-md">
               <CheckCircle className="w-3 h-3 text-white" />
-            </div>
+      </div>
           )}
           
           <div className="flex items-center justify-between">
@@ -469,8 +469,8 @@ function renderEnhancedSection(
                   <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
                     Contenido de alto valor (+{section.points} pts)
                   </span>
-                </div>
-              )}
+          </div>
+        )}
             </div>
           </div>
         </div>
@@ -555,7 +555,7 @@ function renderEnhancedSection(
                 <Brain className="w-4 h-4" />
                 <span>Memorización Visual</span>
               </div>
-            </div>
+          </div>
 
             {/* Contenido del esquema */}
             <div className="schema-content">
@@ -568,7 +568,7 @@ function renderEnhancedSection(
                   <code className="text-gray-800 dark:text-gray-200 schema-interactive">
                     {section.content}
                   </code>
-                </pre>
+          </pre>
               </div>
             </div>
 
@@ -623,9 +623,9 @@ function renderEnhancedSection(
         <div className="relative p-4 bg-white/50 dark:bg-gray-800/50 rounded-xl backdrop-blur-sm border border-gray-200/30 dark:border-gray-700/30 shadow-sm hover:shadow-md transition-shadow duration-200">
           <div className="leading-relaxed text-gray-700 dark:text-gray-300">
             {renderTextWithConcepts(section.content, onConceptClick)}
-          </div>
-        </div>
-      );
+      </div>
+    </div>
+  );
   }
 }
 
