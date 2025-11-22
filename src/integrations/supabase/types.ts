@@ -233,6 +233,39 @@ export type Database = {
         }
         Relationships: []
       }
+      leads_quiz: {
+        Row: {
+          id: string
+          name: string
+          email: string
+          quiz_answers: Json
+          plan_recommended: string | null
+          status: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          name: string
+          email: string
+          quiz_answers: Json
+          plan_recommended?: string | null
+          status?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          name?: string
+          email?: string
+          quiz_answers?: Json
+          plan_recommended?: string | null
+          status?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

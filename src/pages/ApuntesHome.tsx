@@ -54,7 +54,7 @@ const ApuntesHome: React.FC = () => {
       icon: Target,
       title: "Gamificación Premium",
       description: "Sistema de puntos, medallas y niveles para motivar tu progreso diario",
-      color: "from-purple-500 to-pink-500"
+      color: "from-indigo-500 to-indigo-600"
     },
     {
       icon: Compass,
@@ -105,7 +105,7 @@ const ApuntesHome: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-slate-900 dark:via-slate-800 dark:to-indigo-900 relative overflow-hidden">
       {/* Efectos de fondo decorativos */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-20 right-20 w-96 h-96 bg-gradient-to-br from-blue-400/10 to-purple-400/10 rounded-full blur-3xl animate-pulse-glow" />
+        <div className="absolute top-20 right-20 w-96 h-96 bg-indigo-400/8 dark:bg-indigo-500/4 rounded-full blur-3xl animate-pulse-glow" />
         <div className="absolute bottom-40 left-20 w-64 h-64 bg-gradient-to-br from-emerald-400/10 to-cyan-400/10 rounded-full blur-3xl animate-float" />
         <div className="absolute top-1/2 right-1/3 w-48 h-48 bg-gradient-to-br from-amber-400/10 to-orange-400/10 rounded-full blur-2xl animate-shimmer" />
         
@@ -148,7 +148,7 @@ const ApuntesHome: React.FC = () => {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="mb-8"
           >
-            <h1 className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent mb-6 leading-tight">
+            <h1 className="text-5xl md:text-7xl font-bold text-[#1d1d1f] dark:text-white mb-6 leading-tight">
               Punto Legal
               <br />
               <span className="text-4xl md:text-6xl">Apuntes</span>
@@ -156,7 +156,7 @@ const ApuntesHome: React.FC = () => {
             <div className="flex items-center justify-center gap-3 mb-6">
               <div className="w-16 h-px bg-gradient-to-r from-transparent via-blue-500 to-transparent" />
               <Brain className="w-6 h-6 text-blue-500 animate-pulse" />
-              <div className="w-16 h-px bg-gradient-to-r from-transparent via-purple-500 to-transparent" />
+              <div className="w-16 h-px bg-indigo-500/30" />
             </div>
           </motion.div>
 
@@ -185,7 +185,7 @@ const ApuntesHome: React.FC = () => {
               </div>
               <div className="w-px h-8 bg-white/20" />
               <div className="text-center">
-                <div className="text-2xl font-bold text-purple-600">{progress.totalPoints}</div>
+                <div className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">{progress.totalPoints}</div>
                 <div className="text-sm text-gray-600 dark:text-gray-400">Puntos Ganados</div>
               </div>
               <div className="w-px h-8 bg-white/20" />
@@ -205,7 +205,7 @@ const ApuntesHome: React.FC = () => {
           >
             <Button
               onClick={() => navigate('/apuntes')}
-              className="group relative overflow-hidden bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 hover:from-blue-700 hover:via-purple-700 hover:to-indigo-700 text-white px-8 py-4 text-lg rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 border border-white/20"
+              className="group relative overflow-hidden bg-indigo-500 hover:bg-indigo-600 text-white px-8 py-4 text-lg rounded-full shadow-xl hover:shadow-2xl transition-all duration-300"
               size="lg"
             >
               <div className="relative flex items-center gap-3">
@@ -247,7 +247,7 @@ const ApuntesHome: React.FC = () => {
                   <p className="text-sm text-gray-600 dark:text-gray-400">Navega entre conceptos como en un mapa mental</p>
                 </div>
                 <div className="text-center">
-                  <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <div className="w-16 h-16 bg-indigo-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
                     <Award className="w-8 h-8 text-white" />
                   </div>
                   <h3 className="text-lg font-semibold mb-2">Gamificación</h3>
@@ -312,7 +312,7 @@ const ApuntesHome: React.FC = () => {
       </section>
 
       {/* Stats Section */}
-      <section className="py-20 px-4 bg-gradient-to-r from-blue-600/10 via-purple-600/10 to-indigo-600/10">
+      <section className="py-20 px-4 bg-stone-50 dark:bg-[#1c1c1e]">
         <div className="max-w-7xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -361,7 +361,7 @@ const ApuntesHome: React.FC = () => {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            <h2 className="text-4xl md:text-5xl font-bold mb-6 text-[#1d1d1f] dark:text-white">
               Lo Que Dicen Nuestros Usuarios
             </h2>
           </motion.div>
@@ -386,7 +386,7 @@ const ApuntesHome: React.FC = () => {
                     "{testimonial.content}"
                   </p>
                   <div className="flex items-center">
-                    <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold mr-4">
+                    <div className="w-12 h-12 bg-indigo-500 rounded-full flex items-center justify-center text-white font-bold mr-4">
                       {testimonial.avatar}
                     </div>
                     <div>
@@ -406,7 +406,7 @@ const ApuntesHome: React.FC = () => {
       </section>
 
       {/* CTA Final */}
-      <section className="py-20 px-4 bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 relative overflow-hidden">
+      <section className="py-20 px-4 bg-[#1d1d1f] dark:bg-stone-900 relative overflow-hidden">
         <div className="absolute inset-0 bg-black/20" />
         <div className="absolute inset-0">
           {[...Array(8)].map((_, i) => (

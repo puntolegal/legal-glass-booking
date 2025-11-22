@@ -482,40 +482,40 @@ const InteractiveQuiz: React.FC<InteractiveQuizProps> = ({
     }
   };
 
-  // 🎨 Configuración visual por dificultad
+  // 🎨 Configuración visual por dificultad - Paleta iPadOS Legal
   const getDifficultyConfig = (diff: string) => {
     switch(diff) {
       case 'básico': 
         return { 
-          color: 'from-emerald-400 to-green-500', 
+          color: 'bg-stone-600', 
           icon: Lightbulb, 
           emoji: '🌱',
-          bg: 'from-emerald-50 to-green-50 dark:from-emerald-900/30 dark:to-green-900/30',
-          border: 'border-emerald-200/50 dark:border-emerald-700/50'
+          bg: 'bg-white/60 dark:bg-[#1c1c1e]/60 backdrop-blur-2xl',
+          border: 'border-white/20 dark:border-white/5'
         };
       case 'intermedio': 
         return { 
-          color: 'from-cyan-400 to-blue-500', 
+          color: 'bg-indigo-500', 
           icon: Zap, 
           emoji: '⚡',
-          bg: 'from-cyan-50 to-blue-50 dark:from-cyan-900/30 dark:to-blue-900/30',
-          border: 'border-cyan-200/50 dark:border-cyan-700/50'
+          bg: 'bg-white/60 dark:bg-[#1c1c1e]/60 backdrop-blur-2xl',
+          border: 'border-white/20 dark:border-white/5'
         };
       case 'avanzado': 
         return { 
-          color: 'from-purple-400 to-fuchsia-500', 
+          color: 'bg-stone-700', 
           icon: Crown, 
           emoji: '👑',
-          bg: 'from-purple-50 to-fuchsia-50 dark:from-purple-900/30 dark:to-fuchsia-900/30',
-          border: 'border-purple-200/50 dark:border-purple-700/50'
+          bg: 'bg-white/60 dark:bg-[#1c1c1e]/60 backdrop-blur-2xl',
+          border: 'border-white/20 dark:border-white/5'
         };
       default: 
         return { 
-          color: 'from-gray-400 to-gray-500', 
+          color: 'bg-stone-600', 
           icon: BookOpen, 
           emoji: '📚',
-          bg: 'from-gray-50 to-gray-100 dark:from-gray-900/30 dark:to-gray-800/30',
-          border: 'border-gray-200/50 dark:border-gray-700/50'
+          bg: 'bg-white/60 dark:bg-[#1c1c1e]/60 backdrop-blur-2xl',
+          border: 'border-white/20 dark:border-white/5'
         };
     }
   };
@@ -536,59 +536,60 @@ const InteractiveQuiz: React.FC<InteractiveQuizProps> = ({
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className={`bg-gradient-to-br ${config.bg} rounded-3xl p-8 border ${config.border} shadow-2xl`}
+        className={`${config.bg} rounded-[32px] p-8 border ${config.border} shadow-xl shadow-black/5`}
       >
         <div className="text-center space-y-6">
           <motion.div
-            animate={{ rotate: [0, 360] }}
-            transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-            className={`w-20 h-20 mx-auto bg-gradient-to-r ${config.color} rounded-3xl flex items-center justify-center shadow-2xl`}
+            initial={{ scale: 0.9 }}
+            animate={{ scale: 1 }}
+            transition={{ type: "spring", stiffness: 200, damping: 15 }}
+            className={`w-20 h-20 mx-auto ${config.color} rounded-2xl flex items-center justify-center shadow-lg`}
           >
-            <IconComponent className="w-10 h-10 text-white" />
+            <IconComponent className="w-10 h-10 text-white" strokeWidth={1.5} />
           </motion.div>
           
           <div className="space-y-3">
             <div className="flex items-center justify-center gap-2">
               <span className="text-4xl">{config.emoji}</span>
-              <h3 className="text-3xl font-black text-gray-900 dark:text-white">
+              <h3 className="text-3xl font-black text-slate-900 dark:text-white">
                 ¡Quiz {difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}!
               </h3>
             </div>
-            <p className="text-xl font-bold text-gray-700 dark:text-gray-200">
+            <p className="text-xl font-bold text-slate-700 dark:text-slate-200">
               Demuestra tu dominio en {category.replace('-', ' ')}
             </p>
-            <p className="text-gray-600 dark:text-gray-300 text-lg">
+            <p className="text-slate-600 dark:text-slate-300 text-lg">
               {questions.length} preguntas • Sistema de puntos dinámico • Bonificaciones por velocidad
             </p>
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-            <div className="bg-white/70 dark:bg-gray-800/70 rounded-2xl p-4 backdrop-blur-sm border border-white/30">
-              <Timer className={`w-6 h-6 text-blue-600 dark:text-blue-400 mx-auto mb-2`} />
-              <p className="text-lg font-bold text-gray-700 dark:text-gray-300">{questions[0]?.timeLimit || 30}s</p>
-              <p className="text-sm text-gray-500 dark:text-gray-400">por pregunta</p>
+            <div className="bg-white/70 dark:bg-slate-800/70 rounded-2xl p-4 backdrop-blur-sm border border-slate-200/40 dark:border-slate-700/30">
+              <Timer className="w-6 h-6 text-slate-600 dark:text-slate-400 mx-auto mb-2" />
+              <p className="text-lg font-bold text-slate-700 dark:text-slate-300">{questions[0]?.timeLimit || 30}s</p>
+              <p className="text-sm text-slate-600/70 dark:text-slate-400/70">por pregunta</p>
             </div>
-            <div className="bg-white/70 dark:bg-gray-800/70 rounded-2xl p-4 backdrop-blur-sm border border-white/30">
-              <Star className="w-6 h-6 text-yellow-600 dark:text-yellow-400 mx-auto mb-2" />
-              <p className="text-lg font-bold text-gray-700 dark:text-gray-300">Hasta {Math.max(...questions.map(q => q.points + 20))}pts</p>
-              <p className="text-sm text-gray-500 dark:text-gray-400">por respuesta</p>
+            <div className="bg-white/70 dark:bg-slate-800/70 rounded-2xl p-4 backdrop-blur-sm border border-slate-200/40 dark:border-slate-700/30">
+              <Star className="w-6 h-6 text-slate-600 dark:text-slate-400 mx-auto mb-2" />
+              <p className="text-lg font-bold text-slate-700 dark:text-slate-300">Hasta {Math.max(...questions.map(q => q.points + 20))}pts</p>
+              <p className="text-sm text-slate-600/70 dark:text-slate-400/70">por respuesta</p>
             </div>
-            <div className="bg-white/70 dark:bg-gray-800/70 rounded-2xl p-4 backdrop-blur-sm border border-white/30">
-              <Rocket className="w-6 h-6 text-purple-600 dark:text-purple-400 mx-auto mb-2" />
-              <p className="text-lg font-bold text-gray-700 dark:text-gray-300">Bonus</p>
-              <p className="text-sm text-gray-500 dark:text-gray-400">por velocidad</p>
+            <div className="bg-white/70 dark:bg-slate-800/70 rounded-2xl p-4 backdrop-blur-sm border border-slate-200/40 dark:border-slate-700/30">
+              <Rocket className="w-6 h-6 text-slate-600 dark:text-slate-400 mx-auto mb-2" />
+              <p className="text-lg font-bold text-slate-700 dark:text-slate-300">Bonus</p>
+              <p className="text-sm text-slate-600/70 dark:text-slate-400/70">por velocidad</p>
             </div>
-            <div className="bg-white/70 dark:bg-gray-800/70 rounded-2xl p-4 backdrop-blur-sm border border-white/30">
-              <XCircle className="w-6 h-6 text-red-600 dark:text-red-400 mx-auto mb-2" />
-              <p className="text-lg font-bold text-gray-700 dark:text-gray-300">-{Math.max(...questions.map(q => q.penalty))}pts</p>
-              <p className="text-sm text-gray-500 dark:text-gray-400">por error</p>
+            <div className="bg-white/70 dark:bg-slate-800/70 rounded-2xl p-4 backdrop-blur-sm border border-slate-200/40 dark:border-slate-700/30">
+              <XCircle className="w-6 h-6 text-slate-600 dark:text-slate-400 mx-auto mb-2" />
+              <p className="text-lg font-bold text-slate-700 dark:text-slate-300">-{Math.max(...questions.map(q => q.penalty))}pts</p>
+              <p className="text-sm text-slate-600/70 dark:text-slate-400/70">por error</p>
             </div>
           </div>
 
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
             <Button 
               onClick={startQuiz}
-              className={`w-full bg-gradient-to-r ${config.color} hover:shadow-2xl text-white font-bold py-4 text-xl rounded-2xl transition-all duration-300 relative overflow-hidden`}
+              className={`w-full ${config.color} hover:opacity-90 text-white font-bold py-4 text-xl rounded-full transition-all duration-300 relative overflow-hidden shadow-lg`}
             >
               <motion.div
                 className="absolute inset-0 bg-white/20"
@@ -622,27 +623,27 @@ const InteractiveQuiz: React.FC<InteractiveQuizProps> = ({
     
     if (isPerfect) {
       resultMessage = '¡PERFECTO! 🏆 ¡Eres un maestro del derecho!';
-      resultIcon = <Crown className="w-12 h-12 text-yellow-500" />;
-      resultColor = 'from-yellow-400 to-orange-500';
+      resultIcon = <Crown className="w-12 h-12 text-slate-600 dark:text-slate-400" />;
+      resultColor = 'from-slate-600 to-slate-700';
     } else if (isExcellent) {
       resultMessage = '¡EXCELENTE! 🔥 Dominas muy bien la materia';
-      resultIcon = <Trophy className="w-12 h-12 text-purple-500" />;
-      resultColor = 'from-purple-400 to-fuchsia-500';
+      resultIcon = <Trophy className="w-12 h-12 text-slate-600 dark:text-slate-400" />;
+      resultColor = 'from-slate-600 to-slate-700';
     } else if (isGood) {
       resultMessage = '¡BIEN HECHO! ⚡ Estás en buen camino';
-      resultIcon = <Award className="w-12 h-12 text-blue-500" />;
-      resultColor = 'from-blue-400 to-cyan-500';
+      resultIcon = <Award className="w-12 h-12 text-slate-600 dark:text-slate-400" />;
+      resultColor = 'from-slate-500 to-slate-600';
     } else {
       resultMessage = '¡SIGUE PRACTICANDO! 💪 Cada intento te hace mejor';
-      resultIcon = <Target className="w-12 h-12 text-green-500" />;
-      resultColor = 'from-green-400 to-emerald-500';
+      resultIcon = <Target className="w-12 h-12 text-slate-600 dark:text-slate-400" />;
+      resultColor = 'from-slate-500 to-slate-600';
     }
     
     return (
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
-        className={`bg-gradient-to-br ${config.bg} rounded-3xl p-8 border ${config.border} shadow-2xl`}
+        className={`${config.bg} rounded-[32px] p-8 border ${config.border} shadow-xl shadow-black/5`}
       >
         <div className="text-center space-y-6">
           <motion.div
@@ -655,51 +656,51 @@ const InteractiveQuiz: React.FC<InteractiveQuizProps> = ({
           </motion.div>
 
           <div className="space-y-3">
-            <h3 className="text-3xl font-black text-gray-900 dark:text-white">
+            <h3 className="text-3xl font-black text-slate-900 dark:text-white">
               {resultMessage}
             </h3>
-            <p className="text-xl text-gray-600 dark:text-gray-300">
+            <p className="text-xl text-slate-600 dark:text-slate-300">
               Respondiste {score} de {questions.length} preguntas correctamente
             </p>
           </div>
 
           {/* 📊 Estadísticas detalladas */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="bg-white/70 dark:bg-gray-800/70 rounded-2xl p-4 text-center backdrop-blur-sm border border-white/30">
-              <p className="text-3xl font-black text-green-600 dark:text-green-400">{percentage.toFixed(0)}%</p>
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Precisión</p>
+            <div className="bg-white/70 dark:bg-slate-800/70 rounded-2xl p-4 text-center backdrop-blur-sm border border-slate-200/40 dark:border-slate-700/30">
+              <p className="text-3xl font-black text-slate-700 dark:text-slate-300">{percentage.toFixed(0)}%</p>
+              <p className="text-sm font-medium text-slate-600/70 dark:text-slate-400/70">Precisión</p>
             </div>
-            <div className="bg-white/70 dark:bg-gray-800/70 rounded-2xl p-4 text-center backdrop-blur-sm border border-white/30">
-              <p className="text-3xl font-black text-purple-600 dark:text-purple-400">+{finalScore}</p>
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Puntos netos</p>
+            <div className="bg-white/70 dark:bg-slate-800/70 rounded-2xl p-4 text-center backdrop-blur-sm border border-slate-200/40 dark:border-slate-700/30">
+              <p className="text-3xl font-black text-slate-700 dark:text-slate-300">+{finalScore}</p>
+              <p className="text-sm font-medium text-slate-600/70 dark:text-slate-400/70">Puntos netos</p>
             </div>
-            <div className="bg-white/70 dark:bg-gray-800/70 rounded-2xl p-4 text-center backdrop-blur-sm border border-white/30">
-              <p className="text-3xl font-black text-orange-600 dark:text-orange-400">{correctStreak}</p>
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Mejor racha</p>
+            <div className="bg-white/70 dark:bg-slate-800/70 rounded-2xl p-4 text-center backdrop-blur-sm border border-slate-200/40 dark:border-slate-700/30">
+              <p className="text-3xl font-black text-slate-700 dark:text-slate-300">{correctStreak}</p>
+              <p className="text-sm font-medium text-slate-600/70 dark:text-slate-400/70">Mejor racha</p>
             </div>
-            <div className="bg-white/70 dark:bg-gray-800/70 rounded-2xl p-4 text-center backdrop-blur-sm border border-white/30">
-              <p className="text-3xl font-black text-blue-600 dark:text-blue-400">{speedBonus}</p>
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Bonus velocidad</p>
+            <div className="bg-white/70 dark:bg-slate-800/70 rounded-2xl p-4 text-center backdrop-blur-sm border border-slate-200/40 dark:border-slate-700/30">
+              <p className="text-3xl font-black text-slate-700 dark:text-slate-300">{speedBonus}</p>
+              <p className="text-sm font-medium text-slate-600/70 dark:text-slate-400/70">Bonus velocidad</p>
             </div>
           </div>
 
           {/* 🎖️ Logros especiales */}
           {(isPerfect || perfectAnswers > 0 || hintsUsed === 0) && (
             <div className="space-y-3">
-              <h4 className="text-lg font-bold text-gray-800 dark:text-gray-200">🏅 Logros Desbloqueados</h4>
+              <h4 className="text-lg font-bold text-slate-800 dark:text-slate-200">🏅 Logros Desbloqueados</h4>
               <div className="flex flex-wrap gap-2 justify-center">
                 {isPerfect && (
-                  <Badge className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-4 py-2">
+                  <Badge className="bg-slate-700/90 dark:bg-slate-600/90 text-white px-4 py-2">
                     👑 Respuesta Perfecta
                   </Badge>
                 )}
                 {perfectAnswers > 0 && (
-                  <Badge className="bg-gradient-to-r from-blue-400 to-cyan-500 text-white px-4 py-2">
+                  <Badge className="bg-slate-700/90 dark:bg-slate-600/90 text-white px-4 py-2">
                     ⚡ Velocista x{perfectAnswers}
                   </Badge>
                 )}
                 {hintsUsed === 0 && (
-                  <Badge className="bg-gradient-to-r from-purple-400 to-fuchsia-500 text-white px-4 py-2">
+                  <Badge className="bg-slate-700/90 dark:bg-slate-600/90 text-white px-4 py-2">
                     🧠 Sin Ayuda
                   </Badge>
                 )}
@@ -717,7 +718,7 @@ const InteractiveQuiz: React.FC<InteractiveQuizProps> = ({
             </Button>
             <Button
               onClick={() => setIsComplete(false)}
-              className={`flex-1 bg-gradient-to-r ${config.color} text-white py-3 text-lg font-bold`}
+              className={`flex-1 ${config.color} text-white py-3 text-lg font-bold rounded-full`}
             >
               🎯 Siguiente Quiz
             </Button>
@@ -741,19 +742,19 @@ const InteractiveQuiz: React.FC<InteractiveQuizProps> = ({
       {/* 📊 Header con métricas avanzadas */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center space-x-4">
-          <Badge className={`bg-gradient-to-r ${config.color} text-white border-0 px-4 py-2 text-sm font-bold`}>
+          <Badge className={`${config.color} text-white border-0 px-4 py-2 text-sm font-bold rounded-full`}>
             {config.emoji} {difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}
           </Badge>
-          <span className="text-sm font-bold text-gray-500 dark:text-gray-400">
+          <span className="text-sm font-bold text-slate-500 dark:text-slate-400">
             {currentQuestion + 1} de {questions.length}
           </span>
           {correctStreak > 1 && (
             <motion.div
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
-              className="flex items-center space-x-1 bg-gradient-to-r from-orange-400 to-red-500 text-white px-3 py-1 rounded-full shadow-lg"
+              className="flex items-center space-x-1 bg-[#1d1d1f] dark:bg-stone-700 text-white px-3 py-1 rounded-full shadow-lg"
             >
-              <Flame className="w-4 h-4" />
+              <Flame className="w-4 h-4" strokeWidth={1.5} />
               <span className="text-sm font-bold">
                 {correctStreak} {getStreakEmoji(correctStreak)}
               </span>
@@ -776,8 +777,8 @@ const InteractiveQuiz: React.FC<InteractiveQuizProps> = ({
           )}
           
           <div className="flex items-center space-x-2">
-            <Timer className={`w-5 h-5 ${timeLeft <= 10 ? 'text-red-500' : timeLeft <= 20 ? 'text-orange-500' : 'text-blue-500'}`} />
-            <span className={`font-black text-lg ${timeLeft <= 10 ? 'text-red-500' : timeLeft <= 20 ? 'text-orange-500' : 'text-blue-600 dark:text-blue-400'}`}>
+            <Timer className={`w-5 h-5 ${timeLeft <= 10 ? 'text-slate-600 dark:text-slate-400' : timeLeft <= 20 ? 'text-slate-600 dark:text-slate-400' : 'text-slate-600 dark:text-slate-400'}`} />
+            <span className={`font-black text-lg ${timeLeft <= 10 ? 'text-slate-700 dark:text-slate-300' : timeLeft <= 20 ? 'text-slate-700 dark:text-slate-300' : 'text-slate-700 dark:text-slate-300'}`}>
               {timeLeft}s
             </span>
           </div>
@@ -792,7 +793,7 @@ const InteractiveQuiz: React.FC<InteractiveQuizProps> = ({
         </div>
         <div className="w-full h-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
           <motion.div
-            className={`h-full bg-gradient-to-r ${config.color} shadow-lg`}
+            className={`h-full ${config.color} shadow-lg rounded-full`}
             initial={{ width: 0 }}
             animate={{ width: `${((currentQuestion + 1) / questions.length) * 100}%` }}
             transition={{ duration: 0.5 }}
@@ -824,11 +825,11 @@ const InteractiveQuiz: React.FC<InteractiveQuizProps> = ({
         </h3>
         <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
           <div className="flex items-center gap-1">
-            <Star className="w-4 h-4 text-yellow-500" />
+            <Star className="w-4 h-4 text-slate-600 dark:text-slate-400" />
             <span className="font-bold">+{question.points} pts</span>
           </div>
           <div className="flex items-center gap-1">
-            <XCircle className="w-4 h-4 text-red-500" />
+            <XCircle className="w-4 h-4 text-slate-600 dark:text-slate-400" />
             <span className="font-bold">-{question.penalty} pts por error</span>
           </div>
         </div>
@@ -841,15 +842,15 @@ const InteractiveQuiz: React.FC<InteractiveQuizProps> = ({
           
           if (!showAnswer) {
             buttonClass += selectedAnswer === index 
-              ? `border-blue-500 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 shadow-lg shadow-blue-500/20`
-              : "border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-750 hover:shadow-lg";
+              ? `border-slate-500/60 bg-slate-100/70 dark:bg-slate-800/50 text-slate-700 dark:text-slate-300 shadow-lg shadow-slate-500/10`
+              : "border-slate-200/50 dark:border-slate-700/40 hover:border-slate-300/50 dark:hover:border-slate-600/40 bg-white/80 dark:bg-slate-800/60 hover:bg-slate-50/80 dark:hover:bg-slate-700/60 hover:shadow-lg";
           } else {
             if (index === question.correctAnswer) {
-              buttonClass += "border-green-500 bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-300 shadow-lg shadow-green-500/20";
+              buttonClass += "border-slate-500/60 bg-slate-100/70 dark:bg-slate-800/50 text-slate-700 dark:text-slate-300 shadow-lg shadow-slate-500/10";
             } else if (selectedAnswer === index) {
-              buttonClass += "border-red-500 bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-300 shadow-lg shadow-red-500/20";
+              buttonClass += "border-slate-500/60 bg-slate-100/70 dark:bg-slate-800/50 text-slate-700 dark:text-slate-300 shadow-lg shadow-slate-500/10";
             } else {
-              buttonClass += "border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 opacity-60";
+              buttonClass += "border-slate-200/50 dark:border-slate-700/40 bg-slate-50/60 dark:bg-slate-800/60 opacity-60";
             }
           }
 
@@ -865,9 +866,9 @@ const InteractiveQuiz: React.FC<InteractiveQuizProps> = ({
               <div className="flex items-center justify-between">
                 <div className="flex items-start space-x-4">
                   <div className={`w-8 h-8 rounded-full border-2 flex items-center justify-center font-bold ${
-                    !showAnswer ? 'border-gray-300 dark:border-gray-600' :
-                    index === question.correctAnswer ? 'border-green-500 bg-green-500 text-white' :
-                    selectedAnswer === index ? 'border-red-500 bg-red-500 text-white' : 'border-gray-300'
+                    !showAnswer ? 'border-slate-300 dark:border-slate-600' :
+                    index === question.correctAnswer ? 'border-slate-600 bg-slate-600 text-white' :
+                    selectedAnswer === index ? 'border-slate-600 bg-slate-600 text-white' : 'border-slate-300'
                   }`}>
                     {String.fromCharCode(65 + index)}
                   </div>
@@ -876,10 +877,10 @@ const InteractiveQuiz: React.FC<InteractiveQuizProps> = ({
                 {showAnswer && (
                   <div className="flex-shrink-0 ml-4">
                     {index === question.correctAnswer && (
-                      <CheckCircle className="w-6 h-6 text-green-600 dark:text-green-400" />
+                      <CheckCircle className="w-6 h-6 text-slate-600 dark:text-slate-400" />
                     )}
                     {selectedAnswer === index && index !== question.correctAnswer && (
-                      <XCircle className="w-6 h-6 text-red-600 dark:text-red-400" />
+                      <XCircle className="w-6 h-6 text-slate-600 dark:text-slate-400" />
                     )}
                   </div>
                 )}
@@ -897,18 +898,18 @@ const InteractiveQuiz: React.FC<InteractiveQuizProps> = ({
             animate={{ opacity: 1, y: 0 }}
             className="space-y-6"
           >
-            <div className={`${config.bg} rounded-2xl p-6 border ${config.border} backdrop-blur-sm`}>
-              <h4 className="font-black text-lg text-gray-800 dark:text-gray-200 mb-3 flex items-center gap-2">
+            <div className={`${config.bg} rounded-2xl p-6 border ${config.border}`}>
+              <h4 className="font-black text-lg text-slate-800 dark:text-slate-200 mb-3 flex items-center gap-2">
                 <BookOpen className="w-5 h-5" />
                 Explicación:
               </h4>
-              <p className="text-gray-700 dark:text-gray-300 leading-relaxed">{question.explanation}</p>
+              <p className="text-slate-700 dark:text-slate-300 leading-relaxed">{question.explanation}</p>
             </div>
             
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
                 {selectedAnswer === question.correctAnswer ? (
-                  <div className="flex items-center space-x-2 text-green-600 dark:text-green-400">
+                  <div className="flex items-center space-x-2 text-slate-700 dark:text-slate-300">
                     <CheckCircle className="w-6 h-6" />
                     <div>
                       <span className="font-black text-lg">¡CORRECTO!</span>
@@ -918,7 +919,7 @@ const InteractiveQuiz: React.FC<InteractiveQuizProps> = ({
                     </div>
                   </div>
                 ) : (
-                  <div className="flex items-center space-x-2 text-red-600 dark:text-red-400">
+                  <div className="flex items-center space-x-2 text-slate-700 dark:text-slate-300">
                     <XCircle className="w-6 h-6" />
                     <div>
                       <span className="font-black text-lg">
@@ -932,7 +933,7 @@ const InteractiveQuiz: React.FC<InteractiveQuizProps> = ({
               
               <Button
                 onClick={nextQuestion}
-                className={`bg-gradient-to-r ${config.color} text-white font-bold px-8 py-3 text-lg rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300`}
+                className={`${config.color} text-white font-bold px-8 py-3 text-lg rounded-full shadow-lg hover:opacity-90 transition-all duration-300`}
               >
                 {currentQuestion < questions.length - 1 ? (
                   <>

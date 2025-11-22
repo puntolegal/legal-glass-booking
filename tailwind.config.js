@@ -37,6 +37,22 @@ module.exports = {
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
         ring: 'hsl(var(--ring))',
+        // Design tokens base (para flujo de agendamiento y elementos globales)
+        // Los colores por servicio se manejan dinámicamente via serviceThemes.ts
+        brand: {
+          rose: {
+            // Pink/Rose como default para flujo de agendamiento
+            500: '#ec4899',
+            600: '#db2777',
+            400: '#f472b6',
+          },
+          prestige: {
+            // Amber/Gold para elementos de prestigio
+            DEFAULT: '#f59e0b',
+            light: '#fbbf24',
+            dark: '#d97706',
+          },
+        },
       },
       backgroundImage: {
         'rock-wall': "url('/rockwall-background.webp')",
