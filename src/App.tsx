@@ -62,6 +62,8 @@ import BlogTributario3 from '@/pages/BlogTributario3';
 // Apuntes
 import ApuntesIndex from '@/pages/apuntes/index';
 import ApunteDetail from '@/pages/apuntes/ApunteDetail';
+import AuditoriaPage from '@/pages/apuntes/AuditoriaPage';
+import AmandaLogin from '@/pages/AmandaLogin';
 
 // Layout específico para Apuntes
 const ApuntesLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -143,6 +145,8 @@ const LayoutWrapper: React.FC = () => {
       <Route path="/apuntes/home" element={<ApuntesHome />} />
       <Route path="/apuntes" element={<ApuntesIndex />} />
       <Route path="/apuntes/:slug" element={<ApunteDetail />} />
+      <Route path="/apuntes/auditoria" element={<AuditoriaPage />} />
+      <Route path="/amanda" element={<AmandaLogin />} />
       
       {/* Service Routes */}
       <Route path="/servicios/corporativo" element={<ServicioCorporativoPage />} />
