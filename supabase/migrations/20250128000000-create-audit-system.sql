@@ -27,6 +27,12 @@ CREATE INDEX IF NOT EXISTS idx_apuntes_audits_audited_at ON public.apuntes_audit
 -- Habilitar RLS
 ALTER TABLE public.apuntes_audits ENABLE ROW LEVEL SECURITY;
 
+-- Eliminar políticas existentes si existen (para hacer la migración idempotente)
+DROP POLICY IF EXISTS "Anyone can view audits" ON public.apuntes_audits;
+DROP POLICY IF EXISTS "Anyone can create audits" ON public.apuntes_audits;
+DROP POLICY IF EXISTS "Anyone can update audits" ON public.apuntes_audits;
+DROP POLICY IF EXISTS "Anyone can delete audits" ON public.apuntes_audits;
+
 -- Política: Permitir lectura a todos (incluyendo usuarios anónimos)
 -- Esto permite que la app funcione sin autenticación real de Supabase
 CREATE POLICY "Anyone can view audits"
