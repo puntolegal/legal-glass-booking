@@ -1,9 +1,12 @@
-#root {
+/* Estilos base comentados para evitar conflictos con Tailwind y modo oscuro */
+/* Estos estilos estaban causando problemas en móvil con fondo blanco */
+
+/* #root {
   max-width: 1280px;
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
-}
+} */
 
 .logo {
   height: 6em;
@@ -60,20 +63,21 @@ html {
   scrollbar-width: thin;
 }
 
-body {
+/* ESTILOS PROBLEMÁTICOS COMENTADOS - Causaban fondo blanco en móvil */
+/* body {
   background: #ffefe0 !important;
-}
+} */
 
 /* Si hay clases específicas para el fondo, también actualizarlas */
-.bg-white, .bg-background, .glass-strong {
+/* .bg-white, .bg-background, .glass-strong {
   background: #ffefe0 !important;
-}
+} */
 
-.text-foreground {
+/* .text-foreground {
   color: #1a1a1a !important;
-}
+} */
 
-header, .sidebar, .glass-strong.header, .glass-strong.sidebar {
+/* header, .sidebar, .glass-strong.header, .glass-strong.sidebar {
   background: #1a1a1a !important;
   color: #fff !important;
-}
+} */
