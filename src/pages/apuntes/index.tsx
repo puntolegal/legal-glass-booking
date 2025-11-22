@@ -185,8 +185,8 @@ const ApuntesIndex: React.FC = () => {
         viewMode="grid"
       />
 
-      {/* Contenido Principal con Márgenes Amplios */}
-      <div className="pt-16 sm:pt-20 md:pt-22 pb-12 px-4 md:px-8 lg:px-12 max-w-7xl mx-auto relative z-10">
+      {/* Contenido Principal con Márgenes Amplios - Asegurar que no quede oculto por el header */}
+      <div className="pt-20 sm:pt-24 md:pt-28 lg:pt-32 pb-12 px-4 md:px-8 lg:px-12 max-w-7xl mx-auto relative z-10">
         {/* Hero Section */}
         <div className="mb-12 text-center md:text-left">
           <div className="flex flex-col md:flex-row items-center md:items-start gap-6 mb-6">
