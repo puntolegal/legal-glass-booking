@@ -97,7 +97,7 @@ export default function ServicioInmobiliarioPage() {
               
               <div className="flex flex-wrap gap-4 justify-center">
                 <Link
-                  to="/contacto"
+                  to="/agendamiento?plan=comprador-seguro"
                   className="px-8 py-4 bg-primary text-white rounded-xl font-semibold hover:bg-primary/90 transition-all duration-300 shadow-lg hover:shadow-xl"
                 >
                   Estudio de Títulos
