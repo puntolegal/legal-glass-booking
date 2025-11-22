@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
@@ -55,24 +56,37 @@ const AmandaAccessModal: React.FC<AmandaAccessModalProps> = ({ open, onClose }) 
   useEffect(() => {
     if (open) {
       document.body.style.overflow = 'hidden';
+      // Asegurar que el modal esté en el nivel más alto
+      document.body.style.position = 'relative';
     } else {
       document.body.style.overflow = '';
+      document.body.style.position = '';
     }
     return () => {
       document.body.style.overflow = '';
+      document.body.style.position = '';
     };
   }, [open]);
 
-  return (
+  // Renderizar usando portal para asegurar que esté fuera del flujo normal
+  const modalContent = (
     <AnimatePresence>
       {open && (
         <motion.div
-          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 dark:bg-slate-950/90 backdrop-blur-md px-4 py-4 sm:py-6"
+          className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 dark:bg-slate-950/95 backdrop-blur-md px-4 py-4 sm:py-6"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           onClick={onClose}
-          style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}
+          style={{ 
+            position: 'fixed', 
+            top: 0, 
+            left: 0, 
+            right: 0, 
+            bottom: 0,
+            zIndex: 9999,
+            WebkitOverflowScrolling: 'touch'
+          }}
         >
           <motion.div
             initial={{ scale: 0.95, opacity: 0, y: 20 }}
@@ -139,6 +153,13 @@ const AmandaAccessModal: React.FC<AmandaAccessModalProps> = ({ open, onClose }) 
       )}
     </AnimatePresence>
   );
+
+  // Renderizar usando portal si está disponible, sino renderizar normalmente
+  if (typeof document !== 'undefined') {
+    return createPortal(modalContent, document.body);
+  }
+
+  return modalContent;
 };
 
 export default AmandaAccessModal;
