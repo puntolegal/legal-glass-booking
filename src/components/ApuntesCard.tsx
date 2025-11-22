@@ -80,7 +80,7 @@ const ApuntesCard: React.FC<ApuntesCardProps> = ({
       case 'derecho-civil':
         return 'bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/20 dark:text-blue-300 dark:border-blue-700';
       case 'derecho-procesal':
-        return 'bg-purple-100 text-purple-800 border-purple-200 dark:bg-purple-900/20 dark:text-purple-300 dark:border-purple-700';
+        return 'bg-indigo-100 text-indigo-800 border-indigo-200 dark:bg-indigo-900/20 dark:text-indigo-300 dark:border-indigo-700';
       case 'derecho-penal':
         return 'bg-red-100 text-red-800 border-red-200 dark:bg-red-900/20 dark:text-red-300 dark:border-red-700';
       case 'derecho-constitucional':
@@ -138,6 +138,7 @@ const ApuntesCard: React.FC<ApuntesCardProps> = ({
     return concepts.slice(0, 8); // Máximo 8 conceptos
   };
 
+
   const handleCardClick = () => {
     if (onNoteClick) {
       onNoteClick(apunte);
@@ -149,6 +150,104 @@ const ApuntesCard: React.FC<ApuntesCardProps> = ({
     if (onConceptClick) {
       onConceptClick(concept);
     }
+  };
+
+  const renderInlineSegments = (text: string, keyPrefix: string) => {
+    return text
+      .split(/(\*\*[^*]+\*\*|\*[^*]+\*)/g)
+      .filter(Boolean)
+      .map((segment, idx) => {
+        if (segment.startsWith('**') && segment.endsWith('**')) {
+          return (
+            <strong key={`${keyPrefix}-bold-${idx}`} className="font-semibold">
+              {segment.slice(2, -2)}
+            </strong>
+          );
+        }
+        if (segment.startsWith('*') && segment.endsWith('*')) {
+          return (
+            <em key={`${keyPrefix}-italic-${idx}`} className="italic">
+              {segment.slice(1, -1)}
+            </em>
+          );
+        }
+        return <span key={`${keyPrefix}-text-${idx}`}>{segment}</span>;
+      });
+  };
+
+  const renderLineWithConcepts = (line: string, keyPrefix: string) => {
+    const parts = line.split(/(\[\[[^\]]+\]\])/g).filter(Boolean);
+    const nodes: React.ReactNode[] = [];
+
+    parts.forEach((part, idx) => {
+      if (part.startsWith('[[') && part.endsWith(']]')) {
+        const concept = part.slice(2, -2);
+        nodes.push(
+          <button
+            key={`${keyPrefix}-concept-${idx}`}
+            onClick={(event) => handleConceptClick(concept, event)}
+            className="text-blue-600 dark:text-blue-400 font-semibold hover:underline"
+          >
+            {concept}
+          </button>
+        );
+      } else {
+        nodes.push(...renderInlineSegments(part, `${keyPrefix}-inline-${idx}`));
+      }
+    });
+
+    return nodes;
+  };
+
+  const renderStructuredLine = (line: string, index: number) => {
+    const trimmed = line.trim();
+    if (!trimmed) {
+      return <div key={`spacer-${index}`} className="h-2" />;
+    }
+
+    const cleanText = trimmed.replace(/^[-*]\s+/, '');
+    const content = renderLineWithConcepts(cleanText, `line-${index}`);
+
+    if (trimmed.startsWith('###')) {
+      return (
+        <h4 key={`heading-3-${index}`} className="text-sm font-semibold text-gray-900 dark:text-white mt-2">
+          {renderLineWithConcepts(trimmed.replace(/^#+\s*/, ''), `heading-3-${index}`)}
+        </h4>
+      );
+    }
+
+    if (trimmed.startsWith('##')) {
+      return (
+        <h3 key={`heading-2-${index}`} className="text-base font-semibold text-gray-900 dark:text-white mt-3">
+          {renderLineWithConcepts(trimmed.replace(/^#+\s*/, ''), `heading-2-${index}`)}
+        </h3>
+      );
+    }
+
+    if (trimmed.startsWith('#')) {
+      return (
+        <h2 key={`heading-1-${index}`} className="text-lg font-semibold text-gray-900 dark:text-white mt-4">
+          {renderLineWithConcepts(trimmed.replace(/^#+\s*/, ''), `heading-1-${index}`)}
+        </h2>
+      );
+    }
+
+    if (trimmed.startsWith('- ') || trimmed.startsWith('* ')) {
+      return (
+        <p
+          key={`list-${index}`}
+          className="text-sm text-gray-600 dark:text-gray-300 pl-4 relative before:content-['•'] before:absolute before:left-0 before:text-blue-500"
+        >
+          {content}
+        </p>
+      );
+    }
+
+    return (
+      <p key={`paragraph-${index}`} className="text-sm text-gray-600 dark:text-gray-300">
+        {content}
+      </p>
+    );
   };
 
   const contentPreview = extractContentPreview(apunte.content || '');
@@ -203,7 +302,7 @@ const ApuntesCard: React.FC<ApuntesCardProps> = ({
         {/* Header con gradiente */}
         <div className="relative p-6 border-b border-gray-100 dark:border-gray-700">
           {/* Fondo con gradiente sutil */}
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-50/50 to-purple-50/50 dark:from-blue-900/10 dark:to-purple-900/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          <div className="absolute inset-0 bg-indigo-50/30 dark:bg-indigo-900/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           
           <div className="relative z-10">
             <div className="flex items-start justify-between mb-3">
@@ -308,30 +407,12 @@ const ApuntesCard: React.FC<ApuntesCardProps> = ({
             <div className="prose prose-sm dark:prose-invert max-w-none">
               <div className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
                 {showFullContent ? (
-                  <div 
-                    className="markdown-content"
-                    dangerouslySetInnerHTML={{ 
-                      __html: apunte.content
-                        .replace(/^#\s+(.+)$/gm, '<h1>$1</h1>')
-                        .replace(/^##\s+(.+)$/gm, '<h2>$1</h2>')
-                        .replace(/^###\s+(.+)$/gm, '<h3>$1</h3>')
-                        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-                        .replace(/\*(.+?)\*/g, '<em>$1</em>')
-                        .replace(/\[\[([^\]]+)\]\]/g, '<span class="text-blue-600 dark:text-blue-400 cursor-pointer hover:underline" onclick="handleConceptClick(\'$1\')">$1</span>')
-                        .replace(/\n/g, '<br>')
-                    }}
-                  />
+                  <div className="space-y-2">
+                    {apunte.content.split('\n').map((line, index) => renderStructuredLine(line, index))}
+                  </div>
                 ) : (
-                  <div>
-                    {apunte.content.split('\n').slice(0, 10).map((line, index) => (
-                      <div key={index} className="mb-2">
-                        {line.startsWith('#') ? (
-                          <strong className="text-gray-900 dark:text-white">{line.replace(/^#+\s*/, '')}</strong>
-                        ) : (
-                          <span>{line}</span>
-                        )}
-                      </div>
-                    ))}
+                  <div className="space-y-2">
+                    {apunte.content.split('\n').slice(0, 10).map((line, index) => renderStructuredLine(line, index))}
                     {apunte.content.split('\n').length > 10 && (
                       <button
                         onClick={() => setShowFullContent(true)}
