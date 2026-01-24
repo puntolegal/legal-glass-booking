@@ -67,7 +67,7 @@ const MarcasPatentesPage = () => {
 
   const content = (
     <>
-      <Header onAgendarClick={() => setShowForm(true)} serviceName="Punto Legal Propiedad Intelectual" />
+      <Header />
       <div className="hidden lg:block lg:pt-20">
         <HeroSection 
           title={marcasData.heroTitle}

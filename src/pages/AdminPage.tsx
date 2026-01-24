@@ -175,7 +175,7 @@ const AdminPage = () => {
                   Panel de Administración
                 </h1>
                 <p className="text-slate-600 dark:text-slate-400 mt-2">
-                  Bienvenido, <span className="font-semibold text-blue-600 dark:text-blue-400">{profile?.nombre || 'Administrador'}</span>. 
+                  Bienvenido, <span className="font-semibold text-blue-600 dark:text-blue-400">{profile?.name || 'Administrador'}</span>. 
                   Gestiona usuarios, reservas y configuraciones del sistema.
                 </p>
               </div>

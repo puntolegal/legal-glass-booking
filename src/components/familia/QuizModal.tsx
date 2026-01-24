@@ -495,14 +495,14 @@ const QuizModal: React.FC<QuizModalProps> = ({ isOpen, onClose }) => {
                       <div className="space-y-3">
                         <button
                           onClick={() => {
-                            const planSlug = `familia-${recommendation.plan.toLowerCase()}`;
-                            navigate(`/agendamiento?plan=${planSlug}`);
+                            // Siempre redirigir a la consulta estratégica de $35.000
+                            navigate('/agendamiento?plan=consulta-estrategica-familia');
                           }}
                           className="w-full py-4 px-6 rounded-xl font-semibold text-white bg-gradient-to-r 
                                    from-pink-500 to-rose-600 hover:from-pink-600 hover:to-rose-700 
                                    transition-all duration-200 text-center shadow-lg"
                         >
-                          Agendar Mi Consulta con Descuento
+                          Agendar
                         </button>
                         
                         <button

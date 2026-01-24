@@ -67,7 +67,7 @@ const ReclamosSernacPage = () => {
 
   const content = (
     <>
-      <Header onAgendarClick={() => setShowForm(true)} serviceName="Punto Legal Consumidor" />
+      <Header />
       <div className="hidden lg:block lg:pt-20">
         <HeroSection 
           title={reclamosData.heroTitle}

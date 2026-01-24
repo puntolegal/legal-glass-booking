@@ -28,10 +28,9 @@ const PageTransition: React.FC<PageTransitionProps> = ({ children }) => {
   };
 
   const pageTransition = {
-    type: "spring",
+    type: "spring" as const,
     stiffness: 200,
-    damping: 25,
-    duration: 0.4
+    damping: 25
   };
 
   return (

@@ -240,11 +240,7 @@ export default function PremiumPaymentFlow({
               customer={{
                 name: customerData.name,
                 email: customerData.email,
-                phone: customerData.phone,
-                identification: {
-                  type: 'RUT',
-                  number: customerData.rut
-                }
+                phone: customerData.phone
               }}
               onSuccess={onSuccess}
               onError={onError}

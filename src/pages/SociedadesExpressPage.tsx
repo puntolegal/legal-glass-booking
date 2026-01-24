@@ -67,7 +67,7 @@ const SociedadesExpressPage = () => {
 
   const content = (
     <>
-      <Header onAgendarClick={() => setShowForm(true)} serviceName="Punto Legal Sociedades" />
+      <Header />
       <div className="hidden lg:block lg:pt-20">
         <HeroSection 
           title={sociedadesData.heroTitle}

@@ -44,8 +44,6 @@ const DynamicHeader: React.FC<DynamicHeaderProps> = ({ onAgendarClick, serviceNa
     <HeaderService 
       theme={theme} 
       transparentOnTop={isTransparentOnTop}
-      onAgendarClick={onAgendarClick}
-      serviceName={serviceName}
     />
   );
 };

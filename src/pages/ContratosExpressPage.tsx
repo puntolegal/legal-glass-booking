@@ -67,7 +67,7 @@ const ContratosExpressPage = () => {
 
   const content = (
     <>
-      <Header onAgendarClick={() => setShowForm(true)} serviceName="Punto Legal Express" />
+      <Header />
       <div className="hidden lg:block lg:pt-20">
         <HeroSection 
           title={contratosData.heroTitle}

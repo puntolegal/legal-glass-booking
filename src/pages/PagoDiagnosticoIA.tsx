@@ -681,14 +681,12 @@ const PagoDiagnosticoIA = () => {
                     {currentStep === 1 && (
                       <motion.div
                         key="step-1"
-                        initial={{ opacity: 0, x: 20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: -20 }}
-                        transition={{ duration: 0.3 }}
-                        layout
                         variants={stepContainerVariants}
                         initial="hidden"
                         animate="visible"
+                        exit={{ opacity: 0, x: -20 }}
+                        transition={{ duration: 0.3 }}
+                        layout
                         className="space-y-6"
                       >
                         <motion.div
