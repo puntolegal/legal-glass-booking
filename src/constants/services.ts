@@ -16,7 +16,7 @@ export const serviceCatalog: Record<string, Service> = {
   'inmobiliario': { name: 'Punto Legal Inmobiliario', price: '27.500', category: 'Inmobiliario', originalPrice: '55.000', discount: '50% OFF' },
   
   // Familia - Consulta Estratégica y Planes
-  'consulta-estrategica-familia': { name: 'Consulta Estratégica Premium Familia', price: '150.000', category: 'Familia', originalPrice: '300.000', discount: '50% OFF CYBER', note: '100% reembolsable si contratas un plan' },
+  'consulta-estrategica-familia': { name: 'Consulta Estratégica Familia', price: '35.000', category: 'Familia', originalPrice: '85.000', discount: '58% OFF', note: 'Primera consulta con abogado especialista' },
   'familia': { name: 'Punto Legal Familia', price: '35.000', category: 'Familia', originalPrice: '70.000', discount: '50% OFF' },
   'integral': { name: 'Protección Familiar Integral', price: '550.000', category: 'Familia', originalPrice: '1.100.000', discount: '50% OFF CYBER' },
   'familia-integral': { name: 'Protección Familiar Integral', price: '550.000', category: 'Familia', originalPrice: '1.100.000', discount: '50% OFF CYBER' },

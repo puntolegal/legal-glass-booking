@@ -67,7 +67,7 @@ const ECommerceCompliancePage = () => {
 
   const content = (
     <>
-      <Header onAgendarClick={() => setShowForm(true)} serviceName="Punto Legal Digital" />
+      <Header />
       <div className="hidden lg:block lg:pt-20">
         <HeroSection 
           title={ecommerceData.heroTitle}

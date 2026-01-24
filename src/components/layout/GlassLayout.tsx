@@ -14,7 +14,15 @@ interface GlassLayoutProps {
   onFiltersToggle?: () => void;
 }
 
-const GlassLayout: React.FC<GlassLayoutProps> = ({ children }) => {
+const GlassLayout: React.FC<GlassLayoutProps> = ({ 
+  children,
+  searchQuery,
+  onSearchChange,
+  viewMode,
+  onViewModeChange,
+  showFilters,
+  onFiltersToggle
+}) => {
   return (
     <div className="relative min-h-screen bg-[#F5F7FA] dark:bg-[#050B1C] text-slate-900 dark:text-slate-100 overflow-hidden selection:bg-indigo-500/30 selection:text-slate-900">
       <div

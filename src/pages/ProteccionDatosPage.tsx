@@ -67,7 +67,7 @@ const ProteccionDatosPage = () => {
 
   const content = (
     <>
-      <Header onAgendarClick={() => setShowForm(true)} serviceName="Punto Legal Protección de Datos" />
+      <Header />
       <div className="hidden lg:block lg:pt-20">
         <HeroSection 
           title={proteccionData.heroTitle}

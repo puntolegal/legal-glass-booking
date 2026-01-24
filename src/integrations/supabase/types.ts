@@ -14,6 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
+      apuntes_audits: {
+        Row: {
+          audited_at: string
+          auditor_id: string
+          auditor_name: string
+          comments: string | null
+          created_at: string
+          id: string
+          note_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          audited_at?: string
+          auditor_id: string
+          auditor_name: string
+          comments?: string | null
+          created_at?: string
+          id?: string
+          note_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          audited_at?: string
+          auditor_id?: string
+          auditor_name?: string
+          comments?: string | null
+          created_at?: string
+          id?: string
+          note_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       family_quiz_responses: {
         Row: {
           bienes: string | null
@@ -53,6 +89,39 @@ export type Database = {
           recommended_plan?: string
           servicio?: string
           status?: string | null
+        }
+        Relationships: []
+      }
+      leads_quiz: {
+        Row: {
+          created_at: string | null
+          email: string
+          id: string
+          name: string
+          plan_recommended: string | null
+          quiz_answers: Json
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          id?: string
+          name: string
+          plan_recommended?: string | null
+          quiz_answers: Json
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          email?: string
+          id?: string
+          name?: string
+          plan_recommended?: string | null
+          quiz_answers?: Json
+          status?: string | null
+          updated_at?: string | null
         }
         Relationships: []
       }
@@ -275,81 +344,20 @@ export type Database = {
         }
         Relationships: []
       }
-      apuntes_audits: {
-        Row: {
-          id: string
-          note_id: string
-          auditor_id: string
-          auditor_name: string
-          audited_at: string
-          comments: string | null
-          status: string
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id?: string
-          note_id: string
-          auditor_id: string
-          auditor_name: string
-          audited_at?: string
-          comments?: string | null
-          status?: string
-          created_at?: string
-          updated_at?: string
-        }
-        Update: {
-          id?: string
-          note_id?: string
-          auditor_id?: string
-          auditor_name?: string
-          audited_at?: string
-          comments?: string | null
-          status?: string
-          created_at?: string
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      leads_quiz: {
-        Row: {
-          id: string
-          name: string
-          email: string
-          quiz_answers: Json
-          plan_recommended: string | null
-          status: string
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id?: string
-          name: string
-          email: string
-          quiz_answers: Json
-          plan_recommended?: string | null
-          status?: string
-          created_at?: string
-          updated_at?: string
-        }
-        Update: {
-          id?: string
-          name?: string
-          email?: string
-          quiz_answers?: Json
-          plan_recommended?: string | null
-          status?: string
-          created_at?: string
-          updated_at?: string
-        }
-        Relationships: []
-      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_note_audit_status: {
+        Args: { note_id_param: string }
+        Returns: {
+          audited_at: string
+          auditor_name: string
+          comments: string
+          is_audited: boolean
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never

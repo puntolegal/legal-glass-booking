@@ -88,7 +88,9 @@ const ApuntesSidebar: React.FC<ApuntesSidebarProps> = ({
   apuntes,
   clearFilters,
   getReadCount,
-  getUnreadCount
+  getUnreadCount,
+  isOpen,
+  onToggle
 }) => {
   const [showFilters, setShowFilters] = useState(true);
   const [showNavigation, setShowNavigation] = useState(true);

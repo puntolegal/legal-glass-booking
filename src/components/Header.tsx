@@ -2,14 +2,24 @@ import React from 'react';
 import { useLocation } from 'react-router-dom';
 import DynamicHeader from './DynamicHeader';
 
-const Header = ({ onAgendarClick, serviceName }: { onAgendarClick?: () => void; serviceName?: string }) => {
+interface HeaderProps {
+  variant?: 'default' | 'apuntes' | 'service' | 'none';
+  onAgendarClick?: () => void;
+  serviceName?: string;
+}
+
+const Header: React.FC<HeaderProps> = ({ variant = 'default' }) => {
   const location = useLocation();
 
   if (location.pathname.startsWith('/apuntes')) {
     return null;
   }
 
-  return <DynamicHeader onAgendarClick={onAgendarClick} serviceName={serviceName} />;
+  if (variant === 'none') {
+    return null;
+  }
+
+  return <DynamicHeader />;
 };
 
 export default Header;

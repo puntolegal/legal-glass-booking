@@ -363,7 +363,7 @@ export default function ServicioFamiliaPage() {
         <Header />
         <div className="h-20" />
 
-        {/* HERO */}
+        {/* HERO - Simplificado sin contador */}
         <section className="relative pt-10 md:pt-14 pb-10 md:pb-16 overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-r from-pink-500/10 via-transparent to-rose-500/10" />
           <div className="container mx-auto px-4 relative z-10">
@@ -383,24 +383,6 @@ export default function ServicioFamiliaPage() {
               <p className="mt-6 max-w-2xl mx-auto text-lg text-slate-400">
                 Enfrentar un problema familiar es difícil. Te damos claridad y defensa legal para proteger tu futuro.
               </p>
-              <div className="max-w-lg mx-auto mt-8">
-                <div className="relative p-4 md:p-6 bg-slate-800/50 border border-slate-700 rounded-2xl">
-                  <div className="flex justify-center mb-3">
-                    <div className="inline-flex items-center gap-2 bg-gradient-to-r from-pink-500 to-rose-500 text-white px-3 md:px-4 py-1 md:py-1.5 rounded-full shadow-lg text-xs md:text-sm font-bold">
-                      <Sparkles className="w-4 h-4" />
-                      HASTA 50% OFF (Cyber Extendido)
-                    </div>
-                  </div>
-                  <h3 className="text-sm md:text-lg font-bold text-center mb-3 bg-gradient-to-r from-pink-400 to-rose-500 bg-clip-text text-transparent">
-                    Termina en:
-                  </h3>
-                  <CountdownTimer />
-                  <div className="flex items-center justify-center gap-2 text-xs md:text-sm text-slate-500 mt-3">
-                    <AlertCircle className="w-4 h-4 text-pink-500" />
-                    <span>Cupos limitados este mes</span>
-                  </div>
-                </div>
-              </div>
             </motion.div>
           </div>
         </section>

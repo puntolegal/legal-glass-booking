@@ -55,13 +55,12 @@ export const validationRules = {
       value: 500,
       message: 'La descripción no puede exceder 500 caracteres'
     }
-  }
+  },
+  
+  // Campos opcionales sin validación
+  empresa: {},
+  codigoConvenio: {}
 };
-
-
-
-
-
 
 
 

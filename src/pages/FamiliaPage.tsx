@@ -67,7 +67,7 @@ const FamiliaPage = () => {
 
   const content = (
     <>
-      <Header onAgendarClick={() => setShowForm(true)} serviceName="Punto Legal Familia" />
+      <Header />
       <div className="hidden lg:block lg:pt-20">
         <HeroSection 
           title={familiaData.heroTitle}

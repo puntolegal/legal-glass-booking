@@ -66,7 +66,7 @@ const CorporativoPage = () => {
 
   const content = (
     <>
-      <Header onAgendarClick={() => setShowForm(true)} serviceName="Punto Legal Corporativo" />
+      <Header />
       <div className="hidden lg:block lg:pt-20">
         <HeroSection 
           title={corporativoData.heroTitle}
