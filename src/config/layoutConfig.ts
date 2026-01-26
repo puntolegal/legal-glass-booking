@@ -98,6 +98,23 @@ export const layoutConfigs: RouteLayoutRule[] = [
     }
   },
   
+  // 3c. Layout de foco - Portal Reconstrucción (sin header ni footer global)
+  {
+    path: '/portal-reconstruccion',
+    config: {
+      type: 'focus',
+      showHeader: false,
+      showFooter: false,
+      headerVariant: 'none',
+      footerVariant: 'none',
+      useMobileLayout: false,
+      seoConfig: {
+        titleSuffix: 'Portal de Habilitación Jurídica',
+        defaultDescription: 'Sistema de validación de admisibilidad para fondos de reconstrucción regional'
+      }
+    }
+  },
+  
   // 4. Layout Apuntes - Index (con footer)
   {
     path: '/apuntes',

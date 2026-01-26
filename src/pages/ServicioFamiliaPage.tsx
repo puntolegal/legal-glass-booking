@@ -280,29 +280,29 @@ const CountdownTimer = () => {
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 
   useEffect(() => {
-    const getTargetDate = () => {
-      const stored = localStorage.getItem('cyber_familia_end_date');
-      if (stored) {
-        const targetDate = new Date(stored);
-        if (targetDate.getTime() < Date.now()) {
-          const newTarget = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000);
-          localStorage.setItem('cyber_familia_end_date', newTarget.toISOString());
-          return newTarget;
-        }
-        return targetDate;
-      } else {
-        const newTarget = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000);
-        localStorage.setItem('cyber_familia_end_date', newTarget.toISOString());
-        return newTarget;
-      }
+        const getTargetDate = () => {
+            const stored = localStorage.getItem('cyber_familia_end_date');
+            if (stored) {
+                const targetDate = new Date(stored);
+                if (targetDate.getTime() < Date.now()) {
+                    const newTarget = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000);
+                    localStorage.setItem('cyber_familia_end_date', newTarget.toISOString());
+                    return newTarget;
+                }
+                return targetDate;
+            } else {
+                const newTarget = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000);
+                localStorage.setItem('cyber_familia_end_date', newTarget.toISOString());
+                return newTarget;
+            }
     };
 
-    const calculateTimeLeft = () => {
-      const target = getTargetDate();
-      const difference = target.getTime() - Date.now();
-      if (difference > 0) {
-        return {
-          days: Math.floor(difference / (1000 * 60 * 60 * 24)),
+        const calculateTimeLeft = () => {
+            const target = getTargetDate();
+            const difference = target.getTime() - Date.now();
+            if (difference > 0) {
+                return {
+                    days: Math.floor(difference / (1000 * 60 * 60 * 24)),
           hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
           minutes: Math.floor((difference / 1000 / 60) % 60),
           seconds: Math.floor((difference / 1000) % 60)
@@ -311,9 +311,9 @@ const CountdownTimer = () => {
       return { days: 3, hours: 0, minutes: 0, seconds: 0 };
     };
 
-    setTimeLeft(calculateTimeLeft());
+        setTimeLeft(calculateTimeLeft());
     const timer = setInterval(() => setTimeLeft(calculateTimeLeft()), 1000);
-    return () => clearInterval(timer);
+        return () => clearInterval(timer);
   }, []);
 
   return (
@@ -343,8 +343,8 @@ export default function ServicioFamiliaPage() {
   const [isHelperModalOpen, setIsHelperModalOpen] = useState(false);
 
   const openHelperModal = (plan: any) => {
-    setSelectedPlan(plan);
-    setIsHelperModalOpen(true);
+        setSelectedPlan(plan);
+        setIsHelperModalOpen(true);
   };
 
   return (

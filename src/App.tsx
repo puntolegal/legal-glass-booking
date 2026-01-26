@@ -45,6 +45,7 @@ import ServicioTributarioPage from '@/pages/ServicioTributarioPage';
 import ServicioPenalEconomicoPage from '@/pages/ServicioPenalEconomicoPage';
 import PagoDiagnosticoIA from '@/pages/PagoDiagnosticoIA';
 import DiagnosticoIniciar from '@/pages/DiagnosticoIniciar';
+import PortalReconstruccionPage from '@/pages/PortalReconstruccionPage';
 
 // Blog Posts
 import BlogPost1 from '@/pages/BlogPost1';
@@ -115,6 +116,7 @@ function App() {
                       {/* Diagnóstico Routes */}
                       <Route path="/pago/diagnostico-ia" element={<PagoDiagnosticoIA />} />
                       <Route path="/diagnostico/iniciar" element={<DiagnosticoIniciar />} />
+                      <Route path="/portal-reconstruccion" element={<PortalReconstruccionPage />} />
       <Route path="/servicios/tributario" element={<ServicioTributarioPage />} />
       <Route path="/servicios/penal-economico" element={<ServicioPenalEconomicoPage />} />
       
