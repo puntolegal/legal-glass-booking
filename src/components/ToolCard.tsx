@@ -104,7 +104,8 @@ export const ToolCard: React.FC<ToolCardProps> = ({
             type="button"
             onClick={onClick}
             className={`group/button mt-4 flex w-full items-center justify-center gap-2 rounded-2xl border border-transparent bg-gradient-to-r from-sky-500 via-cyan-500 to-violet-500 px-5 py-3 text-sm font-semibold uppercase tracking-wide text-white transition-all
-                       shadow-lg shadow-sky-500/25 hover:shadow-sky-400/40 hover:scale-[1.02]
+                       shadow-lg shadow-sky-500/25 hover:shadow-sky-400/40 hover:scale-[1.02] active:scale-[0.98]
+                       touch-manipulation z-10 relative
                        ${buttonClassName ?? ''}`}
           >
             <span>{ctaText}</span>

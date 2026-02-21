@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { useLocation } from 'react-router-dom';
 import ApuntesHeader from '@/components/ApuntesHeader';
 import Footer from '@/components/Footer';
 
@@ -23,6 +24,9 @@ const GlassLayout: React.FC<GlassLayoutProps> = ({
   showFilters,
   onFiltersToggle
 }) => {
+  const location = useLocation();
+  const isBlogPage = location.pathname.startsWith('/blog');
+  
   return (
     <div className="relative min-h-screen bg-[#F5F7FA] dark:bg-[#050B1C] text-slate-900 dark:text-slate-100 overflow-hidden selection:bg-indigo-500/30 selection:text-slate-900">
       <div
@@ -34,19 +38,22 @@ const GlassLayout: React.FC<GlassLayoutProps> = ({
         <div className="absolute bottom-32 left-12 w-72 h-72 bg-gradient-to-br from-emerald-200/15 to-cyan-200/10 rounded-full blur-3xl animate-float" />
       </div>
 
-      <ApuntesHeader
-        searchQuery={searchQuery}
-        onSearchChange={onSearchChange}
-        viewMode={viewMode}
-        onViewModeChange={onViewModeChange}
-        showFilters={showFilters}
-        onFiltersToggle={onFiltersToggle}
-      />
+      {/* Solo mostrar ApuntesHeader si NO es una página de blog */}
+      {!isBlogPage && (
+        <ApuntesHeader
+          searchQuery={searchQuery}
+          onSearchChange={onSearchChange}
+          viewMode={viewMode}
+          onViewModeChange={onViewModeChange}
+          showFilters={showFilters}
+          onFiltersToggle={onFiltersToggle}
+        />
+      )}
 
-      <main className="relative z-10 pt-24 pb-12">
+      <main className={`relative z-10 ${!isBlogPage ? 'pt-24' : 'pt-8'} pb-12`}>
         {children}
       </main>
-      <Footer variant="apuntes" />
+      <Footer variant={isBlogPage ? 'default' : 'apuntes'} />
     </div>
   );
 };

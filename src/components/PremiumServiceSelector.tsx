@@ -252,29 +252,45 @@ export const PremiumServiceSelector: React.FC = () => {
         {/* Premium Header */}
         <div className="relative p-6 pb-0">
 
-          {/* Progress Indicators - iOS Style */}
+          {/* Progress Indicators - iOS Style Mejorado */}
           <div className="flex items-center justify-center gap-2 mb-6">
             {services.map((service, index) => (
               <motion.button
                 key={index}
                 onClick={() => setSelectedIndex(index)}
-                className="relative p-1"
+                className="relative p-2 group"
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.95 }}
+                aria-label={`Ir a servicio ${service.name}`}
               >
                 <motion.div
                   className={`rounded-full transition-all duration-300 ${
                     index === selectedIndex 
-                      ? 'w-8 h-2' 
-                      : 'w-2 h-2'
+                      ? 'w-10 h-2.5' 
+                      : 'w-2.5 h-2.5'
                   }`}
                   style={{
                     backgroundColor: index === selectedIndex 
                       ? service.color.accent
-                      : service.color.accent + '40'
+                      : 'rgba(148, 163, 184, 0.3)',
+                    boxShadow: index === selectedIndex 
+                      ? `0 2px 8px ${service.color.accent}50`
+                      : 'none'
                   }}
                   layout
                 />
+                {/* Indicador visual mejorado - línea sutil */}
+                {index === selectedIndex && (
+                  <motion.div
+                    className="absolute inset-0 rounded-full"
+                    style={{
+                      background: `linear-gradient(90deg, transparent, ${service.color.accent}30, transparent)`,
+                    }}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.3 }}
+                  />
+                )}
               </motion.button>
             ))}
           </div>

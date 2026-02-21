@@ -227,18 +227,21 @@ const QuizModal: React.FC<QuizModalProps> = ({ isOpen, onClose }) => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+            className="absolute inset-0 bg-black/70 backdrop-blur-sm z-0"
             onClick={onClose}
+            role="button"
+            tabIndex={-1}
+            aria-label="Cerrar modal"
           />
 
-          <div className="absolute inset-0 flex items-center justify-center p-4 overflow-y-auto">
+          <div className="absolute inset-0 flex items-center justify-center p-3 sm:p-4 overflow-y-auto z-10">
             <motion.div
               layout
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
               transition={{ type: 'spring', duration: 0.5, bounce: 0.3 }}
-              className="w-full max-w-2xl min-h-[600px] sm:min-h-[500px] max-h-[90vh] my-auto
+              className="w-full max-w-2xl min-h-[500px] sm:min-h-[500px] max-h-[95vh] my-auto
                          bg-slate-900 border border-slate-700 
                          shadow-2xl flex flex-col overflow-hidden relative rounded-2xl"
               onClick={(e) => e.stopPropagation()}
@@ -468,47 +471,65 @@ const QuizModal: React.FC<QuizModalProps> = ({ isOpen, onClose }) => {
                   {showResult && recommendation && (
                     <motion.div
                       key="result"
-                      initial={{ opacity: 0, scale: 0.95 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0.95 }}
-                      transition={{ duration: 0.3 }}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -20 }}
+                      transition={{ duration: 0.4 }}
+                      className="space-y-6"
                     >
-                      <div className="text-center mb-8">
-                        <div className="w-16 h-16 bg-slate-800 border-2 border-pink-500/30 rounded-full 
-                                      flex items-center justify-center mx-auto mb-4 shadow-xl">
-                          <Gift className="w-8 h-8 text-pink-400" />
+                      {/* Header estilo iOS */}
+                      <div className="text-center space-y-4">
+                        <div className="w-20 h-20 bg-white/10 border border-white/20 rounded-3xl 
+                                      flex items-center justify-center mx-auto backdrop-blur-xl">
+                          <CheckCircle className="w-10 h-10 text-white/90" />
                         </div>
-                        <h3 className="text-2xl font-bold text-slate-100 mb-2">
-                          Tu Plan Recomendado
-                        </h3>
+                        <div>
+                          <h3 className="text-2xl font-semibold text-white mb-1">
+                            Plan Recomendado
+                          </h3>
+                          <p className="text-sm text-white/50">
+                            Basado en tus respuestas
+                          </p>
+                        </div>
                       </div>
                       
-                      <div className="bg-slate-800 border border-slate-700 rounded-xl p-6 mb-6">
-                        <h4 className="text-xl font-bold text-slate-100 mb-2">
-                          {recommendation.title}
-                        </h4>
-                        <p className="text-slate-400 mb-6">
-                          {recommendation.reason}
-                        </p>
+                      {/* Card principal estilo iOS */}
+                      <div className="bg-white/[0.05] border border-white/10 rounded-3xl p-6 backdrop-blur-xl">
+                        <div className="space-y-4">
+                          <div>
+                            <h4 className="text-xl font-semibold text-white mb-2">
+                              {recommendation.title}
+                            </h4>
+                            <p className="text-sm text-white/60 leading-relaxed">
+                              {recommendation.reason}
+                            </p>
+                          </div>
+                          
+                          {/* Precio destacado */}
+                          <div className="pt-4 border-t border-white/10">
+                            <div className="flex items-baseline gap-3">
+                              <span className="text-3xl font-bold text-white">$35.000</span>
+                              <span className="text-sm text-white/40 line-through">$70.000</span>
+                            </div>
+                            <p className="text-xs text-white/50 mt-1">Consulta Estratégica con Abogado</p>
+                          </div>
+                        </div>
                       </div>
                       
+                      {/* Botones estilo iOS */}
                       <div className="space-y-3">
                         <button
                           onClick={() => {
-                            // Siempre redirigir a la consulta estratégica de $35.000
-                            navigate('/agendamiento?plan=consulta-estrategica-familia');
+                            navigate('/agendamiento?plan=general');
                           }}
-                          className="w-full py-4 px-6 rounded-xl font-semibold text-white bg-gradient-to-r 
-                                   from-pink-500 to-rose-600 hover:from-pink-600 hover:to-rose-700 
-                                   transition-all duration-200 text-center shadow-lg"
+                          className="w-full py-4 px-6 rounded-2xl font-semibold text-white bg-white/10 border border-white/20 hover:bg-white/15 transition-all backdrop-blur-xl"
                         >
-                          Agendar
+                          Agendar Consulta - $35.000
                         </button>
                         
                         <button
                           onClick={resetQuiz}
-                          className="w-full py-3 px-6 rounded-xl font-medium text-slate-500 hover:text-slate-300 
-                                   transition-colors"
+                          className="w-full py-3 px-6 rounded-2xl font-medium text-white/50 hover:text-white/70 transition-colors"
                         >
                           Hacer el Quiz Nuevamente
                         </button>

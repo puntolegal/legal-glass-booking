@@ -166,6 +166,23 @@ export const layoutConfigs: RouteLayoutRule[] = [
     }
   },
   
+  // 5b. Página de inicio (sin header ni footer en móvil)
+  {
+    path: '/',
+    config: {
+      type: 'default',
+      showHeader: false,
+      showFooter: false,
+      headerVariant: 'none',
+      footerVariant: 'none',
+      useMobileLayout: false,
+      seoConfig: {
+        titleSuffix: 'Punto Legal',
+        defaultDescription: 'Startup legal chilena que democratiza el acceso a la justicia con tecnología'
+      }
+    }
+  },
+  
   // 6. Default - Resto de páginas
   // Esta regla siempre coincide (no tiene path ni pathPrefix)
 ];

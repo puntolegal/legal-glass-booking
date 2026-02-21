@@ -363,9 +363,14 @@ export default function ServicioFamiliaPage() {
         <Header />
         <div className="h-20" />
 
-        {/* HERO - Simplificado sin contador */}
-        <section className="relative pt-10 md:pt-14 pb-10 md:pb-16 overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-r from-pink-500/10 via-transparent to-rose-500/10" />
+        {/* HERO - Estilo iOS Glassmorphism */}
+        <section className="relative pt-8 md:pt-16 pb-10 md:pb-20 overflow-hidden">
+          {/* Fondos estilo iOS - Gradientes sutiles */}
+          <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-950 to-slate-900" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-pink-900/8 via-rose-900/5 to-transparent pointer-events-none" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_var(--tw-gradient-stops))] from-rose-900/6 via-pink-900/4 to-transparent pointer-events-none" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-sky-900/5 via-transparent to-transparent pointer-events-none" />
+          
           <div className="container mx-auto px-4 relative z-10">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -373,16 +378,36 @@ export default function ServicioFamiliaPage() {
               transition={{ duration: 0.6 }}
               className="text-center max-w-5xl mx-auto"
             >
-              <div className="inline-flex items-center gap-2 bg-slate-800/50 rounded-full px-4 py-1.5 mb-4 border border-slate-700">
-                <Heart className="w-5 h-5 text-pink-400" />
-                <span className="text-sm font-medium text-slate-300">Abogado Especialista en Derecho de Familia</span>
-              </div>
-              <h1 className="text-4xl sm:text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white to-slate-400 leading-tight mb-4">
+              {/* Badge Glassmorphism iOS */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.1 }}
+                className="inline-flex items-center gap-2 bg-white/5 backdrop-blur-xl rounded-full px-4 py-2 md:px-5 md:py-2.5 mb-4 md:mb-6 border border-white/10 shadow-lg"
+              >
+                <Heart className="w-4 h-4 md:w-5 md:h-5 text-pink-400" />
+                <span className="text-xs md:text-sm font-semibold text-slate-200">Abogado Especialista en Derecho de Familia</span>
+              </motion.div>
+              
+              {/* Título con glassmorphism */}
+              <motion.h1
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-white leading-tight mb-4 md:mb-6 px-2"
+              >
                 Tu tranquilidad familiar, nuestra prioridad legal
-              </h1>
-              <p className="mt-6 max-w-2xl mx-auto text-lg text-slate-400">
+              </motion.h1>
+              
+              {/* Descripción con glassmorphism */}
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.3 }}
+                className="mt-4 md:mt-6 max-w-2xl mx-auto text-base md:text-lg text-slate-300 px-2 leading-relaxed"
+              >
                 Enfrentar un problema familiar es difícil. Te damos claridad y defensa legal para proteger tu futuro.
-              </p>
+              </motion.p>
             </motion.div>
           </div>
         </section>
@@ -434,20 +459,6 @@ export default function ServicioFamiliaPage() {
                   />
                 </div>
 
-                {/* Centro: Diagnóstico IA */}
-                <div className="order-3 md:order-2">
-                  <SecondaryOfferCard
-                    icon={Zap}
-                    title="Diagnóstico de Pensión IA"
-                    description="Obtén un <strong>Diagnóstico de Pensión 100% automatizado</strong>, entrenado por tu abogado, y recibe un PDF con <strong>montos estimados y riesgos clave</strong> en menos de 3 minutos."
-                    context="Perfecto cuando necesitas una estimación concreta para decidir rápido."
-                    price="$6.990"
-                    priceDetails="Precio Normal: $13.990 (50% OFF Cyber)"
-                    ctaText="Obtener Claridad Ahora"
-                    href="/pago/diagnostico-ia"
-                    badge="Para una respuesta inmediata"
-                  />
-                </div>
 
                 {/* Derecha: Estrategia Personalizada */}
                 <div className="order-2 md:order-3">
@@ -455,9 +466,9 @@ export default function ServicioFamiliaPage() {
                     title="Consulta Estratégica con Abogado"
                     description="Agenda 1 hora de trabajo <strong>directo con tu abogado especialista</strong> para ordenar tu caso, definir un <strong>Plan de Acción claro</strong> y saber exactamente qué hacer en los próximos 30 días."
                     context="Para quienes quieren acompañamiento completo, ejecución y seguimiento experto."
-                    price="$150.000"
+                    price="$35.000"
                     priceTag="Consulta preferente Cyber"
-                    originalPrice="$300.000"
+                    originalPrice="$70.000"
                     priceDetails="Se descuenta íntegramente del plan final y asegura prioridad en agenda."
                     deliverableLabel="PDF + asesoría"
                     ctaText="Agendar Pack con Garantía"
@@ -812,14 +823,14 @@ export default function ServicioFamiliaPage() {
                 <p className="mt-4 max-w-2xl mx-auto text-lg text-pink-100">No dejes que las dudas te paralicen. Elige el primer paso que te acomode hoy.</p>
                 <div className="mt-8 flex flex-col md:flex-row justify-center items-center gap-4">
                   <Link
-                    to="/pago/diagnostico-ia"
-                    className="bg-white/10 border border-white/30 text-white font-bold py-3 px-8 rounded-lg hover:bg-white/20 transition-all w-full md:w-auto"
+                    to="/agendamiento?plan=general"
+                    className="bg-white text-pink-600 font-bold py-3 px-8 rounded-lg hover:bg-pink-50 transition-transform hover:scale-105 inline-block shadow-lg w-full md:w-auto"
                   >
-                    Obtener Diagnóstico Inmediato ($6.990)
+                    Agenda con Nosotros
                   </Link>
                   <Link
                     to="/agendamiento?plan=consulta-estrategica-familia"
-                    className="bg-white text-pink-600 font-bold py-3 px-8 rounded-lg hover:bg-pink-50 transition-transform hover:scale-105 inline-block shadow-lg w-full md:w-auto"
+                    className="bg-white/10 border border-white/30 text-white font-bold py-3 px-8 rounded-lg hover:bg-white/20 transition-all w-full md:w-auto"
                   >
                     Agendar Pack de Inicio (Garantizado)
                   </Link>

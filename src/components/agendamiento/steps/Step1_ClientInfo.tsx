@@ -2,7 +2,7 @@
 
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { CheckCircle, Sparkles, User } from 'lucide-react';
+import { CheckCircle, Sparkles, User, ArrowRight, CheckCircle2 } from 'lucide-react';
 import { useAgendamiento } from '@/contexts/AgendamientoContext';
 import { validationRules } from '@/hooks/useFormValidation';
 import { serviceThemes } from '@/config/serviceThemes';
@@ -49,6 +49,8 @@ const Step1_ClientInfo: React.FC = () => {
   const watchedValues = watch();
   const [currentField, setCurrentField] = useState(0);
   const { isConvenioValido, isAdminValido } = priceCalculation;
+  const [fieldValidationState, setFieldValidationState] = useState<Record<string, boolean>>({});
+  const [isInputFocused, setIsInputFocused] = useState(false);
   
   type FieldKey = keyof FormData;
 
@@ -158,6 +160,9 @@ const Step1_ClientInfo: React.FC = () => {
       return;
     }
 
+    // Actualizar estado de validación para feedback visual
+    setFieldValidationState((prev) => ({ ...prev, [field.name]: true }));
+
     if (currentField === fieldsConfig.length - 1) {
       setStep(2);
     } else {
@@ -181,6 +186,33 @@ const Step1_ClientInfo: React.FC = () => {
       await handleAdvance();
     }
   };
+
+  const handleInputKeyDown = async (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      await handleAdvance();
+    }
+  };
+
+  // Verificar si el campo actual es válido
+  const isCurrentFieldValid = useMemo(() => {
+    const field = fieldsConfig[currentField];
+    if (!field) return false;
+    
+    // Si es opcional, siempre es válido si está vacío
+    if (field.optional && (!watchedValues[field.name] || watchedValues[field.name].toString().trim() === '')) {
+      return true;
+    }
+    
+    // Verificar si hay error
+    if (errors[field.name]) {
+      return false;
+    }
+    
+    // Verificar si tiene valor
+    const value = watchedValues[field.name];
+    return value && value.toString().trim().length > 0;
+  }, [currentField, fieldsConfig, watchedValues, errors]);
 
   const completedFields = fieldsConfig
     .slice(0, currentField)
@@ -214,42 +246,42 @@ const Step1_ClientInfo: React.FC = () => {
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -20 }}
       transition={{ duration: 0.3 }}
-      className="space-y-6"
+      className="space-y-6 pb-32 md:pb-6 relative z-10"
     >
       <div 
-        className="bg-slate-900/70 backdrop-blur-md border border-slate-800/70 rounded-3xl p-6 md:p-8 shadow-2xl"
+        className="bg-slate-900/80 backdrop-blur-md border border-slate-800/70 rounded-3xl p-4 md:p-8 shadow-2xl relative z-10"
         style={{
-          boxShadow: `0 32px 65px ${hexToRgba(serviceTheme.primary, 0.1)}`
+          boxShadow: `0 32px 65px ${hexToRgba(serviceTheme.primary, 0.08)}`
         }}
         role="region"
         aria-label="Formulario de información del cliente"
       >
-        <div className="flex items-center gap-3 mb-6">
+        <div className="flex items-center gap-2 md:gap-3 mb-4 md:mb-6">
           <div 
-            className="w-12 h-12 rounded-xl flex items-center justify-center shadow-lg"
+            className="w-10 h-10 md:w-12 md:h-12 rounded-xl flex items-center justify-center shadow-lg flex-shrink-0"
             style={{ 
-              background: primaryGradient,
-              boxShadow: `0 8px 24px ${hexToRgba(serviceTheme.primary, 0.4)}`
+              background: serviceTheme.gradient,
+              boxShadow: `0 8px 24px ${hexToRgba(serviceTheme.accent, 0.3)}`
             }}
             aria-hidden="true"
           >
-            <User className="w-6 h-6 text-white" />
+            <User className="w-5 h-5 md:w-6 md:h-6 text-white" />
           </div>
-          <div>
-            <h3 className="text-xl font-bold text-white">Asistente de Bienvenida</h3>
-            <p className="text-sm text-slate-400">
+          <div className="min-w-0 flex-1">
+            <h3 className="text-base md:text-xl font-bold text-white">Asistente de Bienvenida</h3>
+            <p className="text-xs md:text-sm text-slate-400 hidden md:block">
               Te guiamos paso a paso para preparar tu consulta estratégica
             </p>
           </div>
         </div>
         
-        <div className="space-y-6">
+        <div className="space-y-4 md:space-y-6">
           <div>
             <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-semibold uppercase tracking-widest text-slate-500">
+              <span className="text-[10px] md:text-xs font-semibold uppercase tracking-widest text-slate-500">
                 Progreso {currentField}/{fieldsConfig.length}
               </span>
-              <span className="text-xs text-slate-500">{Math.round(progressPercent)}%</span>
+              <span className="text-[10px] md:text-xs text-slate-500">{Math.round(progressPercent)}%</span>
             </div>
             <div 
               className="h-1.5 w-full bg-slate-800/80 rounded-full overflow-hidden"
@@ -261,10 +293,12 @@ const Step1_ClientInfo: React.FC = () => {
             >
               <motion.div
                 className="h-full"
-                style={{ background: primaryGradient }}
                 initial={{ width: 0 }}
                 animate={{ width: `${progressPercent}%` }}
                 transition={{ type: 'spring', stiffness: 120, damping: 20 }}
+                style={{
+                  background: `linear-gradient(90deg, ${serviceTheme.primary}, ${serviceTheme.accent})`,
+                }}
               />
             </div>
           </div>
@@ -292,7 +326,7 @@ const Step1_ClientInfo: React.FC = () => {
             </div>
           )}
 
-          <form onSubmit={handleSubmitField} className="space-y-4">
+          <form onSubmit={handleSubmitField} className="space-y-3 md:space-y-4">
             <AnimatePresence mode="wait">
               {activeField && (
                 <motion.div
@@ -301,10 +335,10 @@ const Step1_ClientInfo: React.FC = () => {
                   initial="hidden"
                   animate="visible"
                   exit="hidden"
-                  className="space-y-3"
+                  className="space-y-2 md:space-y-3"
                 >
                   <motion.h4 
-                    className="text-xl font-bold text-white" 
+                    className="text-base md:text-xl font-bold text-white leading-tight" 
                     variants={stepItemVariants}
                     id={`question-${activeField.name}`}
                   >
@@ -356,36 +390,86 @@ const Step1_ClientInfo: React.FC = () => {
                         }}
                       />
                     ) : (
-                      <input
-                        {...getRegisterProps(activeField)}
-                        id={`input-${activeField.name}`}
-                        type={activeField.type || 'text'}
-                        placeholder={activeField.placeholder}
-                        autoComplete={activeField.autoComplete}
-                        aria-label={activeField.question}
-                        aria-describedby={activeField.helper ? `helper-${activeField.name}` : errors[activeField.name] ? `error-${activeField.name}` : undefined}
-                        aria-invalid={!!errors[activeField.name]}
-                        aria-required={!activeField.optional}
-                        className="w-full rounded-2xl border bg-slate-900/60 px-4 py-4 text-base text-white placeholder-slate-500 focus:outline-none focus-visible:ring-2 transition-all"
-                        style={{
-                          borderColor: errors[activeField.name] 
-                            ? '#f43f5e' 
-                            : 'rgba(148, 163, 184, 0.3)',
-                          '--focus-ring-color': hexToRgba(serviceTheme.primary, 0.4),
-                        } as React.CSSProperties & { '--focus-ring-color': string }}
-                        onFocus={(e) => {
-                          if (!errors[activeField.name]) {
-                            e.target.style.borderColor = serviceTheme.primary;
-                            e.target.style.boxShadow = `0 0 0 2px ${hexToRgba(serviceTheme.primary, 0.2)}`;
-                          }
-                        }}
-                        onBlur={(e) => {
-                          e.target.style.borderColor = errors[activeField.name] 
-                            ? '#f43f5e' 
-                            : 'rgba(148, 163, 184, 0.3)';
-                          e.target.style.boxShadow = 'none';
-                        }}
-                      />
+                      <div className="relative">
+                        <input
+                          {...(() => {
+                            const registerProps = getRegisterProps(activeField);
+                            const originalOnChange = registerProps.onChange;
+                            return {
+                              ...registerProps,
+                              onChange: async (e: React.ChangeEvent<HTMLInputElement>) => {
+                                // Llamar al onChange del register primero
+                                if (originalOnChange) {
+                                  originalOnChange(e);
+                                }
+                                
+                                // Auto-advance cuando se completa el teléfono (9+ dígitos numéricos)
+                                if (activeField.name === 'telefono') {
+                                  const numericValue = e.target.value.replace(/\D/g, '');
+                                  if (numericValue.length >= 9) {
+                                    setTimeout(async () => {
+                                      const isValid = await trigger(activeField.name);
+                                      if (isValid) {
+                                        await handleAdvance();
+                                      }
+                                    }, 500);
+                                  }
+                                }
+                              }
+                            };
+                          })()}
+                          id={`input-${activeField.name}`}
+                          type={activeField.type || 'text'}
+                          inputMode={activeField.name === 'telefono' ? 'tel' : activeField.type === 'email' ? 'email' : 'text'}
+                          placeholder={activeField.placeholder}
+                          autoComplete={activeField.autoComplete}
+                          aria-label={activeField.question}
+                          aria-describedby={activeField.helper ? `helper-${activeField.name}` : errors[activeField.name] ? `error-${activeField.name}` : undefined}
+                          aria-invalid={!!errors[activeField.name]}
+                          aria-required={!activeField.optional}
+                          onKeyDown={handleInputKeyDown}
+                          className="w-full rounded-2xl border bg-slate-900/60 px-4 py-3 md:py-4 pr-12 text-base text-white placeholder-slate-500 focus:outline-none focus-visible:ring-2 transition-all touch-manipulation"
+                          style={{
+                            borderColor: errors[activeField.name] 
+                              ? '#f43f5e' 
+                              : isCurrentFieldValid && watchedValues[activeField.name]
+                              ? '#10b981'
+                              : 'rgba(148, 163, 184, 0.3)',
+                            '--focus-ring-color': hexToRgba(serviceTheme.primary, 0.4),
+                          } as React.CSSProperties & { '--focus-ring-color': string }}
+                          onFocus={(e) => {
+                            setIsInputFocused(true);
+                            if (!errors[activeField.name]) {
+                              e.target.style.borderColor = serviceTheme.primary;
+                              e.target.style.boxShadow = `0 0 0 2px ${hexToRgba(serviceTheme.primary, 0.2)}`;
+                            }
+                          }}
+                          onBlur={async (e) => {
+                            setIsInputFocused(false);
+                            // Validar al perder foco
+                            if (activeField.rules) {
+                              await trigger(activeField.name);
+                            }
+                            e.target.style.borderColor = errors[activeField.name] 
+                              ? '#f43f5e' 
+                              : isCurrentFieldValid && watchedValues[activeField.name]
+                              ? '#10b981'
+                              : 'rgba(148, 163, 184, 0.3)';
+                            e.target.style.boxShadow = 'none';
+                          }}
+                        />
+                        {/* Check verde animado cuando el campo es válido */}
+                        {isCurrentFieldValid && watchedValues[activeField.name] && !errors[activeField.name] && (
+                          <motion.div
+                            initial={{ scale: 0, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+                            className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none"
+                          >
+                            <CheckCircle2 className="w-5 h-5 text-emerald-400" />
+                          </motion.div>
+                        )}
+                      </div>
                     )}
                     {activeField.helper && !errors[activeField.name] && (
                       <p 
@@ -409,7 +493,7 @@ const Step1_ClientInfo: React.FC = () => {
                     </motion.p>
                   )}
 
-                  <motion.p className="text-xs text-slate-500" variants={stepItemVariants}>
+                  <motion.p className="text-xs text-slate-500 hidden md:block" variants={stepItemVariants}>
                     Presiona <span className="text-slate-200 font-semibold">Enter</span> para continuar
                     {activeField.isTextArea && ' · Usa Shift + Enter para saltos de línea'}
                   </motion.p>
@@ -417,6 +501,69 @@ const Step1_ClientInfo: React.FC = () => {
             )}
             </AnimatePresence>
           </form>
+
+          {/* Botón Siguiente Sticky - Solo visible cuando el campo es válido y no está en focus */}
+          <AnimatePresence>
+            {isCurrentFieldValid && !isInputFocused && (
+              <motion.div
+                initial={{ opacity: 0, y: 100 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 100 }}
+                transition={{ duration: 0.2 }}
+                className="md:hidden fixed bottom-0 left-0 right-0 p-4 bg-slate-900/95 backdrop-blur-lg border-t border-slate-800/70 z-50 safe-area-inset-bottom"
+                style={{
+                  paddingBottom: 'max(1rem, env(safe-area-inset-bottom))'
+                }}
+              >
+                <button
+                  type="button"
+                  onClick={handleAdvance}
+                  className="w-full min-h-[52px] rounded-2xl font-bold text-base flex items-center justify-center gap-2 transition-all duration-200 shadow-lg hover:scale-[1.02] active:scale-[0.98]"
+                  style={{
+                    background: primaryGradient,
+                    boxShadow: `0 8px 24px ${hexToRgba(serviceTheme.primary, 0.4)}`,
+                  }}
+                >
+                  <span className="text-white">Continuar</span>
+                  <ArrowRight className="w-5 h-5 text-white/80" />
+                </button>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Botón Siguiente Desktop - Dentro del formulario */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="hidden md:block mt-6"
+          >
+            <button
+              type="button"
+              onClick={handleAdvance}
+              disabled={!isCurrentFieldValid}
+              className={`w-full min-h-[52px] rounded-2xl font-bold text-base flex items-center justify-center gap-2 transition-all duration-200 ${
+                isCurrentFieldValid
+                  ? 'shadow-lg hover:scale-[1.02] active:scale-[0.98]'
+                  : 'opacity-50 cursor-not-allowed'
+              }`}
+              style={isCurrentFieldValid ? {
+                background: primaryGradient,
+                boxShadow: `0 8px 24px ${hexToRgba(serviceTheme.primary, 0.4)}`,
+              } : {
+                background: 'rgba(148, 163, 184, 0.2)',
+                color: 'rgba(148, 163, 184, 0.5)',
+              }}
+            >
+              {isCurrentFieldValid ? (
+                <>
+                  <span className="text-white">Continuar</span>
+                  <ArrowRight className="w-5 h-5 text-white" />
+                </>
+              ) : (
+                <span>Completa este campo para continuar</span>
+              )}
+            </button>
+          </motion.div>
 
           {(isConvenioValido || isAdminValido) && (
             <motion.div 

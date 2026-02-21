@@ -10,13 +10,13 @@ export const serviceCatalog: Record<string, Service> = {
   'basico': { name: 'Corporativo Básico', price: '350.000', category: 'Corporativo' },
   'premium': { name: 'Corporativo Premium', price: '800.000', category: 'Corporativo' },
   'enterprise': { name: 'Corporativo Enterprise', price: '1.500.000', category: 'Corporativo' },
-  'corporativo': { name: 'Asesoría Corporativa', price: '35.000', category: 'Corporativo', note: 'Consulta especializada' },
+  'corporativo': { name: 'Asesoría Corporativa', price: '80.000', category: 'Corporativo', originalPrice: '160.000', discount: '50% OFF', note: 'Consulta especializada' },
   
   // Inmobiliario
-  'inmobiliario': { name: 'Punto Legal Inmobiliario', price: '27.500', category: 'Inmobiliario', originalPrice: '55.000', discount: '50% OFF' },
+  'inmobiliario': { name: 'Punto Legal Inmobiliario', price: '45.000', category: 'Inmobiliario', originalPrice: '90.000', discount: '50% OFF' },
   
   // Familia - Consulta Estratégica y Planes
-  'consulta-estrategica-familia': { name: 'Consulta Estratégica Familia', price: '35.000', category: 'Familia', originalPrice: '85.000', discount: '58% OFF', note: 'Primera consulta con abogado especialista' },
+  'consulta-estrategica-familia': { name: 'Consulta Estratégica Familia', price: '35.000', category: 'Familia', originalPrice: '70.000', discount: '50% OFF', note: 'Primera consulta con abogado especialista' },
   'familia': { name: 'Punto Legal Familia', price: '35.000', category: 'Familia', originalPrice: '70.000', discount: '50% OFF' },
   'integral': { name: 'Protección Familiar Integral', price: '550.000', category: 'Familia', originalPrice: '1.100.000', discount: '50% OFF CYBER' },
   'familia-integral': { name: 'Protección Familiar Integral', price: '550.000', category: 'Familia', originalPrice: '1.100.000', discount: '50% OFF CYBER' },
@@ -28,7 +28,7 @@ export const serviceCatalog: Record<string, Service> = {
   'laboral': { name: 'Punto Legal Laboral', price: '30.000', category: 'Laboral', originalPrice: '60.000', discount: '50% OFF' },
   
   // General
-  'general': { name: 'Consulta General', price: '35.000', category: 'General', originalPrice: '70.000', discount: '50% OFF' },
+  'general': { name: 'Consulta General', price: '60.000', category: 'General', originalPrice: '120.000', discount: '50% OFF' },
   
   // Sucesorio
   'sucesorio': { name: 'Punto Legal Sucesorio', price: '30.000', category: 'Sucesorio', originalPrice: '60.000', discount: '50% OFF' },

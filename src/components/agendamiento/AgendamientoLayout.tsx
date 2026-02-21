@@ -1,11 +1,12 @@
 // RUTA: src/components/agendamiento/AgendamientoLayout.tsx
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useAgendamiento } from '@/contexts/AgendamientoContext';
 import { useMobile } from '@/hooks/useMobile';
 import ProgressBar from './ProgressBar';
 import ConversionSidebar from './ConversionSidebar';
 import SEO from '../SEO';
+import { serviceThemes } from '@/config/serviceThemes';
 
 interface AgendamientoLayoutProps {
   children: React.ReactNode;
@@ -14,6 +15,19 @@ interface AgendamientoLayoutProps {
 const AgendamientoLayout: React.FC<AgendamientoLayoutProps> = ({ children }) => {
   const { step, service } = useAgendamiento();
   const isMobile = useMobile();
+  
+  // Obtener tema del servicio para colores dinámicos
+  const serviceTheme = useMemo(() => {
+    const category = service.category.toLowerCase();
+    return serviceThemes[category as keyof typeof serviceThemes] || serviceThemes.general;
+  }, [service.category]);
+  
+  const hexToRgba = (hex: string, alpha: number) => {
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+  };
 
   const handleDevSkipToPayment = () => {
     if (!import.meta.env.DEV) return;
@@ -30,48 +44,40 @@ const AgendamientoLayout: React.FC<AgendamientoLayoutProps> = ({ children }) => 
         description={`Agenda tu consulta estratégica de ${service.name} con nuestros expertos. Precio: $${service.price}. Garantía de satisfacción total y respuesta rápida.`}
       />
       
-      {/* Layout de Foco Premium - Sin Header/Footer */}
-      <div className="min-h-screen bg-slate-900 bg-gradient-to-br from-slate-900 via-slate-900 to-slate-800">
-        {/* Gradientes sutiles de fondo */}
-        <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-pink-900/20 via-transparent to-transparent pointer-events-none" />
-        <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_var(--tw-gradient-stops))] from-sky-900/20 via-transparent to-transparent pointer-events-none" />
-        
-        {/* Logo minimalista + herramientas de desarrollo */}
-        <div className="relative pt-8 pb-6">
-          <div className="max-w-5xl mx-auto px-4">
-            <div className="flex items-center justify-center">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-pink-500 to-rose-600 flex items-center justify-center">
-                  <span className="text-sm font-bold text-white">PL</span>
-                </div>
-                <span className="text-lg font-bold text-white">Punto Legal</span>
-              </div>
-            </div>
+      {/* Layout de Foco Premium - Estilo iOS con colores dinámicos del servicio */}
+      <div className="min-h-screen bg-slate-900 bg-gradient-to-br from-slate-900 via-slate-950 to-slate-900">
+        {/* Gradientes dinámicos según el servicio - Estilo iOS tenue y sobrio */}
+        <div 
+          className="fixed inset-0 pointer-events-none"
+          style={{
+            background: `radial-gradient(ellipse at top right, ${hexToRgba(serviceTheme.primary, 0.04)}, transparent 60%)`,
+          }}
+        />
+        <div 
+          className="fixed inset-0 pointer-events-none"
+          style={{
+            background: `radial-gradient(ellipse at bottom left, ${hexToRgba(serviceTheme.accent, 0.03)}, transparent 60%)`,
+          }}
+        />
+        <div 
+          className="fixed inset-0 pointer-events-none"
+          style={{
+            background: `radial-gradient(ellipse at center, ${hexToRgba(serviceTheme.secondary, 0.025)}, transparent 70%)`,
+          }}
+        />
 
-            {import.meta.env.DEV && (
-              <div className="absolute right-4 top-4">
-                <button
-                  type="button"
-                  onClick={handleDevSkipToPayment}
-                  className="text-[11px] md:text-xs px-3 py-1.5 rounded-full border border-white/15 text-white/70 bg-white/5 hover:bg-white/10 backdrop-blur-sm transition"
-                >
-                  Debug: saltar al pago
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Main Content - Diseño de Dos Columnas */}
-        <div className="relative px-4 pb-12">
+        {/* Main Content - Diseño de Dos Columnas Mejorado */}
+        <div className="relative px-4 pb-12 pt-6 md:pt-8">
           <div className="max-w-5xl mx-auto">
             {isMobile ? (
-              // Versión móvil - stack vertical
-              <div className="space-y-6">
-                <div className="bg-slate-800/30 backdrop-blur-sm border border-slate-700 rounded-2xl p-4">
+              // Versión móvil - stack vertical mejorado
+              <div className="space-y-4 relative z-10">
+                <div className="bg-slate-900/80 backdrop-blur-md border border-slate-800/70 rounded-2xl p-3 shadow-2xl">
                   <ProgressBar currentStep={step} totalSteps={3} />
                 </div>
-                {children}
+                <div className="relative z-10 min-h-[60vh]">
+                  {children}
+                </div>
                 {/* Sidebar solo visible en paso 3 en mobile */}
                 {step === 3 && <ConversionSidebar />}
               </div>
@@ -80,7 +86,7 @@ const AgendamientoLayout: React.FC<AgendamientoLayoutProps> = ({ children }) => 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 {/* Columna Izquierda - Acción */}
                 <div className="space-y-6">
-                  <div className="bg-slate-800/30 backdrop-blur-sm border border-slate-700 rounded-2xl p-6">
+                  <div className="bg-slate-900/80 backdrop-blur-md border border-slate-800/70 rounded-2xl p-6 shadow-2xl">
                     <ProgressBar currentStep={step} totalSteps={3} />
                   </div>
                   {children}

@@ -407,81 +407,82 @@ const QuizModal: React.FC<QuizModalProps> = ({ isOpen, onClose }) => {
   };
 
   // Bloquear scroll del body cuando el modal está abierto y llevar al usuario al inicio de la pantalla
-useEffect(() => {
-  if (isOpen) {
-    document.body.style.overflow = 'hidden';
-  } else {
-    document.body.style.overflow = 'unset';
-  }
-  return () => {
-    document.body.style.overflow = 'unset';
-  };
-}, [isOpen]);
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
 
-useEffect(() => {
-  const resendPendingLeads = async () => {
-    const pendingRaw = localStorage.getItem('pendingQuizLeads');
-    if (!pendingRaw) return;
-    let pending: any[] = [];
-    try {
-      const parsed = JSON.parse(pendingRaw);
-      if (Array.isArray(parsed)) {
-        pending = parsed;
-      } else {
+  useEffect(() => {
+    const resendPendingLeads = async () => {
+      const pendingRaw = localStorage.getItem('pendingQuizLeads');
+      if (!pendingRaw) return;
+      let pending: any[] = [];
+      try {
+        const parsed = JSON.parse(pendingRaw);
+        if (Array.isArray(parsed)) {
+          pending = parsed;
+        } else {
+          localStorage.removeItem('pendingQuizLeads');
+          return;
+        }
+      } catch {
         localStorage.removeItem('pendingQuizLeads');
         return;
       }
-    } catch {
-      localStorage.removeItem('pendingQuizLeads');
-      return;
-    }
 
-    if (!pending.length) {
-      localStorage.removeItem('pendingQuizLeads');
-      return;
-    }
-
-    const remaining: any[] = [];
-    for (const lead of pending) {
-      try {
-        const payload = {
-          name: 'Quiz Inline Lead',
-          email: lead.email,
-          quiz_answers: JSON.stringify(lead.answers ?? {}),
-          plan_recommended: lead.plan ?? lead.recommendation?.plan ?? 'Integral',
-          income_range: lead.incomeRange ?? null,
-          income_value: lead.incomeValue ?? null,
-          children_count: lead.childrenCount ?? null,
-          children_label: lead.childrenLabel ?? null,
-          calculated_min: lead.calculatedRange?.min ?? null,
-          calculated_max: lead.calculatedRange?.max ?? null,
-          status: 'pendiente'
-        };
-
-        const { error } = await supabase.from('leads_quiz').insert([payload]);
-        if (error) throw error;
-      } catch (err) {
-        console.warn('No se pudo reenviar lead pendiente', err);
-        remaining.push(lead);
+      if (!pending.length) {
+        localStorage.removeItem('pendingQuizLeads');
+        return;
       }
-    }
 
-    if (remaining.length) {
-      localStorage.setItem('pendingQuizLeads', JSON.stringify(remaining));
-    } else {
-      localStorage.removeItem('pendingQuizLeads');
-    }
-  };
+      const remaining: any[] = [];
+      for (const lead of pending) {
+        try {
+          const payload = {
+            name: 'Quiz Inline Lead',
+            email: lead.email,
+            quiz_answers: JSON.stringify(lead.answers ?? {}),
+            plan_recommended: lead.plan ?? lead.recommendation?.plan ?? 'Integral',
+            income_range: lead.incomeRange ?? null,
+            income_value: lead.incomeValue ?? null,
+            children_count: lead.childrenCount ?? null,
+            children_label: lead.childrenLabel ?? null,
+            calculated_min: lead.calculatedRange?.min ?? null,
+            calculated_max: lead.calculatedRange?.max ?? null,
+            status: 'pendiente'
+          };
 
-  resendPendingLeads();
-}, []);
+          const { error } = await supabase.from('leads_quiz').insert([payload]);
+          if (error) throw error;
+        } catch (err) {
+          console.warn('No se pudo reenviar lead pendiente', err);
+          remaining.push(lead);
+        }
+      }
+
+      if (remaining.length) {
+        localStorage.setItem('pendingQuizLeads', JSON.stringify(remaining));
+      } else {
+        localStorage.removeItem('pendingQuizLeads');
+      }
+    };
+
+    resendPendingLeads();
+  }, []);
 
   if (!isOpen) return null;
 
-  const modalContent = (
+  return ReactDOM.createPortal(
     <AnimatePresence>
       {isOpen && (
         <div 
+          key="quiz-modal"
           className="fixed inset-0 z-[9999]" 
           style={{ 
             position: 'fixed !important' as any, 
@@ -925,30 +926,41 @@ useEffect(() => {
                     exit={{ opacity: 0, scale: 0.95 }}
                     transition={{ duration: 0.3 }}
                   >
-                    <div className="text-center mb-8">
-                      <div className="w-16 h-16 bg-gradient-to-br from-pink-500 to-rose-600 rounded-full 
-                                    flex items-center justify-center mx-auto mb-4 shadow-lg shadow-pink-500/30">
-                        <Gift className="w-8 h-8 text-white" />
+                    <div className="text-center space-y-4 mb-8">
+                      <div className="w-20 h-20 bg-white/10 border border-white/20 rounded-3xl 
+                                    flex items-center justify-center mx-auto backdrop-blur-xl">
+                        <CheckCircle className="w-10 h-10 text-white/90" />
                       </div>
-                      <h3 className="text-2xl font-bold text-white mb-2">
-                        Tu Plan Recomendado
-                      </h3>
-                      <div className="inline-block bg-gradient-to-r from-amber-500/20 to-orange-500/20 
-                                    border border-amber-500/30 rounded-full px-4 py-1 mb-4">
-                        <span className="text-amber-400 font-semibold">
-                          {recommendation.discount} de descuento aplicado
-                        </span>
+                      <div>
+                        <h3 className="text-2xl font-semibold text-white mb-1">
+                          Plan Recomendado
+                        </h3>
+                        <p className="text-sm text-white/50">
+                          Basado en tus respuestas
+                        </p>
                       </div>
                     </div>
                     
-                    <div className="bg-gradient-to-br from-pink-500/10 to-rose-500/10 border border-pink-500/20 
-                                  rounded-2xl p-6 mb-6">
-                      <h4 className="text-xl font-bold text-white mb-2">
-                        {recommendation.title}
-                      </h4>
-                      <p className="text-slate-300 mb-6">
-                        {recommendation.reason}
-                      </p>
+                    <div className="bg-white/[0.05] border border-white/10 rounded-3xl p-6 mb-6 backdrop-blur-xl">
+                      <div className="space-y-4">
+                        <div>
+                          <h4 className="text-xl font-semibold text-white mb-2">
+                            {recommendation.title}
+                          </h4>
+                          <p className="text-sm text-white/60 leading-relaxed">
+                            {recommendation.reason}
+                          </p>
+                        </div>
+                        
+                        {/* Precio destacado */}
+                        <div className="pt-4 border-t border-white/10">
+                          <div className="flex items-baseline gap-3">
+                            <span className="text-3xl font-bold text-white">$35.000</span>
+                            <span className="text-sm text-white/40 line-through">$70.000</span>
+                          </div>
+                          <p className="text-xs text-white/50 mt-1">Consulta Estratégica con Abogado</p>
+                        </div>
+                      </div>
 
                       {/* Testimonio específico del plan - PRUEBA SOCIAL */}
                       {testimonialsByPlan[recommendation.plan as keyof typeof testimonialsByPlan] && (
@@ -1070,52 +1082,21 @@ useEffect(() => {
                             <span>{feature}</span>
                           </li>
                         ))}
-                        
-                        {/* GARANTÍA - Elemento destacado al final */}
-                        <motion.li 
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: 0.5 }}
-                          className="flex items-start gap-3 p-3 rounded-lg bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-500/20 mt-4"
-                        >
-                          <Shield className="w-6 h-6 text-green-400 flex-shrink-0 mt-0.5" />
-                          <div>
-                            <p className="text-green-400 font-bold text-sm mb-1">Garantía Total</p>
-                            <p className="text-slate-300 text-sm">
-                              Si no quedas conforme, te devolvemos el 100% sin preguntas.
-                            </p>
-                          </div>
-                        </motion.li>
                       </ul>
                     </div>
                     
                     {/* CTAs */}
                     <div className="space-y-3">
-                      <div>
-                      <a
-                        href={`/agendamiento?plan=familia-${recommendation.plan.toLowerCase()}&discount=${recommendation.discount}`}
-                        className="block w-full py-4 px-6 rounded-xl font-semibold text-white bg-gradient-to-r 
-                                   from-pink-500 to-rose-600 hover:from-pink-600 hover:to-rose-700 
-                                   transition-all duration-200 text-center shadow-lg shadow-pink-500/30"
+                      <button
+                        onClick={() => window.location.href = '/agendamiento?plan=general'}
+                        className="w-full py-4 px-6 rounded-2xl font-semibold text-white bg-white/10 border border-white/20 hover:bg-white/15 transition-all backdrop-blur-xl"
                       >
-                        Agendar Mi Consulta con Descuento
-                      </a>
-                        {/* Mensaje de urgencia y escasez */}
-                        <motion.p
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          transition={{ delay: 0.6 }}
-                          className="text-center text-xs text-amber-400 mt-2 flex items-center justify-center gap-1"
-                        >
-                          <Clock className="w-3 h-3" />
-                          Cupos limitados esta semana. Asegura tu lugar ahora.
-                        </motion.p>
-                      </div>
+                        Agendar Consulta - $35.000
+                      </button>
                       
                       <button
                         onClick={resetQuiz}
-                        className="w-full py-3 px-6 rounded-xl font-medium text-white/70 hover:text-white 
-                                 transition-colors"
+                        className="w-full py-3 px-6 rounded-2xl font-medium text-white/50 hover:text-white/70 transition-colors"
                       >
                         Hacer el Quiz Nuevamente
                       </button>
@@ -1128,12 +1109,7 @@ useEffect(() => {
           </div>
         </div>
       )}
-    </AnimatePresence>
-  );
-
-  // Renderizar en un portal para evitar problemas de z-index
-  return ReactDOM.createPortal(
-    modalContent,
+    </AnimatePresence>,
     document.body
   );
 };

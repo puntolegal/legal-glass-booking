@@ -25,11 +25,11 @@ export const serviceThemes: Record<string, ServiceTheme> = {
     serviceSlug: 'corporativo'
   },
   laboral: {
-    primary: '#F59E0B', // amber-500
-    secondary: '#FBBF24', // amber-400
-    accent: '#D97706', // amber-600
-    glow: '#F59E0B40',
-    gradient: 'linear-gradient(135deg, #F59E0B, #D97706)',
+    primary: '#F97316', // orange-500
+    secondary: '#FB923C', // orange-400
+    accent: '#EA580C', // orange-600
+    glow: '#F9731640',
+    gradient: 'linear-gradient(135deg, #F97316, #EA580C)',
     icon: Briefcase,
     serviceName: 'Derecho Laboral',
     serviceSlug: 'laboral'

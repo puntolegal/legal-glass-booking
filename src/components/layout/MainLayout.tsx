@@ -13,6 +13,13 @@ import { getLayoutForPath } from '@/config/layoutConfig';
 const MainLayout: React.FC = () => {
   const location = useLocation();
   const config = getLayoutForPath(location.pathname);
+  
+  // Verificación explícita para rutas de agendamiento
+  const isAgendamientoRoute = location.pathname.startsWith('/agendamiento') || 
+                               location.pathname.startsWith('/mercadopago') ||
+                               location.pathname.startsWith('/pago') ||
+                               location.pathname.startsWith('/payment');
+  
   const baseBackgroundClass =
     'relative min-h-screen bg-[#FAFAF9] dark:bg-[#0B1121] text-stone-800 dark:text-stone-100 selection:bg-stone-200 selection:text-stone-900 overflow-hidden';
   const NoiseOverlay = () => (
@@ -31,23 +38,16 @@ const MainLayout: React.FC = () => {
     || 'Startup legal chilena que democratiza el acceso a la justicia con tecnología';
   
   // Para layouts de foco (agendamiento), no usar estructura de header/footer
-  if (config.type === 'focus') {
+  // Verificación doble: por config y por ruta explícita
+  if (config.type === 'focus' || isAgendamientoRoute) {
     return (
       <>
         <Helmet>
           <title>{seoTitle}</title>
           <meta name="description" content={seoDescription} />
         </Helmet>
-        <div className={baseBackgroundClass}>
-          <NoiseOverlay />
-          <div className="relative z-10 flex flex-col min-h-screen">
-            <AnimatePresence mode="wait">
-              <PageTransition key={location.pathname}>
-                <Outlet />
-              </PageTransition>
-            </AnimatePresence>
-          </div>
-        </div>
+        {/* Layout de foco: sin header ni footer globales, sin wrappers */}
+        <Outlet />
       </>
     );
   }

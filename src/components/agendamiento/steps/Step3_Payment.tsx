@@ -75,86 +75,38 @@ const Step3_Payment: React.FC = () => {
       transition={{ duration: 0.3 }}
       className="space-y-6"
     >
-      {/* Resumen de la Reserva */}
-      <div className="bg-[rgba(15,23,42,0.78)] backdrop-blur-xl border border-white/10 rounded-3xl p-6 md:p-7 shadow-[0_24px_52px_rgba(15,23,42,0.6)]">
-        <div className="flex items-center gap-3 mb-6">
-          <div 
-            className="w-12 h-12 rounded-xl flex items-center justify-center shadow-lg"
-            style={{ 
-              background: primaryGradient,
-              boxShadow: `0 8px 24px ${hexToRgba(serviceTheme.primary, 0.4)}`
-            }}
-            aria-hidden="true"
-          >
-            <CheckCircle className="w-6 h-6 text-white" />
-          </div>
-          <div>
-            <h3 className="text-xl font-bold text-white">Resumen de tu Agendamiento</h3>
-            <p className="text-sm text-slate-400">Revisa los detalles antes de confirmar</p>
-          </div>
+      {/* Resumen de la Reserva - Estilo iOS */}
+      <div className="bg-white/[0.03] backdrop-blur-2xl border border-white/10 rounded-3xl p-6 md:p-7">
+        <div className="mb-6">
+          <h3 className="text-xl font-semibold text-white">Resumen</h3>
         </div>
         
         <div className="space-y-4">
-          {/* Servicio */}
-          <div className="flex justify-between items-start pb-4 border-b border-slate-700">
-            <div>
-              <p className="text-sm text-slate-500">Servicio</p>
-              <p className="text-base font-semibold text-white">{service.name}</p>
-              <p className="text-xs text-slate-400">{service.category}</p>
-            </div>
-            <div className="text-right">
-              <p 
-                className="text-2xl font-bold text-transparent bg-clip-text"
+          {/* Resumen compacto */}
+          <div className="space-y-3">
+            <div className="flex justify-between items-center">
+              <span className="text-sm text-slate-400">{service.name}</span>
+              <span 
+                className="text-xl font-bold text-transparent bg-clip-text"
                 style={{ backgroundImage: primaryGradient }}
               >
                 ${precioFinal}
-              </p>
+              </span>
             </div>
-          </div>
-          
-          {/* Datos del cliente */}
-          <div className="pb-4 border-b border-slate-700">
-            <p className="text-sm text-slate-500 mb-2">Tus datos</p>
-            <p className="text-sm text-white">{formData.nombre}</p>
-            <p className="text-sm text-slate-400">{formData.email}</p>
-            <p className="text-sm text-slate-400">{formData.telefono}</p>
-          </div>
-          
-          {/* Fecha y hora */}
-          <div className="pb-4 border-b border-slate-700">
-            <p className="text-sm text-slate-500 mb-2">Fecha y hora</p>
-            <p className="text-sm text-white capitalize">{formatDate(selectedDate)}</p>
-            <p className="text-sm text-slate-400">{selectedTime} hrs</p>
-            <p className="text-xs text-slate-500 mt-1">{getMeetingTypeLabel()}</p>
+            <div className="text-sm text-slate-400">
+              <p className="text-white capitalize">{formatDate(selectedDate)} · {selectedTime} hrs</p>
+              <p className="text-xs mt-1">{getMeetingTypeLabel()}</p>
+            </div>
           </div>
         </div>
       </div>
       
-      {/* Información de Pago */}
+      {/* Información de Pago - Simplificada */}
       {!isFree && (
-        <div className="bg-[rgba(15,23,42,0.78)] backdrop-blur-xl border border-white/10 rounded-3xl p-6 md:p-7 shadow-[0_24px_52px_rgba(15,23,42,0.6)]">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-12 h-12 rounded-xl bg-slate-700/50 flex items-center justify-center">
-              <CreditCard className="w-6 h-6 text-slate-300" />
-            </div>
-            <div>
-              <h3 className="text-lg font-bold text-white">Método de Pago</h3>
-              <p className="text-sm text-slate-400">Procesado por Mercado Pago</p>
-            </div>
-          </div>
-          
-          <div className="bg-slate-900/50 rounded-xl p-4 space-y-3">
-            <div className="flex items-center gap-2 text-sm text-slate-400">
-              <Lock className="w-4 h-4 text-emerald-400" />
-              <span>Transacción 100% segura y encriptada</span>
-            </div>
-            <div className="flex items-center gap-2 text-sm text-slate-400">
-              <Shield className="w-4 h-4 text-emerald-400" />
-              <span>Protección al comprador incluida</span>
-            </div>
-            <p className="text-xs text-slate-500 mt-2">
-              Serás redirigido a Mercado Pago para completar tu pago de forma segura.
-            </p>
+        <div className="bg-slate-900/50 rounded-xl p-4 border border-white/5">
+          <div className="flex items-center gap-2 text-xs text-slate-400">
+            <Lock className="w-3 h-3 text-emerald-400" />
+            <span>Pago seguro procesado por Mercado Pago</span>
           </div>
         </div>
       )}

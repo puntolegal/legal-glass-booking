@@ -3,17 +3,13 @@
 import React, { useMemo, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
-  Award,
   Calendar,
   CheckCircle,
   Clock,
-  Flame,
   Info,
   MapPin,
   Phone,
   Sparkles,
-  Sun,
-  Sunset,
   Video,
 } from 'lucide-react';
 import { useAgendamiento } from '@/contexts/AgendamientoContext';
@@ -65,11 +61,9 @@ const Step2_Scheduling: React.FC = () => {
   const primaryStrong = useMemo(() => hexToRgba(serviceTheme.accent, 0.9), [serviceTheme]);
   
   const availableDates = useMemo(() => getAvailableDates(), []);
-  const [urgencyOption, setUrgencyOption] = useState<'asap' | 'next_week' | 'specific' | null>(null);
-  const [schedulingStep, setSchedulingStep] = useState<'urgency' | 'day' | 'time' | 'confirmation'>(() => {
-    if (selectedDate && selectedTime) return 'confirmation';
+  const [schedulingStep, setSchedulingStep] = useState<'day' | 'time'>(() => {
     if (selectedDate) return 'time';
-    return 'urgency';
+    return 'day';
   });
 
   const { occupiedTimes, isLoading: loadingAvailability } = useAvailability(selectedDate || '');
@@ -107,21 +101,8 @@ const Step2_Scheduling: React.FC = () => {
 
   const toISODate = (date: Date) => date.toISOString().split('T')[0];
 
-  const urgencyDrivenDates = useMemo(() => {
-    const option = urgencyOption ?? 'specific';
-
-    if (option === 'asap') {
-      return availableDates.slice(0, 3);
-    }
-
-    if (option === 'next_week') {
-      const nextWeekStart = availableDates.find((date) => date.getDay() === 1) || availableDates[0];
-      const idx = availableDates.indexOf(nextWeekStart);
-      return availableDates.slice(Math.max(idx, 0), Math.max(idx, 0) + 7);
-    }
-
-    return availableDates.slice(0, 14);
-  }, [availableDates, urgencyOption]);
+  // Mostrar próximos 14 días disponibles
+  const displayedDates = useMemo(() => availableDates.slice(0, 14), [availableDates]);
 
   const freeTimes = useMemo(
     () => availableTimes.filter((time) => !occupiedTimes.includes(time)),
@@ -140,13 +121,6 @@ const Step2_Scheduling: React.FC = () => {
   const morningTimes = remainingTimes.filter((time) => Number(time.split(':')[0]) < 13);
   const afternoonTimes = remainingTimes.filter((time) => Number(time.split(':')[0]) >= 13);
 
-  const handleUrgencySelection = (option: 'asap' | 'next_week' | 'specific') => {
-    setUrgencyOption(option);
-    setSchedulingStep('day');
-    setSelectedDate('');
-    setSelectedTime('');
-  };
-
   const handleSelectDate = (date: Date) => {
     const iso = toISODate(date);
     setSelectedDate(iso);
@@ -156,7 +130,11 @@ const Step2_Scheduling: React.FC = () => {
 
   const handleSelectTime = (time: string) => {
     setSelectedTime(time);
-    setSchedulingStep('confirmation');
+    // Solo avanzar si tenemos fecha, hora y modalidad seleccionadas
+    if (selectedDate && time && selectedMeetingType) {
+      // Ir directo al pago sin paso de confirmación
+      goToPayment();
+    }
   };
 
   const summaryDate = selectedDate
@@ -165,26 +143,6 @@ const Step2_Scheduling: React.FC = () => {
 
   const summaryTime = selectedTime ? `${selectedTime} hrs` : '';
 
-  const urgencyOptions = [
-    {
-      key: 'asap' as const,
-      title: 'Necesito prioridad',
-      description: 'Mostramos los cupos reservados para casos urgentes.',
-      icon: Flame,
-    },
-    {
-      key: 'next_week' as const,
-      title: 'La próxima semana',
-      description: 'Encuentra un espacio entre lunes y viernes próximos.',
-      icon: Sun,
-    },
-    {
-      key: 'specific' as const,
-      title: 'Elegir con calma',
-      description: 'Revisa el calendario completo y selecciona la fecha exacta.',
-      icon: Calendar,
-    },
-  ];
 
   const availabilitySignal = (date: Date) => {
     const day = date.getDay();
@@ -199,94 +157,7 @@ const Step2_Scheduling: React.FC = () => {
     exit: { opacity: 0, y: -12, transition: { duration: 0.2 } },
   };
 
-  const renderUrgencyStep = () => (
-    <motion.div key="urgency" variants={fieldsetVariants} initial="hidden" animate="visible" exit="exit" className="space-y-6">
-      <header className="space-y-2">
-        <h2 className="text-2xl font-semibold text-white">¿Cómo organizamos tu agenda?</h2>
-        <p className="text-sm text-slate-400">Selecciona la alternativa que mejor se ajuste a tu disponibilidad.</p>
-      </header>
-
-      <section className="grid gap-4">
-        {urgencyOptions.map((option) => (
-          <motion.button
-            key={option.key}
-            onClick={() => handleUrgencySelection(option.key)}
-            whileTap={{ scale: 0.97 }}
-            className="rounded-3xl border px-5 py-5 text-left transition"
-            style={{
-              background: primarySoft,
-              borderColor: primaryBorder,
-            }}
-          >
-            <div className="flex items-start gap-4">
-              <div
-                className="w-12 h-12 rounded-2xl flex items-center justify-center"
-                style={{ background: primaryGradient }}
-              >
-                <option.icon className="w-6 h-6 text-white" />
-              </div>
-              <div className="flex-1">
-                <p className="text-lg font-medium text-white">{option.title}</p>
-                <p className="text-sm text-slate-300 mt-1">{option.description}</p>
-              </div>
-              <Sparkles className="w-5 h-5 text-white/60" />
-            </div>
-          </motion.button>
-        ))}
-      </section>
-    </motion.div>
-  );
-
-  const renderDayStep = () => (
-    <motion.div key="day" variants={fieldsetVariants} initial="hidden" animate="visible" exit="exit" className="space-y-6">
-      <header className="flex items-center justify-between">
-            <div>
-          <h2 className="text-2xl font-semibold text-white">Selecciona el día perfecto</h2>
-          <p className="text-sm text-slate-400">Visualiza disponibilidad real y escoge la fecha que más te acomoda.</p>
-            </div>
-        <button
-          onClick={() => setSchedulingStep('urgency')}
-          className="text-xs uppercase tracking-wide font-semibold text-white/60 border border-white/10 rounded-full px-3 py-1 hover:bg-white/10 transition"
-        >
-          Ajustar preferencia
-        </button>
-      </header>
-
-      <section className="flex gap-3 overflow-x-auto pb-1">
-        {urgencyDrivenDates.map((date) => {
-          const iso = toISODate(date);
-          const isSelected = selectedDate === iso;
-          const signal = availabilitySignal(date);
-              
-              return (
-                <motion.button
-              key={iso}
-              onClick={() => handleSelectDate(date)}
-              whileTap={{ scale: 0.95 }}
-              className={`min-w-[160px] rounded-3xl border px-4 py-4 text-left transition ${
-                isSelected ? 'shadow-xl' : 'opacity-90 hover:opacity-100'
-              }`}
-              style={{
-                background: isSelected ? primaryGradient : primarySoft,
-                borderColor: isSelected ? 'transparent' : primaryBorder,
-                boxShadow: isSelected ? `0 14px 36px ${primaryStrong}35` : 'none',
-              }}
-            >
-              <p className={`text-sm font-semibold ${isSelected ? 'text-white/85' : 'text-white/80'}`}>
-                {date.toLocaleDateString('es-CL', { weekday: 'long' })}
-              </p>
-              <p className={`text-2xl font-bold mt-2 ${isSelected ? 'text-white' : 'text-white'}`}>{date.getDate()}</p>
-              <p className={`text-xs mt-2 flex items-center gap-2 ${isSelected ? 'text-white/75' : 'text-white/65'}`}>
-                <span className="inline-flex h-2 w-2 rounded-full" style={{ background: signal.tone }} />
-                {signal.label}
-              </p>
-            </motion.button>
-          );
-        })}
-      </section>
-    </motion.div>
-  );
-
+  // Componente TimePill para los horarios
   const TimePill: React.FC<{ time: string; variant?: 'recommended' | 'standard'; note?: string }> = ({
     time,
     variant = 'standard',
@@ -294,290 +165,201 @@ const Step2_Scheduling: React.FC = () => {
   }) => {
     const isSelected = selectedTime === time;
     
-    // Estilo base unificado para todos los botones
-    const baseStyle = {
-      background: isSelected ? primaryGradient : primarySoft,
-      borderColor: isSelected ? 'transparent' : primaryBorder,
-      color: isSelected ? '#fff' : primaryStrong,
-      boxShadow: isSelected && schedulingStep === 'time' ? `0 12px 30px ${primaryStrong}30` : 'none',
-    };
-
-    // Variante "recommended" usa borde más grueso pero mantiene colores del servicio
-    const recommendedStyle = variant === 'recommended' && !isSelected ? {
-      borderWidth: '2px',
-      borderColor: hexToRgba(serviceTheme.primary, 0.6),
-      background: hexToRgba(serviceTheme.primary, 0.18),
-    } : {};
-
     return (
       <motion.button
-        key={time}
         onClick={() => handleSelectTime(time)}
-        className="px-4 py-3 rounded-full text-sm font-medium border transition"
-        style={{
-          ...baseStyle,
-          ...recommendedStyle,
-        }}
+        whileTap={{ scale: 0.97 }}
+        className={`px-4 py-2.5 rounded-xl text-sm font-medium border transition ${
+          isSelected 
+            ? 'text-white shadow-lg' 
+            : variant === 'recommended'
+            ? 'bg-slate-800/50 border-slate-700/50 text-slate-200'
+            : 'bg-slate-900/40 border-slate-800/40 text-slate-400 hover:bg-slate-800/50 hover:border-slate-700/50'
+        }`}
+        style={isSelected ? {
+          backgroundColor: hexToRgba(serviceTheme.primary, 0.15),
+          borderColor: hexToRgba(serviceTheme.accent, 0.4),
+          boxShadow: `0 4px 16px ${hexToRgba(serviceTheme.primary, 0.25)}`,
+        } : {}}
       >
-        <span className="flex items-center gap-2">
-          {time}
-          {variant === 'recommended' && <Sparkles className="w-4 h-4" />}
-        </span>
-        {note && (
-          <span className="block text-[11px] mt-1 tracking-wide" style={{ color: prestigeAccent }}>
-            {note}
-          </span>
-        )}
+        {time}
       </motion.button>
     );
   };
 
+  const renderDayStep = () => {
+    return (
+      <motion.div key="day" variants={fieldsetVariants} initial="hidden" animate="visible" exit="exit" className="space-y-6">
+        <header className="space-y-1">
+          <h2 className="text-2xl font-semibold text-white">Selecciona el día</h2>
+          <p className="text-sm text-white/40 mt-1">Elige la fecha que más te acomoda</p>
+        </header>
+
+        <section className="grid grid-cols-2 md:flex md:gap-3 md:overflow-x-auto pb-1 gap-2">
+          {displayedDates.map((date) => {
+            const iso = toISODate(date);
+            const isSelected = selectedDate === iso;
+              
+            return (
+              <motion.button
+                key={iso}
+                onClick={() => handleSelectDate(date)}
+                whileTap={{ scale: 0.97 }}
+                className={`rounded-2xl border px-3 py-3 md:min-w-[140px] md:px-4 md:py-4 text-left transition ${
+                  isSelected 
+                    ? 'text-white shadow-lg' 
+                    : 'bg-slate-900/40 border-slate-800/40 hover:bg-slate-800/50'
+                }`}
+                style={isSelected ? {
+                  backgroundColor: hexToRgba(serviceTheme.primary, 0.15),
+                  borderColor: hexToRgba(serviceTheme.accent, 0.4),
+                  boxShadow: `0 4px 16px ${hexToRgba(serviceTheme.primary, 0.25)}`,
+                } : {}}
+              >
+                <p className={`text-xs md:text-sm font-semibold ${isSelected ? 'text-white' : 'text-slate-400'}`}>
+                  {date.toLocaleDateString('es-CL', { weekday: 'short' })}
+                </p>
+                <p className={`text-xl md:text-2xl font-bold mt-1 ${isSelected ? 'text-white' : 'text-slate-300'}`}>{date.getDate()}</p>
+                <p className={`text-[10px] md:text-xs mt-1 hidden md:flex items-center gap-2 text-slate-500`}>
+                  {date.toLocaleDateString('es-CL', { month: 'short' })}
+                </p>
+              </motion.button>
+            );
+          })}
+        </section>
+      </motion.div>
+    );
+  };
+
+
   const renderTimeStep = () => (
-    <motion.div key="time" variants={fieldsetVariants} initial="hidden" animate="visible" exit="exit" className="space-y-8">
-      <header className="space-y-2">
+      <motion.div key="time" variants={fieldsetVariants} initial="hidden" animate="visible" exit="exit" className="space-y-6">
+      <header className="space-y-1">
         <h2 className="text-2xl font-semibold text-white">Selecciona tu horario</h2>
         <p className="text-sm text-slate-400">
-          {loadingAvailability
-            ? 'Estamos consultando disponibilidad en tiempo real…'
-            : 'Sugerimos opciones que se adaptan a agendas exigentes.'}
+          {loadingAvailability ? 'Consultando disponibilidad…' : 'Elige el horario que prefieras'}
         </p>
       </header>
 
       {!loadingAvailability && freeTimes.length === 0 && (
-        <div className="rounded-3xl border border-white/5 bg-white/5 px-4 py-6 text-center space-y-3">
-          <p className="text-sm text-white/70">No quedan cupos para este día.</p>
+        <div className="rounded-3xl border border-slate-800/70 bg-slate-900/60 px-4 py-6 text-center space-y-3">
+          <p className="text-sm text-slate-300">No quedan cupos para este día.</p>
           <button
             onClick={() => setSchedulingStep('day')}
-            className="inline-flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-semibold"
-            style={{
-              background: primarySoft,
-              borderColor: primaryBorder,
-              color: primaryStrong,
-            }}
+            className="inline-flex items-center gap-2 rounded-full border border-slate-700 bg-slate-800/50 px-4 py-2 text-xs font-semibold text-slate-200 hover:bg-slate-800 transition-colors"
           >
             Elegir otra fecha
           </button>
                     </div>
                   )}
 
-      {recommendedTimes.length > 0 && (
-        <section className="space-y-3">
-          <div className="flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-white/70" />
-            <h3 className="text-sm font-semibold text-white/80 uppercase tracking-widest">Horarios recomendados por el equipo</h3>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {recommendedTimes.slice(0, 3).map((time) => (
-              <TimePill key={time} time={time} variant="recommended" />
-            ))}
-          </div>
-        </section>
-      )}
-
-      {lastSlotOfDay && (
-        <section className="space-y-3">
-          <div className="flex items-center gap-2">
-            <Clock className="w-4 h-4" style={{ color: prestigeAccent }} />
-            <h3 className="text-sm font-semibold uppercase tracking-widest" style={{ color: prestigeAccent }}>
-              Último horario disponible
-            </h3>
-          </div>
-          <TimePill time={lastSlotOfDay} note="Último del día" />
-        </section>
-      )}
-
-      <section className="space-y-3">
-        <div className="flex items-center gap-2">
-          <Sun className="w-4 h-4 text-white/70" />
-          <h3 className="text-sm font-semibold text-white/80 uppercase tracking-widest">Mañana</h3>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          {morningTimes.length ? (
-            morningTimes.map((time) => <TimePill key={time} time={time} />)
+      {/* Lista unificada de horarios disponibles - Minimalista */}
+      <section className="space-y-4">
+        <div className="grid grid-cols-3 md:grid-cols-4 gap-2">
+          {freeTimes.length > 0 ? (
+            freeTimes.map((time) => (
+              <TimePill 
+                key={time} 
+                time={time} 
+                variant={recommendedTimes.includes(time) ? 'recommended' : 'standard'} 
+              />
+            ))
           ) : (
-            <span className="text-xs text-slate-500">Sin cupos matutinos para este día.</span>
-                        )}
-                      </div>
-      </section>
-
-      <section className="space-y-3">
-        <div className="flex items-center gap-2">
-          <Sunset className="w-4 h-4 text-white/70" />
-          <h3 className="text-sm font-semibold text-white/80 uppercase tracking-widest">Tarde</h3>
-                        </div>
-        <div className="flex flex-wrap gap-2">
-          {afternoonTimes.length ? (
-            afternoonTimes.map((time) => <TimePill key={time} time={time} />)
-          ) : (
-            <span className="text-xs text-slate-500">Sin cupos vespertinos para este día.</span>
+            <div className="col-span-full text-center py-8">
+              <p className="text-sm text-slate-400 mb-4">No quedan cupos para este día</p>
+              <button
+                onClick={() => {
+                  setSelectedDate('');
+                  setSchedulingStep('day');
+                }}
+                className="inline-flex items-center gap-2 rounded-full border border-slate-700 bg-slate-800/50 px-4 py-2 text-xs font-semibold text-slate-200 hover:bg-slate-800 transition-colors"
+              >
+                Elegir otra fecha
+              </button>
+            </div>
           )}
         </div>
       </section>
 
+      {/* Modalidad - Estilo iOS Minimalista */}
       <section className="space-y-3">
-        <h3 className="text-sm font-semibold text-white/80 uppercase tracking-widest">Modalidad</h3>
-        <div className="grid gap-3">
-          {meetingTypes.map((type) => {
+        <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Modalidad</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+          {meetingTypes.filter(type => type.available).map((type) => {
             const Icon = type.icon;
             const selected = selectedMeetingType === type.value;
+            
             return (
               <motion.button
                 key={type.value}
-                onClick={() => type.available && setSelectedMeetingType(type.value)}
-                whileTap={type.available ? { scale: 0.97 } : {}}
-                className={`rounded-3xl border px-4 py-4 text-left transition ${
-                  type.available ? 'cursor-pointer' : 'opacity-60 cursor-not-allowed'
+                onClick={() => setSelectedMeetingType(type.value)}
+                whileTap={{ scale: 0.97 }}
+                className={`rounded-2xl border px-4 py-3 text-left transition ${
+                  selected 
+                    ? 'text-white shadow-lg' 
+                    : 'bg-slate-900/40 border-slate-800/40 text-slate-300 hover:bg-slate-800/50'
                 }`}
-                style={{
-                  background: selected ? primaryGradient : 'rgba(15, 23, 42, 0.4)',
-                  borderColor: selected ? 'transparent' : 'rgba(148, 163, 184, 0.25)',
-                  boxShadow: selected ? `0 16px 40px ${primaryStrong}25` : 'none',
-                }}
+                style={selected ? {
+                  backgroundColor: hexToRgba(serviceTheme.primary, 0.15),
+                  borderColor: hexToRgba(serviceTheme.accent, 0.4),
+                  boxShadow: `0 4px 16px ${hexToRgba(serviceTheme.primary, 0.25)}`,
+                } : {}}
               >
-                <div className="flex items-start gap-3">
-                  <div className="w-11 h-11 rounded-2xl flex items-center justify-center bg-white/10">
-                    <Icon className={`w-6 h-6 ${selected ? 'text-white' : 'text-white/80'}`} />
+                <div className="flex items-center gap-3">
+                  <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${selected ? 'bg-pink-500/20' : 'bg-slate-800/50'}`}>
+                    <Icon className={`w-5 h-5 ${selected ? 'text-white' : 'text-slate-400'}`} />
                   </div>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <p className={`text-base font-semibold ${selected ? 'text-white' : 'text-white/85'}`}>
-                        {type.label}
-                        </p>
-                      {selected && <CheckCircle className="w-4 h-4 text-white" />}
-                    </div>
-                    <p className={`text-xs ${selected ? 'text-white/75' : 'text-white/60'}`}>{type.description}</p>
-                    {type.highlights && (
-                      <div className="flex flex-wrap gap-2 mt-3">
-                        {type.highlights.map((highlight) => (
-                          <span key={highlight} className="text-[11px] px-2 py-1 rounded-full bg-black/20 text-white/70">
-                            {highlight}
-                          </span>
-                        ))}
-                      </div>
-                    )}
+                  <div className="flex-1 min-w-0">
+                    <p className={`text-sm font-medium truncate ${selected ? 'text-white' : 'text-slate-300'}`}>
+                      {type.label.replace(' Privada', '').replace(' Telefónica', '').replace(' Boutique', '')}
+                    </p>
                   </div>
-                  </div>
-                </motion.button>
-              );
-            })}
-          </div>
+                  {selected && <CheckCircle className="w-4 h-4 text-pink-400 flex-shrink-0" />}
+                </div>
+              </motion.button>
+            );
+          })}
+        </div>
       </section>
 
+      {/* Botón para continuar al pago - Estilo con gradiente */}
+      {selectedTime && selectedMeetingType && (
+        <motion.button
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          onClick={goToPayment}
+          disabled={isLoading}
+          className="w-full py-4 rounded-2xl text-base font-bold text-white disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-lg hover:scale-[1.02] active:scale-[0.98]"
+          style={{
+            background: primaryGradient,
+            boxShadow: `0 8px 24px ${hexToRgba(serviceTheme.primary, 0.4)}`,
+          }}
+        >
+          {isLoading ? 'Procesando...' : 'Continuar al pago'}
+        </motion.button>
+      )}
+      
       <div className="flex items-center justify-between pt-2">
         <button
           onClick={() => {
             setSelectedDate('');
-            setSelectedTime('');
             setSchedulingStep('day');
           }}
-          className="text-xs uppercase tracking-wide font-semibold text-white/60 border border-white/10 rounded-full px-3 py-1 hover:bg-white/10 transition"
+          className="text-xs uppercase tracking-wide font-semibold text-slate-400 border border-slate-700/50 rounded-full px-3 py-1 hover:bg-slate-800/50 transition"
         >
-          Ajustar fecha
+          Cambiar fecha
         </button>
-            </div>
+      </div>
     </motion.div>
   );
 
-  const renderConfirmationStep = () => (
-    <motion.div key="confirmation" variants={fieldsetVariants} initial="hidden" animate="visible" exit="exit" className="space-y-6">
-      <motion.div
-        className="rounded-3xl p-6 text-center"
-        style={{
-          background: primarySoft,
-          border: `1px solid ${primaryBorder}`,
-          boxShadow: `0 24px 48px ${primaryStrong}30`,
-        }}
-      >
-          <motion.div
-            initial={{ scale: 0, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ delay: 0.1, type: 'spring' }}
-            className="mx-auto mb-4 w-16 h-16 rounded-full flex items-center justify-center"
-            style={{ background: primaryGradient }}
-          >
-            <CheckCircle className="w-10 h-10 text-white" />
-          </motion.div>
-
-          <motion.div className="space-y-3">
-            <motion.p
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.18 }}
-              className="text-sm uppercase tracking-[0.4em] text-white/60"
-            >
-              Confirmación
-            </motion.p>
-            <motion.h2
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.26 }}
-              className="text-3xl font-semibold text-white"
-            >
-              ¿Confirmamos tu consulta para
-              <span className="block text-white/90 mt-1">{summaryDate} · {summaryTime}</span>
-            </motion.h2>
-            <motion.p
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.32 }}
-              className="text-sm text-white/65 max-w-md mx-auto"
-            >
-              Al confirmar, recibirás un correo con los detalles y el enlace seguro de tu reunión.
-            </motion.p>
-          </motion.div>
-        </motion.div>
-
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.38 }}
-        className="rounded-3xl border border-white/5 bg-white/5 px-5 py-4 flex items-start gap-3"
-          >
-        <Award className="w-5 h-5 text-white/70 mt-0.5" />
-        <p className="text-xs text-white/70 leading-relaxed">
-          Estás a un paso de unirte al <strong className="text-white">92% de nuestros clientes</strong> que resuelven su caso con una 
-          estrategia clara desde la primera consulta.
-        </p>
-      </motion.div>
-
-      <motion.button
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.45 }}
-        whileTap={{ scale: 0.96 }}
-        onClick={goToPayment}
-        disabled={isLoading}
-        className="w-full py-5 rounded-3xl text-lg font-semibold text-white shadow-2xl disabled:opacity-60 disabled:cursor-not-allowed"
-        style={{
-          background: primaryGradient,
-          boxShadow: `0 26px 52px ${primaryStrong}35`,
-        }}
-      >
-        {isLoading ? 'Confirmando…' : 'Confirmar y continuar al pago'}
-      </motion.button>
-
-      <motion.button
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.52 }}
-        onClick={() => setSchedulingStep('time')}
-        className="text-xs uppercase tracking-wide font-semibold text-white/60 border border-white/10 rounded-full px-3 py-1 hover:bg-white/10 transition w-full"
-                >
-        Ajustar horario
-      </motion.button>
-    </motion.div>
-  );
 
   const renderStepContent = () => {
     switch (schedulingStep) {
-      case 'urgency':
-        return renderUrgencyStep();
       case 'day':
         return renderDayStep();
       case 'time':
         return renderTimeStep();
-      case 'confirmation':
-        return renderConfirmationStep();
       default:
         return null;
     }
@@ -592,7 +374,7 @@ const Step2_Scheduling: React.FC = () => {
       transition={{ duration: 0.35 }}
       className="space-y-8"
     >
-      <motion.div className="bg-[rgba(15,23,42,0.75)] backdrop-blur-xl border border-white/5 rounded-3xl p-6 md:p-8 shadow-[0_32px_65px_rgba(15,23,42,0.55)] space-y-8">
+      <motion.div className="bg-white/[0.03] backdrop-blur-2xl border border-white/10 rounded-3xl p-6 md:p-8 space-y-8">
         <AnimatePresence mode="wait">
           {renderStepContent()}
         </AnimatePresence>
@@ -606,11 +388,6 @@ const Step2_Scheduling: React.FC = () => {
           Volver al paso anterior
         </button>
 
-        {schedulingStep !== 'confirmation' && (
-          <p className="text-xs text-white/50 md:text-right">
-            Selecciona tus preferencias para coordinar tu consulta estratégica.
-          </p>
-        )}
       </div>
     </motion.div>
   );

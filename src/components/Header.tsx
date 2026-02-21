@@ -11,7 +11,20 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({ variant = 'default' }) => {
   const location = useLocation();
 
+  // No renderizar header en rutas de foco (agendamiento, pago, etc.)
   if (location.pathname.startsWith('/apuntes')) {
+    return null;
+  }
+
+  if (location.pathname.startsWith('/agendamiento')) {
+    return null;
+  }
+
+  if (location.pathname.startsWith('/mercadopago')) {
+    return null;
+  }
+
+  if (location.pathname.startsWith('/pago') || location.pathname.startsWith('/payment')) {
     return null;
   }
 
