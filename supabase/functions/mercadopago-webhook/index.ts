@@ -109,7 +109,7 @@ serve(async (req) => {
           JSON.stringify({ 
             success: false, 
             error: 'Error de conexión con MercadoPago',
-            details: fetchError.message
+            details: (fetchError as Error).message
           }),
           { 
             status: 502, // Bad Gateway
