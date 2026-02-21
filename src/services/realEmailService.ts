@@ -663,58 +663,32 @@ const generateAdminEmailHTML = (booking: BookingEmailData): string => {
  */
 export const sendRealBookingEmails = async (bookingData: BookingEmailData): Promise<EmailResult> => {
   try {
-    console.log('📧 Enviando emails REALES para reserva:', bookingData.id);
+    console.log('📧 Enviando emails para reserva:', bookingData.id);
 
-    // Generar plantillas HTML
-    const clientHTML = generateClientEmailHTML(bookingData);
-    const adminHTML = generateAdminEmailHTML(bookingData);
-
-    // Mostrar información detallada en consola
-    console.log('');
-    console.log('📧 ========== ENVIANDO EMAIL AL CLIENTE ==========');
-    console.log('Para:', bookingData.email);
-    console.log('Asunto: ✅ Confirmación de tu cita - ' + bookingData.servicio + ' - Punto Legal');
-    console.log('Contenido: Plantilla HTML profesional generada');
-    console.log('');
-    
-    console.log('📧 ========== ENVIANDO EMAIL AL ADMIN ==========');
-    console.log('Para: puntolegalelgolf@gmail.com');
-    console.log('Asunto: 🔔 Nueva reserva - ' + bookingData.nombre + ' - ' + bookingData.servicio);
-    console.log('Contenido: Notificación completa con todos los detalles');
-    console.log('');
-
-    // Enviar emails reales usando Resend API
-    const clientResult = await sendEmailWithResend({
+    // IMPORTANTE: clever-action envía AMBOS emails (cliente + admin) en una sola llamada.
+    // Solo llamamos UNA VEZ para evitar duplicados.
+    const result = await sendEmailWithResend({
       from: 'Punto Legal <team@puntolegal.online>',
       to: [bookingData.email],
       subject: `✅ Confirmación de tu cita - ${bookingData.servicio} - Punto Legal`,
-      html: clientHTML
+      html: '' // clever-action genera sus propios templates
     }, bookingData);
 
-    const adminResult = await sendEmailWithResend({
-      from: 'Punto Legal <team@puntolegal.online>',
-      to: ['puntolegalelgolf@gmail.com'],
-      subject: `🔔 Nueva reserva - ${bookingData.nombre} - ${bookingData.servicio}`,
-      html: adminHTML
-    }, bookingData);
-
-    console.log('✅ Emails REALES enviados exitosamente');
-    console.log('✅ Email al cliente:', clientResult.id);
-    console.log('✅ Email al admin:', adminResult.id);
+    console.log('✅ Emails enviados (cliente + admin) en una sola llamada:', result.id);
 
     return {
       success: true,
-      message: 'Emails reales enviados exitosamente',
-      clientEmail: clientResult,
-      adminEmail: adminResult
+      message: 'Emails enviados exitosamente',
+      clientEmail: result,
+      adminEmail: result
     };
 
   } catch (error) {
-    console.error('❌ Error enviando emails reales:', error);
+    console.error('❌ Error enviando emails:', error);
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Error desconocido',
-      message: 'Error enviando emails reales'
+      message: 'Error enviando emails'
     };
   }
 };

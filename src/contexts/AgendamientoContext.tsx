@@ -27,7 +27,7 @@ interface AgendamientoContextType extends BookingState {
   setSelectedMeetingType: (type: 'videollamada' | 'telefonica' | 'presencial') => void;
   handleBookingAndPayment: () => Promise<void>;
   formatRUT: (value: string) => string;
-  goToPayment: () => void;
+  goToPayment: (freshTime?: string) => void;
 }
 
 const AgendamientoContext = createContext<AgendamientoContextType | undefined>(undefined);
@@ -156,7 +156,8 @@ const AgendamientoProviderInner: React.FC<{ children: ReactNode; initialService?
       };
       
       // Si el precio es 0, crear reserva directamente (sin pasar por MercadoPago)
-      if (precioFinal === '0' || precioConConvenio === 0) {
+      const isFreeBooking = precioFinal === '0' || normalizedPriceForPayment === 0;
+      if (isFreeBooking) {
         const bookingData: BookingData = {
           cliente: {
             nombre: formData.nombre,
@@ -352,12 +353,14 @@ const AgendamientoProviderInner: React.FC<{ children: ReactNode; initialService?
     }
   }, [selectedDate, selectedTime, selectedMeetingType, formData, service, priceCalculation]);
   
-  // Función para ir al paso de pago
-  const goToPayment = useCallback(() => {
-    if (!selectedDate || !selectedTime || !selectedMeetingType) {
+  // Función para ir al paso de pago (acepta valores frescos para evitar stale closures)
+  const goToPayment = useCallback((freshTime?: string) => {
+    const timeToCheck = freshTime || selectedTime;
+    if (!selectedDate || !timeToCheck || !selectedMeetingType) {
       setError('Por favor completa la selección de fecha y hora');
       return;
     }
+    setError(null);
     setStep(3);
   }, [selectedDate, selectedTime, selectedMeetingType]);
   
