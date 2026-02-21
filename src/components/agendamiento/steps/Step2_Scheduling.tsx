@@ -132,8 +132,8 @@ const Step2_Scheduling: React.FC = () => {
     setSelectedTime(time);
     // Solo avanzar si tenemos fecha, hora y modalidad seleccionadas
     if (selectedDate && time && selectedMeetingType) {
-      // Ir directo al pago sin paso de confirmación
-      goToPayment();
+      // Pasar el time fresco para evitar stale closure
+      goToPayment(time);
     }
   };
 
@@ -327,7 +327,7 @@ const Step2_Scheduling: React.FC = () => {
         <motion.button
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          onClick={goToPayment}
+          onClick={() => goToPayment()}
           disabled={isLoading}
           className="w-full py-4 rounded-2xl text-base font-bold text-white disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-lg hover:scale-[1.02] active:scale-[0.98]"
           style={{

@@ -200,10 +200,10 @@ export default function PaymentSuccessPage() {
         console.error('❌ Error actualizando estado:', updateResult.error);
       }
 
-      // 4. Enviar emails SIEMPRE si el pago es aprobado
+      // 4. Enviar emails SOLO si el pago es aprobado Y no se han enviado ya (evitar duplicados con webhook)
       let emailResult: EmailResult | null = null;
 
-      if (isApproved) {
+      if (isApproved && !reserva.email_enviado) {
         console.log('📧 Pago aprobado - enviando emails de confirmación...');
         setProcessingStatus('Enviando emails de confirmación...');
         
@@ -234,6 +234,9 @@ export default function PaymentSuccessPage() {
         }
         
         setProcessingStatus('¡Pago confirmado y emails enviados!');
+      } else if (isApproved && reserva.email_enviado) {
+        console.log('📧 Emails ya enviados previamente (webhook), no se duplican');
+        setProcessingStatus('¡Pago confirmado!');
       } else {
         setProcessingStatus('Pago registrado');
       }
