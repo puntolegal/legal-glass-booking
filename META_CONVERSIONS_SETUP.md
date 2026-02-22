@@ -21,9 +21,9 @@ META_CONVERSIONS_API_TOKEN=EABAXeUpkjJIBQ2fV4rm07Dj9K3aWV30YmpT6yPBTzSZCrZBSmxJD
 ```
 
 ### 2. Pixel ID
-- **Pixel ID:** `1101807351995991`
+- **Pixel ID:** `1824057828514723`
 - **API Version:** `v21.0`
-- **Endpoint:** `https://graph.facebook.com/v21.0/1101807351995991/events`
+- **Endpoint:** `https://graph.facebook.com/v21.0/1824057828514723/events`
 
 ## Eventos Configurados
 

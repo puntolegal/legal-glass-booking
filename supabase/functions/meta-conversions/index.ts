@@ -5,7 +5,7 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-const META_PIXEL_ID = '1101807351995991';
+const META_PIXEL_ID = '1824057828514723';
 const META_API_VERSION = 'v21.0';
 const META_API_URL = `https://graph.facebook.com/${META_API_VERSION}/${META_PIXEL_ID}/events`;
 
