@@ -9,6 +9,7 @@ import { supabase } from '@/integrations/supabase/client';
 import type { PendingPaymentData } from '@/types/payments';
 import { ensurePriceFormatted, parsePendingPaymentData } from '@/utils/paymentData';
 import { getMercadoPagoPaymentInfo } from '@/services/mercadopagoPaymentInfo';
+import { trackMetaEvent } from '@/services/metaConversionsService';
 
 interface PaymentSuccessState {
   reservation: Reserva;
@@ -225,6 +226,17 @@ export default function PaymentSuccessPage() {
         
         if (emailResult.success) {
           console.log('✅ Emails enviados exitosamente');
+
+          // Track Purchase event via Meta CAPI
+          trackMetaEvent({
+            event_name: 'Purchase',
+            user_data: { em: reserva.email, ph: reserva.telefono, fn: reserva.nombre },
+            custom_data: {
+              content_name: reserva.servicio,
+              value: Number(String(reserva.precio).replace(/[^0-9]/g, '')) || 0,
+              currency: 'CLP',
+            },
+          });
           await supabase
             .from('reservas')
             .update({ email_enviado: true } as any)
