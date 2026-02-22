@@ -8,6 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { createOfflineBookingWithEmail, type OfflineBookingData } from '@/services/offlineBooking';
 import { checkSupabaseConnection } from '@/integrations/supabase/client';
 import type { PendingPaymentData } from '@/types/payments';
+import { trackMetaEvent } from '@/services/metaConversionsService';
 import type { Service, FormData, BookingState } from '@/types/agendamiento';
 import { calculatePrice, formatRUT, getServiceColors } from '@/utils/agendamiento';
 import { serviceCatalog } from '@/constants/services';
@@ -190,6 +191,13 @@ const AgendamientoProviderInner: React.FC<{ children: ReactNode; initialService?
               .update({ external_reference: externalReference })
               .eq('id', result.reserva.id);
 
+            // Track Schedule event for free bookings
+            trackMetaEvent({
+              event_name: 'Schedule',
+              user_data: { em: formData.email, ph: formData.telefono, fn: formData.nombre },
+              custom_data: { content_name: service.name, content_category: service.category, value: 0, currency: 'CLP' },
+            });
+
             // Ir directo a la página de éxito para reservas gratuitas (marcando como aprobadas)
             window.location.href = `/payment-success?status=approved&external_reference=${encodeURIComponent(
               externalReference
@@ -338,6 +346,19 @@ const AgendamientoProviderInner: React.FC<{ children: ReactNode; initialService?
           }
 
           console.log('🚀 Redirigiendo directo a Checkout Pro de MercadoPago...');
+
+          // Track Lead + InitiateCheckout events via Meta CAPI
+          trackMetaEvent({
+            event_name: 'Lead',
+            user_data: { em: formData.email, ph: formData.telefono, fn: formData.nombre },
+            custom_data: { content_name: service.name, content_category: service.category, value: normalizedPriceForPayment, currency: 'CLP' },
+          });
+          trackMetaEvent({
+            event_name: 'InitiateCheckout',
+            user_data: { em: formData.email, ph: formData.telefono, fn: formData.nombre },
+            custom_data: { content_name: service.name, value: normalizedPriceForPayment, currency: 'CLP' },
+          });
+
           window.location.assign(redirectUrl);
         } else {
           setError('Error al crear la reserva. Por favor intenta nuevamente.');
