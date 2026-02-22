@@ -12,6 +12,7 @@ const META_API_URL = `https://graph.facebook.com/${META_API_VERSION}/${META_PIXE
 interface EventData {
   event_name: string;
   event_time?: number;
+  test_event_code?: string;  // Test event code for Meta testing
   user_data?: {
     em?: string;        // email (will be hashed)
     ph?: string;        // phone (will be hashed)
@@ -48,7 +49,7 @@ serve(async (req) => {
     }
 
     const body: EventData = await req.json();
-    const { event_name, user_data, custom_data, event_source_url } = body;
+    const { event_name, user_data, custom_data, event_source_url, test_event_code } = body;
 
     if (!event_name) {
       return new Response(JSON.stringify({ error: 'event_name is required' }), {
@@ -93,9 +94,16 @@ serve(async (req) => {
       ],
     };
 
-    console.log(`[Meta CAPI] Sending ${event_name} event`);
+    // Add test_event_code to URL if provided
+    const urlParams = new URLSearchParams({ access_token: accessToken });
+    if (test_event_code) {
+      urlParams.append('test_event_code', test_event_code);
+      console.log(`[Meta CAPI] Sending ${event_name} event with test_event_code: ${test_event_code}`);
+    } else {
+      console.log(`[Meta CAPI] Sending ${event_name} event`);
+    }
 
-    const response = await fetch(`${META_API_URL}?access_token=${accessToken}`, {
+    const response = await fetch(`${META_API_URL}?${urlParams.toString()}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(eventPayload),

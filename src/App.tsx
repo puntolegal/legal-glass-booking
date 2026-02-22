@@ -30,6 +30,7 @@ import NotFound from '@/pages/NotFound';
 import PrivacyPolicy from '@/pages/PrivacyPolicy';
 import TermsOfService from '@/pages/TermsOfService';
 import TestPage from '@/pages/TestPage';
+import TestMetaPixel from '@/pages/TestMetaPixel';
 import ApuntesHome from './pages/ApuntesHome';
 import AmandaLogin from '@/pages/AmandaLogin';
 
@@ -97,6 +98,7 @@ function App() {
       <Route path="/privacy-policy" element={<PrivacyPolicy />} />
       <Route path="/terms-of-service" element={<TermsOfService />} />
       <Route path="/test" element={<TestPage />} />
+      <Route path="/test-meta-pixel" element={<TestMetaPixel />} />
       
       {/* Apuntes Routes */}
       <Route path="/apuntes/home" element={<ApuntesHome />} />

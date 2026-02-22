@@ -1,0 +1,395 @@
+# [[Derecho Civil]]
+
+## 📋 Metadatos
+- Rama del Derecho: Civil
+- Conexiones Principales: [[Derecho Comercial]], [[Derecho Procesal Civil]], [[Derecho de Familia]]
+- Normativa Base: Código Civil
+- Última Actualización: 2024
+
+## 📚 Estructura General
+El Derecho Civil es la rama del derecho privado que regula las relaciones entre particulares. Se divide en las siguientes áreas principales:
+
+### I. Teoría General del Acto Jurídico
+- [[Acto Jurídico]]
+  - Concepto y elementos
+  - Clasificación
+  - Efectos
+- [[Elementos del Acto Jurídico]]
+  - Voluntad
+  - Objeto
+  - Causa
+- [[Vicios del Consentimiento]]
+  - Error
+  - Fuerza
+  - Dolo
+- [[Nulidad]]
+  - Nulidad absoluta
+  - Nulidad relativa
+- [[Simulación]]
+  - Simulación absoluta
+  - Simulación relativa
+- [[Representación]]
+  - Representación legal
+  - Representación convencional
+- [[Condición y Plazo]]
+  - Condición suspensiva
+  - Condición resolutoria
+  - Plazo suspensivo
+  - Plazo resolutorio
+- [[Modo]]
+  - Concepto
+  - Efectos
+  - Extinción
+
+### II. Bienes
+- [[Teoría General de los Bienes]]
+  - Clasificación
+  - Bienes corporales e incorporales
+  - Bienes muebles e inmuebles
+- [[Derechos Reales]]
+  - Características
+  - Clasificación
+  - Modos de adquirir
+- [[Dominio]]
+  - Concepto
+  - Atributos
+  - Limitaciones
+- [[Posesión]]
+  - Concepto
+  - Clases
+  - Efectos
+- [[Modos de Adquirir]]
+  - Originarios
+  - Derivativos
+- [[Tradición]]
+  - Concepto
+  - Clases
+  - Efectos
+- [[Prescripción Adquisitiva]]
+  - Ordinaria
+  - Extraordinaria
+- [[Copropiedad]]
+  - Concepto
+  - Administración
+  - División
+- [[Usufructo]]
+  - Concepto
+  - Constitución
+  - Extinción
+- [[Servidumbres]]
+  - Concepto
+  - Clases
+  - Constitución
+- [[Hipoteca]]
+  - Concepto
+  - Constitución
+  - Extinción
+- [[Prenda]]
+  - Concepto
+  - Constitución
+  - Extinción
+- [[Acciones Protectoras]]
+  - Reivindicación
+  - Publiciana
+  - Confesoria
+- [[Acciones Posesorias]]
+  - Interdictos
+  - Querella de amparo
+- [[Registro Conservatorio]]
+  - Organización
+  - Inscripciones
+  - Efectos
+- [[Solemnidades de Derechos Reales]]
+  - Escritura pública
+  - Inscripción
+  - Efectos
+- [[Vicios del Consentimiento en Materia Inmobiliaria]]
+  - Error
+  - Fuerza
+  - Dolo
+- [[Nulidad y Registro Conservatorio]]
+  - Efectos
+  - Cancelación
+  - Restitución
+- [[Conexiones entre Acto Jurídico y Bienes]]
+  - Validez
+  - Efectos
+  - Extinción
+- [[Dominio y Copropiedad]]
+  - Relaciones
+  - Conflictos
+  - Soluciones
+
+### III. Obligaciones
+- [[Teoría General de las Obligaciones]]
+  - Concepto
+  - Elementos
+  - Clasificación
+- [[Fuentes de las Obligaciones]]
+  - Contrato
+  - Cuasicontrato
+  - Delito
+  - Cuasidelito
+  - Ley
+- [[Clasificación de las Obligaciones]]
+  - Por su objeto
+  - Por sus sujetos
+  - Por su eficacia
+- [[Efectos de las Obligaciones]]
+  - Cumplimiento
+  - Incumplimiento
+  - Mora
+- [[Transmisión de las Obligaciones]]
+  - Cesión de derechos
+  - Cesión de deudas
+  - Subrogación
+- [[Extinción de las Obligaciones]]
+  - Pago
+  - Novación
+  - Remisión
+  - Compensación
+- [[Contratos]]
+  - Concepto
+  - Clasificación
+  - Efectos
+- [[Responsabilidad Civil]]
+  - Extracontractual
+  - Contractual
+- [[Enriquecimiento sin Causa]]
+  - Concepto
+  - Requisitos
+  - Efectos
+- [[Gestión de Negocios]]
+  - Concepto
+  - Requisitos
+  - Efectos
+
+### IV. Sucesiones
+- [[Teoría General de las Sucesiones]]
+  - Concepto
+  - Clasificación
+  - Apertura
+- [[Testamento]]
+  - Concepto
+  - Clases
+  - Efectos
+- [[Sucesión Intestada]]
+  - Orden de suceder
+  - Representación
+  - Derechos
+- [[Asignaciones Forzosas]]
+  - Concepto
+  - Clases
+  - Efectos
+- [[Partición]]
+  - Concepto
+  - Procedimiento
+  - Efectos
+- [[Petición de Herencia]]
+  - Concepto
+  - Requisitos
+  - Efectos
+- [[Colación]]
+  - Concepto
+  - Bienes colacionables
+  - Efectos
+- [[Aceptación y Repudiación]]
+  - Concepto
+  - Efectos
+  - Plazos
+- [[Administración de la Herencia]]
+  - Concepto
+  - Facultades
+  - Responsabilidades
+- [[Responsabilidad Hereditaria]]
+  - Concepto
+  - Límites
+  - Efectos
+
+### V. Familia
+- [[Teoría General del Derecho de Familia]]
+  - Concepto
+  - Principios
+  - Fuentes
+- [[Matrimonio]]
+  - Concepto
+  - Requisitos
+  - Efectos
+- [[Régimen Matrimonial]]
+  - Sociedad conyugal
+  - Separación de bienes
+  - Participación en los gananciales
+- [[Filiación]]
+  - Concepto
+  - Clases
+  - Efectos
+- [[Alimentos]]
+  - Concepto
+  - Clases
+  - Efectos
+- [[Patria Potestad]]
+  - Concepto
+  - Ejercicio
+  - Extinción
+- [[Adopción]]
+  - Concepto
+  - Requisitos
+  - Efectos
+- [[Unión Civil]]
+  - Concepto
+  - Requisitos
+  - Efectos
+- [[Violencia Intrafamiliar]]
+  - Concepto
+  - Medidas
+  - Efectos
+- [[Medidas de Protección]]
+  - Concepto
+  - Clases
+  - Efectos
+
+### VI. Personas
+- [[Teoría General de las Personas]]
+  - Concepto
+  - Clasificación
+  - Capacidad
+- [[Persona Natural]]
+  - Concepto
+  - Atributos
+  - Capacidad
+- [[Persona Jurídica]]
+  - Concepto
+  - Clasificación
+  - Constitución
+- [[Domicilio]]
+  - Concepto
+  - Clases
+  - Efectos
+- [[Estado Civil]]
+  - Concepto
+  - Clases
+  - Efectos
+- [[Capacidad]]
+  - Concepto
+  - Clases
+  - Efectos
+- [[Ausencia]]
+  - Concepto
+  - Clases
+  - Efectos
+- [[Muerte Presunta]]
+  - Concepto
+  - Requisitos
+  - Efectos
+- [[Registro Civil]]
+  - Organización
+  - Inscripciones
+  - Efectos
+- [[Identidad de Género]]
+  - Concepto
+  - Requisitos
+  - Efectos
+
+### VII. Conexiones Interdisciplinarias
+- [[Derecho Civil y Comercial]]
+  - Contratos mercantiles
+  - Sociedades
+  - Títulos valores
+- [[Derecho Civil y Procesal]]
+  - Acciones
+  - Procedimientos
+  - Medidas cautelares
+- [[Derecho Civil y Constitucional]]
+  - Derechos fundamentales
+  - Control de constitucionalidad
+  - Tutela de derechos
+- [[Derecho Civil y Tributario]]
+  - Impuestos
+  - Contribuciones
+  - Sanciones
+- [[Derecho Civil y Laboral]]
+  - Contrato de trabajo
+  - Seguridad social
+  - Previsión
+
+### VIII. Jurisprudencia Relevante
+- [[Corte Suprema]]
+  - Fallos relevantes
+  - Tendencias
+  - Doctrina
+- [[Corte de Apelaciones]]
+  - Fallos relevantes
+  - Tendencias
+  - Doctrina
+- [[Tribunal Constitucional]]
+  - Fallos relevantes
+  - Tendencias
+  - Doctrina
+- [[Tribunal de Defensa de la Libre Competencia]]
+  - Fallos relevantes
+  - Tendencias
+  - Doctrina
+- [[Tribunal de Propiedad Industrial]]
+  - Fallos relevantes
+  - Tendencias
+  - Doctrina
+
+### IX. Doctrina
+- [[Manuales Clásicos]]
+  - Autores
+  - Obras
+  - Tendencias
+- [[Tratados Modernos]]
+  - Autores
+  - Obras
+  - Tendencias
+- [[Revistas Especializadas]]
+  - Publicaciones
+  - Artículos
+  - Tendencias
+- [[Congresos y Seminarios]]
+  - Eventos
+  - Ponentes
+  - Temas
+- [[Tendencias Actuales]]
+  - Doctrina
+  - Jurisprudencia
+  - Legislación
+
+### X. Preparación para el Examen
+- [[Estrategias de Estudio]]
+  - Planificación
+  - Técnicas
+  - Recursos
+- [[Técnicas de Memorización]]
+  - Métodos
+  - Ejercicios
+  - Consejos
+- [[Resolución de Casos]]
+  - Metodología
+  - Ejemplos
+  - Práctica
+- [[Preguntas Frecuentes]]
+  - Temas
+  - Respuestas
+  - Explicaciones
+- [[Errores Comunes]]
+  - Identificación
+  - Prevención
+  - Corrección
+- [[Consejos para el Día del Examen]]
+  - Preparación
+  - Estrategia
+  - Calma
+
+## 📅 Actualizaciones Recientes
+- 2024: Actualización de jurisprudencia
+- 2023: Reformas legales
+- 2022: Nuevas tendencias doctrinales
+
+## 🔗 Recursos Adicionales
+- [[Bibliografía Recomendada]]
+- [[Sitios Web de Interés]]
+- [[Bases de Datos Jurídicas]]
+- [[Material de Estudio]]
+- [[Ejercicios Prácticos]] 

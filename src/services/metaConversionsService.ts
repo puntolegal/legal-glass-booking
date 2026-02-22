@@ -16,6 +16,7 @@ interface MetaEventOptions {
   user_data?: MetaEventUserData;
   custom_data?: Record<string, unknown>;
   event_source_url?: string;
+  test_event_code?: string;  // Test event code for Meta testing
 }
 
 function getCookie(name: string): string | undefined {
@@ -28,7 +29,7 @@ function getCookie(name: string): string | undefined {
  * Also fires the browser-side fbq pixel event for deduplication.
  */
 export async function trackMetaEvent(options: MetaEventOptions): Promise<void> {
-  const { event_name, user_data, custom_data, event_source_url } = options;
+  const { event_name, user_data, custom_data, event_source_url, test_event_code } = options;
 
   // Browser-side pixel (client)
   try {
@@ -54,6 +55,7 @@ export async function trackMetaEvent(options: MetaEventOptions): Promise<void> {
         user_data: enrichedUserData,
         custom_data,
         event_source_url: event_source_url || window.location.href,
+        ...(test_event_code ? { test_event_code } : {}),
       },
     });
 
