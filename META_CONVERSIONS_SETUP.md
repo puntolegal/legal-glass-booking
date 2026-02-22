@@ -119,6 +119,41 @@ Para verificar que los eventos se están enviando correctamente:
 2. Busca eventos con el nombre correspondiente
 3. Verifica que los parámetros estén correctos
 
+## Prueba de Eventos
+
+### Código de Prueba
+- **test_event_code:** `TEST2065`
+
+### Página de Prueba Local
+Visita: `http://localhost:8080/test-meta-pixel`
+
+Esta página incluye botones para probar todos los eventos configurados:
+- PageView
+- ViewContent
+- CompleteRegistration
+- Lead
+- InitiateCheckout
+- Schedule
+- Purchase
+
+### Probar desde Meta Events Manager
+
+1. Ve a **Meta Events Manager** → **Probar eventos**
+2. Mantén la página "Probar eventos" abierta
+3. Usa la página de prueba local (`/test-meta-pixel`) o realiza acciones en el sitio
+4. Los eventos aparecerán en tiempo real en Meta Events Manager con el código `TEST2065`
+
+### Probar con Graph API Explorer
+
+1. Copia el código de prueba: `TEST2065`
+2. Ve a Graph API Explorer
+3. Realiza una solicitud POST a:
+   ```
+   https://graph.facebook.com/v21.0/1824057828514723/events?access_token={TOKEN}&test_event_code=TEST2065
+   ```
+4. Con el payload de ejemplo proporcionado en Meta Events Manager
+5. Vuelve a la página "Probar eventos" para verificar
+
 ## Troubleshooting
 
 Si los eventos no aparecen:
