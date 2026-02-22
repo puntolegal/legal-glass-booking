@@ -13,9 +13,11 @@ interface EventData {
   event_name: string;
   event_time?: number;
   user_data?: {
-    em?: string;        // hashed email
-    ph?: string;        // hashed phone
-    fn?: string;        // hashed first name
+    em?: string;        // email (will be hashed)
+    ph?: string;        // phone (will be hashed)
+    fn?: string;        // first name (will be hashed)
+    ct?: string;        // city
+    ge?: string;        // gender (m/f)
     client_ip_address?: string;
     client_user_agent?: string;
     fbc?: string;
@@ -55,11 +57,24 @@ serve(async (req) => {
       });
     }
 
-    // Hash PII fields
-    const hashedUserData: Record<string, string> = {};
-    if (user_data?.em) hashedUserData.em = await hashSHA256(user_data.em);
-    if (user_data?.ph) hashedUserData.ph = await hashSHA256(user_data.ph);
-    if (user_data?.fn) hashedUserData.fn = await hashSHA256(user_data.fn);
+    // Hash PII fields (emails, phones, names must be hashed)
+    const hashedUserData: Record<string, string | string[]> = {};
+    if (user_data?.em) {
+      hashedUserData.em = [await hashSHA256(user_data.em)];
+    }
+    if (user_data?.ph) {
+      // Phone can be null if not provided
+      hashedUserData.ph = user_data.ph ? [await hashSHA256(user_data.ph)] : [null as any];
+    }
+    if (user_data?.fn) {
+      hashedUserData.fn = [await hashSHA256(user_data.fn)];
+    }
+    if (user_data?.ct) {
+      hashedUserData.ct = [await hashSHA256(user_data.ct)];
+    }
+    if (user_data?.ge) {
+      hashedUserData.ge = [await hashSHA256(user_data.ge.toLowerCase())];
+    }
     if (user_data?.client_ip_address) hashedUserData.client_ip_address = user_data.client_ip_address;
     if (user_data?.client_user_agent) hashedUserData.client_user_agent = user_data.client_user_agent;
     if (user_data?.fbc) hashedUserData.fbc = user_data.fbc;
@@ -69,8 +84,8 @@ serve(async (req) => {
       data: [
         {
           event_name,
-          event_time: Math.floor(Date.now() / 1000),
-          action_source: 'website',
+          event_time: body.event_time || Math.floor(Date.now() / 1000),
+          action_source: body.action_source || 'website',
           event_source_url: event_source_url || 'https://puntolegal.cl',
           user_data: hashedUserData,
           ...(custom_data ? { custom_data } : {}),

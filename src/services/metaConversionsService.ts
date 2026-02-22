@@ -1,9 +1,11 @@
 import { supabase } from '@/integrations/supabase/client';
 
 interface MetaEventUserData {
-  em?: string;
-  ph?: string;
-  fn?: string;
+  em?: string;  // email
+  ph?: string;  // phone
+  fn?: string;  // first name
+  ct?: string;  // city
+  ge?: string;  // gender (m/f)
   client_user_agent?: string;
   fbc?: string;
   fbp?: string;

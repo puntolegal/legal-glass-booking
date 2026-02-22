@@ -8,6 +8,7 @@ import { MobileLayout } from "@/components/MobileLayout";
 import PremiumMobileHero from "@/components/PremiumMobileHero";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import { trackMetaEvent } from "@/services/metaConversionsService";
 
 const Index = () => {
   // Eliminar estados relacionados con modales ya que siempre redirigimos
@@ -23,6 +24,17 @@ const Index = () => {
     window.addEventListener('resize', checkMobile);
     
     return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // Track ViewContent event when landing page loads
+  useEffect(() => {
+    trackMetaEvent({
+      event_name: 'ViewContent',
+      custom_data: {
+        content_name: 'Punto Legal - Inicio',
+        content_category: 'Landing Page',
+      },
+    });
   }, []);
 
   const handleServiceSelect = (service: { title: string; promoPrice?: string; price?: string }) => {

@@ -347,6 +347,23 @@ const AgendamientoProviderInner: React.FC<{ children: ReactNode; initialService?
 
           console.log('🚀 Redirigiendo directo a Checkout Pro de MercadoPago...');
 
+          // Track CompleteRegistration event when form is completed
+          trackMetaEvent({
+            event_name: 'CompleteRegistration',
+            user_data: { 
+              em: formData.email, 
+              ph: formData.telefono, 
+              fn: formData.nombre,
+              ct: formData.ciudad || undefined,
+            },
+            custom_data: { 
+              content_name: service.name, 
+              content_category: service.category,
+              value: normalizedPriceForPayment, 
+              currency: 'CLP' 
+            },
+          });
+
           // Track Lead + InitiateCheckout events via Meta CAPI
           trackMetaEvent({
             event_name: 'Lead',

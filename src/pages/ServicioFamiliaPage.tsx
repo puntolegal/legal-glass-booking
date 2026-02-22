@@ -1,5 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect } from 'react';
+import { trackMetaEvent } from '@/services/metaConversionsService';
 import {
   Heart,
   Users,
@@ -341,6 +342,17 @@ export default function ServicioFamiliaPage() {
   const [showExitModal, setShowExitModal] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<any>(null);
   const [isHelperModalOpen, setIsHelperModalOpen] = useState(false);
+
+  // Track ViewContent event when page loads
+  useEffect(() => {
+    trackMetaEvent({
+      event_name: 'ViewContent',
+      custom_data: {
+        content_name: 'Punto Legal Familia',
+        content_category: 'Servicios Legales',
+      },
+    });
+  }, []);
 
   const openHelperModal = (plan: any) => {
         setSelectedPlan(plan);
