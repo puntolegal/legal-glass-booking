@@ -158,7 +158,7 @@ const ConversionSidebar: React.FC = () => {
 
       {/* WhatsApp - Enlace discreto para indecisos */}
       <motion.a
-        href="https://wa.me/56962321883?text=Hola%2C%20quisiera%20agendar%20en%20Punto%20Legal"
+        href="https://wa.me/56962321883?text=Hola%2C%20estoy%20agendando%2C%20quisiera%20avanzar!"
         target="_blank"
         rel="noopener noreferrer"
         initial={{ opacity: 0, y: 12 }}
