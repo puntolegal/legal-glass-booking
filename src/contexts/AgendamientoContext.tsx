@@ -354,7 +354,7 @@ const AgendamientoProviderInner: React.FC<{ children: ReactNode; initialService?
               em: formData.email, 
               ph: formData.telefono, 
               fn: formData.nombre,
-              ct: formData.ciudad || undefined,
+              
             },
             custom_data: { 
               content_name: service.name, 
