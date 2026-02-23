@@ -45,7 +45,7 @@ const ConversionSidebar: React.FC = () => {
   const ServiceIcon = serviceInfo.icon;
   
   return (
-    <div className="sticky top-4 space-y-6">
+    <div className="md:sticky md:top-4 space-y-6">
       <motion.section
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
