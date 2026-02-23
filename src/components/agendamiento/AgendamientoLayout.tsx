@@ -84,7 +84,7 @@ const AgendamientoLayout: React.FC<AgendamientoLayoutProps> = ({ children }) => 
                 {/* FAB WhatsApp - solo steps 1 y 2 en mobile */}
                 {step < 3 && (
                   <a
-                    href="https://wa.me/56962321883?text=Hola%2C%20quisiera%20agendar%20en%20Punto%20Legal"
+                    href="https://wa.me/56962321883?text=Hola%2C%20estoy%20agendando%2C%20quisiera%20avanzar!"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="fixed bottom-6 right-6 z-50 flex h-12 w-12 items-center justify-center rounded-full shadow-lg transition-opacity hover:opacity-100"
