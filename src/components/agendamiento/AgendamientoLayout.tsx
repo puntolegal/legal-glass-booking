@@ -74,7 +74,18 @@ const AgendamientoLayout: React.FC<AgendamientoLayoutProps> = ({ children }) => 
               <div className="space-y-4 relative z-10">
                 {/* Sidebar de conversión visible en mobile */}
                 <ConversionSidebar />
-                <div className="bg-slate-900/80 backdrop-blur-md border border-slate-800/70 rounded-2xl p-3 shadow-2xl">
+                {/* Botón CTA para scroll al formulario */}
+                <button
+                  onClick={() => {
+                    const el = document.getElementById('agendamiento-form');
+                    el?.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                  className="w-full rounded-2xl py-3.5 text-base font-semibold text-white shadow-lg transition-transform active:scale-[0.98]"
+                  style={{ background: serviceTheme.gradient }}
+                >
+                  Agendar ahora ↓
+                </button>
+                <div id="agendamiento-form" className="bg-slate-900/80 backdrop-blur-md border border-slate-800/70 rounded-2xl p-3 shadow-2xl">
                   <ProgressBar currentStep={step} totalSteps={3} />
                 </div>
                 <div className="relative z-10 min-h-[60vh]">
