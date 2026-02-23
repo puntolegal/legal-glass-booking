@@ -72,14 +72,14 @@ const AgendamientoLayout: React.FC<AgendamientoLayoutProps> = ({ children }) => 
             {isMobile ? (
               // Versión móvil - stack vertical mejorado
               <div className="space-y-4 relative z-10">
+                {/* Sidebar de conversión visible en mobile */}
+                <ConversionSidebar />
                 <div className="bg-slate-900/80 backdrop-blur-md border border-slate-800/70 rounded-2xl p-3 shadow-2xl">
                   <ProgressBar currentStep={step} totalSteps={3} />
                 </div>
-              <div className="relative z-10 min-h-[60vh]">
+                <div className="relative z-10 min-h-[60vh]">
                   {children}
                 </div>
-                {/* Sidebar solo visible en paso 3 en mobile */}
-                {step === 3 && <ConversionSidebar />}
 
                 {/* FAB WhatsApp - solo steps 1 y 2 en mobile */}
                 {step < 3 && (
