@@ -47,6 +47,7 @@ import ServicioPenalEconomicoPage from '@/pages/ServicioPenalEconomicoPage';
 import PagoDiagnosticoIA from '@/pages/PagoDiagnosticoIA';
 import DiagnosticoIniciar from '@/pages/DiagnosticoIniciar';
 import PortalReconstruccionPage from '@/pages/PortalReconstruccionPage';
+import RugbyPage from '@/pages/RugbyPage';
 
 // Blog Posts
 import BlogPost1 from '@/pages/BlogPost1';
@@ -119,6 +120,7 @@ function App() {
                       <Route path="/pago/diagnostico-ia" element={<PagoDiagnosticoIA />} />
                       <Route path="/diagnostico/iniciar" element={<DiagnosticoIniciar />} />
                       <Route path="/portal-reconstruccion" element={<PortalReconstruccionPage />} />
+                      <Route path="/rugby" element={<RugbyPage />} />
       <Route path="/servicios/tributario" element={<ServicioTributarioPage />} />
       <Route path="/servicios/penal-economico" element={<ServicioPenalEconomicoPage />} />
       
