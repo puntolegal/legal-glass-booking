@@ -119,28 +119,106 @@ const RugbyPage: React.FC = () => {
       />
 
       <div className="min-h-screen bg-[#F1F5F9] text-[#1E293B] font-sans selection:bg-[#002147]/10 safe-area-inset">
-        {/* HEADER NAVBAR */}
-        <header className="w-full bg-white border-b-2 border-[#002147] py-3 px-4 sm:py-4 sm:px-6 md:px-8 shadow-sm sticky top-0 z-50">
-          <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
-            <div className="flex items-center gap-2 sm:gap-3 md:gap-4 flex-1 min-w-0">
-              <Scale className="text-[#002147] flex-shrink-0" size={20} />
-              <div className="flex flex-col min-w-0">
-                <h1 className="text-sm sm:text-base md:text-lg lg:text-xl font-serif font-black text-[#002147] tracking-tight leading-tight uppercase truncate">
-                  PUNTO LEGAL SPORTS
-                </h1>
-                <span className="text-[9px] sm:text-[10px] font-bold text-[#64748B] uppercase tracking-[0.15em] sm:tracking-[0.2em] mt-0.5">
-                  División Deportiva
-                </span>
+        {/* DASHBOARD DEMO - PASAPORTE DEPORTIVO Y PANEL DE CONTROL - MOVIDO ARRIBA */}
+        <section className="bg-white border-b-2 border-[#002147]/10 py-8 sm:py-12 md:py-16 lg:py-20">
+          <div className="max-w-7xl mx-auto px-4 sm:px-5 md:px-6">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 md:gap-10 items-start">
+              {/* COLUMNA IZQUIERDA: PASAPORTE DEPORTIVO */}
+              <div className="lg:col-span-7">
+                <PasaporteDeportivo
+                  nombre="Juan Pablo Fernández"
+                  rut="18.234.567-8"
+                  habilitadoARUSA={true}
+                  seguroActivo={true}
+                  numeroJugador={12}
+                />
+              </div>
+
+              {/* COLUMNA DERECHA: PANEL DE CONTROL */}
+              <div className="lg:col-span-5">
+                <div className="bg-[#F8FAFC] border-2 border-[#002147]/10 rounded-3xl sm:rounded-[32px] p-6 sm:p-8 md:p-10 shadow-sm">
+                  <div className="mb-6 sm:mb-8">
+                    <h3 className="text-[11px] sm:text-xs font-black uppercase tracking-[0.25em] sm:tracking-[0.3em] text-slate-400 mb-2">
+                      Estado del Plantel
+                    </h3>
+                    <div className="flex items-baseline gap-3">
+                      <span className="text-4xl sm:text-5xl md:text-6xl font-black text-[#002147] tracking-tight">28</span>
+                      <span className="text-lg sm:text-xl text-[#475569] font-bold">de 30</span>
+                    </div>
+                    <p className="text-sm sm:text-base text-[#475569] mt-2">Jugadores Habilitados</p>
+                  </div>
+
+                  {/* BARRA DE PROGRESO */}
+                  <div className="mb-6 sm:mb-8">
+                    <div className="h-3 sm:h-4 bg-slate-200 rounded-full overflow-hidden">
+                      <div 
+                        className="h-full bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-full transition-all duration-500"
+                        style={{ width: '93.3%' }}
+                      />
+                    </div>
+                    <p className="text-xs sm:text-sm text-slate-500 mt-2">93.3% de disponibilidad</p>
+                  </div>
+
+                  {/* ESTADÍSTICAS RÁPIDAS */}
+                  <div className="space-y-4 sm:space-y-5">
+                    <div className="flex items-center justify-between p-3 sm:p-4 bg-white rounded-xl border border-slate-200">
+                      <div className="flex items-center gap-3">
+                        <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-lg bg-emerald-500/10 flex items-center justify-center">
+                          <CheckCircle2 size={16} className="text-emerald-600" />
+                        </div>
+                        <div>
+                          <p className="text-xs sm:text-sm font-bold text-[#002147]">ARUSA Activos</p>
+                          <p className="text-[10px] sm:text-xs text-slate-500">28 jugadores</p>
+                        </div>
+                      </div>
+                      <span className="text-lg sm:text-xl font-black text-emerald-600">28</span>
+                    </div>
+
+                    <div className="flex items-center justify-between p-3 sm:p-4 bg-white rounded-xl border border-slate-200">
+                      <div className="flex items-center gap-3">
+                        <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-lg bg-amber-500/10 flex items-center justify-center">
+                          <Clock size={16} className="text-amber-600" />
+                        </div>
+                        <div>
+                          <p className="text-xs sm:text-sm font-bold text-[#002147]">En Trámite</p>
+                          <p className="text-[10px] sm:text-xs text-slate-500">2 jugadores</p>
+                        </div>
+                      </div>
+                      <span className="text-lg sm:text-xl font-black text-amber-600">2</span>
+                    </div>
+
+                    <div className="flex items-center justify-between p-3 sm:p-4 bg-white rounded-xl border border-slate-200">
+                      <div className="flex items-center gap-3">
+                        <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-lg bg-[#002147]/10 flex items-center justify-center">
+                          <ShieldCheck size={16} className="text-[#002147]" />
+                        </div>
+                        <div>
+                          <p className="text-xs sm:text-sm font-bold text-[#002147]">Seguros Vigentes</p>
+                          <p className="text-[10px] sm:text-xs text-slate-500">30 jugadores</p>
+                        </div>
+                      </div>
+                      <span className="text-lg sm:text-xl font-black text-[#002147]">30</span>
+                    </div>
+                  </div>
+
+                  {/* BOTÓN DE ACCESO RÁPIDO */}
+                  <div className="mt-6 sm:mt-8">
+                    <a
+                      href="https://wa.me/56912345678?text=Hola,%20quiero%20acceder%20al%20dashboard%20del%20plantel"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full bg-[#002147] hover:bg-[#001529] active:bg-[#001529] text-white py-3 sm:py-4 px-6 rounded-xl font-black text-xs sm:text-sm uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-2 sm:gap-3 shadow-lg group"
+                    >
+                      <MessageCircle size={16} />
+                      <span>Acceso Directo</span>
+                      <ArrowRight size={16} className="group-active:translate-x-1 transition-transform" />
+                    </a>
+                  </div>
+                </div>
               </div>
             </div>
-
-            <nav className="flex items-center gap-3 sm:gap-4 sm:gap-6 text-[10px] sm:text-xs font-bold uppercase tracking-wider">
-              <a href="#b2b" className="text-[#002147] hover:text-[#002147]/70 transition-colors">B2B Directiva</a>
-              <a href="#b2c" className="text-[#002147] hover:text-[#002147]/70 transition-colors">Hub Jugadores</a>
-              <a href="#contacto" className="text-[#002147] hover:text-[#002147]/70 transition-colors">Contacto</a>
-            </nav>
           </div>
-        </header>
+        </section>
 
         {/* HERO SECTION */}
         <section className="max-w-7xl mx-auto px-4 sm:px-5 md:px-6 py-12 sm:py-16 md:py-20 lg:py-24">
@@ -388,132 +466,6 @@ const RugbyPage: React.FC = () => {
           </div>
         </section>
 
-        {/* DASHBOARD DEMO - PASAPORTE DEPORTIVO Y PANEL DE CONTROL */}
-        <section className="bg-white border-y-2 border-[#002147]/10 py-12 sm:py-16 md:py-20 lg:py-24">
-          <div className="max-w-7xl mx-auto px-4 sm:px-5 md:px-6">
-            <div className="text-center mb-10 sm:mb-12 md:mb-16">
-              <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-[#002147] tracking-tight mb-4 sm:mb-6">
-                Dashboard en Tiempo Real
-              </h2>
-              <p className="text-base sm:text-lg md:text-xl text-[#475569] leading-relaxed max-w-2xl mx-auto">
-                Visualiza la disponibilidad de tu equipo desde cualquier dispositivo. Estado de habilitación ARUSA y seguros médicos actualizados en tiempo real.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-10 md:gap-12 items-start">
-              {/* COLUMNA IZQUIERDA: PASAPORTE DEPORTIVO */}
-              <div className="lg:col-span-7">
-                <PasaporteDeportivo
-                  nombre="Juan Pablo Fernández"
-                  rut="18.234.567-8"
-                  habilitadoARUSA={true}
-                  seguroActivo={true}
-                  numeroJugador={12}
-                />
-              </div>
-
-              {/* COLUMNA DERECHA: PANEL DE CONTROL */}
-              <div className="lg:col-span-5">
-                <div className="bg-[#F8FAFC] border-2 border-[#002147]/10 rounded-3xl sm:rounded-[32px] p-6 sm:p-8 md:p-10 shadow-sm">
-                  <div className="mb-6 sm:mb-8">
-                    <h3 className="text-[11px] sm:text-xs font-black uppercase tracking-[0.25em] sm:tracking-[0.3em] text-slate-400 mb-2">
-                      Estado del Plantel
-                    </h3>
-                    <div className="flex items-baseline gap-3">
-                      <span className="text-4xl sm:text-5xl md:text-6xl font-black text-[#002147] tracking-tight">28</span>
-                      <span className="text-lg sm:text-xl text-[#475569] font-bold">de 30</span>
-                    </div>
-                    <p className="text-sm sm:text-base text-[#475569] mt-2">Jugadores Habilitados</p>
-                  </div>
-
-                  {/* BARRA DE PROGRESO */}
-                  <div className="mb-6 sm:mb-8">
-                    <div className="h-3 sm:h-4 bg-slate-200 rounded-full overflow-hidden">
-                      <div 
-                        className="h-full bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-full transition-all duration-500"
-                        style={{ width: '93.3%' }}
-                      />
-                    </div>
-                    <p className="text-xs sm:text-sm text-slate-500 mt-2">93.3% de disponibilidad</p>
-                  </div>
-
-                  {/* ESTADÍSTICAS RÁPIDAS */}
-                  <div className="space-y-4 sm:space-y-5">
-                    <div className="flex items-center justify-between p-3 sm:p-4 bg-white rounded-xl border border-slate-200">
-                      <div className="flex items-center gap-3">
-                        <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-lg bg-emerald-500/10 flex items-center justify-center">
-                          <CheckCircle2 size={16} className="text-emerald-600" />
-                        </div>
-                        <div>
-                          <p className="text-xs sm:text-sm font-bold text-[#002147]">ARUSA Activos</p>
-                          <p className="text-[10px] sm:text-xs text-slate-500">28 jugadores</p>
-                        </div>
-                      </div>
-                      <span className="text-lg sm:text-xl font-black text-emerald-600">28</span>
-                    </div>
-
-                    <div className="flex items-center justify-between p-3 sm:p-4 bg-white rounded-xl border border-slate-200">
-                      <div className="flex items-center gap-3">
-                        <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-lg bg-amber-500/10 flex items-center justify-center">
-                          <Clock size={16} className="text-amber-600" />
-                        </div>
-                        <div>
-                          <p className="text-xs sm:text-sm font-bold text-[#002147]">En Trámite</p>
-                          <p className="text-[10px] sm:text-xs text-slate-500">2 jugadores</p>
-                        </div>
-                      </div>
-                      <span className="text-lg sm:text-xl font-black text-amber-600">2</span>
-                    </div>
-
-                    <div className="flex items-center justify-between p-3 sm:p-4 bg-white rounded-xl border border-slate-200">
-                      <div className="flex items-center gap-3">
-                        <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-lg bg-[#002147]/10 flex items-center justify-center">
-                          <ShieldCheck size={16} className="text-[#002147]" />
-                        </div>
-                        <div>
-                          <p className="text-xs sm:text-sm font-bold text-[#002147]">Seguros Vigentes</p>
-                          <p className="text-[10px] sm:text-xs text-slate-500">30 jugadores</p>
-                        </div>
-                      </div>
-                      <span className="text-lg sm:text-xl font-black text-[#002147]">30</span>
-                    </div>
-                  </div>
-
-                  {/* BOTÓN DE ACCESO RÁPIDO */}
-                  <div className="mt-6 sm:mt-8">
-                    <a
-                      href="https://wa.me/56912345678?text=Hola,%20quiero%20acceder%20al%20dashboard%20del%20plantel"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="w-full bg-[#002147] hover:bg-[#001529] active:bg-[#001529] text-white py-3 sm:py-4 px-6 rounded-xl font-black text-xs sm:text-sm uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-2 sm:gap-3 shadow-lg group"
-                    >
-                      <MessageCircle size={16} />
-                      <span>Acceso Directo</span>
-                      <ArrowRight size={16} className="group-active:translate-x-1 transition-transform" />
-                    </a>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* FOOTER */}
-        <footer id="contacto" className="bg-white border-t border-slate-200 py-8 sm:py-10 md:py-12 lg:py-16 px-4 sm:px-6 md:px-8">
-          <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6 sm:gap-8 md:gap-10">
-            <div className="flex flex-col items-center md:items-start text-center md:text-left max-w-full">
-              <p className="text-[10px] sm:text-[11px] text-[#001529] font-black uppercase tracking-[0.4em] sm:tracking-[0.5em] mb-2 sm:mb-3">
-                Punto Legal El Golf SpA
-              </p>
-              <p className="text-[9px] sm:text-[10px] text-slate-500 max-w-xs font-medium leading-relaxed px-2 sm:px-0">
-                Operado por Punto Legal El Golf SpA. Plataforma de gestión legal y deportiva · 2026.
-              </p>
-            </div>
-            <div className="flex items-center gap-6 sm:gap-8 flex-shrink-0">
-              <Scale className="text-[#002147]" size={24} />
-            </div>
-          </div>
-        </footer>
       </div>
     </>
   );

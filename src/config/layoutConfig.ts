@@ -115,6 +115,23 @@ export const layoutConfigs: RouteLayoutRule[] = [
     }
   },
   
+  // 3d. Layout de foco - Rugby UC (sin header ni footer global)
+  {
+    path: '/rugby',
+    config: {
+      type: 'focus',
+      showHeader: false,
+      showFooter: false,
+      headerVariant: 'none',
+      footerVariant: 'none',
+      useMobileLayout: false,
+      seoConfig: {
+        titleSuffix: 'Punto Legal Sports - Rugby UC',
+        defaultDescription: 'Seguridad legal automatizada para el plantel adulto de Rugby UC'
+      }
+    }
+  },
+  
   // 4. Layout Apuntes - Index (con footer)
   {
     path: '/apuntes',
