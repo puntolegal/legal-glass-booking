@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   ShieldCheck,
   FileText,
@@ -258,36 +258,6 @@ const RugbyPage: React.FC = () => {
           </div>
         </section>
 
-        {/* HERO SECTION */}
-        <section className="max-w-7xl mx-auto px-4 sm:px-5 md:px-6 py-12 sm:py-16 md:py-20 lg:py-24">
-          <div className="text-center max-w-4xl mx-auto">
-            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-[#002147] tracking-tight mb-4 sm:mb-6 leading-tight">
-              Ustedes ganen en la cancha.<br className="hidden sm:block" />
-              <span className="text-[#002147]/80"> Nosotros en el escritorio.</span>
-            </h2>
-            <p className="text-base sm:text-lg md:text-xl text-[#475569] leading-relaxed mb-8 sm:mb-10 md:mb-12 max-w-2xl mx-auto">
-              Seguridad legal automatizada para el plantel adulto de Rugby. Eximentes de responsabilidad, defensa en ARUSA y gestión de seguros médicos.
-            </p>
-            
-            <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center items-center">
-              <a
-                href="#b2b"
-                className="w-full sm:w-auto bg-[#002147] hover:bg-[#001529] active:bg-[#001529] text-white py-4 sm:py-5 px-8 sm:px-12 rounded-xl sm:rounded-2xl font-black text-sm sm:text-base uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3 sm:gap-4 shadow-xl shadow-[#002147]/20 group min-h-[52px] active:scale-[0.98]"
-              >
-                <span>Portal Directiva / Coach</span>
-                <ArrowRight size={18} className="group-active:translate-x-1 transition-transform flex-shrink-0" />
-              </a>
-              <a
-                href="#b2c"
-                className="w-full sm:w-auto bg-transparent border-2 border-[#002147] hover:bg-[#002147]/5 active:bg-[#002147]/10 text-[#002147] py-4 sm:py-5 px-8 sm:px-12 rounded-xl sm:rounded-2xl font-black text-sm sm:text-base uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3 sm:gap-4 min-h-[52px] active:scale-[0.98]"
-              >
-                <span>Hub Legal Jugadores</span>
-                <Users size={18} className="flex-shrink-0" />
-              </a>
-            </div>
-          </div>
-        </section>
-
         {/* SECCIÓN DIRECTIVA/STAFF - BLINDAJE INSTITUCIONAL */}
         <section id="staff" className="bg-white border-y-2 border-[#002147]/10 py-12 sm:py-16 md:py-20 lg:py-24">
           <div className="max-w-7xl mx-auto px-4 sm:px-5 md:px-6">
@@ -508,6 +478,22 @@ const RugbyPage: React.FC = () => {
           </div>
         </section>
 
+        {/* FOOTER CORPORATIVO */}
+        <footer className="bg-white border-t-2 border-[#002147]/10 py-8 sm:py-10 md:py-12 lg:py-16 px-4 sm:px-6 md:px-8">
+          <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6 sm:gap-8 md:gap-10">
+            <div className="flex flex-col items-center md:items-start text-center md:text-left max-w-full">
+              <p className="text-[10px] sm:text-[11px] text-[#001529] font-black uppercase tracking-[0.4em] sm:tracking-[0.5em] mb-2 sm:mb-3">
+                Punto Legal El Golf SpA
+              </p>
+              <p className="text-[9px] sm:text-[10px] text-slate-500 max-w-xs font-medium leading-relaxed px-2 sm:px-0">
+                Operado por Punto Legal El Golf SpA. Plataforma de gestión legal y deportiva · 2026.
+              </p>
+            </div>
+            <div className="flex items-center gap-6 sm:gap-8 flex-shrink-0">
+              <Scale className="text-[#002147]" size={24} />
+            </div>
+          </div>
+        </footer>
       </div>
     </>
   );
