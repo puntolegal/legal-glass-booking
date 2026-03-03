@@ -109,8 +109,6 @@ const PasaporteDeportivo = ({
 };
 
 const RugbyPage: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'b2b' | 'b2c'>('b2b');
-
   return (
     <>
       <SEO
@@ -119,8 +117,48 @@ const RugbyPage: React.FC = () => {
       />
 
       <div className="min-h-screen bg-[#F1F5F9] text-[#1E293B] font-sans selection:bg-[#002147]/10 safe-area-inset">
-        {/* DASHBOARD DEMO - PASAPORTE DEPORTIVO Y PANEL DE CONTROL - MOVIDO ARRIBA */}
-        <section className="bg-white border-b-2 border-[#002147]/10 py-8 sm:py-12 md:py-16 lg:py-20">
+        {/* NAVBAR SIMPLE */}
+        <nav className="w-full bg-white border-b-2 border-[#002147] py-3 px-4 sm:py-4 sm:px-6 md:px-8">
+          <div className="max-w-7xl mx-auto flex items-center gap-3">
+            <Scale className="text-[#002147] flex-shrink-0" size={20} />
+            <h1 className="text-sm sm:text-base md:text-lg font-serif font-black text-[#002147] tracking-tight uppercase">
+              PUNTO LEGAL SPORTS
+            </h1>
+          </div>
+        </nav>
+
+        {/* HERO SECTION - PRIMERO */}
+        <section className="max-w-7xl mx-auto px-4 sm:px-5 md:px-6 py-12 sm:py-16 md:py-20 lg:py-24">
+          <div className="text-center max-w-4xl mx-auto">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-[#002147] tracking-tight mb-4 sm:mb-6 leading-tight">
+              Ustedes ganen en la cancha.<br className="hidden sm:block" />
+              <span className="text-[#002147]/80"> Nosotros en el escritorio.</span>
+            </h2>
+            <p className="text-base sm:text-lg md:text-xl text-[#475569] leading-relaxed mb-8 sm:mb-10 md:mb-12 max-w-2xl mx-auto">
+              Seguridad legal automatizada para el plantel adulto de Rugby. Eximentes de responsabilidad, defensa en ARUSA y gestión de seguros médicos.
+            </p>
+            
+            <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center items-center">
+              <a
+                href="#staff"
+                className="w-full sm:w-auto bg-[#002147] hover:bg-[#001529] active:bg-[#001529] text-white py-4 sm:py-5 px-8 sm:px-12 rounded-xl sm:rounded-2xl font-black text-sm sm:text-base uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3 sm:gap-4 shadow-xl shadow-[#002147]/20 group min-h-[52px] active:scale-[0.98]"
+              >
+                <span>Portal Directiva / Staff</span>
+                <ArrowRight size={18} className="group-active:translate-x-1 transition-transform flex-shrink-0" />
+              </a>
+              <a
+                href="#jugadores"
+                className="w-full sm:w-auto bg-transparent border-2 border-[#002147] hover:bg-[#002147]/5 active:bg-[#002147]/10 text-[#002147] py-4 sm:py-5 px-8 sm:px-12 rounded-xl sm:rounded-2xl font-black text-sm sm:text-base uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3 sm:gap-4 min-h-[52px] active:scale-[0.98]"
+              >
+                <span>Hub del Camarín</span>
+                <Users size={18} className="flex-shrink-0" />
+              </a>
+            </div>
+          </div>
+        </section>
+
+        {/* DASHBOARD DEMO - DESPUÉS DEL HERO */}
+        <section className="bg-white border-y-2 border-[#002147]/10 py-8 sm:py-12 md:py-16 lg:py-20">
           <div className="max-w-7xl mx-auto px-4 sm:px-5 md:px-6">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 md:gap-10 items-start">
               {/* COLUMNA IZQUIERDA: PASAPORTE DEPORTIVO */}
@@ -250,8 +288,8 @@ const RugbyPage: React.FC = () => {
           </div>
         </section>
 
-        {/* SECCIÓN B2B - BLINDAJE INSTITUCIONAL */}
-        <section id="b2b" className="bg-white border-y-2 border-[#002147]/10 py-12 sm:py-16 md:py-20 lg:py-24">
+        {/* SECCIÓN DIRECTIVA/STAFF - BLINDAJE INSTITUCIONAL */}
+        <section id="staff" className="bg-white border-y-2 border-[#002147]/10 py-12 sm:py-16 md:py-20 lg:py-24">
           <div className="max-w-7xl mx-auto px-4 sm:px-5 md:px-6">
             <div className="text-center mb-10 sm:mb-12 md:mb-16">
               <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-[#002147] tracking-tight mb-4 sm:mb-6">
@@ -259,8 +297,12 @@ const RugbyPage: React.FC = () => {
                 <span className="text-[#002147]/80">Marzo a costo cero.</span>
               </h2>
               <p className="text-base sm:text-lg md:text-xl text-[#475569] leading-relaxed max-w-3xl mx-auto">
-                Arrancamos la pretemporada y los amistosos. Asumimos la gestión legal de marzo a cambio de indumentaria y liberación de cuota, para que prueben el sistema sin tocar el presupuesto. Luego, pasamos al retainer mensual de <strong className="text-[#002147]">$450.000</strong>.
+                Arrancamos la pretemporada y los amistosos. Asumimos la gestión legal de <strong className="text-[#002147] font-black">marzo a cambio de indumentaria y liberación de cuota</strong>, para que prueben el sistema sin tocar el presupuesto. Luego, pasamos al retainer mensual de <strong className="text-[#002147]">$450.000</strong>.
               </p>
+              <div className="mt-6 inline-flex items-center gap-2 px-4 py-2 bg-emerald-500/10 border-2 border-emerald-500/30 rounded-xl">
+                <CheckCircle2 size={20} className="text-emerald-600" />
+                <span className="text-sm font-black text-emerald-700 uppercase tracking-wide">Marzo sin costo - Solo canje</span>
+              </div>
             </div>
 
             {/* GRID DE MÓDULOS B2B */}
@@ -342,24 +384,24 @@ const RugbyPage: React.FC = () => {
               </div>
             </div>
 
-            {/* CTA B2B */}
+            {/* CTA DIRECTIVA */}
             <div className="text-center">
               <a
-                href="https://wa.me/56912345678?text=Hola,%20quiero%20activar%20el%20servicio%20B2B%20para%20Rugby%20UC"
+                href="https://wa.me/56912345678?text=Hola,%20quiero%20activar%20el%20servicio%20de%20seguridad%20legal%20para%20Rugby%20UC"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-3 sm:gap-4 bg-[#002147] hover:bg-[#001529] active:bg-[#001529] text-white py-4 sm:py-5 px-8 sm:px-12 rounded-xl sm:rounded-2xl font-black text-sm sm:text-base uppercase tracking-[0.2em] transition-all shadow-xl shadow-[#002147]/20 group min-h-[52px] active:scale-[0.98]"
               >
                 <MessageCircle size={18} />
-                <span>Solicitar Activación B2B</span>
+                <span>Activar Seguridad del Plantel ($450.000/mes)</span>
                 <ArrowRight size={18} className="group-active:translate-x-1 transition-transform" />
               </a>
             </div>
           </div>
         </section>
 
-        {/* SECCIÓN B2C - HUB LEGAL DEL CAMARÍN */}
-        <section id="b2c" className="bg-[#F1F5F9] py-12 sm:py-16 md:py-20 lg:py-24">
+        {/* SECCIÓN JUGADORES - HUB LEGAL DEL CAMARÍN */}
+        <section id="jugadores" className="bg-[#F1F5F9] py-12 sm:py-16 md:py-20 lg:py-24">
           <div className="max-w-7xl mx-auto px-4 sm:px-5 md:px-6">
             <div className="text-center mb-10 sm:mb-12 md:mb-16">
               <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-[#002147] tracking-tight mb-4 sm:mb-6">
@@ -450,16 +492,16 @@ const RugbyPage: React.FC = () => {
               </div>
             </div>
 
-            {/* CTA B2C */}
+            {/* CTA JUGADORES */}
             <div className="text-center">
               <a
-                href="https://wa.me/56912345678?text=Hola,%20soy%20jugador%20del%20plantel%20y%20quiero%20acceder%20al%20Hub%20Legal"
+                href="https://wa.me/56912345678?text=Hola,%20soy%20jugador%20del%20plantel%20y%20quiero%20acceder%20al%20Hub%20del%20Camarín"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-3 sm:gap-4 bg-transparent border-2 border-[#002147] hover:bg-[#002147]/5 active:bg-[#002147]/10 text-[#002147] py-4 sm:py-5 px-8 sm:px-12 rounded-xl sm:rounded-2xl font-black text-sm sm:text-base uppercase tracking-[0.2em] transition-all min-h-[52px] active:scale-[0.98]"
               >
                 <MessageCircle size={18} />
-                <span>Ingresar al Hub B2C</span>
+                <span>Ingresar al Hub del Camarín</span>
                 <ArrowRight size={18} className="group-active:translate-x-1 transition-transform" />
               </a>
             </div>
