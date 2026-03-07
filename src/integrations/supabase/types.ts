@@ -121,7 +121,7 @@ export type Database = {
           income_value?: number | null
           name?: string | null
           plan_recommended?: string | null
-          quiz_answers: Json
+          quiz_answers?: Json
           status?: string | null
           updated_at?: string | null
         }
