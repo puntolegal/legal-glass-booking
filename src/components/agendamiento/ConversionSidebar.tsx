@@ -9,7 +9,7 @@ import { getServiceInfo } from '@/config/serviceInfo';
 import { serviceThemes } from '@/config/serviceThemes';
 
 const ConversionSidebar: React.FC = () => {
-  const { service, priceCalculation } = useAgendamiento();
+  const { service, priceCalculation, step } = useAgendamiento();
   const { precioFinal, isConvenioValido, isAdminValido } = priceCalculation;
   const [searchParams] = useSearchParams();
   const plan = searchParams.get('plan') || 'general';
@@ -156,16 +156,17 @@ const ConversionSidebar: React.FC = () => {
       </motion.section>
       )}
 
-      {/* WhatsApp - Enlace discreto para indecisos */}
-      <motion.a
-        href="https://wa.me/56962321883?text=Hola%2C%20estoy%20agendando%2C%20quisiera%20avanzar!"
-        target="_blank"
-        rel="noopener noreferrer"
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.24 }}
-        className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.03] px-5 py-4 backdrop-blur-xl transition-colors hover:bg-white/[0.06] group"
-      >
+      {/* ¿Tienes dudas? - Enlace discreto para indecisos - Solo desktop y solo en Step 1 */}
+      {step === 1 && (
+        <motion.a
+          href="https://wa.me/56962321883?text=Hola%2C%20estoy%20agendando%2C%20quisiera%20avanzar!"
+          target="_blank"
+          rel="noopener noreferrer"
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.24 }}
+          className="hidden md:flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.03] px-5 py-4 backdrop-blur-xl transition-colors hover:bg-white/[0.06] group"
+        >
         <div
           className="flex h-10 w-10 items-center justify-center rounded-xl shrink-0"
           style={{ backgroundColor: '#25D366', boxShadow: '0 4px 12px rgba(37, 211, 102, 0.2)' }}
@@ -179,6 +180,7 @@ const ConversionSidebar: React.FC = () => {
           <p className="text-xs text-slate-500">Habla con un abogado antes de agendar</p>
         </div>
       </motion.a>
+      )}
       
     </div>
   );

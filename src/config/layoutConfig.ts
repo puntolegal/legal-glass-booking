@@ -183,6 +183,23 @@ export const layoutConfigs: RouteLayoutRule[] = [
     }
   },
   
+  // 5a. Calculadora de Pensión - Squeeze Page (sin header ni footer para máxima conversión)
+  {
+    path: '/servicios/familia/calculadora',
+    config: {
+      type: 'focus',
+      showHeader: false,
+      showFooter: false,
+      headerVariant: 'none',
+      footerVariant: 'none',
+      useMobileLayout: false,
+      seoConfig: {
+        titleSuffix: 'Calculadora de Pensión de Alimentos 2026',
+        defaultDescription: 'Descubre cuánto te corresponde por ley en 30 segundos. Calculadora gratuita de pensión de alimentos actualizada 2026.'
+      }
+    }
+  },
+  
   // 5b. Página de inicio (sin header ni footer en móvil)
   {
     path: '/',

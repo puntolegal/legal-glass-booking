@@ -48,6 +48,7 @@ import PagoDiagnosticoIA from '@/pages/PagoDiagnosticoIA';
 import DiagnosticoIniciar from '@/pages/DiagnosticoIniciar';
 import PortalReconstruccionPage from '@/pages/PortalReconstruccionPage';
 import RugbyPage from '@/pages/RugbyPage';
+import CalculadoraPensionPage from '@/pages/CalculadoraPensionPage';
 
 // Blog Posts
 import BlogPost1 from '@/pages/BlogPost1';
@@ -114,6 +115,7 @@ function App() {
       <Route path="/servicios/inmobiliario" element={<ServicioInmobiliarioPage />} />
       <Route path="/servicios/civil" element={<ServicioCivilPage />} />
       <Route path="/servicios/familia" element={<ServicioFamiliaPage />} />
+      <Route path="/servicios/familia/calculadora" element={<CalculadoraPensionPage />} />
       <Route path="/servicios/penal" element={<ServicioPenalPage />} />
                       
                       {/* Diagnóstico Routes */}

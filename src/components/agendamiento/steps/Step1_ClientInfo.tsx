@@ -46,11 +46,19 @@ const Step1_ClientInfo: React.FC = () => {
     formState: { errors },
   } = form;
 
+  // Prellenar email desde URL params (viene del Quiz)
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const emailFromUrl = urlParams.get('email');
+    
+    if (emailFromUrl) {
+      setValue('email', emailFromUrl, { shouldValidate: true, shouldDirty: true });
+    }
+  }, [setValue]);
+
   const watchedValues = watch();
-  const [currentField, setCurrentField] = useState(0);
   const { isConvenioValido, isAdminValido } = priceCalculation;
   const [fieldValidationState, setFieldValidationState] = useState<Record<string, boolean>>({});
-  const [isInputFocused, setIsInputFocused] = useState(false);
   
   type FieldKey = keyof FormData;
 
@@ -104,6 +112,7 @@ const Step1_ClientInfo: React.FC = () => {
       type: 'text',
       summaryLabel: 'RUT',
       helper: 'Formato: 12345678-9',
+      autoComplete: 'off',
       rules: validationRules.rut,
           },
     {
@@ -112,6 +121,7 @@ const Step1_ClientInfo: React.FC = () => {
       placeholder: 'Mi Empresa SpA',
       type: 'text',
       summaryLabel: 'Empresa',
+      autoComplete: 'organization',
       optional: true,
     },
     {
@@ -120,6 +130,7 @@ const Step1_ClientInfo: React.FC = () => {
       placeholder: 'Código especial',
       type: 'text',
       summaryLabel: 'Convenio',
+      autoComplete: 'off',
       optional: true,
     },
     {
@@ -131,97 +142,39 @@ const Step1_ClientInfo: React.FC = () => {
       summaryLabel: 'Descripción',
       optional: true,
       isTextArea: true,
+      autoComplete: 'off',
       helper: 'Puedes usar Shift + Enter para añadir saltos de línea.',
       rules: validationRules.descripcion,
           },
   ], [watchedValues.nombre]);
 
-  useEffect(() => {
-    const field = fieldsConfig[currentField];
-    if (!field) return;
-
-    const focusTimeout = setTimeout(() => {
-      setFocus(field.name);
-    }, 120);
-
-    return () => clearTimeout(focusTimeout);
-  }, [currentField, fieldsConfig, setFocus]);
-
-  const handleAdvance = useCallback(async () => {
-    const field = fieldsConfig[currentField];
-    if (!field) return;
-
-    let isValid = true;
-    if (field.rules) {
-      isValid = await trigger(field.name);
-    }
-
-    if (!isValid) {
-      return;
-    }
-
-    // Actualizar estado de validación para feedback visual
-    setFieldValidationState((prev) => ({ ...prev, [field.name]: true }));
-
-    if (currentField === fieldsConfig.length - 1) {
-      setStep(2);
-    } else {
-      setCurrentField((prev) => Math.min(prev + 1, fieldsConfig.length - 1));
-    }
-  }, [currentField, fieldsConfig, trigger, setStep]);
-
-  const handleSubmitField = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    await handleAdvance();
-  };
-
-  const descriptionIndex = useMemo(
-    () => fieldsConfig.findIndex((field) => field.name === 'descripcion'),
-    [fieldsConfig]
-  );
-
-  const handleDescriptionKeyDown = async (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (currentField === descriptionIndex && event.key === 'Enter' && !event.shiftKey) {
-      event.preventDefault();
-      await handleAdvance();
-    }
-  };
-
-  const handleInputKeyDown = async (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === 'Enter') {
-      event.preventDefault();
-      await handleAdvance();
-    }
-  };
-
-  // Verificar si el campo actual es válido
-  const isCurrentFieldValid = useMemo(() => {
-    const field = fieldsConfig[currentField];
-    if (!field) return false;
-    
-    // Si es opcional, siempre es válido si está vacío
-    if (field.optional && (!watchedValues[field.name] || watchedValues[field.name].toString().trim() === '')) {
-      return true;
-    }
-    
-    // Verificar si hay error
-    if (errors[field.name]) {
-      return false;
-    }
-    
-    // Verificar si tiene valor
-    const value = watchedValues[field.name];
-    return value && value.toString().trim().length > 0;
-  }, [currentField, fieldsConfig, watchedValues, errors]);
-
-  const completedFields = fieldsConfig
-    .slice(0, currentField)
-    .filter((field) => {
+  // Verificar si todos los campos requeridos están completos
+  const requiredFieldsComplete = useMemo(() => {
+    const requiredFields = fieldsConfig.filter(f => !f.optional);
+    return requiredFields.every(field => {
       const value = watchedValues[field.name];
-      return value && value.toString().trim().length > 0;
+      return value && value.toString().trim().length > 0 && !errors[field.name];
     });
+  }, [fieldsConfig, watchedValues, errors]);
 
-  const progressPercent = Math.min((currentField / fieldsConfig.length) * 100, 100);
+  const handleFormSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    
+    // Validar todos los campos requeridos
+    const requiredFields = fieldsConfig.filter(f => !f.optional);
+    let allValid = true;
+    
+    for (const field of requiredFields) {
+      const isValid = await trigger(field.name);
+      if (!isValid) {
+        allValid = false;
+      }
+    }
+    
+    if (allValid) {
+      setStep(2);
+    }
+  };
 
   const getRegisterProps = (field: FieldConfig) => {
     if (field.name === 'rut') {
@@ -237,8 +190,6 @@ const Step1_ClientInfo: React.FC = () => {
     return register(field.name, field.rules);
   };
 
-  const activeField = fieldsConfig[currentField];
-
   return (
     <motion.div
       key="step1"
@@ -246,7 +197,7 @@ const Step1_ClientInfo: React.FC = () => {
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -20 }}
       transition={{ duration: 0.3 }}
-      className="space-y-6 pb-32 md:pb-6 relative z-10"
+      className="space-y-4 md:space-y-6 pb-20 md:pb-6 relative z-10"
     >
       <div 
         className="bg-slate-900/80 backdrop-blur-md border border-slate-800/70 rounded-3xl p-4 md:p-8 shadow-2xl relative z-10"
@@ -256,7 +207,7 @@ const Step1_ClientInfo: React.FC = () => {
         role="region"
         aria-label="Formulario de información del cliente"
       >
-        <div className="flex items-center gap-2 md:gap-3 mb-4 md:mb-6">
+        <div className="flex items-center gap-2 md:gap-3 mb-2 md:mb-6">
           <div 
             className="w-10 h-10 md:w-12 md:h-12 rounded-xl flex items-center justify-center shadow-lg flex-shrink-0"
             style={{ 
@@ -276,115 +227,73 @@ const Step1_ClientInfo: React.FC = () => {
         </div>
         
         <div className="space-y-4 md:space-y-6">
+          {/* Encabezado */}
           <div>
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-[10px] md:text-xs font-semibold uppercase tracking-widest text-slate-500">
-                Progreso {currentField}/{fieldsConfig.length}
-              </span>
-              <span className="text-[10px] md:text-xs text-slate-500">{Math.round(progressPercent)}%</span>
-            </div>
-            <div 
-              className="h-1.5 w-full bg-slate-800/80 rounded-full overflow-hidden"
-              role="progressbar"
-              aria-valuenow={Math.round(progressPercent)}
-              aria-valuemin={0}
-              aria-valuemax={100}
-              aria-label={`Progreso del formulario: ${Math.round(progressPercent)}% completado`}
-            >
-              <motion.div
-                className="h-full"
-                initial={{ width: 0 }}
-                animate={{ width: `${progressPercent}%` }}
-                transition={{ type: 'spring', stiffness: 120, damping: 20 }}
-                style={{
-                  background: `linear-gradient(90deg, ${serviceTheme.primary}, ${serviceTheme.accent})`,
-                }}
-              />
-            </div>
+            <h4 className="text-lg md:text-xl font-bold text-white mb-1 md:mb-2">
+              Información de contacto
+            </h4>
+            <p className="text-xs md:text-sm text-slate-400">
+              Completa todos los campos para continuar. Tu navegador puede autocompletar esta información automáticamente.
+            </p>
           </div>
 
-          {completedFields.length > 0 && (
-            <div className="space-y-2">
-              {completedFields.map((field) => (
-              <motion.div 
-                  key={field.name}
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                  className="flex items-center justify-between rounded-2xl border border-slate-800/70 bg-slate-900/60 px-4 py-3 text-sm"
-                >
-                  <div className="flex flex-col">
-                    <span className="text-xs uppercase tracking-wide text-slate-500">{field.summaryLabel}</span>
-                    <span className="text-slate-200 mt-1">{watchedValues[field.name]}</span>
-                  </div>
-                  <CheckCircle 
-                    className="w-4 h-4" 
-                    style={{ color: serviceTheme.primary }}
-                    aria-hidden="true"
-                  />
-                </motion.div>
-              ))}
-            </div>
-          )}
-
-          <form onSubmit={handleSubmitField} className="space-y-3 md:space-y-4">
-            <AnimatePresence mode="wait">
-              {activeField && (
-                <motion.div
-                  key={activeField.name}
-                  variants={stepContainerVariants}
-                  initial="hidden"
-                  animate="visible"
-                  exit="hidden"
-                  className="space-y-2 md:space-y-3"
-                >
-                  <motion.h4 
-                    className="text-base md:text-xl font-bold text-white leading-tight" 
-                    variants={stepItemVariants}
-                    id={`question-${activeField.name}`}
-                  >
-                    {activeField.question}
-                  </motion.h4>
-
-                  {activeField.helper && (
-                    <motion.p className="text-xs text-slate-400" variants={stepItemVariants}>
-                      {activeField.helper}
-                    </motion.p>
-                  )}
-
-                  <motion.div variants={stepItemVariants}>
+          {/* Formulario con todos los campos visibles - Optimizado para autocompletar del navegador */}
+          <form 
+            onSubmit={handleFormSubmit} 
+            className="space-y-3 md:space-y-4"
+            autoComplete="on"
+            name="agendamiento-form"
+            id="agendamiento-form"
+          >
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+              {fieldsConfig.map((field) => {
+                const isFieldValid = watchedValues[field.name] && !errors[field.name];
+                const fieldSpan = field.isTextArea ? 'md:col-span-2' : '';
+                
+                return (
+                  <div key={field.name} className={fieldSpan}>
                     <label 
-                      htmlFor={`input-${activeField.name}`}
-                      className="sr-only"
+                      htmlFor={`input-${field.name}`}
+                      className="block text-sm font-semibold text-white mb-2"
                     >
-                      {activeField.question}
+                      {field.summaryLabel}
+                      {!field.optional && <span className="text-rose-400 ml-1">*</span>}
                     </label>
-                    {activeField.isTextArea ? (
+                    
+                    {field.isTextArea ? (
                       <textarea
-                        {...getRegisterProps(activeField)}
-                        id={`input-${activeField.name}`}
+                        {...getRegisterProps(field)}
+                        id={`input-${field.name}`}
+                        name={field.name}
                         rows={4}
-                        onKeyDown={handleDescriptionKeyDown}
-                        placeholder={activeField.placeholder}
-                        aria-label={activeField.question}
-                        aria-describedby={activeField.helper ? `helper-${activeField.name}` : errors[activeField.name] ? `error-${activeField.name}` : undefined}
-                        aria-invalid={!!errors[activeField.name]}
-                        aria-required={!activeField.optional}
-                        className="w-full rounded-2xl border bg-slate-900/60 px-4 py-4 text-base text-white placeholder-slate-500 focus:outline-none focus-visible:ring-2 transition-all"
+                        placeholder={field.placeholder}
+                        autoComplete={field.autoComplete || 'off'}
+                        aria-label={field.question}
+                        aria-describedby={field.helper ? `helper-${field.name}` : errors[field.name] ? `error-${field.name}` : undefined}
+                        aria-invalid={!!errors[field.name]}
+                        aria-required={!field.optional}
+                        className="w-full rounded-xl border bg-slate-900/60 px-4 py-3 text-base text-white placeholder-slate-500 focus:outline-none focus-visible:ring-2 transition-all resize-none"
                         style={{
-                          borderColor: errors[activeField.name] 
+                          borderColor: errors[field.name] 
                             ? '#f43f5e' 
+                            : isFieldValid
+                            ? '#10b981'
                             : 'rgba(148, 163, 184, 0.3)',
-                          '--focus-ring-color': hexToRgba(serviceTheme.primary, 0.4),
-                        } as React.CSSProperties & { '--focus-ring-color': string }}
+                        }}
                         onFocus={(e) => {
-                          if (!errors[activeField.name]) {
+                          if (!errors[field.name]) {
                             e.target.style.borderColor = serviceTheme.primary;
                             e.target.style.boxShadow = `0 0 0 2px ${hexToRgba(serviceTheme.primary, 0.2)}`;
                           }
                         }}
-                        onBlur={(e) => {
-                          e.target.style.borderColor = errors[activeField.name] 
+                        onBlur={async (e) => {
+                          if (field.rules) {
+                            await trigger(field.name);
+                          }
+                          e.target.style.borderColor = errors[field.name] 
                             ? '#f43f5e' 
+                            : isFieldValid
+                            ? '#10b981'
                             : 'rgba(148, 163, 184, 0.3)';
                           e.target.style.boxShadow = 'none';
                         }}
@@ -392,178 +301,125 @@ const Step1_ClientInfo: React.FC = () => {
                     ) : (
                       <div className="relative">
                         <input
-                          {...(() => {
-                            const registerProps = getRegisterProps(activeField);
-                            const originalOnChange = registerProps.onChange;
-                            return {
-                              ...registerProps,
-                              onChange: async (e: React.ChangeEvent<HTMLInputElement>) => {
-                                // Llamar al onChange del register primero
-                                if (originalOnChange) {
-                                  originalOnChange(e);
-                                }
-                                
-                                // Auto-advance cuando se completa el teléfono (9+ dígitos numéricos)
-                                if (activeField.name === 'telefono') {
-                                  const numericValue = e.target.value.replace(/\D/g, '');
-                                  if (numericValue.length >= 9) {
-                                    setTimeout(async () => {
-                                      const isValid = await trigger(activeField.name);
-                                      if (isValid) {
-                                        await handleAdvance();
-                                      }
-                                    }, 500);
-                                  }
-                                }
-                              }
-                            };
-                          })()}
-                          id={`input-${activeField.name}`}
-                          type={activeField.type || 'text'}
-                          inputMode={activeField.name === 'telefono' ? 'tel' : activeField.type === 'email' ? 'email' : 'text'}
-                          placeholder={activeField.placeholder}
-                          autoComplete={activeField.autoComplete}
-                          aria-label={activeField.question}
-                          aria-describedby={activeField.helper ? `helper-${activeField.name}` : errors[activeField.name] ? `error-${activeField.name}` : undefined}
-                          aria-invalid={!!errors[activeField.name]}
-                          aria-required={!activeField.optional}
-                          onKeyDown={handleInputKeyDown}
-                          className="w-full rounded-2xl border bg-slate-900/60 px-4 py-3 md:py-4 pr-12 text-base text-white placeholder-slate-500 focus:outline-none focus-visible:ring-2 transition-all touch-manipulation"
+                          {...getRegisterProps(field)}
+                          id={`input-${field.name}`}
+                          name={field.name}
+                          type={field.type || 'text'}
+                          inputMode={field.name === 'telefono' ? 'tel' : field.type === 'email' ? 'email' : 'text'}
+                          placeholder={field.placeholder}
+                          autoComplete={field.autoComplete || 'off'}
+                          aria-label={field.question}
+                          aria-describedby={field.helper ? `helper-${field.name}` : errors[field.name] ? `error-${field.name}` : undefined}
+                          aria-invalid={!!errors[field.name]}
+                          aria-required={!field.optional}
+                          className="w-full rounded-xl border bg-slate-900/60 px-4 py-3 pr-12 text-base text-white placeholder-slate-500 focus:outline-none focus-visible:ring-2 transition-all"
                           style={{
-                            borderColor: errors[activeField.name] 
+                            borderColor: errors[field.name] 
                               ? '#f43f5e' 
-                              : isCurrentFieldValid && watchedValues[activeField.name]
+                              : isFieldValid
                               ? '#10b981'
                               : 'rgba(148, 163, 184, 0.3)',
-                            '--focus-ring-color': hexToRgba(serviceTheme.primary, 0.4),
-                          } as React.CSSProperties & { '--focus-ring-color': string }}
+                          }}
                           onFocus={(e) => {
-                            setIsInputFocused(true);
-                            if (!errors[activeField.name]) {
+                            if (!errors[field.name]) {
                               e.target.style.borderColor = serviceTheme.primary;
                               e.target.style.boxShadow = `0 0 0 2px ${hexToRgba(serviceTheme.primary, 0.2)}`;
                             }
                           }}
                           onBlur={async (e) => {
-                            setIsInputFocused(false);
-                            // Validar al perder foco
-                            if (activeField.rules) {
-                              await trigger(activeField.name);
+                            if (field.rules) {
+                              await trigger(field.name);
                             }
-                            e.target.style.borderColor = errors[activeField.name] 
+                            e.target.style.borderColor = errors[field.name] 
                               ? '#f43f5e' 
-                              : isCurrentFieldValid && watchedValues[activeField.name]
+                              : isFieldValid
                               ? '#10b981'
                               : 'rgba(148, 163, 184, 0.3)';
                             e.target.style.boxShadow = 'none';
                           }}
                         />
-                        {/* Check verde animado cuando el campo es válido */}
-                        {isCurrentFieldValid && watchedValues[activeField.name] && !errors[activeField.name] && (
-                          <motion.div
-                            initial={{ scale: 0, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 1 }}
-                            transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-                            className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none"
-                          >
+                        {isFieldValid && (
+                          <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
                             <CheckCircle2 className="w-5 h-5 text-emerald-400" />
-                          </motion.div>
+                          </div>
                         )}
                       </div>
                     )}
-                    {activeField.helper && !errors[activeField.name] && (
+                    
+                    {field.helper && !errors[field.name] && (
                       <p 
-                        id={`helper-${activeField.name}`}
+                        id={`helper-${field.name}`}
                         className="text-xs text-slate-400 mt-1"
                       >
-                        {activeField.helper}
+                        {field.helper}
                       </p>
                     )}
-                  </motion.div>
+                    
+                    {errors[field.name] && (
+                      <p
+                        id={`error-${field.name}`}
+                        className="text-sm text-rose-400 mt-1"
+                        role="alert"
+                        aria-live="polite"
+                      >
+                        {errors[field.name]?.message as string}
+                      </p>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
 
-                  {errors[activeField.name] && (
-                    <motion.p
-                      id={`error-${activeField.name}`}
-                      className="text-sm text-rose-400"
-                      variants={stepItemVariants}
-                      role="alert"
-                      aria-live="polite"
-                    >
-                      {errors[activeField.name]?.message as string}
-                    </motion.p>
-                  )}
-
-                  <motion.p className="text-xs text-slate-500 hidden md:block" variants={stepItemVariants}>
-                    Presiona <span className="text-slate-200 font-semibold">Enter</span> para continuar
-                    {activeField.isTextArea && ' · Usa Shift + Enter para saltos de línea'}
-                  </motion.p>
-              </motion.div>
-            )}
-            </AnimatePresence>
-          </form>
-
-          {/* Botón Siguiente Sticky - Solo visible cuando el campo es válido y no está en focus */}
-          <AnimatePresence>
-            {isCurrentFieldValid && !isInputFocused && (
-              <motion.div
-                initial={{ opacity: 0, y: 100 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 100 }}
-                transition={{ duration: 0.2 }}
-                className="md:hidden fixed bottom-0 left-0 right-0 p-4 bg-slate-900/95 backdrop-blur-lg border-t border-slate-800/70 z-50 safe-area-inset-bottom"
-                style={{
-                  paddingBottom: 'max(1rem, env(safe-area-inset-bottom))'
-                }}
-              >
-                <button
-                  type="button"
-                  onClick={handleAdvance}
-                  className="w-full min-h-[52px] rounded-2xl font-bold text-base flex items-center justify-center gap-2 transition-all duration-200 shadow-lg hover:scale-[1.02] active:scale-[0.98]"
-                  style={{
-                    background: primaryGradient,
-                    boxShadow: `0 8px 24px ${hexToRgba(serviceTheme.primary, 0.4)}`,
-                  }}
-                >
-                  <span className="text-white">Continuar</span>
-                  <ArrowRight className="w-5 h-5 text-white/80" />
-                </button>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {/* Botón Siguiente Desktop - Dentro del formulario */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="hidden md:block mt-6"
-          >
-            <button
-              type="button"
-              onClick={handleAdvance}
-              disabled={!isCurrentFieldValid}
-              className={`w-full min-h-[52px] rounded-2xl font-bold text-base flex items-center justify-center gap-2 transition-all duration-200 ${
-                isCurrentFieldValid
-                  ? 'shadow-lg hover:scale-[1.02] active:scale-[0.98]'
+            {/* Botón Continuar - Optimizado para móvil */}
+            <motion.button
+              type="submit"
+              disabled={!requiredFieldsComplete}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className={`w-full min-h-[56px] md:min-h-[52px] rounded-xl font-bold text-base md:text-base flex items-center justify-center gap-2 transition-all duration-200 mt-4 md:mt-6 ${
+                requiredFieldsComplete
+                  ? 'shadow-xl hover:scale-[1.02] active:scale-[0.98]'
                   : 'opacity-50 cursor-not-allowed'
               }`}
-              style={isCurrentFieldValid ? {
+              style={requiredFieldsComplete ? {
                 background: primaryGradient,
-                boxShadow: `0 8px 24px ${hexToRgba(serviceTheme.primary, 0.4)}`,
+                boxShadow: `0 12px 32px ${hexToRgba(serviceTheme.primary, 0.5)}`,
               } : {
                 background: 'rgba(148, 163, 184, 0.2)',
                 color: 'rgba(148, 163, 184, 0.5)',
               }}
             >
-              {isCurrentFieldValid ? (
+              {requiredFieldsComplete ? (
                 <>
-                  <span className="text-white">Continuar</span>
-                  <ArrowRight className="w-5 h-5 text-white" />
+                  <span className="text-white text-base md:text-base font-bold">Continuar a seleccionar fecha</span>
+                  <ArrowRight className="w-5 h-5 md:w-5 md:h-5 text-white flex-shrink-0" />
                 </>
               ) : (
-                <span>Completa este campo para continuar</span>
+                <span className="text-sm md:text-base">Completa los campos requeridos para continuar</span>
               )}
-            </button>
-          </motion.div>
+            </motion.button>
+          </form>
+
+          {/* Botón "Tienes dudas" - Abajo del botón continuar */}
+          <a
+            href="https://wa.me/56962321883?text=Hola%2C%20estoy%20agendando%2C%20quisiera%20avanzar!"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.03] px-5 py-3 backdrop-blur-xl transition-colors hover:bg-white/[0.06] group mt-4"
+          >
+            <div
+              className="flex h-10 w-10 items-center justify-center rounded-xl shrink-0"
+              style={{ backgroundColor: '#25D366', boxShadow: '0 4px 12px rgba(37, 211, 102, 0.2)' }}
+            >
+              <svg viewBox="0 0 24 24" className="h-5 w-5 text-white" fill="currentColor">
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+              </svg>
+            </div>
+            <div className="min-w-0">
+              <p className="text-sm font-medium text-slate-300 group-hover:text-white transition-colors">¿Tienes dudas?</p>
+              <p className="text-xs text-slate-500">Habla con un abogado antes de agendar</p>
+            </div>
+          </a>
 
           {(isConvenioValido || isAdminValido) && (
             <motion.div 
@@ -592,23 +448,6 @@ const Step1_ClientInfo: React.FC = () => {
       </div>
     </motion.div>
   );
-};
-
-const stepContainerVariants = {
-  hidden: { opacity: 1 },
-  visible: {
-    opacity: 1,
-    transition: { staggerChildren: 0.06, delayChildren: 0.02 },
-  },
-};
-
-const stepItemVariants = {
-  hidden: { opacity: 0, y: 12 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.2 },
-  },
 };
 
 export default Step1_ClientInfo;

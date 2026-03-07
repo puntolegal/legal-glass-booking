@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import ReactDOM from 'react-dom';
+import { useNavigate } from 'react-router-dom';
 import { X, ArrowRight, ChevronLeft, Target, Users, Clock, DollarSign, Sparkles, Gift, Heart, Shield, Star, AlertCircle, CheckCircle, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence, useSpring, useTransform } from 'framer-motion';
 import { toast } from 'sonner';
@@ -75,9 +76,12 @@ const testimonialsByPlan = {
 };
 
 const QuizModal: React.FC<QuizModalProps> = ({ isOpen, onClose }) => {
+  const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(-1); // Empezamos en -1 para el "Paso Cero"
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [email, setEmail] = useState('');
+  const [emailValid, setEmailValid] = useState(false);
+  const [emailSaved, setEmailSaved] = useState(false);
   const [showResult, setShowResult] = useState(false);
   const [recommendation, setRecommendation] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -89,6 +93,40 @@ const QuizModal: React.FC<QuizModalProps> = ({ isOpen, onClose }) => {
   const [numberOfChildren, setNumberOfChildren] = useState<number | null>(null);
   const [selectedChildrenLabel, setSelectedChildrenLabel] = useState<string | null>(null);
   const [calculatedRange, setCalculatedRange] = useState<{ min: string; max: string } | null>(null);
+  
+  // Debounce para guardar email inmediatamente
+  useEffect(() => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const isValid = emailRegex.test(email);
+    setEmailValid(isValid);
+    
+    if (isValid && !emailSaved) {
+      const timeoutId = setTimeout(async () => {
+        try {
+          const quizData = {
+            name: 'Quiz Inline Lead',
+            email: email,
+            quiz_answers: JSON.stringify({}),
+            plan_recommended: null,
+            status: 'iniciado'
+          };
+          
+          const { error } = await supabase
+            .from('leads_quiz')
+            .insert([quizData]);
+          
+          if (!error) {
+            setEmailSaved(true);
+            console.log('✅ Email guardado inmediatamente:', email);
+          }
+        } catch (error) {
+          console.error('Error guardando email:', error);
+        }
+      }, 1000); // Debounce de 1 segundo
+      
+      return () => clearTimeout(timeoutId);
+    }
+  }, [email, emailSaved]);
 
   const questions = [
     {
@@ -206,36 +244,126 @@ const QuizModal: React.FC<QuizModalProps> = ({ isOpen, onClose }) => {
     }
   };
 
-  const handleAnswer = (value: string) => {
-    const stepKey = currentStep.toString();
+  const handleAnswer = (questionId: number, value: string) => {
+    const stepKey = questionId.toString();
     const newAnswers = { ...answers, [stepKey]: value };
     delete newAnswers.calculatorIncome;
     delete newAnswers.calculatorChildren;
     setAnswers(newAnswers);
     
-    if (currentStep < questions.length - 1) {
+    // Scroll suave a la siguiente pregunta si no es la última - usando el contenedor principal del modal
+    if (questionId < questions.length - 1) {
       setTimeout(() => {
-        setCurrentStep(currentStep + 1);
-      }, 200);
-    } else {
-      // Última pregunta respondida
-      setTimeout(() => {
-        const shouldCalculate = shouldShowCalculator(newAnswers);
-        setMonthlyIncome(null);
-        setSelectedIncomeLabel(null);
-        setNumberOfChildren(null);
-        setSelectedChildrenLabel(null);
-        setCalculatedRange(null);
-
-        const result = getRecommendation(newAnswers);
-        setRecommendation(result);
-
-        if (shouldCalculate) {
-          setCurrentStep(3); // Paso de ingresos
-        } else {
-          setCurrentStep(5); // Ir directo al email
+        const nextQuestionElement = document.getElementById(`question-${questionId + 1}`);
+        const scrollContainer = document.querySelector('[data-quiz-modal]');
+        
+        if (nextQuestionElement && scrollContainer) {
+          // Calcular posición relativa al contenedor scrollable principal
+          const containerRect = scrollContainer.getBoundingClientRect();
+          const elementRect = nextQuestionElement.getBoundingClientRect();
+          const scrollTop = scrollContainer.scrollTop;
+          const offset = 100; // Offset desde arriba del contenedor
+          
+          const targetScroll = scrollTop + (elementRect.top - containerRect.top) - offset;
+          
+          scrollContainer.scrollTo({
+            top: Math.max(0, targetScroll),
+            behavior: 'smooth'
+          });
+        } else if (nextQuestionElement) {
+          // Fallback si no se encuentra el contenedor
+          nextQuestionElement.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'center',
+            inline: 'nearest'
+          });
         }
-      }, 200);
+      }, 350); // Delay para permitir que la animación del botón termine
+    }
+  };
+  
+  // Verificar si todas las preguntas están respondidas
+  const allQuestionsAnswered = useMemo(() => {
+    return questions.every(q => answers[q.id.toString()] !== undefined);
+  }, [answers]);
+  
+  // Función para mostrar recomendación
+  const handleShowRecommendation = async () => {
+    if (!emailValid || !allQuestionsAnswered) return;
+    
+    const shouldCalculate = shouldShowCalculator(answers);
+    
+    if (shouldCalculate) {
+      setMonthlyIncome(null);
+      setSelectedIncomeLabel(null);
+      setNumberOfChildren(null);
+      setSelectedChildrenLabel(null);
+      setCalculatedRange(null);
+      setCurrentStep(3); // Paso de ingresos
+    } else {
+      // Calcular recomendación primero
+      const result = getRecommendation(answers);
+      setRecommendation(result);
+      // Luego guardar y mostrar resultado
+      await handleFinalSubmit(result);
+    }
+  };
+  
+  const handleFinalSubmit = async (recommendationData: any = null) => {
+    setIsLoading(true);
+    try {
+      const finalRecommendation = recommendationData ?? recommendation;
+      
+      // Actualizar el lead existente o crear uno nuevo
+      const quizData = {
+        name: 'Quiz Inline Lead',
+        email: email,
+        quiz_answers: JSON.stringify(answers),
+        plan_recommended: finalRecommendation?.plan || 'Integral',
+        income_range: selectedIncomeLabel,
+        income_value: monthlyIncome,
+        children_count: numberOfChildren,
+        children_label: selectedChildrenLabel,
+        calculated_min: calculatedRange?.min ?? null,
+        calculated_max: calculatedRange?.max ?? null,
+        status: 'completo'
+      };
+      
+      // Intentar actualizar primero (si existe)
+      const { data: existing } = await supabase
+        .from('leads_quiz')
+        .select('id')
+        .eq('email', email)
+        .eq('status', 'iniciado')
+        .limit(1)
+        .single();
+      
+      if (existing) {
+        await supabase
+          .from('leads_quiz')
+          .update(quizData)
+          .eq('id', existing.id);
+      } else {
+        await supabase
+          .from('leads_quiz')
+          .insert([quizData]);
+      }
+      
+      setShowResult(true);
+      // Scroll al inicio cuando se muestra el resultado
+      setTimeout(() => {
+        const modalContainer = document.querySelector('[data-quiz-modal]');
+        if (modalContainer) {
+          modalContainer.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+      }, 150);
+      setCurrentStep(6);
+      toast.success('Te enviamos el plan recomendado a tu email.');
+    } catch (error) {
+      console.error('Error guardando lead completo:', error);
+      toast.error('Guardamos tu resultado, pero no pudimos enviar el email. Te contactaremos pronto.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -287,84 +415,10 @@ const QuizModal: React.FC<QuizModalProps> = ({ isOpen, onClose }) => {
     const result = getRecommendation(updatedAnswers);
     setRecommendation(result);
     
-    setTimeout(() => {
-      setCurrentStep(5);
+    // Guardar lead completo y mostrar resultado
+    setTimeout(async () => {
+      await handleFinalSubmit(result);
     }, 150);
-  };
-
-  const handleEmailSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!email) {
-      toast.error('Por favor ingresa tu email');
-      return;
-    }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      toast.error('Por favor ingresa un email válido');
-      return;
-    }
-
-    const showRecommendationInstantly = () => {
-      setShowResult(true);
-      setCurrentStep(6);
-    };
-
-    const persistLead = async () => {
-      const quizData = {
-        name: 'Quiz Inline Lead',
-        email: email,
-        quiz_answers: JSON.stringify(answers),
-        plan_recommended: recommendation?.plan || 'Integral',
-        income_range: selectedIncomeLabel,
-        income_value: monthlyIncome,
-        children_count: numberOfChildren,
-        children_label: selectedChildrenLabel,
-        calculated_min: calculatedRange?.min ?? null,
-        calculated_max: calculatedRange?.max ?? null,
-        status: 'nuevo'
-      };
-
-      const { error } = await supabase
-        .from('leads_quiz')
-        .insert([quizData]);
-
-      if (error) throw error;
-    };
-
-    showRecommendationInstantly();
-    setIsLoading(true);
-
-    try {
-      await persistLead();
-      toast.success('Te enviamos el plan recomendado a tu email.');
-    } catch (error) {
-      console.error('Error guardando lead:', error);
-      const pendingLeadsRaw = localStorage.getItem('pendingQuizLeads');
-      let pendingLeads: any[] = [];
-      try {
-        pendingLeads = pendingLeadsRaw ? JSON.parse(pendingLeadsRaw) : [];
-        if (!Array.isArray(pendingLeads)) pendingLeads = [];
-      } catch {
-        pendingLeads = [];
-      }
-      pendingLeads.push({
-        email,
-        answers,
-        plan: recommendation?.plan || 'Integral',
-        incomeRange: selectedIncomeLabel,
-        incomeValue: monthlyIncome,
-        childrenCount: numberOfChildren,
-        childrenLabel: selectedChildrenLabel,
-        calculatedRange,
-        timestamp: Date.now()
-      });
-      localStorage.setItem('pendingQuizLeads', JSON.stringify(pendingLeads));
-      toast.error('Guardamos tu resultado, pero no pudimos enviar el email. Te contactaremos pronto.');
-    } finally {
-      setIsLoading(false);
-    }
   };
 
   const resetQuiz = () => {
@@ -406,15 +460,18 @@ const QuizModal: React.FC<QuizModalProps> = ({ isOpen, onClose }) => {
     };
   };
 
-  // Bloquear scroll del body cuando el modal está abierto y llevar al usuario al inicio de la pantalla
+  // Bloquear scroll del body cuando el modal está abierto
   useEffect(() => {
     if (isOpen) {
+      // Solo bloquear el scroll del body, pero permitir scroll dentro del modal
       document.body.style.overflow = 'hidden';
+      // Scroll al inicio cuando se abre el modal
+      window.scrollTo({ top: 0, behavior: 'instant' });
     } else {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = '';
     }
     return () => {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = '';
     };
   }, [isOpen]);
 
@@ -483,14 +540,18 @@ const QuizModal: React.FC<QuizModalProps> = ({ isOpen, onClose }) => {
       {isOpen && (
         <div 
           key="quiz-modal"
-          className="fixed inset-0 z-[9999]" 
+          data-quiz-modal
+          className="fixed inset-0 z-[9999] overflow-y-auto" 
           style={{ 
             position: 'fixed !important' as any, 
             top: 0, 
             left: 0, 
             right: 0, 
             bottom: 0,
-            zIndex: 9999
+            zIndex: 9999,
+            WebkitOverflowScrolling: 'touch' as any,
+            overflowY: 'auto',
+            touchAction: 'pan-y'
           }}
         >
           {/* Backdrop */}
@@ -498,31 +559,31 @@ const QuizModal: React.FC<QuizModalProps> = ({ isOpen, onClose }) => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+            className="fixed inset-0 bg-black/70 backdrop-blur-sm"
             onClick={onClose}
+            style={{ position: 'fixed' }}
           />
-
-          {/* Modal - Centrado perfecto web y móvil */}
+          
+          {/* Modal - Desde arriba en móvil, centrado en desktop */}
           <div 
-            className="absolute inset-0 flex items-center justify-center p-4 overflow-y-auto"
+            className="min-h-full flex items-start justify-center p-0 sm:p-2 md:p-4 py-0"
           >
           <motion.div
             layout
-            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+            initial={{ opacity: 0, scale: 0.95, y: -20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            transition={{ type: 'spring', duration: 0.5, bounce: 0.3 }}
-              className="w-full max-w-2xl min-h-[600px] sm:min-h-[500px] max-h-[90vh] my-auto
-                         bg-slate-900/95 backdrop-blur-xl rounded-3xl border border-slate-700/50 
-                         shadow-2xl shadow-black/50
-                         flex flex-col overflow-hidden relative"
+            exit={{ opacity: 0, scale: 0.95, y: -20 }}
+            transition={{ type: 'spring', duration: 0.4, bounce: 0.2 }}
+              className="w-full max-w-2xl bg-slate-900/95 backdrop-blur-xl rounded-none sm:rounded-2xl md:rounded-3xl border-0 sm:border border-slate-700/50 
+                         shadow-2xl shadow-black/50 flex flex-col relative
+                         min-h-screen sm:min-h-[500px] md:min-h-0 md:max-h-[90vh] md:my-auto"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
-            <div className="relative p-6 border-b border-slate-700/50 flex-shrink-0 bg-gradient-to-r from-pink-500/5 to-rose-500/5">
+            <div className="relative p-4 sm:p-6 border-b border-slate-700/50 flex-shrink-0 bg-gradient-to-r from-pink-500/5 to-rose-500/5">
               <button
                 onClick={onClose}
-                className="absolute right-4 top-4 p-2 rounded-full bg-slate-800/50 hover:bg-slate-700/50 
+                className="absolute right-3 top-3 sm:right-4 sm:top-4 p-2 rounded-full bg-slate-800/50 hover:bg-slate-700/50 
                          transition-colors duration-200 z-10 border border-slate-700/50"
                 aria-label="Cerrar modal"
               >
@@ -557,9 +618,9 @@ const QuizModal: React.FC<QuizModalProps> = ({ isOpen, onClose }) => {
             )}
 
             {/* Contenido - Scrollable */}
-            <div className="p-6 overflow-y-auto flex-1">
+            <div className="p-4 sm:p-6 pb-8 sm:pb-6 flex-1 min-h-0" data-quiz-content>
               <AnimatePresence mode="wait">
-                {/* PASO CERO - Conexión Emocional */}
+                {/* PASO CERO - Mensaje de Bienvenida + Captura de Email */}
                 {!showResult && currentStep === -1 && (
                   <motion.div
                     key="step-zero"
@@ -567,143 +628,226 @@ const QuizModal: React.FC<QuizModalProps> = ({ isOpen, onClose }) => {
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.95 }}
                     transition={{ duration: 0.4 }}
-                    className="flex flex-col items-center justify-center text-center py-8"
+                    className="space-y-4 md:space-y-6"
                   >
-                    {/* Ícono grande con animación de latido */}
-                    <motion.div
-                      animate={{ 
-                        scale: [1, 1.1, 1],
-                      }}
-                      transition={{
-                        duration: 2,
-                        repeat: Infinity,
-                        ease: "easeInOut"
-                      }}
-                      className="w-24 h-24 bg-gradient-to-br from-pink-500/20 to-rose-500/20 rounded-full 
-                               flex items-center justify-center mb-6 shadow-lg shadow-pink-500/20"
-                    >
-                      <Heart className="w-12 h-12 text-pink-400" />
-                    </motion.div>
-
-                    {/* Mensaje de empatía */}
-                    <h3 className="text-3xl font-bold text-white mb-4 max-w-lg">
-                      Sabemos que este es un momento difícil
-                    </h3>
-                    <p className="text-xl text-slate-300 mb-8 max-w-md leading-relaxed">
-                      Estamos aquí para darte <span className="text-pink-400 font-semibold">claridad</span> y 
-                      <span className="text-pink-400 font-semibold"> tranquilidad</span>.
-                    </p>
-
-                    {/* Beneficios rápidos */}
-                    <div className="grid gap-3 mb-8 text-left max-w-md">
-                      {[
-                        "60 segundos para saber qué camino tomar",
-                        "Recomendación personalizada sin compromiso",
-                        "Descuento exclusivo aplicado automáticamente"
-                      ].map((benefit, idx) => (
-                        <motion.div
-                          key={idx}
-                          initial={{ opacity: 0, x: -20 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: 0.2 + idx * 0.1 }}
-                          className="flex items-center gap-3"
-                        >
-                          <div className="w-6 h-6 rounded-full bg-green-500/20 flex items-center justify-center flex-shrink-0">
-                            <div className="w-2 h-2 rounded-full bg-green-400" />
-                          </div>
-                          <span className="text-slate-300">{benefit}</span>
-                        </motion.div>
-                      ))}
+                    {/* Encabezado Permanente - Mensaje de Bienvenida */}
+                    <div className="text-center">
+                      <motion.div
+                        animate={{ 
+                          scale: [1, 1.1, 1],
+                        }}
+                        transition={{
+                          duration: 2,
+                          repeat: Infinity,
+                          ease: "easeInOut"
+                        }}
+                        className="w-16 h-16 md:w-20 md:h-20 bg-gradient-to-br from-pink-500/20 to-rose-500/20 rounded-full 
+                                 flex items-center justify-center mx-auto mb-3 md:mb-4 shadow-lg shadow-pink-500/20"
+                      >
+                        <Heart className="w-8 h-8 md:w-10 md:h-10 text-pink-400" />
+                      </motion.div>
+                      <h3 className="text-xl md:text-2xl font-bold text-white mb-2">
+                        Sabemos que este es un momento difícil
+                      </h3>
+                      <p className="text-slate-300 text-xs md:text-sm">
+                        Estamos aquí para darte <span className="text-pink-400 font-semibold">claridad</span> y 
+                        <span className="text-pink-400 font-semibold"> tranquilidad</span>.
+                      </p>
                     </div>
 
-                    {/* CTA Grande */}
-                    <motion.button
-                      onClick={() => setCurrentStep(0)}
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      className="w-full max-w-md py-5 px-8 rounded-xl font-bold text-lg text-white 
-                               bg-gradient-to-r from-pink-500 to-rose-600 
-                               hover:from-pink-600 hover:to-rose-700 
-                               shadow-2xl shadow-pink-500/40 transition-all duration-200
-                               flex items-center justify-center gap-3"
-                    >
-                      Comenzar mi diagnóstico
-                      <ArrowRight className="w-6 h-6" />
-                    </motion.button>
+                    {/* Campo de Email - Captura Inmediata */}
+                    <div className="space-y-3">
+                      <label className="block text-sm font-semibold text-white">
+                        Para comenzar, ¿cuál es tu correo electrónico?
+                      </label>
+                      <div className="relative">
+                        <div className={`w-full p-4 rounded-2xl bg-slate-800/60 border flex items-center gap-3 transition-all ${
+                          emailValid 
+                            ? 'border-green-500/50 bg-slate-700/60' 
+                            : 'border-slate-700/50 focus-within:border-pink-500 focus-within:bg-slate-700/60'
+                        }`}>
+                          <input
+                            type="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            onBlur={(e) => {
+                              const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                              setEmailValid(emailRegex.test(e.target.value));
+                            }}
+                            className="flex-1 bg-transparent text-white placeholder-white/40 text-base focus:outline-none"
+                            placeholder="tu@email.com"
+                            autoComplete="email"
+                          />
+                          {emailValid && (
+                            <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0" />
+                          )}
+                        </div>
+                        {emailSaved && (
+                          <p className="text-xs text-green-400 mt-2 flex items-center gap-1">
+                            <CheckCircle className="w-3 h-3" />
+                            Email guardado
+                          </p>
+                        )}
+                      </div>
+                    </div>
 
-                    <p className="text-xs text-slate-500 mt-4">
-                      100% confidencial • Sin compromiso • Respuesta inmediata
-                    </p>
+                    {/* Botón para continuar */}
+                    <motion.button
+                      onClick={() => {
+                        if (emailValid) {
+                          setCurrentStep(0);
+                        } else {
+                          toast.error('Por favor ingresa un email válido');
+                        }
+                      }}
+                      disabled={!emailValid}
+                      whileHover={emailValid ? { scale: 1.02 } : {}}
+                      whileTap={emailValid ? { scale: 0.98 } : {}}
+                      className={`w-full py-4 px-6 rounded-xl font-bold text-white transition-all duration-200 flex items-center justify-center gap-3 ${
+                        emailValid
+                          ? 'bg-gradient-to-r from-pink-500 to-rose-600 hover:from-pink-600 hover:to-rose-700 shadow-xl shadow-pink-500/40'
+                          : 'bg-slate-700/50 text-slate-400 cursor-not-allowed'
+                      }`}
+                    >
+                      Continuar al cuestionario
+                      <ArrowRight className="w-5 h-5" />
+                    </motion.button>
                   </motion.div>
                 )}
 
-                {/* Preguntas */}
-                {!showResult && currentStep >= 0 && currentStep < questions.length && (
+                {/* TODAS LAS PREGUNTAS SIMULTÁNEAMENTE - Paso 0 */}
+                {!showResult && currentStep === 0 && (
                   <motion.div
-                    key={`question-${currentStep}`}
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -20 }}
+                    key="all-questions"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
                     transition={{ duration: 0.3 }}
+                    className="space-y-4 md:space-y-8"
                   >
-                    <h3 className="text-xl font-semibold text-white mb-6">
-                      {questions[currentStep].question}
-                    </h3>
-                    
-                    <div className="grid gap-3">
-                      {questions[currentStep].options.map((option, index) => {
-                        const Icon = option.icon;
-                        return (
-                          <motion.button
-                            key={option.value}
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: index * 0.1 }}
-                            onClick={() => {
-                              setClickedButton(option.value);
-                              // Micro-feedback con borde iluminado
-                              setTimeout(() => {
-                                handleAnswer(option.value);
-                                setClickedButton(null);
-                              }, 200);
-                            }}
-                            whileHover={{ scale: 1.02, x: 3 }}
-                            whileTap={{ scale: 0.98 }}
-                            className={`w-full p-4 rounded-2xl bg-slate-800/50 border transition-all duration-200 
-                                     text-left flex items-center gap-4 group relative overflow-hidden
-                                     ${clickedButton === option.value 
-                                       ? 'border-pink-500 shadow-lg shadow-pink-500/30' 
-                                       : 'border-slate-700/50 hover:bg-slate-700/50 hover:border-pink-500/30'
-                                     }`}
-                          >
-                            {/* Efecto de brillo al seleccionar */}
-                            {clickedButton === option.value && (
-                              <motion.div
-                                initial={{ x: '-100%' }}
-                                animate={{ x: '200%' }}
-                                transition={{ duration: 0.5 }}
-                                className="absolute inset-0 bg-gradient-to-r from-transparent via-pink-500/20 to-transparent"
-                              />
-                            )}
-                            
-                            <div className="p-3 rounded-full bg-gradient-to-br from-pink-500/20 to-rose-500/20 
-                                          group-hover:from-pink-500/30 group-hover:to-rose-500/30 transition-colors relative">
-                              <Icon className="w-6 h-6 text-pink-400" />
-                            </div>
-                            <span className="text-white font-medium relative">{option.label}</span>
-                          </motion.button>
-                        );
-                      })}
+                    {/* Encabezado */}
+                    <div className="text-center">
+                      <h3 className="text-xl md:text-2xl font-bold text-white mb-1 md:mb-2">
+                        Responde estas 3 preguntas
+                      </h3>
+                      <p className="text-slate-400 text-xs md:text-sm">
+                        Puedes responder en cualquier orden
+                      </p>
                     </div>
-                    
-                    {currentStep > 0 && (
-                      <button
-                        onClick={() => setCurrentStep(currentStep - 1)}
-                        className="mt-6 flex items-center gap-2 text-white/60 hover:text-white transition-colors"
+
+                    {/* Todas las preguntas renderizadas */}
+                    {questions.map((question, qIndex) => {
+                      const questionId = question.id;
+                      const isAnswered = answers[questionId.toString()] !== undefined;
+                      const isBlocked = !emailValid;
+                      
+                      return (
+                        <div
+                          key={questionId}
+                          id={`question-${questionId}`}
+                          className={`space-y-3 md:space-y-4 transition-all scroll-mt-24 ${isBlocked ? 'opacity-50 pointer-events-none' : ''}`}
+                        >
+                          <div className="flex items-center gap-2 md:gap-3">
+                            <div className={`w-7 h-7 md:w-8 md:h-8 rounded-full flex items-center justify-center text-xs md:text-sm font-bold flex-shrink-0 ${
+                              isAnswered 
+                                ? 'bg-green-500/20 text-green-400 border border-green-500/50' 
+                                : 'bg-slate-700/50 text-slate-400 border border-slate-600/50'
+                            }`}>
+                              {isAnswered ? <CheckCircle className="w-3.5 h-3.5 md:w-4 md:h-4" /> : questionId + 1}
+                            </div>
+                            <h4 className="text-base md:text-lg font-semibold text-white flex-1">
+                              {question.question}
+                            </h4>
+                          </div>
+                          
+                          <div className="grid gap-2 md:gap-3 ml-9 md:ml-11">
+                            {question.options.map((option, index) => {
+                              const Icon = option.icon;
+                              const isSelected = answers[questionId.toString()] === option.value;
+                              const optionKey = `${questionId}-${option.value}`;
+                              
+                              return (
+                                <motion.button
+                                  key={option.value}
+                                  initial={{ opacity: 0, y: 10 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  transition={{ delay: index * 0.05 }}
+                                  onClick={() => {
+                                    setClickedButton(optionKey);
+                                    setTimeout(() => {
+                                      handleAnswer(questionId, option.value);
+                                      setClickedButton(null);
+                                    }, 150);
+                                  }}
+                                  whileHover={!isBlocked ? { scale: 1.02, x: 3 } : {}}
+                                  whileTap={!isBlocked ? { scale: 0.98 } : {}}
+                                  className={`w-full p-4 rounded-2xl border transition-all duration-200 
+                                           text-left flex items-center gap-4 group relative overflow-hidden
+                                           ${isSelected
+                                             ? 'border-pink-500 bg-pink-500/10 shadow-lg shadow-pink-500/30'
+                                             : 'bg-slate-800/50 border-slate-700/50 hover:bg-slate-700/50 hover:border-pink-500/30'
+                                           }`}
+                                >
+                                  {clickedButton === optionKey && (
+                                    <motion.div
+                                      initial={{ x: '-100%' }}
+                                      animate={{ x: '200%' }}
+                                      transition={{ duration: 0.5 }}
+                                      className="absolute inset-0 bg-gradient-to-r from-transparent via-pink-500/20 to-transparent"
+                                    />
+                                  )}
+                                  
+                                  <div className={`p-3 rounded-full transition-colors relative ${
+                                    isSelected
+                                      ? 'bg-gradient-to-br from-pink-500/30 to-rose-500/30'
+                                      : 'bg-gradient-to-br from-pink-500/20 to-rose-500/20 group-hover:from-pink-500/30 group-hover:to-rose-500/30'
+                                  }`}>
+                                    <Icon className="w-5 h-5 text-pink-400" />
+                                  </div>
+                                  <span className="text-white font-medium relative flex-1">{option.label}</span>
+                                  {isSelected && (
+                                    <CheckCircle className="w-5 h-5 text-pink-400 flex-shrink-0" />
+                                  )}
+                                </motion.button>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      );
+                    })}
+
+                    {/* Botón Final - Solo visible cuando todo está completo */}
+                    {emailValid && allQuestionsAnswered && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.2 }}
+                        className="pt-6 border-t border-slate-700/50 sticky bottom-0 bg-slate-900/95 backdrop-blur-xl pb-4 z-10"
                       >
-                        <ChevronLeft className="w-4 h-4" />
-                        Volver
-                      </button>
+                        <motion.button
+                          onClick={handleShowRecommendation}
+                          disabled={isLoading}
+                          whileHover={!isLoading ? { scale: 1.02 } : {}}
+                          whileTap={!isLoading ? { scale: 0.98 } : {}}
+                          className="w-full py-4 md:py-5 px-6 rounded-xl font-bold text-base md:text-lg text-white 
+                                   bg-gradient-to-r from-pink-500 to-rose-600 
+                                   hover:from-pink-600 hover:to-rose-700 
+                                   shadow-2xl shadow-pink-500/40 transition-all duration-200
+                                   flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          {isLoading ? (
+                            <>
+                              <Loader2 className="w-5 h-5 animate-spin" />
+                              Procesando...
+                            </>
+                          ) : (
+                            <>
+                              Ver mi Recomendación
+                              <ArrowRight className="w-5 h-5 md:w-6 md:h-6" />
+                            </>
+                          )}
+                        </motion.button>
+                      </motion.div>
                     )}
                   </motion.div>
                 )}
@@ -837,86 +981,6 @@ const QuizModal: React.FC<QuizModalProps> = ({ isOpen, onClose }) => {
                   </motion.div>
                 )}
 
-                {/* Paso de email (Paso 5) */}
-                {!showResult && currentStep === 5 && (
-                  <motion.div
-                    key="email-step"
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -20 }}
-                    transition={{ duration: 0.3 }}
-                    className="space-y-6"
-                  >
-                    <div className="text-center space-y-3">
-                      <div className="w-16 h-16 bg-gradient-to-br from-pink-500 to-rose-600 rounded-full flex items-center justify-center mx-auto shadow-lg shadow-pink-500/30">
-                        {calculatedRange ? (
-                          <DollarSign className="w-8 h-8 text-white" />
-                        ) : (
-                          <Sparkles className="w-8 h-8 text-white" />
-                        )}
-                      </div>
-                      <h3 className="text-2xl font-bold text-white">
-                        ¡Último paso! ¿A qué correo enviamos tu estrategia?
-                      </h3>
-                      <p className="text-slate-300 text-sm">
-                        En menos de 60 segundos recibirás tu rango estimado y el plan legal priorizado por nuestro equipo.
-                      </p>
-                    </div>
-
-                    <div className="bg-gradient-to-br from-pink-500/10 to-rose-500/10 border border-pink-500/20 rounded-2xl p-6">
-                      <p className="text-white text-center font-semibold mb-4">
-                        Obtendrás al instante:
-                      </p>
-                      <ul className="space-y-3 text-left">
-                        <li className="flex items-center gap-3 text-sm text-white">
-                          <CheckCircle className="w-5 h-5 text-rose-400 flex-shrink-0" />
-                          <span>El rango estimado de pensión calculado para tu caso</span>
-                        </li>
-                        <li className="flex items-center gap-3 text-sm text-white">
-                          <Gift className="w-5 h-5 text-amber-400 flex-shrink-0" />
-                          <span>La recomendación de plan con un beneficio preferente</span>
-                        </li>
-                        <li className="flex items-center gap-3 text-sm text-white">
-                          <Shield className="w-5 h-5 text-rose-300 flex-shrink-0" />
-                          <span>Acceso inmediato a nuestra garantía de satisfacción total</span>
-                        </li>
-                      </ul>
-                    </div>
-
-                    <form onSubmit={handleEmailSubmit} className="space-y-4">
-                      <div className="relative">
-                        <div className="w-full p-4 rounded-2xl bg-slate-800/60 border border-slate-700/50 flex items-center gap-3 transition-all focus-within:border-pink-500 focus-within:bg-slate-700/60">
-                          <input
-                            type="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            className="flex-1 bg-transparent text-white placeholder-white/40 text-lg focus:outline-none"
-                            placeholder="Escribe tu correo aquí"
-                            required
-                          />
-                          <motion.button
-                            type="submit"
-                            whileHover={!isLoading ? { scale: 1.05 } : {}}
-                            whileTap={!isLoading ? { scale: 0.96 } : {}}
-                            disabled={isLoading}
-                            className="w-12 h-12 rounded-full flex items-center justify-center bg-gradient-to-br from-pink-500 to-rose-600 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-pink-500/30"
-                          >
-                            {isLoading ? (
-                              <Loader2 className="w-5 h-5 text-white animate-spin" />
-                            ) : (
-                              <ArrowRight className="w-5 h-5 text-white" />
-                            )}
-                          </motion.button>
-                        </div>
-                      </div>
-                    </form>
-
-                    <p className="text-[11px] text-center text-slate-500">
-                      Tu información es confidencial y está protegida al 100%.
-                    </p>
-                  </motion.div>
-                )}
-
                 {/* Resultado */}
                 {showResult && recommendation && (
                   <motion.div
@@ -925,38 +989,54 @@ const QuizModal: React.FC<QuizModalProps> = ({ isOpen, onClose }) => {
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.95 }}
                     transition={{ duration: 0.3 }}
+                    className="w-full space-y-6"
                   >
-                    <div className="text-center space-y-4 mb-8">
-                      <div className="w-20 h-20 bg-white/10 border border-white/20 rounded-3xl 
+                    <div className="text-center space-y-3 md:space-y-4 mb-6">
+                      <div className="w-16 h-16 md:w-20 md:h-20 bg-white/10 border border-white/20 rounded-3xl 
                                     flex items-center justify-center mx-auto backdrop-blur-xl">
-                        <CheckCircle className="w-10 h-10 text-white/90" />
+                        <CheckCircle className="w-8 h-8 md:w-10 md:h-10 text-white/90" />
                       </div>
                       <div>
-                        <h3 className="text-2xl font-semibold text-white mb-1">
+                        <h3 className="text-xl md:text-2xl font-semibold text-white mb-1">
                           Plan Recomendado
                         </h3>
-                        <p className="text-sm text-white/50">
+                        <p className="text-xs md:text-sm text-white/50">
                           Basado en tus respuestas
                         </p>
                       </div>
                     </div>
                     
-                    <div className="bg-white/[0.05] border border-white/10 rounded-3xl p-6 mb-6 backdrop-blur-xl">
-                      <div className="space-y-4">
+                    {/* CTA Principal - Arriba para mejor acceso */}
+                    <div className="space-y-3 mb-6">
+                      <motion.button
+                        onClick={() => {
+                          onClose();
+                          navigate(`/agendamiento?plan=general&email=${encodeURIComponent(email)}`);
+                        }}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        className="w-full py-4 px-6 rounded-2xl font-semibold text-white bg-gradient-to-r from-pink-500 to-rose-600 hover:from-pink-600 hover:to-rose-700 transition-all shadow-xl shadow-pink-500/40 text-base md:text-lg"
+                      >
+                        Agendar Consulta - $35.000
+                      </motion.button>
+                    </div>
+                    
+                    <div className="bg-white/[0.05] border border-white/10 rounded-2xl md:rounded-3xl p-4 md:p-6 mb-6 backdrop-blur-xl">
+                      <div className="space-y-3 md:space-y-4">
                         <div>
-                          <h4 className="text-xl font-semibold text-white mb-2">
+                          <h4 className="text-lg md:text-xl font-semibold text-white mb-2">
                             {recommendation.title}
                           </h4>
-                          <p className="text-sm text-white/60 leading-relaxed">
+                          <p className="text-xs md:text-sm text-white/60 leading-relaxed">
                             {recommendation.reason}
                           </p>
                         </div>
                         
                         {/* Precio destacado */}
-                        <div className="pt-4 border-t border-white/10">
-                          <div className="flex items-baseline gap-3">
-                            <span className="text-3xl font-bold text-white">$35.000</span>
-                            <span className="text-sm text-white/40 line-through">$70.000</span>
+                        <div className="pt-3 md:pt-4 border-t border-white/10">
+                          <div className="flex items-baseline gap-2 md:gap-3">
+                            <span className="text-2xl md:text-3xl font-bold text-white">$35.000</span>
+                            <span className="text-xs md:text-sm text-white/40 line-through">$70.000</span>
                           </div>
                           <p className="text-xs text-white/50 mt-1">Consulta Estratégica con Abogado</p>
                         </div>
@@ -970,10 +1050,18 @@ const QuizModal: React.FC<QuizModalProps> = ({ isOpen, onClose }) => {
                           transition={{ delay: 0.3 }}
                           className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-4 mt-4"
                         >
-                          {/* Estrellas */}
-                          <div className="flex gap-1 mb-2">
+                          {/* Estrellas Premium - Diseño mejorado */}
+                          <div className="flex gap-1 mb-3">
                             {[...Array(testimonialsByPlan[recommendation.plan as keyof typeof testimonialsByPlan].rating)].map((_, i) => (
-                              <Star key={i} className="w-4 h-4 text-amber-400 fill-amber-400" />
+                              <svg 
+                                key={i} 
+                                className="w-5 h-5 text-pink-400 transition-transform duration-200 hover:scale-110" 
+                                fill="currentColor" 
+                                viewBox="0 0 24 24" 
+                                style={{ transitionDelay: `${i * 50}ms` }}
+                              >
+                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                              </svg>
                             ))}
                           </div>
                           {/* Cita */}
@@ -1071,13 +1159,13 @@ const QuizModal: React.FC<QuizModalProps> = ({ isOpen, onClose }) => {
                       </motion.div>
                     )}
                     
-                    <div className="bg-white/5 rounded-2xl p-6 mb-6">
-                      <h4 className="font-semibold text-white mb-3">Tu plan incluye:</h4>
-                      <ul className="space-y-3">
+                    <div className="bg-white/5 rounded-2xl p-4 md:p-6 mb-6">
+                      <h4 className="font-semibold text-white mb-3 text-sm md:text-base">Tu plan incluye:</h4>
+                      <ul className="space-y-2 md:space-y-3">
                         {recommendation.features.map((feature: string, index: number) => (
-                          <li key={index} className="flex items-start gap-2 text-slate-300">
-                            <div className="w-5 h-5 rounded-full bg-pink-500/20 flex items-center justify-center mt-0.5 flex-shrink-0">
-                              <div className="w-2 h-2 rounded-full bg-pink-400" />
+                          <li key={index} className="flex items-start gap-2 text-slate-300 text-xs md:text-sm">
+                            <div className="w-4 h-4 md:w-5 md:h-5 rounded-full bg-pink-500/20 flex items-center justify-center mt-0.5 flex-shrink-0">
+                              <div className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-pink-400" />
                             </div>
                             <span>{feature}</span>
                           </li>
@@ -1085,18 +1173,11 @@ const QuizModal: React.FC<QuizModalProps> = ({ isOpen, onClose }) => {
                       </ul>
                     </div>
                     
-                    {/* CTAs */}
-                    <div className="space-y-3">
-                      <button
-                        onClick={() => window.location.href = '/agendamiento?plan=general'}
-                        className="w-full py-4 px-6 rounded-2xl font-semibold text-white bg-white/10 border border-white/20 hover:bg-white/15 transition-all backdrop-blur-xl"
-                      >
-                        Agendar Consulta - $35.000
-                      </button>
-                      
+                    {/* Botón secundario */}
+                    <div className="pb-6">
                       <button
                         onClick={resetQuiz}
-                        className="w-full py-3 px-6 rounded-2xl font-medium text-white/50 hover:text-white/70 transition-colors"
+                        className="w-full py-3 px-6 rounded-2xl font-medium text-white/50 hover:text-white/70 transition-colors text-sm md:text-base"
                       >
                         Hacer el Quiz Nuevamente
                       </button>
