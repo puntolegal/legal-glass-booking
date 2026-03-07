@@ -11,6 +11,7 @@ const META_API_URL = `https://graph.facebook.com/${META_API_VERSION}/${META_PIXE
 
 interface EventData {
   event_name: string;
+  event_id?: string;  // Event ID for deduplication between Pixel and CAPI
   event_time?: number;
   test_event_code?: string;  // Test event code for Meta testing
   user_data?: {
@@ -54,7 +55,7 @@ serve(async (req) => {
     }
 
     const body: EventData = await req.json();
-    const { event_name, user_data, custom_data, event_source_url, test_event_code } = body;
+    const { event_name, event_id, user_data, custom_data, event_source_url, test_event_code } = body;
 
     if (!event_name) {
       return new Response(JSON.stringify({ error: 'event_name is required' }), {
@@ -64,54 +65,71 @@ serve(async (req) => {
     }
 
     // Hash PII fields (emails, phones, names must be hashed)
+    // IMPORTANT: Only include non-null, non-empty values to avoid 422 errors
     const hashedUserData: Record<string, string | string[]> = {};
-    if (user_data?.em) {
+    
+    // Email: hash and include only if present
+    if (user_data?.em && user_data.em.trim()) {
       hashedUserData.em = [await hashSHA256(user_data.em)];
     }
-    if (user_data?.ph) {
-      // Phone can be null if not provided
-      hashedUserData.ph = user_data.ph ? [await hashSHA256(user_data.ph)] : [null as any];
+    
+    // Phone: hash only if present and not empty
+    if (user_data?.ph && user_data.ph.trim()) {
+      hashedUserData.ph = [await hashSHA256(user_data.ph)];
     }
-    if (user_data?.fn) {
+    // Don't include ph if it's null or empty (Meta rejects null arrays)
+    
+    // First name: hash only if present
+    if (user_data?.fn && user_data.fn.trim()) {
       hashedUserData.fn = [await hashSHA256(user_data.fn)];
     }
-    if (user_data?.ct) {
+    
+    // City: hash only if present
+    if (user_data?.ct && user_data.ct.trim()) {
       hashedUserData.ct = [await hashSHA256(user_data.ct)];
     }
-    if (user_data?.ge) {
+    
+    // Gender: hash only if present
+    if (user_data?.ge && user_data.ge.trim()) {
       hashedUserData.ge = [await hashSHA256(user_data.ge.toLowerCase())];
     }
     
     // Siempre incluir IP y User Agent (extraídos automáticamente de headers)
     // Esto corrige el error 400 subcode 2804050 de Meta
-    if (clientIp) {
-      hashedUserData.client_ip_address = clientIp;
-    }
-    if (userAgent) {
-      hashedUserData.client_user_agent = userAgent;
-    }
-    
-    // Permitir override desde el body si se envía explícitamente
-    if (user_data?.client_ip_address) {
-      hashedUserData.client_ip_address = user_data.client_ip_address;
-    }
-    if (user_data?.client_user_agent) {
-      hashedUserData.client_user_agent = user_data.client_user_agent;
-    }
+    // IMPORTANT: These are required fields, so we use fallback values if missing
+    hashedUserData.client_ip_address = clientIp || user_data?.client_ip_address || '0.0.0.0';
+    hashedUserData.client_user_agent = userAgent || user_data?.client_user_agent || 'Unknown';
     
     // Incluir cookies de Facebook si vienen en el body para mejorar el match
-    if (user_data?.fbc) hashedUserData.fbc = user_data.fbc;
-    if (user_data?.fbp) hashedUserData.fbp = user_data.fbp;
+    if (user_data?.fbc && user_data.fbc.trim()) {
+      hashedUserData.fbc = user_data.fbc;
+    }
+    if (user_data?.fbp && user_data.fbp.trim()) {
+      hashedUserData.fbp = user_data.fbp;
+    }
 
-    const eventPayload = {
+    // Build event payload following Meta's exact schema
+    const eventPayload: {
+      data: Array<{
+        event_name: string;
+        event_id?: string;
+        event_time: number;
+        action_source: string;
+        event_source_url: string;
+        user_data: Record<string, string | string[]>;
+        custom_data?: Record<string, unknown>;
+      }>;
+    } = {
       data: [
         {
           event_name,
+          ...(event_id ? { event_id } : {}), // Include event_id for deduplication
           event_time: body.event_time || Math.floor(Date.now() / 1000),
           action_source: body.action_source || 'website',
           event_source_url: event_source_url || 'https://puntolegal.cl',
           user_data: hashedUserData,
-          ...(custom_data ? { custom_data } : {}),
+          // Only include custom_data if it exists and has values
+          ...(custom_data && Object.keys(custom_data).length > 0 ? { custom_data } : {}),
         },
       ],
     };
