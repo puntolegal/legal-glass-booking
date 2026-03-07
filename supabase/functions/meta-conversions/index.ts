@@ -43,6 +43,11 @@ serve(async (req) => {
   }
 
   try {
+    // Extraer IP y User Agent de los headers automáticamente
+    const forwardedFor = req.headers.get('x-forwarded-for');
+    const clientIp = forwardedFor ? forwardedFor.split(',')[0].trim() : req.headers.get('x-real-ip') || null;
+    const userAgent = req.headers.get('user-agent') || null;
+
     const accessToken = Deno.env.get('META_CONVERSIONS_API_TOKEN');
     if (!accessToken) {
       throw new Error('META_CONVERSIONS_API_TOKEN not configured');
@@ -76,8 +81,25 @@ serve(async (req) => {
     if (user_data?.ge) {
       hashedUserData.ge = [await hashSHA256(user_data.ge.toLowerCase())];
     }
-    if (user_data?.client_ip_address) hashedUserData.client_ip_address = user_data.client_ip_address;
-    if (user_data?.client_user_agent) hashedUserData.client_user_agent = user_data.client_user_agent;
+    
+    // Siempre incluir IP y User Agent (extraídos automáticamente de headers)
+    // Esto corrige el error 400 subcode 2804050 de Meta
+    if (clientIp) {
+      hashedUserData.client_ip_address = clientIp;
+    }
+    if (userAgent) {
+      hashedUserData.client_user_agent = userAgent;
+    }
+    
+    // Permitir override desde el body si se envía explícitamente
+    if (user_data?.client_ip_address) {
+      hashedUserData.client_ip_address = user_data.client_ip_address;
+    }
+    if (user_data?.client_user_agent) {
+      hashedUserData.client_user_agent = user_data.client_user_agent;
+    }
+    
+    // Incluir cookies de Facebook si vienen en el body para mejorar el match
     if (user_data?.fbc) hashedUserData.fbc = user_data.fbc;
     if (user_data?.fbp) hashedUserData.fbp = user_data.fbp;
 

@@ -42,11 +42,17 @@ export async function trackMetaEvent(options: MetaEventOptions): Promise<void> {
 
   // Server-side CAPI
   try {
+    // Capturar cookies de Facebook automáticamente para mejorar el match
+    const fbcCookie = getCookie('_fbc');
+    const fbpCookie = getCookie('_fbp');
+    
     const enrichedUserData: MetaEventUserData = {
       ...user_data,
-      client_user_agent: navigator.userAgent,
-      fbc: getCookie('_fbc'),
-      fbp: getCookie('_fbp'),
+      // Siempre incluir User Agent del navegador
+      client_user_agent: typeof navigator !== 'undefined' ? navigator.userAgent : undefined,
+      // Incluir cookies de Facebook si están disponibles (mejora el match de usuarios)
+      ...(fbcCookie ? { fbc: fbcCookie } : {}),
+      ...(fbpCookie ? { fbp: fbpCookie } : {}),
     };
 
     const { error } = await supabase.functions.invoke('meta-conversions', {
