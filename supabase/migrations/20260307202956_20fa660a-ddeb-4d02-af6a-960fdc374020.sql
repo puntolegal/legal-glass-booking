@@ -1,0 +1,1 @@
+ALTER TABLE public.leads_quiz ALTER COLUMN quiz_answers SET DEFAULT '{}'::jsonb;
