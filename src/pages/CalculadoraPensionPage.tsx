@@ -81,7 +81,7 @@ const CalculadoraPensionPage: React.FC = () => {
     });
   }, []);
 
-  // Guardado silencioso de email (Ninja Lead) - Mejorado con retry
+  // Guardado silencioso de email (Ninja Lead) - Mejorado con retry y mejor manejo de errores
   useEffect(() => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const isValid = emailRegex.test(email);
@@ -90,21 +90,23 @@ const CalculadoraPensionPage: React.FC = () => {
     if (isValid && !emailSaved) {
       const timeoutId = setTimeout(async () => {
         try {
+          // Payload exacto que coincide con los nombres de las columnas
           const quizData = {
-            name: 'Calculadora Pensión Lead',
             email: email,
+            name: 'Calculadora Pensión Lead', // Opcional ahora (columna nullable)
             quiz_answers: JSON.stringify({ source: 'calculadora_pension' }),
             plan_recommended: null,
             status: 'calculadora_iniciada'
           };
           
-          const { error } = await supabase
+          const { data, error, status, statusText } = await supabase
             .from('leads_quiz')
-            .insert([quizData]);
+            .insert([quizData])
+            .select();
           
           if (!error) {
             setEmailSaved(true);
-            console.log('✅ Email guardado silenciosamente:', email);
+            console.log('✅ Email guardado silenciosamente:', email, data);
             
             // Tracking Meta - Lead event
             trackMetaEvent({
@@ -120,28 +122,60 @@ const CalculadoraPensionPage: React.FC = () => {
               }
             });
           } else {
+            // Log detallado del error para debugging
+            console.error('❌ Error guardando email en Supabase:', {
+              error,
+              status,
+              statusText,
+              code: error?.code,
+              message: error?.message,
+              details: error?.details,
+              hint: error?.hint,
+              email,
+              quizData
+            });
+            
             // Retry una vez después de 2 segundos
             setTimeout(async () => {
-              const { error: retryError } = await supabase
+              const { data: retryData, error: retryError, status: retryStatus } = await supabase
                 .from('leads_quiz')
-                .insert([quizData]);
+                .insert([quizData])
+                .select();
+              
               if (!retryError) {
                 setEmailSaved(true);
+                console.log('✅ Email guardado en retry:', email, retryData);
+              } else {
+                console.error('❌ Error en retry:', {
+                  retryError,
+                  retryStatus,
+                  code: retryError?.code,
+                  message: retryError?.message,
+                  details: retryError?.details
+                });
               }
             }, 2000);
           }
         } catch (error) {
-          console.error('Error guardando email:', error);
+          // Manejo de errores mejorado con detalles completos
+          console.error('❌ Excepción al guardar email:', {
+            error,
+            message: error instanceof Error ? error.message : String(error),
+            stack: error instanceof Error ? error.stack : undefined,
+            email
+          });
+          
           // Guardar en localStorage como fallback
           try {
             const pendingLeads = JSON.parse(localStorage.getItem('pendingCalculadoraLeads') || '[]');
-            pendingLeads.push({ email, timestamp: Date.now() });
+            pendingLeads.push({ email, timestamp: Date.now(), quizData: { source: 'calculadora_pension' } });
             localStorage.setItem('pendingCalculadoraLeads', JSON.stringify(pendingLeads));
+            console.log('💾 Email guardado en localStorage como fallback:', email);
           } catch (e) {
-            console.error('Error guardando en localStorage:', e);
+            console.error('❌ Error guardando en localStorage:', e);
           }
         }
-      }, 1000); // Debounce de 1 segundo
+      }, 300); // Debounce de 300ms para captura rápida
       
       return () => clearTimeout(timeoutId);
     }
@@ -269,7 +303,7 @@ const CalculadoraPensionPage: React.FC = () => {
             anomalia_legal: calculatedRange.isEdgeCase
           });
           
-          await supabase
+          const { data, error, status } = await supabase
             .from('leads_quiz')
             .update({
               quiz_answers: quizAnswers,
@@ -280,9 +314,31 @@ const CalculadoraPensionPage: React.FC = () => {
               status: 'calculo_completado'
             })
             .eq('email', email)
-            .in('status', ['calculadora_iniciada', 'calculo_completado']); // Permite sobreescribir si el usuario recalcula
+            .in('status', ['calculadora_iniciada', 'calculo_completado']) // Permite sobreescribir si el usuario recalcula
+            .select();
+          
+          if (!error) {
+            console.log('✅ Lead actualizado con datos del cálculo:', data);
+          } else {
+            console.error('❌ Error actualizando los datos del lead:', {
+              error,
+              status,
+              code: error?.code,
+              message: error?.message,
+              details: error?.details,
+              hint: error?.hint,
+              email,
+              selectedIncome,
+              selectedChildren
+            });
+          }
         } catch (error) {
-          console.error('Error actualizando los datos del lead:', error);
+          console.error('❌ Excepción al actualizar lead:', {
+            error,
+            message: error instanceof Error ? error.message : String(error),
+            stack: error instanceof Error ? error.stack : undefined,
+            email
+          });
         }
       };
       

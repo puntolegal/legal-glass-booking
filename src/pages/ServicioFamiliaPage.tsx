@@ -33,61 +33,61 @@
 
   const services = [
     {
-      icon: Heart,
-      title: 'Divorcios y Separaciones',
-      description: 'Procesos de divorcio con enfoque humano y eficiente.',
-      features: ['Divorcio de mutuo acuerdo', 'Divorcio unilateral', 'Separación de bienes', 'Compensación económica']
+    icon: Heart,
+    title: 'Divorcios y Separaciones',
+    description: 'Procesos de divorcio con enfoque humano y eficiente.',
+    features: ['Divorcio de mutuo acuerdo', 'Divorcio unilateral', 'Separación de bienes', 'Compensación económica']
     },
     {
-      icon: Baby,
-      title: 'Pensiones de Alimentos',
-      description: 'Establecimiento y cobro de pensiones alimenticias.',
-      features: ['Demanda de alimentos', 'Aumento de pensión', 'Cobro ejecutivo', 'Liquidación de deudas']
+    icon: Baby,
+    title: 'Pensiones de Alimentos',
+    description: 'Establecimiento y cobro de pensiones alimenticias.',
+    features: ['Demanda de alimentos', 'Aumento de pensión', 'Cobro ejecutivo', 'Liquidación de deudas']
     },
     {
-      icon: Users,
-      title: 'Filiación y Paternidad',
-      description: 'Acciones de filiación y reconocimiento paterno.',
-      features: ['Reconocimiento de paternidad', 'Pruebas de ADN', 'Impugnación de paternidad', 'Derechos del menor']
+    icon: Users,
+    title: 'Filiación y Paternidad',
+    description: 'Acciones de filiación y reconocimiento paterno.',
+    features: ['Reconocimiento de paternidad', 'Pruebas de ADN', 'Impugnación de paternidad', 'Derechos del menor']
     },
     {
-      icon: Home,
-      title: 'Régimen de Visitas',
-      description: 'Regulación del cuidado personal y visitas.',
-      features: ['Cuidado personal compartido', 'Régimen comunicacional', 'Relación directa y regular', 'Modificación de régimen']
+    icon: Home,
+    title: 'Régimen de Visitas',
+    description: 'Regulación del cuidado personal y visitas.',
+    features: ['Cuidado personal compartido', 'Régimen comunicacional', 'Relación directa y regular', 'Modificación de régimen']
     },
     {
-      icon: Shield,
-      title: 'Violencia Intrafamiliar',
-      description: 'Protección legal en casos de violencia familiar.',
-      features: ['Medidas de protección', 'Denuncias VIF', 'Cautelares urgentes', 'Acompañamiento legal']
+    icon: Shield,
+    title: 'Violencia Intrafamiliar',
+    description: 'Protección legal en casos de violencia familiar.',
+    features: ['Medidas de protección', 'Denuncias VIF', 'Cautelares urgentes', 'Acompañamiento legal']
     },
     {
-      icon: FileText,
-      title: 'Adopción y Tutela',
-      description: 'Procesos de adopción y designación de tutores.',
-      features: ['Adopción simple y plena', 'Tutela y curaduría', 'Guarda del menor', 'Autorización judicial']
+    icon: FileText,
+    title: 'Adopción y Tutela',
+    description: 'Procesos de adopción y designación de tutores.',
+    features: ['Adopción simple y plena', 'Tutela y curaduría', 'Guarda del menor', 'Autorización judicial']
     }
   ];
 
   const testimonials = [
     {
-      name: 'María José Herrera',
-      role: 'Madre de Familia',
-      content: 'Me ayudaron a obtener la pensión de alimentos que mi hijo necesitaba. El proceso fue rápido y siempre me mantuvieron informada.',
-      rating: 5
+    name: 'María José Herrera',
+    role: 'Madre de Familia',
+    content: 'Me ayudaron a obtener la pensión de alimentos que mi hijo necesitaba. El proceso fue rápido y siempre me mantuvieron informada.',
+    rating: 5
     },
     {
-      name: 'Carlos Mendoza',
-      role: 'Padre Divorciado',
-      content: 'Logramos un divorcio de mutuo acuerdo sin complicaciones. Su enfoque humano hizo la diferencia en un momento difícil.',
-      rating: 5
+    name: 'Carlos Mendoza',
+    role: 'Padre Divorciado',
+    content: 'Logramos un divorcio de mutuo acuerdo sin complicaciones. Su enfoque humano hizo la diferencia en un momento difícil.',
+    rating: 5
     },
     {
-      name: 'Patricia Silva',
-      role: 'Abuela Cuidadora',
-      content: 'Obtuve la custodia de mi nieta gracias a su excelente trabajo. Son especialistas reales en derecho de familia.',
-      rating: 5
+    name: 'Patricia Silva',
+    role: 'Abuela Cuidadora',
+    content: 'Obtuve la custodia de mi nieta gracias a su excelente trabajo. Son especialistas reales en derecho de familia.',
+    rating: 5
     }
   ];
 
@@ -100,13 +100,13 @@
 
   const packages = [
     {
-      id: 'familia-integral',
-      name: 'Protección Familiar Integral',
-      shortName: 'Integral',
-      price: '$550.000',
-      originalPrice: '$1.100.000',
-      discount: '50%',
-      description: 'Común acuerdo + pensión',
+    id: 'familia-integral',
+    name: 'Protección Familiar Integral',
+    shortName: 'Integral',
+    price: '$550.000',
+    originalPrice: '$1.100.000',
+    discount: '50%',
+    description: 'Común acuerdo + pensión',
       context: 'Ideal para acuerdos en buen pie y procesos colaborativos.',
       color: 'from-sky-500 to-cyan-600', // Adjusted color
       features: [
@@ -120,18 +120,18 @@
         'WhatsApp horario laboral',
         '🎁 Upgrade gratis si no hay acuerdo'
       ],
-      popular: false
+    popular: false
     },
     {
-      id: 'familia-premium',
-      name: 'Defensa Familiar Premium',
-      shortName: 'Premium',
-      price: '$1.100.000',
-      originalPrice: '$2.200.000',
-      discount: '50%',
-      description: 'Contencioso + equipo completo',
+    id: 'familia-premium',
+    name: 'Defensa Familiar Premium',
+    shortName: 'Premium',
+    price: '$1.100.000',
+    originalPrice: '$2.200.000',
+    discount: '50%',
+    description: 'Contencioso + equipo completo',
       context: 'Diseñado para defensas contenciosas con un equipo completo detrás.',
-      color: 'from-pink-500 to-rose-600',
+    color: 'from-pink-500 to-rose-600',
       features: [
         'Todo lo del plan Integral +',
         'Divorcio contencioso (audiencias ilimitadas)',
@@ -144,18 +144,18 @@
         'Seguimiento 6 meses',
         '🎁 Apelación incluida sin costo'
       ],
-      popular: true
+    popular: true
     },
     {
-      id: 'familia-elite',
-      name: 'Blindaje Familiar Elite',
-      shortName: 'Elite',
-      price: '$1.700.000',
-      originalPrice: '$3.400.000',
-      discount: '50%',
-      description: 'Casos complejos + internacional',
+    id: 'familia-elite',
+    name: 'Blindaje Familiar Elite',
+    shortName: 'Elite',
+    price: '$1.700.000',
+    originalPrice: '$3.400.000',
+    discount: '50%',
+    description: 'Casos complejos + internacional',
       context: 'Pensado para casos complejos, patrimonio familiar o alcance internacional.',
-      color: 'from-purple-600 to-indigo-700',
+    color: 'from-purple-600 to-indigo-700',
       features: [
         'Todo lo del plan Premium +',
         'Casos con componente internacional',
@@ -168,7 +168,7 @@
         'Seguimiento 12 meses + 1 modificación gratis',
         '🎁 Hasta Corte Suprema incluido'
       ],
-      popular: false
+    popular: false
     }
   ];
 
@@ -204,106 +204,106 @@
 
   const successCases = [
     {
-      amount: '$22M',
-      case: 'Compensación económica recuperada',
-      client: 'Claudia M., 41 años',
-      plan: 'Premium',
-      icon: DollarSign
+    amount: '$22M',
+    case: 'Compensación económica recuperada',
+    client: 'Claudia M., 41 años',
+    plan: 'Premium',
+    icon: DollarSign
     },
     {
-      amount: '65%',
-      case: 'Aumento en pensión alimenticia',
-      client: 'Patricia R., 35 años',
-      plan: 'Integral',
-      icon: TrendingUp
+    amount: '65%',
+    case: 'Aumento en pensión alimenticia',
+    client: 'Patricia R., 35 años',
+    plan: 'Integral',
+    icon: TrendingUp
     },
     {
-      amount: '100%',
-      case: 'Custodia completa obtenida',
-      client: 'María S., 38 años',
-      plan: 'Elite',
-      icon: Heart
+    amount: '100%',
+    case: 'Custodia completa obtenida',
+    client: 'María S., 38 años',
+    plan: 'Elite',
+    icon: Heart
     }
   ];
 
   const whyDifferent = [
     {
-      icon: Ban,
-      title: 'Sin Cobros Ocultos',
-      description: 'Precio cerrado. Audiencias ilimitadas sin costo extra.',
-      gradient: 'from-pink-400 to-rose-500'
+    icon: Ban,
+    title: 'Sin Cobros Ocultos',
+    description: 'Precio cerrado. Audiencias ilimitadas sin costo extra.',
+    gradient: 'from-pink-400 to-rose-500'
     },
     {
-      icon: Zap,
-      title: 'Respuesta Rápida',
-      description: 'WhatsApp directo. Respuesta en menos de 4 horas.',
-      gradient: 'from-pink-500 to-rose-500'
+    icon: Zap,
+    title: 'Respuesta Rápida',
+    description: 'WhatsApp directo. Respuesta en menos de 4 horas.',
+    gradient: 'from-pink-500 to-rose-500'
     },
     {
-      icon: CheckCircle,
-      title: 'Garantía Real',
-      description: 'Si no hay acuerdo, upgrade gratis o apelación incluida.',
-      gradient: 'from-rose-400 to-pink-500'
+    icon: CheckCircle,
+    title: 'Garantía Real',
+    description: 'Si no hay acuerdo, upgrade gratis o apelación incluida.',
+    gradient: 'from-rose-400 to-pink-500'
     },
     {
-      icon: Heart,
-      title: 'Apoyo Integral',
-      description: 'Abogado + apoyo psicológico trabajando para ti.',
-      gradient: 'from-rose-500 to-pink-600'
+    icon: Heart,
+    title: 'Apoyo Integral',
+    description: 'Abogado + apoyo psicológico trabajando para ti.',
+    gradient: 'from-rose-500 to-pink-600'
     }
   ];
 
   const faq = [
     {
-      question: '¿Cuánto tiempo demora un proceso de divorcio?',
-      answer: 'Un divorcio de mutuo acuerdo puede resolverse en 2-3 meses, mientras que un divorcio unilateral puede tomar 6-12 meses dependiendo de la complejidad del caso.'
+    question: '¿Cuánto tiempo demora un proceso de divorcio?',
+    answer: 'Un divorcio de mutuo acuerdo puede resolverse en 2-3 meses, mientras que un divorcio unilateral puede tomar 6-12 meses dependiendo de la complejidad del caso.'
     },
     {
-      question: '¿Cómo se calcula una pensión de alimentos?',
-      answer: 'La pensión se calcula considerando las necesidades del alimentario y las facultades económicas del alimentante, generalmente entre el 20% y 50% de los ingresos.'
+    question: '¿Cómo se calcula una pensión de alimentos?',
+    answer: 'La pensión se calcula considerando las necesidades del alimentario y las facultades económicas del alimentante, generalmente entre el 20% y 50% de los ingresos.'
     },
     {
-      question: '¿Puedo modificar un régimen de visitas establecido?',
-      answer: 'Sí, cuando cambien las circunstancias que motivaron la resolución original, se puede solicitar la modificación del régimen ante el tribunal.'
+    question: '¿Puedo modificar un régimen de visitas establecido?',
+    answer: 'Sí, cuando cambien las circunstancias que motivaron la resolución original, se puede solicitar la modificación del régimen ante el tribunal.'
     },
     {
-      question: '¿Qué documentos necesito para iniciar un proceso de filiación?',
-      answer: 'Certificado de nacimiento del menor, antecedentes que acrediten la relación paterno-filial, y documentación de ingresos para efectos alimentarios.'
+    question: '¿Qué documentos necesito para iniciar un proceso de filiación?',
+    answer: 'Certificado de nacimiento del menor, antecedentes que acrediten la relación paterno-filial, y documentación de ingresos para efectos alimentarios.'
     },
     {
-      question: '¿Qué incluye la Consulta Estratégica Premium?',
-      answer: 'Reunión de 1 hora con abogado especializado, análisis completo de tu caso, estrategia legal personalizada y recomendación del plan ideal. Si contratas cualquier plan, los $150.000 se descuentan del total.'
+    question: '¿Qué incluye la Consulta Estratégica Premium?',
+    answer: 'Reunión de 1 hora con abogado especializado, análisis completo de tu caso, estrategia legal personalizada y recomendación del plan ideal. Si contratas cualquier plan, los $150.000 se descuentan del total.'
     }
   ];
 
-  // Contador Auto-renovable
-  const CountdownTimer = () => {
+// Contador Auto-renovable
+const CountdownTimer = () => {
     const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 
     useEffect(() => {
-          const getTargetDate = () => {
-              const stored = localStorage.getItem('cyber_familia_end_date');
-              if (stored) {
-                  const targetDate = new Date(stored);
-                  if (targetDate.getTime() < Date.now()) {
-                      const newTarget = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000);
-                      localStorage.setItem('cyber_familia_end_date', newTarget.toISOString());
-                      return newTarget;
-                  }
-                  return targetDate;
-              } else {
-                  const newTarget = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000);
-                  localStorage.setItem('cyber_familia_end_date', newTarget.toISOString());
-                  return newTarget;
-              }
+        const getTargetDate = () => {
+            const stored = localStorage.getItem('cyber_familia_end_date');
+            if (stored) {
+                const targetDate = new Date(stored);
+                if (targetDate.getTime() < Date.now()) {
+                    const newTarget = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000);
+                    localStorage.setItem('cyber_familia_end_date', newTarget.toISOString());
+                    return newTarget;
+                }
+                return targetDate;
+            } else {
+                const newTarget = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000);
+                localStorage.setItem('cyber_familia_end_date', newTarget.toISOString());
+                return newTarget;
+            }
       };
 
-          const calculateTimeLeft = () => {
-              const target = getTargetDate();
-              const difference = target.getTime() - Date.now();
-              if (difference > 0) {
-                  return {
-                      days: Math.floor(difference / (1000 * 60 * 60 * 24)),
+        const calculateTimeLeft = () => {
+            const target = getTargetDate();
+            const difference = target.getTime() - Date.now();
+            if (difference > 0) {
+                return {
+                    days: Math.floor(difference / (1000 * 60 * 60 * 24)),
             hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
             minutes: Math.floor((difference / 1000 / 60) % 60),
             seconds: Math.floor((difference / 1000) % 60)
@@ -312,9 +312,9 @@
         return { days: 3, hours: 0, minutes: 0, seconds: 0 };
       };
 
-          setTimeLeft(calculateTimeLeft());
+        setTimeLeft(calculateTimeLeft());
       const timer = setInterval(() => setTimeLeft(calculateTimeLeft()), 1000);
-          return () => clearInterval(timer);
+        return () => clearInterval(timer);
     }, []);
 
     return (
@@ -336,7 +336,7 @@
     );
   };
 
-  export default function ServicioFamiliaPage() {
+export default function ServicioFamiliaPage() {
     const [showQuiz, setShowQuiz] = useState(false);
     const [showEliteModal, setShowEliteModal] = useState(false);
     const [showExitModal, setShowExitModal] = useState(false);
@@ -355,8 +355,8 @@
     }, []);
 
     const openHelperModal = (plan: any) => {
-          setSelectedPlan(plan);
-          setIsHelperModalOpen(true);
+        setSelectedPlan(plan);
+        setIsHelperModalOpen(true);
     };
 
     return (
