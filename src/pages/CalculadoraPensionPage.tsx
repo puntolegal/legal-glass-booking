@@ -141,7 +141,7 @@ const CalculadoraPensionPage: React.FC = () => {
             console.error('Error guardando en localStorage:', e);
           }
         }
-      }, 1000); // Debounce de 1 segundo
+      }, 300); // Debounce rápido de 300ms para captura inmediata
       
       return () => clearTimeout(timeoutId);
     }
