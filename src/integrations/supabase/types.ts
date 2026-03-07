@@ -94,30 +94,48 @@ export type Database = {
       }
       leads_quiz: {
         Row: {
+          calculated_max: string | null
+          calculated_min: string | null
+          children_count: number | null
+          children_label: string | null
           created_at: string | null
           email: string
           id: string
-          name: string
+          income_range: string | null
+          income_value: number | null
+          name: string | null
           plan_recommended: string | null
           quiz_answers: Json
           status: string | null
           updated_at: string | null
         }
         Insert: {
+          calculated_max?: string | null
+          calculated_min?: string | null
+          children_count?: number | null
+          children_label?: string | null
           created_at?: string | null
           email: string
           id?: string
-          name: string
+          income_range?: string | null
+          income_value?: number | null
+          name?: string | null
           plan_recommended?: string | null
           quiz_answers: Json
           status?: string | null
           updated_at?: string | null
         }
         Update: {
+          calculated_max?: string | null
+          calculated_min?: string | null
+          children_count?: number | null
+          children_label?: string | null
           created_at?: string | null
           email?: string
           id?: string
-          name?: string
+          income_range?: string | null
+          income_value?: number | null
+          name?: string | null
           plan_recommended?: string | null
           quiz_answers?: Json
           status?: string | null
