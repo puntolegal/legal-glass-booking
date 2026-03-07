@@ -93,8 +93,8 @@ const CalculadoraPensionPage: React.FC = () => {
           // Payload exacto que coincide con los nombres de las columnas
           const quizData = {
             email: email,
-            name: 'Calculadora Pensión Lead', // Opcional ahora (columna nullable)
-            quiz_answers: JSON.stringify({ source: 'calculadora_pension' }),
+            name: 'Calculadora Pensión Lead',
+            quiz_answers: { source: 'calculadora_pension' },
             plan_recommended: null,
             status: 'calculadora_iniciada'
           };
@@ -296,12 +296,12 @@ const CalculadoraPensionPage: React.FC = () => {
     if (calculatedRange && emailValid && emailSaved) {
       const updateLeadData = async () => {
         try {
-          const quizAnswers = JSON.stringify({ 
+          const quizAnswers = { 
             source: 'calculadora_pension',
             ingreso_demandado: selectedIncome,
             cantidad_hijos: selectedChildren,
             anomalia_legal: calculatedRange.isEdgeCase
-          });
+          };
           
           const { data, error, status } = await supabase
             .from('leads_quiz')
