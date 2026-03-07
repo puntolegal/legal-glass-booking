@@ -53,7 +53,7 @@ const TestMetaPixel: React.FC = () => {
                 <strong>Código de prueba:</strong> <span className="font-mono bg-slate-700 px-2 py-1 rounded">TEST2065</span>
               </p>
               <p className="text-xs text-slate-400">
-                <strong>Pixel ID:</strong> 1824057828514723 | <strong>Dataset ID:</strong> 930048081990153
+                <strong>Pixel ID:</strong> 1101807351995991 | <strong>Dataset ID:</strong> 930048081990153
               </p>
             </div>
           </div>
@@ -164,7 +164,7 @@ const TestMetaPixel: React.FC = () => {
             <ul className="space-y-2 text-sm text-slate-300">
               <li>
                 <a 
-                  href="https://business.facebook.com/events_manager2/list/pixel/1824057828514723/test_events" 
+                  href="https://business.facebook.com/events_manager2/list/pixel/1101807351995991/test_events" 
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-blue-400 hover:text-blue-300 underline"

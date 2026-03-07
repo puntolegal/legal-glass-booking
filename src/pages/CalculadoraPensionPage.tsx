@@ -52,13 +52,22 @@ const AnimatedCounter: React.FC<{ value: string; delay?: number }> = ({ value, d
   return <span>{displayValue}</span>;
 };
 
+// Constantes Jurídicas 2026
+const IMM_2026 = 539000;
+const CANASTA_CRIANZA_2026 = 594883; // Costo promedio por hijo
+
 const CalculadoraPensionPage: React.FC = () => {
   const [email, setEmail] = useState('');
   const [emailValid, setEmailValid] = useState(false);
   const [emailSaved, setEmailSaved] = useState(false);
   const [selectedIncome, setSelectedIncome] = useState<number | null>(null);
   const [selectedChildren, setSelectedChildren] = useState<number | null>(null);
-  const [calculatedRange, setCalculatedRange] = useState<{ min: string; max: string } | null>(null);
+  const [calculatedRange, setCalculatedRange] = useState<{ 
+    min: string; 
+    max: string; 
+    isEdgeCase: boolean; 
+    pisoLegalValue: string 
+  } | null>(null);
 
   // Tracking Meta - ViewContent al cargar
   useEffect(() => {
@@ -163,42 +172,79 @@ const CalculadoraPensionPage: React.FC = () => {
     }).format(amount);
   };
 
-  // Función para calcular rango de pensión (reutilizada de QuizModal)
-  const calculatePensionRange = (income: number | null, children: number | null) => {
-    if (income === null || children === null) {
-      return { min: '$0', max: '$0' };
+  // Función para calcular rango de pensión - Ley 14.908 y Canasta de Crianza 2026
+  const calculatePensionRange = (incomeDemandado: number | null, children: number | null) => {
+    if (incomeDemandado === null || children === null) return null;
+    
+    // Si selecciona "Menos de 800k", usamos el IMM por presunción legal si es muy bajo
+    const I_demandado = Math.max(incomeDemandado, IMM_2026);
+    
+    // Asumimos ingresos del custodio similares al mínimo para el cálculo de prorrata (para no pedir más datos y mantener la conversión alta)
+    const I_custodio = IMM_2026;
+    
+    // Gastos totales presuntos según Canasta del Estado
+    const G_total = CANASTA_CRIANZA_2026 * children;
+    
+    // Hito 1: Piso Legal Irreductible
+    const pisoLegal = children === 1
+      ? 0.40 * IMM_2026
+      : children * (0.30 * IMM_2026);
+    
+    // Hito 2: Techo de Endeudamiento (50% de ingresos)
+    const techoLegal = 0.50 * I_demandado;
+    
+    // Hito 3: Ecuación de Equidad Proporcional
+    const prorrata = G_total * (I_demandado / (I_demandado + I_custodio));
+    
+    // Árbol de decisión
+    let outputMin = Math.min(Math.max(prorrata, pisoLegal), techoLegal);
+    let outputMax = techoLegal;
+    
+    // Manejo del colapso insoluble (Piso > Techo)
+    let isEdgeCase = false;
+    if (pisoLegal > techoLegal) {
+      outputMin = techoLegal;
+      outputMax = techoLegal;
+      isEdgeCase = true;
     }
-    const basePercentage = children === 1 ? 0.3 : 0.4;
-    const min = Math.round(income * (basePercentage - 0.1));
-    const max = Math.round(Math.min(income * 0.5, income * (basePercentage + 0.1)));
-    return { min: formatCurrency(min), max: formatCurrency(max) };
+    
+    return {
+      min: formatCurrency(outputMin),
+      max: formatCurrency(outputMax),
+      isEdgeCase,
+      pisoLegalValue: formatCurrency(pisoLegal)
+    };
   };
 
   // Calcular rango cuando se seleccionan ambos valores
   useEffect(() => {
     if (selectedIncome !== null && selectedChildren !== null) {
       const range = calculatePensionRange(selectedIncome, selectedChildren);
-      setCalculatedRange(range);
-      
-      // Auto-scroll inteligente al resultado después de 150ms
-      setTimeout(() => {
-        const resultElement = document.getElementById('resultado-pension');
-        const whatsappButton = document.getElementById('whatsapp-cta');
+      if (range) {
+        setCalculatedRange(range);
         
-        if (resultElement) {
-          resultElement.scrollIntoView({ 
-            behavior: 'smooth', 
-            block: 'center',
-            inline: 'nearest'
-          });
-        } else if (whatsappButton) {
-          whatsappButton.scrollIntoView({ 
-            behavior: 'smooth', 
-            block: 'center',
-            inline: 'nearest'
-          });
-        }
-      }, 150);
+        // Auto-scroll inteligente al resultado después de 150ms
+        setTimeout(() => {
+          const resultElement = document.getElementById('resultado-pension');
+          const whatsappButton = document.getElementById('whatsapp-cta');
+          
+          if (resultElement) {
+            resultElement.scrollIntoView({ 
+              behavior: 'smooth', 
+              block: 'center',
+              inline: 'nearest'
+            });
+          } else if (whatsappButton) {
+            whatsappButton.scrollIntoView({ 
+              behavior: 'smooth', 
+              block: 'center',
+              inline: 'nearest'
+            });
+          }
+        }, 150);
+      }
+    } else {
+      setCalculatedRange(null);
     }
   }, [selectedIncome, selectedChildren]);
 
@@ -206,10 +252,43 @@ const CalculadoraPensionPage: React.FC = () => {
   // TODO: Reemplazar 569XXXXXXXX con el número de WhatsApp real de Punto Legal
   const WHATSAPP_NUMBER = '56962321883'; // Cambiar este número según corresponda
   const whatsappUrl = useMemo(() => {
-    if (!calculatedRange) return '';
-    const message = `Hola, acabo de usar la calculadora de Punto Legal. El monto estimado es entre ${calculatedRange.min} y ${calculatedRange.max}. Quiero saber cómo demandar.`;
+    if (!calculatedRange || selectedChildren === null) return '';
+    const message = `Hola, acabo de usar la calculadora de Punto Legal. Para ${selectedChildren} hijo(s), el monto estimado por ley es entre ${calculatedRange.min} y ${calculatedRange.max}. Quiero saber cómo exigir esto.`;
     return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
-  }, [calculatedRange]);
+  }, [calculatedRange, selectedChildren]);
+
+  // Actualización silenciosa del Lead con los datos del cálculo
+  useEffect(() => {
+    if (calculatedRange && emailValid && emailSaved) {
+      const updateLeadData = async () => {
+        try {
+          const quizAnswers = JSON.stringify({ 
+            source: 'calculadora_pension',
+            ingreso_demandado: selectedIncome,
+            cantidad_hijos: selectedChildren,
+            anomalia_legal: calculatedRange.isEdgeCase
+          });
+          
+          await supabase
+            .from('leads_quiz')
+            .update({
+              quiz_answers: quizAnswers,
+              income_value: selectedIncome,
+              children_count: selectedChildren,
+              calculated_min: calculatedRange.min,
+              calculated_max: calculatedRange.max,
+              status: 'calculo_completado'
+            })
+            .eq('email', email)
+            .in('status', ['calculadora_iniciada', 'calculo_completado']); // Permite sobreescribir si el usuario recalcula
+        } catch (error) {
+          console.error('Error actualizando los datos del lead:', error);
+        }
+      };
+      
+      updateLeadData();
+    }
+  }, [calculatedRange, email, emailValid, emailSaved, selectedIncome, selectedChildren]);
 
   return (
     <>
@@ -529,43 +608,83 @@ const CalculadoraPensionPage: React.FC = () => {
                       boxShadow: 'inset 0 2px 8px rgba(0, 0, 0, 0.2), 0 4px 16px rgba(0, 0, 0, 0.1)'
                     }}
                   >
-                    <p className="text-sm text-slate-400 mb-6 font-medium">Estimación mensual</p>
-                    <div className="flex items-center justify-center gap-6 md:gap-8 flex-wrap">
+                    {calculatedRange.min === calculatedRange.max ? (
+                      <>
+                        <p className="text-sm text-slate-400 mb-6 font-medium">Estimación mensual</p>
                       <motion.div
                         initial={{ scale: 0.8, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
-                        transition={{ delay: 0.2, type: 'spring', stiffness: 200, damping: 20 }}
+                        transition={{ type: 'spring', stiffness: 200, damping: 20 }}
                         className="text-center"
                       >
-                        <p className="text-xs text-slate-500 mb-3 uppercase tracking-wider">Mínimo</p>
-                        <p className="text-5xl md:text-6xl font-semibold text-white/95 tracking-tight">
-                          <AnimatedCounter value={calculatedRange.min} />
+                        <p className="text-xs text-rose-400 mb-3 uppercase tracking-wider font-bold flex items-center justify-center gap-2">
+                          <AlertTriangle className="w-4 h-4" /> Tope Máximo por Ley (50%)
                         </p>
-                      </motion.div>
-                      
-                      <motion.span
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ delay: 0.4 }}
-                        className="text-4xl text-slate-600"
-                      >
-                        —
-                      </motion.span>
-                      
-                      <motion.div
-                        initial={{ scale: 0.8, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        transition={{ delay: 0.6, type: 'spring', stiffness: 200, damping: 20 }}
-                        className="text-center"
-                      >
-                        <p className="text-xs text-slate-500 mb-3 uppercase tracking-wider">Máximo</p>
                         <p className="text-5xl md:text-6xl font-semibold text-white/95 tracking-tight">
-                          <AnimatedCounter value={calculatedRange.max} delay={0.3} />
+                          <AnimatedCounter value={calculatedRange.max} />
                         </p>
+                        <p className="text-xs text-slate-500 mt-6 font-medium">CLP mensuales</p>
                       </motion.div>
-                    </div>
-                    <p className="text-xs text-slate-500 mt-6 font-medium">CLP mensuales</p>
+                      </>
+                    ) : (
+                      <>
+                        <p className="text-sm text-slate-400 mb-6 font-medium">Estimación mensual</p>
+                        <div className="flex items-center justify-center gap-6 md:gap-8 flex-wrap">
+                        <motion.div
+                          initial={{ scale: 0.8, opacity: 0 }}
+                          animate={{ scale: 1, opacity: 1 }}
+                          transition={{ delay: 0.2, type: 'spring', stiffness: 200, damping: 20 }}
+                          className="text-center"
+                        >
+                          <p className="text-xs text-slate-500 mb-3 uppercase tracking-wider">Mínimo</p>
+                          <p className="text-5xl md:text-6xl font-semibold text-white/95 tracking-tight">
+                            <AnimatedCounter value={calculatedRange.min} />
+                          </p>
+                        </motion.div>
+                        
+                        <motion.span
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          transition={{ delay: 0.4 }}
+                          className="text-4xl text-slate-600"
+                        >
+                          —
+                        </motion.span>
+                        
+                        <motion.div
+                          initial={{ scale: 0.8, opacity: 0 }}
+                          animate={{ scale: 1, opacity: 1 }}
+                          transition={{ delay: 0.6, type: 'spring', stiffness: 200, damping: 20 }}
+                          className="text-center"
+                        >
+                          <p className="text-xs text-slate-500 mb-3 uppercase tracking-wider">Máximo</p>
+                          <p className="text-5xl md:text-6xl font-semibold text-white/95 tracking-tight">
+                            <AnimatedCounter value={calculatedRange.max} delay={0.3} />
+                          </p>
+                        </motion.div>
+                        </div>
+                        <p className="text-xs text-slate-500 mt-6 font-medium">CLP mensuales</p>
+                      </>
+                    )}
                   </div>
+
+                  {/* Alerta de Anomalía Legal */}
+                  {calculatedRange.isEdgeCase && (
+                    <motion.div 
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      transition={{ duration: 0.4 }}
+                      className="mt-4 bg-amber-500/10 backdrop-blur-xl border border-amber-500/30 rounded-xl p-4 text-left flex items-start gap-3"
+                    >
+                      <AlertTriangle className="w-5 h-5 text-amber-400 flex-shrink-0" />
+                      <div>
+                        <p className="text-sm font-semibold text-amber-200 mb-1">Anomalía Legal Detectada</p>
+                        <p className="text-xs text-slate-300 leading-relaxed">
+                          El mínimo exigido por ley ({calculatedRange.pisoLegalValue}) supera el 50% de los ingresos del demandado. Un juez limitará la pensión al monto mostrado, pero esto generará una deuda automática, activando retenciones de AFP y arraigo nacional.
+                        </p>
+                      </div>
+                    </motion.div>
+                  )}
 
                   {/* Disclaimer - iOS Style */}
                   <div className="flex items-start gap-3 text-xs text-slate-400 mb-0 bg-white/5 backdrop-blur-xl rounded-2xl p-4 border border-white/5">

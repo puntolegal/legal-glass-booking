@@ -21,9 +21,9 @@ META_CONVERSIONS_API_TOKEN=EABAXeUpkjJIBQ2fV4rm07Dj9K3aWV30YmpT6yPBTzSZCrZBSmxJD
 ```
 
 ### 2. Pixel ID
-- **Pixel ID:** `1824057828514723`
+- **Pixel ID:** `1101807351995991`
 - **API Version:** `v21.0`
-- **Endpoint:** `https://graph.facebook.com/v21.0/1824057828514723/events`
+- **Endpoint:** `https://graph.facebook.com/v21.0/1101807351995991/events`
 
 ## Eventos Configurados
 
@@ -149,7 +149,7 @@ Esta página incluye botones para probar todos los eventos configurados:
 2. Ve a Graph API Explorer
 3. Realiza una solicitud POST a:
    ```
-   https://graph.facebook.com/v21.0/1824057828514723/events?access_token={TOKEN}&test_event_code=TEST2065
+   https://graph.facebook.com/v21.0/1101807351995991/events?access_token={TOKEN}&test_event_code=TEST2065
    ```
 4. Con el payload de ejemplo proporcionado en Meta Events Manager
 5. Vuelve a la página "Probar eventos" para verificar
