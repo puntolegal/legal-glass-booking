@@ -62,6 +62,8 @@ const CalculadoraPensionPage: React.FC = () => {
   const [emailSaved, setEmailSaved] = useState(false);
   const [selectedIncome, setSelectedIncome] = useState<number | null>(null);
   const [selectedChildren, setSelectedChildren] = useState<number | null>(null);
+  const [currentPension, setCurrentPension] = useState<string>(''); // Monto actual que recibe
+  const [hidesIncome, setHidesIncome] = useState<boolean | null>(null); // Si sospecha que ocultan ingresos
   const [calculatedRange, setCalculatedRange] = useState<{ 
     min: string; 
     max: string; 
@@ -250,9 +252,9 @@ const CalculadoraPensionPage: React.FC = () => {
     };
   };
 
-  // Calcular rango cuando se seleccionan ambos valores
+  // Calcular rango cuando se seleccionan ambos valores Y se completan los pasos 4 y 5
   useEffect(() => {
-    if (selectedIncome !== null && selectedChildren !== null) {
+    if (selectedIncome !== null && selectedChildren !== null && currentPension !== '' && hidesIncome !== null) {
       const range = calculatePensionRange(selectedIncome, selectedChildren);
       if (range) {
         setCalculatedRange(range);
@@ -280,7 +282,7 @@ const CalculadoraPensionPage: React.FC = () => {
     } else {
       setCalculatedRange(null);
     }
-  }, [selectedIncome, selectedChildren]);
+  }, [selectedIncome, selectedChildren, currentPension, hidesIncome]);
 
   // URL de WhatsApp dinámica
   // TODO: Reemplazar 569XXXXXXXX con el número de WhatsApp real de Punto Legal
@@ -300,13 +302,15 @@ const CalculadoraPensionPage: React.FC = () => {
             source: 'calculadora_pension',
             ingreso_demandado: selectedIncome,
             cantidad_hijos: selectedChildren,
-            anomalia_legal: calculatedRange.isEdgeCase
+            anomalia_legal: calculatedRange.isEdgeCase,
+            pension_actual: currentPension,
+            oculta_ingresos: hidesIncome
           };
           
           const { data, error, status } = await supabase
             .from('leads_quiz')
             .update({
-              quiz_answers: quizAnswers,
+              quiz_answers: quizAnswers as any, // Type assertion para JSONB
               income_value: selectedIncome,
               children_count: selectedChildren,
               calculated_min: calculatedRange.min,
@@ -344,7 +348,7 @@ const CalculadoraPensionPage: React.FC = () => {
       
       updateLeadData();
     }
-  }, [calculatedRange, email, emailValid, emailSaved, selectedIncome, selectedChildren]);
+  }, [calculatedRange, email, emailValid, emailSaved, selectedIncome, selectedChildren, currentPension, hidesIncome]);
 
   return (
     <>
@@ -632,7 +636,172 @@ const CalculadoraPensionPage: React.FC = () => {
               </div>
             </motion.div>
 
-            {/* Paso 4: Resultado con números GIGANTES - iOS Glassmorphism Premium */}
+            {/* Paso 4: Monto Actual - iOS Glassmorphism */}
+            {selectedIncome !== null && selectedChildren !== null && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                className={`relative bg-white/5 backdrop-blur-2xl border border-white/10 rounded-3xl p-6 md:p-8 shadow-2xl transition-all ${
+                  !emailValid ? 'opacity-40' : ''
+                }`}
+                style={{
+                  background: emailValid 
+                    ? 'linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%)'
+                    : 'linear-gradient(135deg, rgba(255, 255, 255, 0.02) 0%, rgba(255, 255, 255, 0.01) 100%)',
+                  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+                }}
+              >
+                <div className="flex items-center gap-3 mb-6">
+                  <div className={`w-10 h-10 backdrop-blur-xl rounded-2xl flex items-center justify-center border transition-all ${
+                    emailValid 
+                      ? 'bg-white/10 border-white/10' 
+                      : 'bg-white/5 border-white/5'
+                  }`}>
+                    <span className={`text-lg font-semibold transition-colors ${emailValid ? 'text-white/90' : 'text-slate-500'}`}>4</span>
+                  </div>
+                  <h2 className="text-xl font-semibold text-white/95">¿Cuánto recibes actualmente de pensión?</h2>
+                </div>
+                
+                <div className="relative">
+                  <div className="absolute left-4 top-1/2 -translate-y-1/2">
+                    <DollarSign className={`w-5 h-5 transition-colors ${currentPension ? 'text-blue-400' : 'text-slate-500'}`} />
+                  </div>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    value={currentPension}
+                    onChange={(e) => {
+                      // Solo permitir números y formatear como moneda chilena
+                      const value = e.target.value.replace(/\D/g, '');
+                      if (value === '' || parseInt(value) >= 0) {
+                        setCurrentPension(value);
+                      }
+                    }}
+                    onBlur={() => {
+                      // Formatear al perder el foco
+                      if (currentPension) {
+                        const numValue = parseInt(currentPension.replace(/\D/g, ''));
+                        if (!isNaN(numValue)) {
+                          const formatted = new Intl.NumberFormat('es-CL', {
+                            style: 'currency',
+                            currency: 'CLP',
+                            minimumFractionDigits: 0,
+                            maximumFractionDigits: 0
+                          }).format(numValue);
+                          setCurrentPension(formatted);
+                        }
+                      }
+                    }}
+                    placeholder="$0"
+                    className="w-full pl-12 pr-12 py-4 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 transition-all text-base"
+                    disabled={!emailValid}
+                    style={{
+                      boxShadow: 'inset 0 2px 4px rgba(0, 0, 0, 0.1)'
+                    }}
+                  />
+                  {currentPension && (
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      className="absolute right-4 top-1/2 -translate-y-1/2"
+                    >
+                      <CheckCircle className="w-5 h-5 text-blue-400" />
+                    </motion.div>
+                  )}
+                </div>
+                <p className="text-xs text-slate-500 mt-3">
+                  Si recibes $0, escribe 0. Este dato es confidencial.
+                </p>
+              </motion.div>
+            )}
+
+            {/* Paso 5: Micro-compromiso/Agitación - iOS Glassmorphism */}
+            {selectedIncome !== null && selectedChildren !== null && currentPension !== '' && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                className="relative bg-white/5 backdrop-blur-2xl border border-white/10 rounded-3xl p-6 md:p-8 shadow-2xl"
+                style={{
+                  background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%)',
+                  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+                }}
+              >
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-10 h-10 bg-white/10 backdrop-blur-xl rounded-2xl flex items-center justify-center border border-white/10">
+                    <span className="text-lg font-semibold text-white/90">5</span>
+                  </div>
+                  <h2 className="text-xl font-semibold text-white/95">¿Sospechas que el demandado oculta sus ingresos reales, trabaja en negro o se atrasa en los pagos?</h2>
+                </div>
+                
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <motion.button
+                    onClick={() => setHidesIncome(true)}
+                    whileHover={{ scale: 1.01, y: -2 }}
+                    whileTap={{ scale: 0.99 }}
+                    className={`p-4 rounded-2xl border transition-all text-center flex items-center justify-center gap-3 ${
+                      hidesIncome === true
+                        ? 'border-red-500/50 bg-red-500/10 shadow-lg shadow-red-500/20'
+                        : 'bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20'
+                    }`}
+                    style={{
+                      backdropFilter: 'blur(20px)',
+                      boxShadow: hidesIncome === true 
+                        ? '0 4px 16px rgba(239, 68, 68, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+                        : '0 2px 8px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.05)'
+                    }}
+                  >
+                    <AlertTriangle className={`w-5 h-5 transition-colors ${hidesIncome === true ? 'text-red-400' : 'text-slate-400'}`} />
+                    <span className={`font-medium transition-colors ${hidesIncome === true ? 'text-white' : 'text-slate-300'}`}>
+                      Sí, lo sospecho
+                    </span>
+                    {hidesIncome === true && (
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                      >
+                        <CheckCircle className="w-5 h-5 text-red-400 flex-shrink-0" />
+                      </motion.div>
+                    )}
+                  </motion.button>
+                  
+                  <motion.button
+                    onClick={() => setHidesIncome(false)}
+                    whileHover={{ scale: 1.01, y: -2 }}
+                    whileTap={{ scale: 0.99 }}
+                    className={`p-4 rounded-2xl border transition-all text-center flex items-center justify-center gap-3 ${
+                      hidesIncome === false
+                        ? 'border-blue-500/50 bg-blue-500/10 shadow-lg shadow-blue-500/20'
+                        : 'bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20'
+                    }`}
+                    style={{
+                      backdropFilter: 'blur(20px)',
+                      boxShadow: hidesIncome === false 
+                        ? '0 4px 16px rgba(59, 130, 246, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+                        : '0 2px 8px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.05)'
+                    }}
+                  >
+                    <ShieldCheck className={`w-5 h-5 transition-colors ${hidesIncome === false ? 'text-blue-400' : 'text-slate-400'}`} />
+                    <span className={`font-medium transition-colors ${hidesIncome === false ? 'text-white' : 'text-slate-300'}`}>
+                      No
+                    </span>
+                    {hidesIncome === false && (
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                      >
+                        <CheckCircle className="w-5 h-5 text-blue-400 flex-shrink-0" />
+                      </motion.div>
+                    )}
+                  </motion.button>
+                </div>
+              </motion.div>
+            )}
+
+            {/* Paso 6: Resultado con números GIGANTES - iOS Glassmorphism Premium */}
             {calculatedRange && (
               <motion.div
                 id="resultado-pension"
@@ -724,6 +893,47 @@ const CalculadoraPensionPage: React.FC = () => {
                     )}
                   </div>
 
+                  {/* Bloque de Costo de Inacción - Matemática del Dolor */}
+                  {currentPension && calculatedRange && (
+                    <motion.div 
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      transition={{ duration: 0.4 }}
+                      className="mt-6 bg-red-500/10 backdrop-blur-xl border border-red-500/30 rounded-xl p-5 text-left"
+                      style={{
+                        boxShadow: '0 4px 16px rgba(239, 68, 68, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+                      }}
+                    >
+                      <div className="flex items-start gap-3">
+                        <AlertTriangle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
+                        <div className="flex-1">
+                          <p className="text-sm font-bold text-red-300 mb-2 flex items-center gap-2">
+                            <span className="text-lg">🚨</span> Costo de inacción
+                          </p>
+                          {(() => {
+                            // Calcular el costo anual de inacción
+                            const currentPensionNum = parseInt(currentPension.replace(/\D/g, '')) || 0;
+                            const maxPensionNum = parseInt(calculatedRange.max.replace(/\D/g, '')) || 0;
+                            const monthlyLoss = Math.max(0, maxPensionNum - currentPensionNum);
+                            const annualLoss = monthlyLoss * 12;
+                            const formattedLoss = new Intl.NumberFormat('es-CL', {
+                              style: 'currency',
+                              currency: 'CLP',
+                              minimumFractionDigits: 0,
+                              maximumFractionDigits: 0
+                            }).format(annualLoss);
+                            
+                            return (
+                              <p className="text-sm text-slate-200 leading-relaxed">
+                                Estás perdiendo aproximadamente <strong className="text-red-300 font-bold">{formattedLoss}</strong> al año porque tu pensión no está regulada a los montos de la Ley 2026.
+                              </p>
+                            );
+                          })()}
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+
                   {/* Alerta de Anomalía Legal */}
                   {calculatedRange.isEdgeCase && (
                     <motion.div 
@@ -754,42 +964,111 @@ const CalculadoraPensionPage: React.FC = () => {
               </motion.div>
             )}
 
-            {/* CTA de WhatsApp - Estilo Notificación iOS Premium - Inmediatamente después del resultado */}
+            {/* CTA Mejorado - Upsell de $35.000 - Estilo iOS Premium */}
             {calculatedRange && (
               <motion.div
                 id="whatsapp-cta"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.8, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-                className="flex justify-center"
+                className="space-y-4"
               >
-                <motion.a
-                  href={whatsappUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="group relative w-full sm:w-auto inline-flex items-center justify-between sm:justify-center gap-4 px-6 py-4 rounded-2xl font-medium text-white transition-all overflow-hidden"
+                {/* Tarjeta de Upsell Principal */}
+                <motion.div
+                  className="relative bg-gradient-to-br from-blue-500/10 via-purple-500/5 to-pink-500/10 backdrop-blur-2xl border border-white/10 rounded-3xl p-6 md:p-8 shadow-2xl"
                   style={{
-                    background: 'linear-gradient(180deg, rgba(37, 211, 102, 0.15) 0%, rgba(37, 211, 102, 0.05) 100%)',
-                    backdropFilter: 'blur(20px)',
-                    border: '1px solid rgba(37, 211, 102, 0.3)',
-                    boxShadow: '0 8px 32px rgba(37, 211, 102, 0.15)'
+                    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
                   }}
                 >
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                  
-                  <div className="flex items-center gap-3 relative z-10">
-                    <div className="w-10 h-10 rounded-full bg-[#25D366] flex items-center justify-center shadow-lg shadow-[#25D366]/30">
-                      <MessageCircle className="w-5 h-5 text-white" />
+                  <div className="text-center mb-6">
+                    <h3 className="text-2xl md:text-3xl font-bold text-white/95 mb-2">
+                      Sesión de Auditoría Legal y Plan de Cobro
+                    </h3>
+                    <p className="text-slate-400 text-sm">
+                      Toma el control de tu situación legal hoy
+                    </p>
+                  </div>
+
+                  {/* Viñetas Tangibles */}
+                  <div className="space-y-3 mb-6">
+                    <div className="flex items-start gap-3 bg-white/5 backdrop-blur-xl rounded-xl p-3 border border-white/5">
+                      <CheckCircle className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" />
+                      <span className="text-sm text-slate-200">PDF con tu radiografía legal exacta</span>
                     </div>
-                    <div className="flex flex-col text-left">
-                      <span className="text-base font-semibold leading-none">Hablar con un Abogado</span>
-                      <span className="text-xs text-[#25D366] font-medium mt-1">Línea directa WhatsApp</span>
+                    <div className="flex items-start gap-3 bg-white/5 backdrop-blur-xl rounded-xl p-3 border border-white/5">
+                      <CheckCircle className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" />
+                      <span className="text-sm text-slate-200">Estrategia para retención de fondos (AFP/Bancos)</span>
+                    </div>
+                    <div className="flex items-start gap-3 bg-white/5 backdrop-blur-xl rounded-xl p-3 border border-white/5">
+                      <CheckCircle className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" />
+                      <span className="text-sm text-slate-200">60 minutos con un especialista en Ley 14.908</span>
                     </div>
                   </div>
-                  <ArrowRight className="w-5 h-5 text-slate-400 relative z-10 group-hover:text-white transition-colors group-hover:translate-x-1" />
-                </motion.a>
+
+                  {/* Botón CTA Principal */}
+                  <Link
+                    to="/agendamiento?plan=consulta-estrategica-familia"
+                    className="block w-full"
+                  >
+                    <motion.div
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold py-4 px-6 rounded-2xl text-center transition-all shadow-lg shadow-blue-500/30 flex items-center justify-center gap-3"
+                    >
+                      <DollarSign className="w-5 h-5" />
+                      <span className="text-lg">Agendar Sesión de Auditoría - $35.000</span>
+                      <ArrowRight className="w-5 h-5" />
+                    </motion.div>
+                  </Link>
+
+                  {/* Mata la Objeción de Vía Gratuita */}
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 1 }}
+                    className="mt-4 flex items-start gap-3 bg-white/5 backdrop-blur-xl rounded-xl p-4 border border-white/5"
+                  >
+                    <Shield className="w-5 h-5 text-slate-400 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-xs text-slate-400 leading-relaxed">
+                        <strong className="text-slate-300">¿Pensando en la vía pública gratuita?</strong> Un defensor público atiende 500 casos al mes y demora hasta un año. Toma el control hoy sin esperas.
+                      </p>
+                    </div>
+                  </motion.div>
+                </motion.div>
+
+                {/* CTA Alternativo WhatsApp */}
+                <motion.div
+                  className="flex justify-center"
+                >
+                  <motion.a
+                    href={whatsappUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="group relative w-full sm:w-auto inline-flex items-center justify-between sm:justify-center gap-4 px-6 py-4 rounded-2xl font-medium text-white transition-all overflow-hidden"
+                    style={{
+                      background: 'linear-gradient(180deg, rgba(37, 211, 102, 0.15) 0%, rgba(37, 211, 102, 0.05) 100%)',
+                      backdropFilter: 'blur(20px)',
+                      border: '1px solid rgba(37, 211, 102, 0.3)',
+                      boxShadow: '0 8px 32px rgba(37, 211, 102, 0.15)'
+                    }}
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                    
+                    <div className="flex items-center gap-3 relative z-10">
+                      <div className="w-10 h-10 rounded-full bg-[#25D366] flex items-center justify-center shadow-lg shadow-[#25D366]/30">
+                        <MessageCircle className="w-5 h-5 text-white" />
+                      </div>
+                      <div className="flex flex-col text-left">
+                        <span className="text-base font-semibold leading-none">Hablar con un Abogado</span>
+                        <span className="text-xs text-[#25D366] font-medium mt-1">Línea directa WhatsApp</span>
+                      </div>
+                    </div>
+                    <ArrowRight className="w-5 h-5 text-slate-400 relative z-10 group-hover:text-white transition-colors group-hover:translate-x-1" />
+                  </motion.a>
+                </motion.div>
               </motion.div>
             )}
 
