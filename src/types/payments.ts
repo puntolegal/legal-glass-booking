@@ -1,9 +1,9 @@
 export interface PendingPaymentData {
   id: string;
   reservationId?: string;
-  reservaId?: string; // Alias para compatibilidad
+  reservaId?: string;
   external_reference?: string;
-  externalReference?: string; // Alias para consistencia
+  externalReference?: string;
   nombre: string;
   email: string;
   telefono: string;
@@ -15,8 +15,8 @@ export interface PendingPaymentData {
   originalPrice?: number | null;
   fecha: string;
   hora: string;
-  date: string; // For compatibility
-  time: string; // For compatibility
+  date: string;
+  time: string;
   tipo_reunion: string;
   codigoConvenio?: string | null;
   descuentoConvenio?: boolean;
@@ -24,6 +24,10 @@ export interface PendingPaymentData {
   method?: string | null;
   preferenceId?: string | null;
   timestamp: number;
+  isVip?: boolean;
+  isVulnerable?: boolean;
+  matter?: string | null;
+  protectionType?: string | null;
 }
 
 export interface MercadoPagoMetadata {
