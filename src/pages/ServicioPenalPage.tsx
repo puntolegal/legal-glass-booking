@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { Shield, Gavel, FileText, Users, CheckCircle, Star, Clock, Award, AlertCircle, ArrowRight, Phone } from 'lucide-react'
+import { Shield, Gavel, FileText, Users, CheckCircle, Star, Clock, Award, AlertCircle, ArrowRight, Phone, Calendar } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import SEO from '../components/SEO'
 
@@ -888,13 +888,19 @@ export default function ServicioPenalPage() {
               
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link
-                  to="/agendamiento?plan=defensa-urgente"
+                  to="/urgencia"
                   className="bg-red-500 text-white px-8 py-4 rounded-xl font-semibold hover:bg-red-600 transition-all inline-flex items-center gap-2 animate-pulse"
                 >
                   <Shield className="w-5 h-5" />
-                  Defensa Urgente 24/7
+                  Detención: Activar Defensa Ahora
                 </Link>
-                
+                <Link
+                  to="/agendamiento?plan=defensa-urgente"
+                  className="bg-white/10 backdrop-blur-sm text-foreground px-8 py-4 rounded-xl font-semibold hover:bg-white/20 transition-all inline-flex items-center gap-2 border border-white/20"
+                >
+                  <Calendar className="w-5 h-5" />
+                  Agendar Consulta
+                </Link>
                 <Link
                   to="/consulta-gratuita-penal"
                   className="bg-white/10 backdrop-blur-sm text-foreground px-8 py-4 rounded-xl font-semibold hover:bg-white/20 transition-all inline-flex items-center gap-2 border border-white/20"

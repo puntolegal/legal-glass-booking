@@ -49,6 +49,7 @@ import DiagnosticoIniciar from '@/pages/DiagnosticoIniciar';
 import PortalReconstruccionPage from '@/pages/PortalReconstruccionPage';
 import RugbyPage from '@/pages/RugbyPage';
 import CalculadoraPensionPage from '@/pages/CalculadoraPensionPage';
+import UrgenciaPage from '@/pages/UrgenciaPage';
 
 // Blog Posts
 import BlogPost1 from '@/pages/BlogPost1';
@@ -93,6 +94,7 @@ function App() {
                         <Route path="/payment-success" element={<PaymentSuccessPage />} />
                         <Route path="/payment-failure" element={<PaymentFailurePage />} />
                         <Route path="/payment-pending" element={<PaymentPendingPage />} />
+                        <Route path="/urgencia" element={<UrgenciaPage />} />
                         <Route path="/admin" element={<AdminPage />} />
                         <Route path="/auth" element={<AuthPage />} />
                         <Route path="/amanda" element={<AmandaLogin />} />
