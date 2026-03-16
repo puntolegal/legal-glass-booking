@@ -231,11 +231,12 @@ export default function ExpressPage() {
               <CheckCircle2 className="w-10 h-10 text-emerald-600" />
             </div>
             <h1 className="text-2xl font-black text-slate-900 mb-2">
-              Ticket Presencial Validado
+              Consulta Legal Online Confirmada
             </h1>
             <p className="text-slate-600 text-sm flex items-center justify-center gap-2 flex-wrap">
               <span className="line-through text-slate-400">Consulta Especialista: $75.000</span>
               <span className="font-bold text-slate-900">$25.000</span>
+              <span>• Reunión telemática</span>
             </p>
           </motion.div>
 
