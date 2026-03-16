@@ -14,13 +14,14 @@ import {
   Building2,
   Lock,
   MessageCircle,
+  Scale,
 } from 'lucide-react';
 import SEO from '@/components/SEO';
 import { supabase } from '@/integrations/supabase/client';
 import type { Json } from '@/integrations/supabase/types';
 import { trackMetaEvent } from '@/services/metaConversionsService';
 
-type Materia = 'hogar' | 'familia' | 'trabajador' | 'deudas' | 'pyme' | null;
+type Materia = 'hogar' | 'familia' | 'trabajador' | 'deudas' | 'pyme' | 'penal' | null;
 
 const MATERIAS = [
   { id: 'hogar' as const, label: 'Hogar (Arriendos y Propiedades)', icon: Home },
@@ -28,6 +29,7 @@ const MATERIAS = [
   { id: 'trabajador' as const, label: 'Trabajador (Despidos y Sueldos)', icon: Briefcase },
   { id: 'deudas' as const, label: 'Deudas (Dicom y Embargos)', icon: CreditCard },
   { id: 'pyme' as const, label: 'Pyme (Constitución y Contratos)', icon: Building2 },
+  { id: 'penal' as const, label: 'Derecho Penal', icon: Scale },
 ];
 
 const PRECIO_EXPRESS = 25000;
