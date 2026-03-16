@@ -93,7 +93,8 @@ export default function ExpressPage() {
   // Supabase Ninja: guardar lead al tener WhatsApp válido (debounce)
   const saveLead = useCallback(async () => {
     if (!isValidWhatsapp(whatsapp) || leadSaved) return;
-    const phone = whatsapp.replace(/\D/g, '');
+    const phoneDigits = getWhatsappDigits(whatsapp);
+    const phone = `569${phoneDigits}`;
     const emailPlaceholder = `express-${phone}@puntolegal.online`;
     try {
       const quizAnswers: Json = {
