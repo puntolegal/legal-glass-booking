@@ -335,10 +335,10 @@ export default function ExpressPage() {
                 <div className="flex flex-col items-center gap-2 pt-2">
                   <div className="flex items-center gap-2 text-slate-600 text-sm">
                     <Lock className="w-4 h-4" />
-                    <span>Pago Seguro MercadoPago</span>
-                  </div>
-                  <p className="text-[10px] text-slate-500 text-center max-w-xs">
-                    Garantía 100%: Si no hay solución legal, se devuelve el dinero.
+                     <span>Pago Seguro MercadoPago</span>
+                   </div>
+                   <p className="text-[10px] text-slate-500 text-center max-w-xs">
+                     Consulta 100% online. Después del pago, un abogado te contactará para agendar la reunión telemática.
                   </p>
                 </div>
               </motion.div>

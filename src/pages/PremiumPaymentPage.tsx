@@ -110,6 +110,10 @@ export default function PremiumPaymentPage() {
                 <div className="rounded-xl p-4 bg-slate-50 border-2 border-slate-200">
                   <p className="text-[10px] text-slate-500 uppercase tracking-wider mb-1">Servicio</p>
                   <p className="text-sm font-bold text-slate-900">{paymentData.service}</p>
+                  <p className="text-[10px] text-slate-500 uppercase tracking-wider mt-3 mb-1">Modalidad</p>
+                  <p className="text-sm font-medium text-slate-700">Consulta online</p>
+                  <p className="text-[10px] text-slate-500 uppercase tracking-wider mt-3 mb-1">Siguiente paso</p>
+                  <p className="text-sm text-slate-700">Un abogado te contactará para agendar la reunión telemática.</p>
                   <p className="text-[10px] text-slate-500 uppercase tracking-wider mt-3 mb-1">Total</p>
                   <p className="text-xl font-black text-emerald-600">
                     ${new Intl.NumberFormat('es-CL').format(paymentData.price)}
