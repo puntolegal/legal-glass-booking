@@ -281,23 +281,28 @@ export default function ExpressPage() {
                 className="mb-10"
               >
                 <h2 className="text-lg font-black text-slate-900 mb-4">
-                  2. ¿A qué número te llama el abogado?
+                  2. ¿A qué número te contacta el abogado para agendar tu reunión online?
                 </h2>
                 <div className="space-y-4">
                   <input
                     type="text"
-                    placeholder="Tu nombre real"
+                    placeholder="Nombre completo"
                     value={nombre}
                     onChange={(e) => setNombre(e.target.value)}
                     className="w-full h-[60px] px-4 text-lg font-medium border-2 border-slate-300 rounded-xl focus:ring-4 focus:ring-blue-500/30 focus:border-blue-500 outline-none bg-white"
                   />
                   <input
                     type="tel"
+                    inputMode="numeric"
+                    autoComplete="tel"
                     placeholder="+56 9 1234 5678"
                     value={whatsapp}
                     onChange={(e) => setWhatsapp(formatWhatsapp(e.target.value))}
                     className="w-full h-[60px] px-4 text-lg font-medium border-2 border-slate-300 rounded-xl focus:ring-4 focus:ring-blue-500/30 focus:border-blue-500 outline-none bg-white"
                   />
+                  <p className="text-sm text-slate-500">
+                    Ingresa tu WhatsApp y podrás corregirlo antes de pagar. Un abogado te contactará para coordinar la consulta telemática.
+                  </p>
                 </div>
               </motion.div>
             )}
