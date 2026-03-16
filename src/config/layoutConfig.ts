@@ -195,7 +195,7 @@ export const layoutConfigs: RouteLayoutRule[] = [
       useMobileLayout: false,
       seoConfig: {
         titleSuffix: 'Consulta Legal Express',
-        defaultDescription: 'Consulta presencial validada. Cupo limitado. Resuelve tu problema legal hoy.'
+        defaultDescription: 'Consulta online validada. Cupo limitado. Resuelve tu problema legal hoy.'
       }
     }
   },
@@ -210,7 +210,7 @@ export const layoutConfigs: RouteLayoutRule[] = [
       useMobileLayout: false,
       seoConfig: {
         titleSuffix: 'Consulta Legal Express',
-        defaultDescription: 'Consulta presencial validada. Cupo limitado. Resuelve tu problema legal hoy.'
+        defaultDescription: 'Consulta online validada. Cupo limitado. Resuelve tu problema legal hoy.'
       }
     }
   },

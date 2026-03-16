@@ -353,10 +353,10 @@ export default function PaymentSuccessPage() {
 
   // Vista específica para Express QR (post-pago)
   if (paymentData?.source === 'express_qr') {
-    const whatsappExpress = `https://wa.me/56962321883?text=${encodeURIComponent(`Hola, acabo de pagar mi consulta Express ($25.000) desde el código QR. Necesito agendar mi sesión presencial. Soy ${clientName}.`)}`;
+    const whatsappExpress = `https://wa.me/56962321883?text=${encodeURIComponent(`Hola, acabo de pagar mi consulta Express ($25.000) desde el código QR. Necesito agendar mi sesión online. Soy ${clientName}.`)}`;
     return (
       <>
-        <SEO title="Pago Confirmado - Consulta Express | Punto Legal" description="Tu consulta presencial está confirmada. Te contactaremos por WhatsApp para coordinar." />
+        <SEO title="Pago Confirmado - Consulta Express | Punto Legal" description="Tu consulta online está confirmada. Te contactaremos por WhatsApp para coordinar." />
         <div className="min-h-screen bg-[#FAFAFA] text-slate-900 font-sans antialiased">
           <header className="sticky top-0 z-50 bg-white border-b-2 border-slate-200 py-4 px-4">
             <div className="max-w-lg mx-auto flex items-center justify-center gap-2">
@@ -378,7 +378,7 @@ export default function PaymentSuccessPage() {
               <div className="rounded-2xl border-2 border-slate-200 bg-white p-6 text-left space-y-4">
                 <p className="text-slate-900 font-bold">Próximo paso:</p>
                 <p className="text-slate-600 text-sm leading-relaxed">
-                  Un abogado te contactará por WhatsApp en menos de 2 horas para coordinar tu sesión presencial en el centro.
+                  Un abogado te contactará por WhatsApp en menos de 2 horas para coordinar tu sesión online por videollamada.
                 </p>
               </div>
               <a

@@ -202,7 +202,7 @@ export default function MercadoPagoPaymentPage() {
               {isExpressFlow ? 'Confirma y paga' : 'Activa tu caso legal'}
             </h1>
             <p className={`text-sm mt-2 ${t.textMuted}`}>
-              {isExpressFlow ? 'Consulta presencial · Centro' : `Diagnóstico completado · ${paymentData.nombre?.split(' ')[0] || 'Usuario'}`}
+              {isExpressFlow ? 'Consulta online · Centro' : `Diagnóstico completado · ${paymentData.nombre?.split(' ')[0] || 'Usuario'}`}
             </p>
           </motion.div>
 
@@ -236,7 +236,7 @@ export default function MercadoPagoPaymentPage() {
 
                   <div className={`rounded-2xl p-4 ${t.cardInner}`}>
                     <p className="text-[10px] text-slate-500 uppercase tracking-wider mb-1">Modalidad</p>
-                    <p className={`text-sm font-semibold ${t.text}`}>{isExpressFlow ? 'Presencial · Centro' : 'Videollamada + WhatsApp'}</p>
+                    <p className={`text-sm font-semibold ${t.text}`}>{isExpressFlow ? 'Online · Videollamada' : 'Videollamada + WhatsApp'}</p>
                     <p className={`text-[11px] mt-0.5 ${t.textMuted}`}>
                       {isExpressFlow ? 'Te contactamos por WhatsApp para coordinar' : 'Coordinamos horario por WhatsApp tras el pago'}
                     </p>
@@ -435,7 +435,7 @@ export default function MercadoPagoPaymentPage() {
                   {[
                     { step: '1', text: 'Recibes confirmación por email en menos de 5 minutos' },
                     { step: '2', text: 'Un abogado especialista te escribe por WhatsApp en menos de 2 horas' },
-                    { step: '3', text: isExpressFlow ? 'Coordinan tu sesión presencial en el centro' : 'Coordinan fecha y hora de la sesión según tu disponibilidad' },
+                    { step: '3', text: isExpressFlow ? 'Coordinan tu sesión online por videollamada' : 'Coordinan fecha y hora de la sesión según tu disponibilidad' },
                     { step: '4', text: 'La sesión dura 45-60 minutos — saldrás con tu plan de acción completo' }
                   ].map(({ step, text }) => (
                     <div key={step} className="flex items-start gap-3">
