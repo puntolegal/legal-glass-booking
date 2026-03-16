@@ -36,26 +36,38 @@ const PRECIO_EXPRESS = 25000;
 const PRECIO_ORIGINAL = 75000;
 const COUNTDOWN_MINUTES = 10;
 
-// Formateo WhatsApp chileno
+// Formateo WhatsApp chileno editable y tolerante a correcciones
 const formatWhatsapp = (value: string): string => {
-  const cleaned = value.replace(/\D/g, '');
-  if (!cleaned.startsWith('56')) {
-    if (cleaned.length === 0) return '+56 9 ';
-    if (cleaned.length === 1) return `+56 9 ${cleaned}`;
-    if (cleaned.length <= 5) return `+56 9 ${cleaned.slice(0, 1)} ${cleaned.slice(1)}`;
-    return `+56 9 ${cleaned.slice(0, 1)} ${cleaned.slice(1, 5)} ${cleaned.slice(5, 9)}`;
+  const digits = value.replace(/\D/g, '').slice(0, 11);
+
+  let normalized = digits;
+  if (normalized.startsWith('56')) {
+    normalized = normalized.slice(2);
   }
-  const withoutCode = cleaned.slice(2);
-  if (withoutCode.length === 0) return '+56 9 ';
-  if (withoutCode.length === 1) return `+56 9 ${withoutCode}`;
-  if (withoutCode.length <= 5) return `+56 9 ${withoutCode.slice(0, 1)} ${withoutCode.slice(1)}`;
-  return `+56 9 ${withoutCode.slice(0, 1)} ${withoutCode.slice(1, 5)} ${withoutCode.slice(5, 9)}`;
+  if (normalized.startsWith('9')) {
+    normalized = normalized.slice(1);
+  }
+
+  const number = normalized.slice(0, 8);
+  const firstBlock = number.slice(0, 4);
+  const secondBlock = number.slice(4, 8);
+
+  let formatted = '+56 9';
+  if (firstBlock) formatted += ` ${firstBlock}`;
+  if (secondBlock) formatted += ` ${secondBlock}`;
+
+  return formatted;
 };
 
-const isValidWhatsapp = (value: string): boolean => {
-  const cleaned = value.replace(/\D/g, '');
-  return cleaned.length >= 9 && cleaned.startsWith('569');
+const getWhatsappDigits = (value: string): string => {
+  const digits = value.replace(/\D/g, '');
+  if (digits.startsWith('569')) return digits.slice(3, 11);
+  if (digits.startsWith('56')) return digits.slice(2, 10);
+  if (digits.startsWith('9')) return digits.slice(1, 9);
+  return digits.slice(0, 8);
 };
+
+const isValidWhatsapp = (value: string): boolean => getWhatsappDigits(value).length === 8;
 
 export default function ExpressPage() {
   const navigate = useNavigate();
