@@ -1,11 +1,9 @@
 import React from 'react';
 import {
   ShieldCheck,
-  FileText,
   Scale,
   Users,
   Building2,
-  Home,
   ArrowRight,
   CheckCircle2,
   User,
@@ -14,14 +12,11 @@ import {
   Activity,
   Briefcase,
   Car,
-  Stethoscope,
-  TrendingUp,
   Award,
   Clock,
   AlertCircle,
 } from 'lucide-react';
 import SEO from '@/components/SEO';
-import { Link } from 'react-router-dom';
 
 /* --- COMPONENTE: PASAPORTE DEPORTIVO (TARJETA DE IDENTIDAD DEL JUGADOR) --- */
 const PasaporteDeportivo = ({ 
@@ -98,6 +93,7 @@ const PasaporteDeportivo = ({
         <div className="flex justify-between items-end z-10">
           <div className="text-[7px] text-slate-400 font-bold leading-relaxed uppercase">
             Club Deportivo<br/>Universidad Católica
+            <div className="text-[6px] font-mono text-[#002147]/60 mt-1">Auditado por Punto Legal SpA</div>
           </div>
           <div className="h-10 w-10 bg-[#002147]/5 border border-[#002147]/20 rounded-lg p-1.5 shadow-sm opacity-60">
             <Award className="text-[#002147] w-full h-full" />
@@ -112,8 +108,8 @@ const RugbyPage: React.FC = () => {
   return (
     <>
       <SEO
-        title="Punto Legal Sports - Rugby UC | Seguridad Legal para el Plantel"
-        description="Seguridad legal automatizada para el plantel adulto de Rugby UC. Eximentes de responsabilidad, defensa en ARUSA y gestión de seguros médicos."
+        title="Punto Legal Sports - Rugby UC | Auditoría y Compliance Legal"
+        description="Auditoría y Compliance Legal para el Club Deportivo Universidad Católica. Gestión de riesgo patrimonial, control preventivo ARUSA y compliance deportivo."
       />
 
       <div className="min-h-screen bg-[#F1F5F9] text-[#1E293B] font-sans selection:bg-[#002147]/10 safe-area-inset">
@@ -131,11 +127,11 @@ const RugbyPage: React.FC = () => {
         <section className="max-w-7xl mx-auto px-4 sm:px-5 md:px-6 py-12 sm:py-16 md:py-20 lg:py-24">
           <div className="text-center max-w-4xl mx-auto">
             <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-[#002147] tracking-tight mb-4 sm:mb-6 leading-tight">
-              Ustedes ganen en la cancha.<br className="hidden sm:block" />
-              <span className="text-[#002147]/80"> Nosotros en el escritorio.</span>
+              Auditoría y Compliance Legal<br className="hidden sm:block" />
+              <span className="text-[#002147]/80"> para el Club Deportivo Universidad Católica.</span>
             </h2>
             <p className="text-base sm:text-lg md:text-xl text-[#475569] leading-relaxed mb-8 sm:mb-10 md:mb-12 max-w-2xl mx-auto">
-              Seguridad legal automatizada para el plantel adulto de Rugby. Eximentes de responsabilidad, defensa en ARUSA y gestión de seguros médicos.
+              Gestión de riesgo patrimonial frente a demandas civiles (Art. 2320 C.C.), control preventivo de sanciones ARUSA y estructuración de compliance deportivo.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center items-center">
@@ -150,7 +146,7 @@ const RugbyPage: React.FC = () => {
                 href="#jugadores"
                 className="w-full sm:w-auto bg-transparent border-2 border-[#002147] hover:bg-[#002147]/5 active:bg-[#002147]/10 text-[#002147] py-4 sm:py-5 px-8 sm:px-12 rounded-xl sm:rounded-2xl font-black text-sm sm:text-base uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3 sm:gap-4 min-h-[52px] active:scale-[0.98]"
               >
-                <span>Hub del Camarín</span>
+                <span>Consultorio Legal del Plantel</span>
                 <Users size={18} className="flex-shrink-0" />
               </a>
             </div>
@@ -263,93 +259,124 @@ const RugbyPage: React.FC = () => {
           <div className="max-w-7xl mx-auto px-4 sm:px-5 md:px-6">
             <div className="text-center mb-10 sm:mb-12 md:mb-16">
               <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-[#002147] tracking-tight mb-4 sm:mb-6">
-                Blindaje Institucional.<br />
-                <span className="text-[#002147]/80">Marzo a costo cero.</span>
+                Seguridad Jurídica Institucional.<br />
+                <span className="text-[#002147]/80">Protección del Staff y Directiva.</span>
               </h2>
               <p className="text-base sm:text-lg md:text-xl text-[#475569] leading-relaxed max-w-3xl mx-auto">
-                Arrancamos la pretemporada y los amistosos. Asumimos la gestión legal de <strong className="text-[#002147] font-black">marzo a cambio de indumentaria y liberación de cuota</strong>, para que prueben el sistema sin tocar el presupuesto. Luego, pasamos al retainer mensual de <strong className="text-[#002147]">$450.000</strong>.
+                Evite que el patrimonio del Club o de sus Preparadores Físicos responda solidariamente ante tribunales por lesiones fortuitas o actos de indisciplina. Implementamos los protocolos y contratos obligatorios que blindan al Headcoach, al Staff Médico y a la Directiva frente a los recientes precedentes jurisprudenciales en el rugby nacional.
               </p>
               <div className="mt-6 inline-flex items-center gap-2 px-4 py-2 bg-emerald-500/10 border-2 border-emerald-500/30 rounded-xl">
                 <CheckCircle2 size={20} className="text-emerald-600" />
-                <span className="text-sm font-black text-emerald-700 uppercase tracking-wide">Marzo sin costo - Solo canje</span>
+                <span className="text-sm font-black text-emerald-700 uppercase tracking-wide">Evaluación de Riesgo a Costo Cero - Modelo de Canje Institucional</span>
               </div>
             </div>
 
             {/* GRID DE MÓDULOS B2B */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 md:gap-10 mb-10 sm:mb-12">
-              {/* 1. Pack de Arranque */}
-              <div className="bg-[#F8FAFC] border-2 border-[#002147]/10 rounded-2xl sm:rounded-3xl p-6 sm:p-8 md:p-10 hover:border-[#002147]/30 transition-all group">
-                <div className="flex items-start gap-4 mb-4 sm:mb-6">
-                  <div className="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-xl bg-[#002147] text-white shadow-lg flex-shrink-0">
-                    <FileText size={20} className="sm:w-6 sm:h-6" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="text-lg sm:text-xl md:text-2xl font-black text-[#002147] mb-2">Pack de Arranque</h3>
-                    <p className="text-sm sm:text-base text-[#475569] leading-relaxed">
-                      Firma masiva de eximentes de responsabilidad (Waivers) y cesión de derechos de imagen para redes y auspicios.
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2 text-xs sm:text-sm text-emerald-600 font-bold">
-                  <CheckCircle2 size={16} className="text-emerald-500" />
-                  <span>Incluido en mes de prueba</span>
-                </div>
-              </div>
-
-              {/* 2. Seguro ARUSA */}
+              {/* 1. Protección Legal del Staff */}
               <div className="bg-[#F8FAFC] border-2 border-[#002147]/10 rounded-2xl sm:rounded-3xl p-6 sm:p-8 md:p-10 hover:border-[#002147]/30 transition-all group">
                 <div className="flex items-start gap-4 mb-4 sm:mb-6">
                   <div className="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-xl bg-[#002147] text-white shadow-lg flex-shrink-0">
                     <ShieldCheck size={20} className="sm:w-6 sm:h-6" />
                   </div>
                   <div className="flex-1">
-                    <h3 className="text-lg sm:text-xl md:text-2xl font-black text-[#002147] mb-2">Seguro ARUSA</h3>
+                    <h3 className="text-lg sm:text-xl md:text-2xl font-black text-[#002147] mb-2">Protección Legal del Staff Técnico y Médico</h3>
                     <p className="text-sm sm:text-base text-[#475569] leading-relaxed">
-                      Defensa disciplinaria express. Redacción de descargos en 48 hrs ante tarjetas rojas para no perder titulares.
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2 text-xs sm:text-sm text-emerald-600 font-bold">
-                  <Clock size={16} className="text-emerald-500" />
-                  <span>Respuesta en 48 horas</span>
-                </div>
-              </div>
-
-              {/* 3. Protocolo Médico */}
-              <div className="bg-[#F8FAFC] border-2 border-[#002147]/10 rounded-2xl sm:rounded-3xl p-6 sm:p-8 md:p-10 hover:border-[#002147]/30 transition-all group">
-                <div className="flex items-start gap-4 mb-4 sm:mb-6">
-                  <div className="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-xl bg-[#002147] text-white shadow-lg flex-shrink-0">
-                    <Stethoscope size={20} className="sm:w-6 sm:h-6" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="text-lg sm:text-xl md:text-2xl font-black text-[#002147] mb-2">Protocolo Médico</h3>
-                    <p className="text-sm sm:text-base text-[#475569] leading-relaxed">
-                      Flujograma de acción clara frente a lesiones para activar el seguro catastrófico sin demoras.
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2 text-xs sm:text-sm text-emerald-600 font-bold">
-                  <Activity size={16} className="text-emerald-500" />
-                  <span>Activación inmediata</span>
-                </div>
-              </div>
-
-              {/* 4. Viáticos y Becas */}
-              <div className="bg-[#F8FAFC] border-2 border-[#002147]/10 rounded-2xl sm:rounded-3xl p-6 sm:p-8 md:p-10 hover:border-[#002147]/30 transition-all group">
-                <div className="flex items-start gap-4 mb-4 sm:mb-6">
-                  <div className="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-xl bg-[#002147] text-white shadow-lg flex-shrink-0">
-                    <TrendingUp size={20} className="sm:w-6 sm:h-6" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="text-lg sm:text-xl md:text-2xl font-black text-[#002147] mb-2">Viáticos y Becas</h3>
-                    <p className="text-sm sm:text-base text-[#475569] leading-relaxed">
-                      Estructuración legal de apoyos económicos a jugadores para evitar riesgos laborales a fin de año.
+                      Redacción de Acuerdos de Asunción de Riesgo ante lesiones por acondicionamiento físico o contacto. Resguardamos el patrimonio de Preparadores Físicos y Coaches, gestionando el riesgo inherente mediante consentimiento informado.
                     </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2 text-xs sm:text-sm text-emerald-600 font-bold">
                   <CheckCircle2 size={16} className="text-emerald-500" />
-                  <span>Compliance garantizado</span>
+                  <span>Mitigación de Riesgo Patrimonial</span>
+                </div>
+              </div>
+
+              {/* 2. Límite de Cuasidelito Civil */}
+              <div className="bg-[#F8FAFC] border-2 border-[#002147]/10 rounded-2xl sm:rounded-3xl p-6 sm:p-8 md:p-10 hover:border-[#002147]/30 transition-all group">
+                <div className="flex items-start gap-4 mb-4 sm:mb-6">
+                  <div className="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-xl bg-[#002147] text-white shadow-lg flex-shrink-0">
+                    <AlertCircle size={20} className="sm:w-6 sm:h-6" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-lg sm:text-xl md:text-2xl font-black text-[#002147] mb-2">Límite de Cuasidelito Civil y Responsabilidad Solidaria</h3>
+                    <p className="text-sm sm:text-base text-[#475569] leading-relaxed">
+                      Implementación de Códigos de Conducta y Ética. Mitigamos el riesgo de demandas contra el Club por actos de indisciplina extracurriculares del plantel, delimitando la responsabilidad civil y penal exclusivamente al infractor.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 text-xs sm:text-sm text-emerald-600 font-bold">
+                  <CheckCircle2 size={16} className="text-emerald-500" />
+                  <span>Prevención de Fallos Civiles</span>
+                </div>
+              </div>
+
+              {/* 3. Compliance Ley 21.197 */}
+              <div className="bg-[#F8FAFC] border-2 border-[#002147]/10 rounded-2xl sm:rounded-3xl p-6 sm:p-8 md:p-10 hover:border-[#002147]/30 transition-all group">
+                <div className="flex items-start gap-4 mb-4 sm:mb-6">
+                  <div className="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-xl bg-[#002147] text-white shadow-lg flex-shrink-0">
+                    <Activity size={20} className="sm:w-6 sm:h-6" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-lg sm:text-xl md:text-2xl font-black text-[#002147] mb-2">Compliance Legal Ley N° 21.197 (Menores)</h3>
+                    <p className="text-sm sm:text-base text-[#475569] leading-relaxed">
+                      Gestión obligatoria del Protocolo contra Abuso y Maltrato para divisiones menores (M10-M18). Administramos las declaraciones juradas de inhabilidad del staff, previniendo sanciones administrativas graves o la suspensión de la personalidad jurídica.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 text-xs sm:text-sm text-emerald-600 font-bold">
+                  <CheckCircle2 size={16} className="text-emerald-500" />
+                  <span>Cumplimiento Ministerio del Deporte</span>
+                </div>
+              </div>
+
+              {/* 4. Contratos Honorarios e Imagen */}
+              <div className="bg-[#F8FAFC] border-2 border-[#002147]/10 rounded-2xl sm:rounded-3xl p-6 sm:p-8 md:p-10 hover:border-[#002147]/30 transition-all group">
+                <div className="flex items-start gap-4 mb-4 sm:mb-6">
+                  <div className="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-xl bg-[#002147] text-white shadow-lg flex-shrink-0">
+                    <Briefcase size={20} className="sm:w-6 sm:h-6" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-lg sm:text-xl md:text-2xl font-black text-[#002147] mb-2">Contratos de Honorarios y Derechos de Imagen</h3>
+                    <p className="text-sm sm:text-base text-[#475569] leading-relaxed">
+                      Regulación del vínculo civil del Staff Médico/Técnico para evitar demandas laborales por subordinación. Además, gestionamos la cesión obligatoria de derechos de imagen del plantel para respaldar comercialmente los contratos con auspiciadores.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 text-xs sm:text-sm text-emerald-600 font-bold">
+                  <CheckCircle2 size={16} className="text-emerald-500" />
+                  <span>Auditoría Comercial y Laboral</span>
+                </div>
+              </div>
+            </div>
+
+            {/* BLOQUE ALERTA DE JURISPRUDENCIA */}
+            <div className="mt-8 mb-12 bg-white border-2 border-red-900/10 rounded-2xl overflow-hidden shadow-sm">
+              <div className="bg-red-900/5 px-6 py-4 flex items-center gap-3">
+                <AlertCircle className="w-6 h-6 text-red-700 flex-shrink-0" />
+                <h3 className="text-lg font-black text-[#002147] uppercase tracking-tight">Alerta de Jurisprudencia Reciente</h3>
+              </div>
+              <div className="p-6">
+                <p className="text-sm sm:text-base text-[#475569] leading-relaxed mb-6">
+                  Los tribunales superiores han fallado recientemente contra clubes de rugby nacionales imponiendo indemnizaciones millonarias por daño moral ante actos de indisciplina (ej. bautizos) y lesiones, argumentando &apos;falta de deber de cuidado&apos; e invocando la Responsabilidad por el Hecho Ajeno (Art. 2320 del Código Civil). La gestión preventiva del riesgo contractual es hoy un estándar obligatorio para el Staff.
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                  <div className="px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-center">
+                    <p className="text-xs font-mono font-bold text-[#002147]">Art. 2320 C.C.</p>
+                    <p className="text-[10px] text-slate-500 mt-0.5">Responsabilidad por hecho ajeno</p>
+                  </div>
+                  <div className="px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-center">
+                    <p className="text-xs font-mono font-bold text-[#002147]">Ley N° 21.197</p>
+                    <p className="text-[10px] text-slate-500 mt-0.5">Protección menores</p>
+                  </div>
+                  <div className="px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-center">
+                    <p className="text-xs font-mono font-bold text-[#002147]">Ley N° 19.712</p>
+                    <p className="text-[10px] text-slate-500 mt-0.5">Deporte y recreación</p>
+                  </div>
+                  <div className="px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-center">
+                    <p className="text-xs font-mono font-bold text-[#002147]">Ley N° 20.686</p>
+                    <p className="text-[10px] text-slate-500 mt-0.5">Violencia en estadios</p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -363,7 +390,7 @@ const RugbyPage: React.FC = () => {
                 className="inline-flex items-center gap-3 sm:gap-4 bg-[#002147] hover:bg-[#001529] active:bg-[#001529] text-white py-4 sm:py-5 px-8 sm:px-12 rounded-xl sm:rounded-2xl font-black text-sm sm:text-base uppercase tracking-[0.2em] transition-all shadow-xl shadow-[#002147]/20 group min-h-[52px] active:scale-[0.98]"
               >
                 <MessageCircle size={18} />
-                <span>Activar Seguridad del Plantel ($450.000/mes)</span>
+                <span>Agendar Evaluación de Riesgo Legal Institucional</span>
                 <ArrowRight size={18} className="group-active:translate-x-1 transition-transform" />
               </a>
             </div>
@@ -375,11 +402,11 @@ const RugbyPage: React.FC = () => {
           <div className="max-w-7xl mx-auto px-4 sm:px-5 md:px-6">
             <div className="text-center mb-10 sm:mb-12 md:mb-16">
               <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-[#002147] tracking-tight mb-4 sm:mb-6">
-                Tu abogado personal,<br />
-                <span className="text-[#002147]/80">dentro del camarín.</span>
+                Tu abogado dentro del plantel<br />
+                <span className="text-[#002147]/80">Rugby UC.</span>
               </h2>
               <p className="text-base sm:text-lg md:text-xl text-[#475569] leading-relaxed max-w-3xl mx-auto">
-                Servicio exclusivo y gratuito para miembros del plantel. Consultas rápidas y orientación legal para tus negocios e inversiones.
+                Servicio exclusivo y gratuito para miembros del plantel. Consultas rápidas y orientación legal para tus negocios e inversiones. Consultorio presencial exclusivo: Jueves de 19:30 a 21:30 hrs en el Quincho del Club.
               </p>
             </div>
 
@@ -465,13 +492,13 @@ const RugbyPage: React.FC = () => {
             {/* CTA JUGADORES */}
             <div className="text-center">
               <a
-                href="https://wa.me/56962321883?text=Hola,%20soy%20jugador%20del%20plantel%20y%20quiero%20acceder%20al%20Hub%20del%20Camarín"
+                href="https://wa.me/56962321883?text=Hola,%20soy%20jugador%20del%20plantel%20y%20quiero%20acceder%20al%20Portal%20Legal%20Rugby%20UC"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-3 sm:gap-4 bg-transparent border-2 border-[#002147] hover:bg-[#002147]/5 active:bg-[#002147]/10 text-[#002147] py-4 sm:py-5 px-8 sm:px-12 rounded-xl sm:rounded-2xl font-black text-sm sm:text-base uppercase tracking-[0.2em] transition-all min-h-[52px] active:scale-[0.98]"
               >
                 <MessageCircle size={18} />
-                <span>Ingresar al Hub del Camarín</span>
+                <span>Ingresar Portal Legal Rugby UC</span>
                 <ArrowRight size={18} className="group-active:translate-x-1 transition-transform" />
               </a>
             </div>
