@@ -33,6 +33,7 @@ import TestPage from '@/pages/TestPage';
 import TestMetaPixel from '@/pages/TestMetaPixel';
 import ApuntesHome from './pages/ApuntesHome';
 import AmandaLogin from '@/pages/AmandaLogin';
+import ExpressPage from '@/pages/ExpressPage';
 
 // Service Pages
 import ServicioCorporativoPage from '@/pages/ServicioCorporativoPage';

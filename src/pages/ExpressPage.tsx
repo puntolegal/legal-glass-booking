@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import SEO from '@/components/SEO';
 import { supabase } from '@/integrations/supabase/client';
+import type { Json } from '@/integrations/supabase/types';
 import { trackMetaEvent } from '@/services/metaConversionsService';
 
 type Materia = 'hogar' | 'familia' | 'trabajador' | 'deudas' | 'pyme' | null;
