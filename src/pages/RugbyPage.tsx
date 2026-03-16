@@ -97,8 +97,7 @@ const PasaporteDeportivo = ({
         {/* FOOTER */}
         <div className="flex justify-between items-end z-10">
           <div className="text-[7px] text-slate-400 font-bold leading-relaxed uppercase">
-            Club Deportivo<br/>Universidad Católica<br/>
-            <span className="text-[#002147]/60">Auditado por Punto Legal SpA</span>
+            Club Deportivo<br/>Universidad Católica
           </div>
           <div className="h-10 w-10 bg-[#002147]/5 border border-[#002147]/20 rounded-lg p-1.5 shadow-sm opacity-60">
             <Award className="text-[#002147] w-full h-full" />
@@ -113,8 +112,8 @@ const RugbyPage: React.FC = () => {
   return (
     <>
       <SEO
-        title="Punto Legal Sports - Rugby UC | Auditoría y Compliance Legal"
-        description="Auditoría y Compliance Legal para el Club Deportivo Universidad Católica. Seguridad jurídica institucional, protección del staff y directiva."
+        title="Punto Legal Sports - Rugby UC | Seguridad Legal para el Plantel"
+        description="Seguridad legal automatizada para el plantel adulto de Rugby UC. Eximentes de responsabilidad, defensa en ARUSA y gestión de seguros médicos."
       />
 
       <div className="min-h-screen bg-[#F1F5F9] text-[#1E293B] font-sans selection:bg-[#002147]/10 safe-area-inset">
@@ -132,11 +131,11 @@ const RugbyPage: React.FC = () => {
         <section className="max-w-7xl mx-auto px-4 sm:px-5 md:px-6 py-12 sm:py-16 md:py-20 lg:py-24">
           <div className="text-center max-w-4xl mx-auto">
             <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-[#002147] tracking-tight mb-4 sm:mb-6 leading-tight">
-              Auditoría y Compliance Legal<br className="hidden sm:block" />
-              <span className="text-[#002147]/80"> para el Club Deportivo Universidad Católica.</span>
+              Ustedes ganen en la cancha.<br className="hidden sm:block" />
+              <span className="text-[#002147]/80"> Nosotros en el escritorio.</span>
             </h2>
             <p className="text-base sm:text-lg md:text-xl text-[#475569] leading-relaxed mb-8 sm:mb-10 md:mb-12 max-w-2xl mx-auto">
-              Seguridad jurídica institucional y protección del staff y directiva. Eximentes de responsabilidad, defensa en ARUSA y gestión de seguros médicos.
+              Seguridad legal automatizada para el plantel adulto de Rugby. Eximentes de responsabilidad, defensa en ARUSA y gestión de seguros médicos.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center items-center">
@@ -144,7 +143,7 @@ const RugbyPage: React.FC = () => {
                 href="#staff"
                 className="w-full sm:w-auto bg-[#002147] hover:bg-[#001529] active:bg-[#001529] text-white py-4 sm:py-5 px-8 sm:px-12 rounded-xl sm:rounded-2xl font-black text-sm sm:text-base uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3 sm:gap-4 shadow-xl shadow-[#002147]/20 group min-h-[52px] active:scale-[0.98]"
               >
-                <span>Consultorio Legal del Plantel</span>
+                <span>Portal Directiva / Staff</span>
                 <ArrowRight size={18} className="group-active:translate-x-1 transition-transform flex-shrink-0" />
               </a>
               <a
@@ -364,7 +363,7 @@ const RugbyPage: React.FC = () => {
                 className="inline-flex items-center gap-3 sm:gap-4 bg-[#002147] hover:bg-[#001529] active:bg-[#001529] text-white py-4 sm:py-5 px-8 sm:px-12 rounded-xl sm:rounded-2xl font-black text-sm sm:text-base uppercase tracking-[0.2em] transition-all shadow-xl shadow-[#002147]/20 group min-h-[52px] active:scale-[0.98]"
               >
                 <MessageCircle size={18} />
-                <span>Agendar Evaluación de Riesgo Legal Institucional</span>
+                <span>Activar Seguridad del Plantel ($450.000/mes)</span>
                 <ArrowRight size={18} className="group-active:translate-x-1 transition-transform" />
               </a>
             </div>
