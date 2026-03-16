@@ -145,15 +145,18 @@ export default function ExpressPage() {
 
   const handlePayment = async () => {
     if (!nombre.trim() || !isValidWhatsapp(whatsapp)) return;
-    const phone = whatsapp.replace(/\D/g, '');
+    const phoneDigits = getWhatsappDigits(whatsapp);
+    const phone = `569${phoneDigits}`;
+    const formattedWhatsapp = `+56 9 ${phoneDigits.slice(0, 4)} ${phoneDigits.slice(4, 8)}`.trim();
     const emailPlaceholder = `express-${phone}@puntolegal.online`;
     const quizPayload = {
       source: 'QR_CALLE_CENTRO',
       nombre: nombre.trim(),
-      whatsapp: whatsapp.replace(/\s/g, ''),
+      whatsapp: formattedWhatsapp,
       materia,
       precio: PRECIO_EXPRESS,
       precio_original: PRECIO_ORIGINAL,
+      modalidad: 'online',
     };
     const { data: updated } = await supabase
       .from('leads_quiz')
@@ -167,9 +170,9 @@ export default function ExpressPage() {
     }
     trackMetaEvent({
       event_name: 'InitiateCheckout',
-      user_data: { ph: whatsapp.replace(/\D/g, '') },
+      user_data: { ph: phone },
       custom_data: {
-        content_name: 'Consulta Legal Express (Presencial QR)',
+        content_name: 'Consulta Legal Express Online',
         value: PRECIO_EXPRESS,
         currency: 'CLP',
       },
@@ -181,17 +184,18 @@ export default function ExpressPage() {
       external_reference: externalRef,
       nombre: nombre.trim(),
       email: `express-${phone}@puntolegal.online`,
-      telefono: whatsapp.replace(/\s/g, ''),
-      service: 'Consulta Legal Express (Presencial QR)',
+      telefono: formattedWhatsapp,
+      service: 'Consulta Legal Express Online',
       category: 'Express',
       price: PRECIO_EXPRESS,
       priceFormatted: new Intl.NumberFormat('es-CL').format(PRECIO_EXPRESS),
       originalPrice: PRECIO_ORIGINAL,
       fecha: new Date().toISOString().split('T')[0],
-      hora: 'A coordinar',
+      hora: 'Por coordinar',
       date: new Date().toISOString().split('T')[0],
-      time: 'A coordinar',
-      tipo_reunion: 'presencial',
+      time: 'Por coordinar',
+      tipo_reunion: 'online',
+      descripcion: 'Consulta telemática. Un abogado contactará al cliente para agendar la reunión online.',
       timestamp: Date.now(),
       matter: materia,
       source: 'express_qr',
