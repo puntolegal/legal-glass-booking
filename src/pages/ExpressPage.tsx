@@ -100,7 +100,7 @@ export default function ExpressPage() {
       const quizAnswers: Json = {
         source: 'QR_CALLE_CENTRO',
         nombre: nombre.trim(),
-        whatsapp: whatsapp.replace(/\s/g, ''),
+        whatsapp: `+56 9 ${getWhatsappDigits(whatsapp).slice(0, 4)} ${getWhatsappDigits(whatsapp).slice(4, 8)}`.trim(),
         materia,
         precio: PRECIO_EXPRESS,
         precio_original: PRECIO_ORIGINAL,
