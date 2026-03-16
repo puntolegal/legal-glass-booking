@@ -36,26 +36,38 @@ const PRECIO_EXPRESS = 25000;
 const PRECIO_ORIGINAL = 75000;
 const COUNTDOWN_MINUTES = 10;
 
-// Formateo WhatsApp chileno
+// Formateo WhatsApp chileno editable y tolerante a correcciones
 const formatWhatsapp = (value: string): string => {
-  const cleaned = value.replace(/\D/g, '');
-  if (!cleaned.startsWith('56')) {
-    if (cleaned.length === 0) return '+56 9 ';
-    if (cleaned.length === 1) return `+56 9 ${cleaned}`;
-    if (cleaned.length <= 5) return `+56 9 ${cleaned.slice(0, 1)} ${cleaned.slice(1)}`;
-    return `+56 9 ${cleaned.slice(0, 1)} ${cleaned.slice(1, 5)} ${cleaned.slice(5, 9)}`;
+  const digits = value.replace(/\D/g, '').slice(0, 11);
+
+  let normalized = digits;
+  if (normalized.startsWith('56')) {
+    normalized = normalized.slice(2);
   }
-  const withoutCode = cleaned.slice(2);
-  if (withoutCode.length === 0) return '+56 9 ';
-  if (withoutCode.length === 1) return `+56 9 ${withoutCode}`;
-  if (withoutCode.length <= 5) return `+56 9 ${withoutCode.slice(0, 1)} ${withoutCode.slice(1)}`;
-  return `+56 9 ${withoutCode.slice(0, 1)} ${withoutCode.slice(1, 5)} ${withoutCode.slice(5, 9)}`;
+  if (normalized.startsWith('9')) {
+    normalized = normalized.slice(1);
+  }
+
+  const number = normalized.slice(0, 8);
+  const firstBlock = number.slice(0, 4);
+  const secondBlock = number.slice(4, 8);
+
+  let formatted = '+56 9';
+  if (firstBlock) formatted += ` ${firstBlock}`;
+  if (secondBlock) formatted += ` ${secondBlock}`;
+
+  return formatted;
 };
 
-const isValidWhatsapp = (value: string): boolean => {
-  const cleaned = value.replace(/\D/g, '');
-  return cleaned.length >= 9 && cleaned.startsWith('569');
+const getWhatsappDigits = (value: string): string => {
+  const digits = value.replace(/\D/g, '');
+  if (digits.startsWith('569')) return digits.slice(3, 11);
+  if (digits.startsWith('56')) return digits.slice(2, 10);
+  if (digits.startsWith('9')) return digits.slice(1, 9);
+  return digits.slice(0, 8);
 };
+
+const isValidWhatsapp = (value: string): boolean => getWhatsappDigits(value).length === 8;
 
 export default function ExpressPage() {
   const navigate = useNavigate();
@@ -81,13 +93,14 @@ export default function ExpressPage() {
   // Supabase Ninja: guardar lead al tener WhatsApp válido (debounce)
   const saveLead = useCallback(async () => {
     if (!isValidWhatsapp(whatsapp) || leadSaved) return;
-    const phone = whatsapp.replace(/\D/g, '');
+    const phoneDigits = getWhatsappDigits(whatsapp);
+    const phone = `569${phoneDigits}`;
     const emailPlaceholder = `express-${phone}@puntolegal.online`;
     try {
       const quizAnswers: Json = {
         source: 'QR_CALLE_CENTRO',
         nombre: nombre.trim(),
-        whatsapp: whatsapp.replace(/\s/g, ''),
+        whatsapp: `+56 9 ${getWhatsappDigits(whatsapp).slice(0, 4)} ${getWhatsappDigits(whatsapp).slice(4, 8)}`.trim(),
         materia,
         precio: PRECIO_EXPRESS,
         precio_original: PRECIO_ORIGINAL,
@@ -132,15 +145,18 @@ export default function ExpressPage() {
 
   const handlePayment = async () => {
     if (!nombre.trim() || !isValidWhatsapp(whatsapp)) return;
-    const phone = whatsapp.replace(/\D/g, '');
+    const phoneDigits = getWhatsappDigits(whatsapp);
+    const phone = `569${phoneDigits}`;
+    const formattedWhatsapp = `+56 9 ${phoneDigits.slice(0, 4)} ${phoneDigits.slice(4, 8)}`.trim();
     const emailPlaceholder = `express-${phone}@puntolegal.online`;
     const quizPayload = {
       source: 'QR_CALLE_CENTRO',
       nombre: nombre.trim(),
-      whatsapp: whatsapp.replace(/\s/g, ''),
+      whatsapp: formattedWhatsapp,
       materia,
       precio: PRECIO_EXPRESS,
       precio_original: PRECIO_ORIGINAL,
+      modalidad: 'online',
     };
     const { data: updated } = await supabase
       .from('leads_quiz')
@@ -154,9 +170,9 @@ export default function ExpressPage() {
     }
     trackMetaEvent({
       event_name: 'InitiateCheckout',
-      user_data: { ph: whatsapp.replace(/\D/g, '') },
+      user_data: { ph: phone },
       custom_data: {
-        content_name: 'Consulta Legal Express (Presencial QR)',
+        content_name: 'Consulta Legal Express Online',
         value: PRECIO_EXPRESS,
         currency: 'CLP',
       },
@@ -168,17 +184,18 @@ export default function ExpressPage() {
       external_reference: externalRef,
       nombre: nombre.trim(),
       email: `express-${phone}@puntolegal.online`,
-      telefono: whatsapp.replace(/\s/g, ''),
-      service: 'Consulta Legal Express (Presencial QR)',
+      telefono: formattedWhatsapp,
+      service: 'Consulta Legal Express Online',
       category: 'Express',
       price: PRECIO_EXPRESS,
       priceFormatted: new Intl.NumberFormat('es-CL').format(PRECIO_EXPRESS),
       originalPrice: PRECIO_ORIGINAL,
       fecha: new Date().toISOString().split('T')[0],
-      hora: 'A coordinar',
+      hora: 'Por coordinar',
       date: new Date().toISOString().split('T')[0],
-      time: 'A coordinar',
-      tipo_reunion: 'presencial',
+      time: 'Por coordinar',
+      tipo_reunion: 'online',
+      descripcion: 'Consulta telemática. Un abogado contactará al cliente para agendar la reunión online.',
       timestamp: Date.now(),
       matter: materia,
       source: 'express_qr',
@@ -192,10 +209,10 @@ export default function ExpressPage() {
 
   return (
     <>
-      <SEO
-        title="Consulta Legal $25.000 - Punto Legal | Centro"
-        description="Consulta presencial validada. Cupo limitado. Resuelve tu problema legal hoy."
-      />
+        <SEO
+          title="Consulta Legal Online $25.000 - Punto Legal | Centro"
+          description="Consulta legal telemática con contacto rápido. Un abogado te contactará para agendar tu reunión online."
+        />
 
       <div className="min-h-screen bg-[#FAFAFA] text-slate-900 font-sans antialiased pb-safe">
         {/* 1. Sticky Urgency Banner */}
@@ -214,11 +231,12 @@ export default function ExpressPage() {
               <CheckCircle2 className="w-10 h-10 text-emerald-600" />
             </div>
             <h1 className="text-2xl font-black text-slate-900 mb-2">
-              Ticket Presencial Validado
+              Consulta Legal Online Confirmada
             </h1>
             <p className="text-slate-600 text-sm flex items-center justify-center gap-2 flex-wrap">
               <span className="line-through text-slate-400">Consulta Especialista: $75.000</span>
               <span className="font-bold text-slate-900">$25.000</span>
+              <span>• Reunión telemática</span>
             </p>
           </motion.div>
 
@@ -263,23 +281,28 @@ export default function ExpressPage() {
                 className="mb-10"
               >
                 <h2 className="text-lg font-black text-slate-900 mb-4">
-                  2. ¿A qué número te llama el abogado?
+                  2. ¿A qué número te contacta el abogado para agendar tu reunión online?
                 </h2>
                 <div className="space-y-4">
                   <input
                     type="text"
-                    placeholder="Tu nombre real"
+                    placeholder="Nombre completo"
                     value={nombre}
                     onChange={(e) => setNombre(e.target.value)}
                     className="w-full h-[60px] px-4 text-lg font-medium border-2 border-slate-300 rounded-xl focus:ring-4 focus:ring-blue-500/30 focus:border-blue-500 outline-none bg-white"
                   />
                   <input
                     type="tel"
+                    inputMode="numeric"
+                    autoComplete="tel"
                     placeholder="+56 9 1234 5678"
                     value={whatsapp}
                     onChange={(e) => setWhatsapp(formatWhatsapp(e.target.value))}
                     className="w-full h-[60px] px-4 text-lg font-medium border-2 border-slate-300 rounded-xl focus:ring-4 focus:ring-blue-500/30 focus:border-blue-500 outline-none bg-white"
                   />
+                  <p className="text-sm text-slate-500">
+                    Ingresa tu WhatsApp y podrás corregirlo antes de pagar. Un abogado te contactará para coordinar la consulta telemática.
+                  </p>
                 </div>
               </motion.div>
             )}
@@ -312,10 +335,10 @@ export default function ExpressPage() {
                 <div className="flex flex-col items-center gap-2 pt-2">
                   <div className="flex items-center gap-2 text-slate-600 text-sm">
                     <Lock className="w-4 h-4" />
-                    <span>Pago Seguro MercadoPago</span>
-                  </div>
-                  <p className="text-[10px] text-slate-500 text-center max-w-xs">
-                    Garantía 100%: Si no hay solución legal, se devuelve el dinero.
+                     <span>Pago Seguro MercadoPago</span>
+                   </div>
+                   <p className="text-[10px] text-slate-500 text-center max-w-xs">
+                     Consulta 100% online. Después del pago, un abogado te contactará para agendar la reunión telemática.
                   </p>
                 </div>
               </motion.div>
