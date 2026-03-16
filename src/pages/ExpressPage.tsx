@@ -82,25 +82,20 @@ export default function ExpressPage() {
     const phone = whatsapp.replace(/\D/g, '');
     const emailPlaceholder = `express-${phone}@puntolegal.online`;
     try {
-      const quizData = {
-        email: emailPlaceholder,
-        name: nombre.trim() || 'Express QR',
-        status: 'express_iniciado',
-        quiz_answers: {
-          source: 'QR_CALLE_CENTRO',
-          nombre: nombre.trim(),
-          whatsapp: whatsapp.replace(/\s/g, ''),
-          materia,
-          precio: PRECIO_EXPRESS,
-          precio_original: PRECIO_ORIGINAL,
-        },
+      const quizAnswers: Json = {
+        source: 'QR_CALLE_CENTRO',
+        nombre: nombre.trim(),
+        whatsapp: whatsapp.replace(/\s/g, ''),
+        materia,
+        precio: PRECIO_EXPRESS,
+        precio_original: PRECIO_ORIGINAL,
       };
       const { error: insertErr } = await supabase.from('leads_quiz').insert([
         {
           email: emailPlaceholder,
           name: nombre.trim() || 'Express QR',
           status: 'express_iniciado',
-          quiz_answers: quizData.quiz_answers as Record<string, unknown>,
+          quiz_answers: quizAnswers,
         },
       ]);
       if (!insertErr) {

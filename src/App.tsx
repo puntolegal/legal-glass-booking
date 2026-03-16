@@ -86,6 +86,8 @@ function App() {
                       {/* Todas las rutas envueltas en MainLayout */}
                       <Route element={<MainLayout />}>
                         <Route path="/" element={<Index />} />
+                        <Route path="/centro" element={<ExpressPage />} />
+                        <Route path="/express" element={<ExpressPage />} />
                         <Route path="/servicios" element={<ServicesPage />} />
                         <Route path="/blog" element={<BlogPage />} />
                         <Route path="/agendamiento" element={<AgendamientoPage />} />
