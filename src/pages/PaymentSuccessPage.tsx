@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { CheckCircle, Calendar, Clock, User, Mail, Phone, ArrowRight, Home, CreditCard } from 'lucide-react';
+import { CheckCircle, Calendar, Clock, User, Mail, Phone, ArrowRight, Home, CreditCard, MessageCircle, Shield } from 'lucide-react';
 import SEO from '../components/SEO';
 import { sendRealBookingEmails, type BookingEmailData, type EmailResult } from '@/services/realEmailService';
 import { findReservaByCriteria, updatePaymentStatus, type Reserva } from '../services/supabaseBooking';
@@ -12,7 +12,7 @@ import { getMercadoPagoPaymentInfo } from '@/services/mercadopagoPaymentInfo';
 import { trackMetaEvent } from '@/services/metaConversionsService';
 
 interface PaymentSuccessState {
-  reservation: Reserva;
+  reservation: Reserva | null;
   mercadopagoData: Record<string, unknown>;
   emailResult: EmailResult | null;
   cliente: {
@@ -30,6 +30,7 @@ interface PaymentSuccessState {
   tipo_reunion?: string | null;
   price: number | string | null | undefined;
   priceFormatted: string;
+  source?: string;
 }
 
 const extractStringFromEmailResult = (result: EmailResult | null, keys: string[]): string | undefined => {
@@ -115,14 +116,14 @@ export default function PaymentSuccessPage() {
           
           // Enviar emails con los datos disponibles
           const emailData: BookingEmailData = {
-            id: parsedStoredData.reservationId || 'pending',
+            id: parsedStoredData.reservaId || parsedStoredData.reservationId || 'pending',
             nombre: parsedStoredData.nombre || 'Cliente',
             email: parsedStoredData.email || '',
             telefono: parsedStoredData.telefono || '',
             servicio: parsedStoredData.service || 'Consulta Legal',
             precio: parsedStoredData.price?.toString() || '0',
             fecha: parsedStoredData.fecha || parsedStoredData.date || new Date().toISOString().split('T')[0],
-            hora: parsedStoredData.hora || parsedStoredData.time || '10:00',
+            hora: parsedStoredData.hora || parsedStoredData.time || 'Por agendar',
             tipo_reunion: parsedStoredData.tipo_reunion || 'online',
             descripcion: parsedStoredData.description,
             created_at: new Date().toISOString()
@@ -149,7 +150,7 @@ export default function PaymentSuccessPage() {
           const formattedAmount = currencyFormatter.format(paymentAmount);
 
           setPaymentData({
-            reservation: null as any,
+            reservation: null,
             mercadopagoData: {
               payment_id,
               status: status.toLowerCase(),
@@ -171,7 +172,8 @@ export default function PaymentSuccessPage() {
             hora: parsedStoredData.hora || parsedStoredData.time || '10:00',
             tipo_reunion: parsedStoredData.tipo_reunion,
             price: paymentAmount,
-            priceFormatted: formattedAmount
+            priceFormatted: formattedAmount,
+            source: parsedStoredData.source
           });
 
           setIsProcessing(false);
@@ -346,30 +348,128 @@ export default function PaymentSuccessPage() {
     : 'No especificada';
   const serviceTime = `${paymentData?.reservation?.hora || paymentData?.hora || '10:00'} hrs`;
   const totalFormatted = paymentData?.priceFormatted ? `$${paymentData.priceFormatted}` : 'Confirmado';
+  const agendarUrl = `/agendamiento?postpago=1&email=${encodeURIComponent(clientEmail)}&nombre=${encodeURIComponent(clientName)}&telefono=${encodeURIComponent(clientPhone)}&servicio=${encodeURIComponent(serviceName)}`;
+  const whatsappPostPago = `https://wa.me/56962321883?text=${encodeURIComponent(`Hola, acabo de pagar mi consulta (${serviceName}). Necesito agendar mi sesión. Soy ${clientName}.`)}`;
+
+  // Vista específica para Express QR (post-pago)
+  if (paymentData?.source === 'express_qr') {
+    const whatsappExpress = `https://wa.me/56962321883?text=${encodeURIComponent(`Hola, acabo de pagar mi consulta Express ($25.000) desde el código QR. Necesito agendar mi sesión presencial. Soy ${clientName}.`)}`;
+    return (
+      <>
+        <SEO title="Pago Confirmado - Consulta Express | Punto Legal" description="Tu consulta presencial está confirmada. Te contactaremos por WhatsApp para coordinar." />
+        <div className="min-h-screen bg-[#FAFAFA] text-slate-900 font-sans antialiased">
+          <header className="sticky top-0 z-50 bg-white border-b-2 border-slate-200 py-4 px-4">
+            <div className="max-w-lg mx-auto flex items-center justify-center gap-2">
+              <CheckCircle className="w-6 h-6 text-emerald-600" />
+              <span className="text-sm font-black text-slate-900 uppercase tracking-tight">Punto Legal</span>
+            </div>
+          </header>
+          <main className="max-w-lg mx-auto px-4 py-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-center space-y-6"
+            >
+              <div className="w-20 h-20 rounded-2xl bg-emerald-500/20 flex items-center justify-center mx-auto border-2 border-emerald-500/40">
+                <CheckCircle className="w-10 h-10 text-emerald-600" />
+              </div>
+              <h1 className="text-2xl font-black text-slate-900">PAGO CONFIRMADO</h1>
+              <p className="text-slate-600">Tu consulta Express de $25.000 está confirmada.</p>
+              <div className="rounded-2xl border-2 border-slate-200 bg-white p-6 text-left space-y-4">
+                <p className="text-slate-900 font-bold">Próximo paso:</p>
+                <p className="text-slate-600 text-sm leading-relaxed">
+                  Un abogado te contactará por WhatsApp en menos de 2 horas para coordinar tu sesión presencial en el centro.
+                </p>
+              </div>
+              <a
+                href={whatsappExpress}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-2 w-full py-4 rounded-xl font-bold bg-[#25D366] text-white hover:bg-[#20bd5a] transition-colors"
+              >
+                <MessageCircle className="w-5 h-5" />
+                CONFIRMAR POR WHATSAPP
+              </a>
+            </motion.div>
+          </main>
+        </div>
+      </>
+    );
+  }
+
+  // Vista específica para urgencia penal (post-pago)
+  if (paymentData?.source === 'urgencia') {
+    const whatsappUrgencia = `https://wa.me/56962321883?text=${encodeURIComponent('Hola, acabo de activar la defensa de urgencia. Necesito hablar con el director.')}`;
+    return (
+      <>
+        <SEO title="Pago Confirmado - Urgencia Penal | Punto Legal" description="El equipo legal ha sido activado. Un abogado se dirige a la unidad." />
+        <div className="min-h-screen bg-black text-white font-sans antialiased">
+          <header className="sticky top-0 z-50 bg-black/95 backdrop-blur border-b border-white/10">
+            <div className="max-w-lg mx-auto px-4 py-4 flex justify-center">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center border border-white/20">
+                  <Shield className="w-4 h-4 text-white" />
+                </div>
+                <span className="text-sm font-semibold tracking-tight text-white">Punto Legal</span>
+              </div>
+            </div>
+          </header>
+          <main className="max-w-lg mx-auto px-4 py-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-center space-y-6"
+            >
+              <div className="w-20 h-20 rounded-2xl bg-emerald-500/20 flex items-center justify-center mx-auto border border-emerald-500/30">
+                <CheckCircle className="w-10 h-10 text-emerald-400" />
+              </div>
+              <h1 className="text-2xl font-bold text-white">PAGO CONFIRMADO</h1>
+              <p className="text-slate-400">El equipo legal ha sido activado.</p>
+              <div className="rounded-2xl border border-white/10 bg-white/5 p-6 text-left space-y-4">
+                <p className="text-white font-medium">Instrucción:</p>
+                <p className="text-slate-300 text-sm leading-relaxed">
+                  Indique al funcionario policial que su defensa está a cargo de <strong className="text-white">Punto Legal</strong>. Un abogado se dirige a la unidad ahora mismo.
+                </p>
+              </div>
+              <a
+                href={whatsappUrgencia}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-2 w-full py-4 rounded-xl font-semibold bg-[#25D366] text-white hover:bg-[#20bd5a] transition-colors"
+              >
+                <MessageCircle className="w-5 h-5" />
+                HABLAR CON DIRECTOR
+              </a>
+            </motion.div>
+          </main>
+        </div>
+      </>
+    );
+  }
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center">
         <div className="text-center max-w-md mx-auto px-4">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
-          <h2 className="text-xl font-semibold text-gray-700 mb-2">
+          <div className="animate-spin rounded-full h-12 w-12 border-2 border-pink-500/30 border-t-pink-500 mx-auto mb-4"></div>
+          <h2 className="text-xl font-semibold text-white mb-2">
             {isProcessing ? 'Procesando pago...' : 'Cargando confirmación...'}
           </h2>
           {processingStatus && (
-            <p className="text-sm text-gray-600 mb-4">{processingStatus}</p>
+            <p className="text-sm text-slate-400 mb-4">{processingStatus}</p>
           )}
-          <div className="bg-white/80 backdrop-blur-sm rounded-lg p-4 border border-green-200/50">
-            <div className="space-y-2 text-sm text-gray-700">
+          <div className="rounded-2xl p-5 bg-white/[0.04] border border-white/[0.08]">
+            <div className="space-y-2 text-sm text-slate-300">
               <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                <div className="w-2 h-2 bg-emerald-400 rounded-full"></div>
                 <span>Verificando datos de MercadoPago</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                <div className="w-2 h-2 bg-emerald-400 rounded-full"></div>
                 <span>Guardando reserva en la base de datos</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                <div className="w-2 h-2 bg-emerald-400 rounded-full"></div>
                 <span>Enviando emails de confirmación</span>
               </div>
             </div>
@@ -386,19 +486,34 @@ export default function PaymentSuccessPage() {
         description="Tu pago ha sido procesado exitosamente. Tu consulta legal está confirmada."
       />
       
-      <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50">
-        <div className="max-w-4xl mx-auto px-4 py-16">
+      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
+        <header className="sticky top-0 z-50 bg-slate-950/70 backdrop-blur-xl border-b border-white/[0.06]">
+          <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
+            <Link to="/" className="flex items-center gap-3">
+              <div className="w-9 h-9 bg-white/10 backdrop-blur-xl rounded-xl flex items-center justify-center border border-white/10">
+                <Shield className="w-4 h-4 text-white/90" />
+              </div>
+              <span className="text-lg font-semibold text-white/95 tracking-tight">Punto Legal</span>
+            </Link>
+            <div className="flex items-center gap-2 text-xs text-slate-400">
+              <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></div>
+              Pago confirmado
+            </div>
+          </div>
+        </header>
+
+        <div className="max-w-4xl mx-auto px-4 py-8 md:py-12">
           {/* Header de éxito */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-center mb-12"
+            className="text-center mb-10"
           >
-            <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <CheckCircle className="w-10 h-10 text-green-600" />
+            <div className="w-20 h-20 rounded-2xl bg-emerald-500/20 flex items-center justify-center mx-auto mb-6 border border-emerald-500/30">
+              <CheckCircle className="w-10 h-10 text-emerald-400" />
             </div>
-            <h1 className="text-4xl font-bold text-gray-900 mb-4">{headerTitle}</h1>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">{headerDescription}</p>
+            <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">{headerTitle}</h1>
+            <p className="text-lg text-slate-400 max-w-2xl mx-auto">{headerDescription}</p>
           </motion.div>
 
           {/* Resumen de la consulta */}
@@ -406,46 +521,51 @@ export default function PaymentSuccessPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 border border-green-200/50 shadow-xl mb-8"
+            className="rounded-3xl p-6 md:p-8 mb-6 backdrop-blur-xl"
+            style={{
+              background: 'rgba(255,255,255,0.04)',
+              border: '1px solid rgba(255,255,255,0.08)',
+              boxShadow: '0 4px 24px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.06)'
+            }}
           >
-            <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
-              <CreditCard className="w-6 h-6 text-green-600" />
+            <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-3">
+              <CreditCard className="w-6 h-6 text-emerald-400" />
               Resumen de tu consulta
             </h2>
             
             <div className="grid md:grid-cols-2 gap-6">
                 <div className="space-y-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                    <User className="w-5 h-5 text-green-600" />
+                  <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center border border-emerald-500/30">
+                    <User className="w-5 h-5 text-emerald-400" />
                     </div>
                   <div>
-                    <p className="text-sm text-gray-500">Cliente</p>
-                    <p className="font-semibold text-gray-900">
+                    <p className="text-xs text-slate-500 uppercase tracking-wider">Cliente</p>
+                    <p className="font-semibold text-white">
                       {paymentData?.reservation?.nombre || paymentData?.cliente?.nombre || 'Cliente'}
                     </p>
                   </div>
                 </div>
                 
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                    <Mail className="w-5 h-5 text-green-600" />
+                  <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center border border-emerald-500/30">
+                    <Mail className="w-5 h-5 text-emerald-400" />
                     </div>
                     <div>
-                    <p className="text-sm text-gray-500">Email</p>
-                    <p className="font-semibold text-gray-900">
+                    <p className="text-xs text-slate-500 uppercase tracking-wider">Email</p>
+                    <p className="font-semibold text-white">
                       {paymentData?.reservation?.email || paymentData?.cliente?.email || 'No especificado'}
                       </p>
                     </div>
                   </div>
                   
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                    <Phone className="w-5 h-5 text-green-600" />
+                  <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center border border-emerald-500/30">
+                    <Phone className="w-5 h-5 text-emerald-400" />
                     </div>
                     <div>
-                    <p className="text-sm text-gray-500">Teléfono</p>
-                    <p className="font-semibold text-gray-900">
+                    <p className="text-xs text-slate-500 uppercase tracking-wider">Teléfono</p>
+                    <p className="font-semibold text-white">
                       {paymentData?.reservation?.telefono || paymentData?.cliente?.telefono || 'No especificado'}
                     </p>
                   </div>
@@ -454,37 +574,37 @@ export default function PaymentSuccessPage() {
               
               <div className="space-y-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                    <Calendar className="w-5 h-5 text-green-600" />
+                  <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center border border-emerald-500/30">
+                    <Calendar className="w-5 h-5 text-emerald-400" />
                   </div>
                   <div>
-                    <p className="text-sm text-gray-500">Fecha</p>
-                    <p className="font-semibold text-gray-900">
+                    <p className="text-xs text-slate-500 uppercase tracking-wider">Fecha</p>
+                    <p className="font-semibold text-white">
                       {paymentData?.reservation?.fecha ? new Date(paymentData.reservation.fecha).toLocaleDateString('es-CL') : 
-                       paymentData?.fecha ? new Date(paymentData.fecha).toLocaleDateString('es-CL') : 'No especificada'}
+                       paymentData?.fecha ? new Date(paymentData.fecha).toLocaleDateString('es-CL') : 'A coordinar'}
                       </p>
                     </div>
                   </div>
                   
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                    <Clock className="w-5 h-5 text-green-600" />
+                  <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center border border-emerald-500/30">
+                    <Clock className="w-5 h-5 text-emerald-400" />
                     </div>
                     <div>
-                    <p className="text-sm text-gray-500">Hora</p>
-                    <p className="font-semibold text-gray-900">
-                      {paymentData?.reservation?.hora || paymentData?.hora || '10:00'} hrs
+                    <p className="text-xs text-slate-500 uppercase tracking-wider">Hora</p>
+                    <p className="font-semibold text-white">
+                      {paymentData?.reservation?.hora || paymentData?.hora || 'A coordinar'}
                       </p>
                     </div>
                 </div>
                 
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                    <CreditCard className="w-5 h-5 text-green-600" />
+                  <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center border border-emerald-500/30">
+                    <CreditCard className="w-5 h-5 text-emerald-400" />
                   </div>
                   <div>
-                    <p className="text-sm text-gray-500">Servicio</p>
-                    <p className="font-semibold text-gray-900">
+                    <p className="text-xs text-slate-500 uppercase tracking-wider">Servicio</p>
+                    <p className="font-semibold text-white">
                       {paymentData?.reservation?.servicio || paymentData?.servicio?.tipo || 'Consulta Legal'}
                     </p>
                   </div>
@@ -492,10 +612,10 @@ export default function PaymentSuccessPage() {
               </div>
             </div>
             
-            <div className="border-t border-gray-200 pt-6 mt-6">
+            <div className="border-t border-white/[0.06] pt-6 mt-6">
               <div className="flex items-center justify-between">
-                <span className="text-lg font-semibold text-gray-900">Total pagado</span>
-                <span className="text-2xl font-bold text-green-600">
+                <span className="text-lg font-semibold text-white">Total pagado</span>
+                <span className="text-2xl font-bold text-emerald-400">
                   ${paymentData?.priceFormatted ? paymentData.priceFormatted.replace('$', '') : 'Confirmado'} CLP
                 </span>
               </div>
@@ -507,47 +627,47 @@ export default function PaymentSuccessPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
-            className="bg-blue-50 border border-blue-200 rounded-xl p-6 mb-8"
+            className="rounded-2xl p-6 mb-6 bg-white/[0.03] border border-white/[0.06]"
           >
-            <h3 className="text-lg font-semibold text-blue-900 mb-3">
-              📧 Estado de confirmación
+            <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-4">
+              Estado de confirmación
             </h3>
                 <div className="space-y-3">
               <div className="flex items-center gap-2">
-                <CheckCircle className="w-5 h-5 text-green-500" />
-                <span className="text-blue-800">Reserva guardada en la base de datos</span>
+                <CheckCircle className="w-5 h-5 text-emerald-400" />
+                <span className="text-slate-300">Reserva guardada en la base de datos</span>
               </div>
               <div className="flex items-center gap-2">
-                <CheckCircle className="w-5 h-5 text-green-500" />
-                <span className="text-blue-800">Pago confirmado via MercadoPago</span>
+                <CheckCircle className="w-5 h-5 text-emerald-400" />
+                <span className="text-slate-300">Pago confirmado vía MercadoPago</span>
               </div>
               <div className="flex items-center gap-2">
-                <CheckCircle className="w-5 h-5 text-green-500" />
-                <span className="text-blue-800">Emails de confirmación enviados</span>
+                <CheckCircle className="w-5 h-5 text-emerald-400" />
+                <span className="text-slate-300">Emails de confirmación enviados</span>
               </div>
               {paymentData?.reservation && (
-                <div className="mt-4 p-3 bg-white rounded-lg border border-blue-200">
-                  <p className="text-sm text-blue-700">
-                    <strong>ID de Reserva:</strong> {paymentData.reservation.id}
+                <div className="mt-4 p-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+                  <p className="text-[11px] text-slate-500">
+                    <strong className="text-slate-400">ID de Reserva:</strong> {paymentData.reservation.id}
                   </p>
-                  <p className="text-sm text-blue-700">
-                    <strong>Estado:</strong> {paymentData.reservation.estado}
+                  <p className="text-[11px] text-slate-500">
+                    <strong className="text-slate-400">Estado:</strong> {paymentData.reservation.estado}
                   </p>
                   {trackingCode && (
-                    <p className="text-sm text-blue-700">
-                      <strong>Código de Seguimiento:</strong> {trackingCode}
+                    <p className="text-[11px] text-slate-500">
+                      <strong className="text-slate-400">Código de Seguimiento:</strong> {trackingCode}
                     </p>
                   )}
                   {googleMeetLink && (
-                    <p className="text-sm text-blue-700">
-                      <strong>Link de Google Meet:</strong> 
+                    <p className="text-[11px] text-slate-500">
+                      <strong className="text-slate-400">Link de Google Meet:</strong> 
                       <a 
                         href={googleMeetLink} 
                         target="_blank" 
                         rel="noopener noreferrer"
-                        className="text-blue-600 hover:text-blue-800 underline ml-1"
+                        className="text-pink-400 hover:text-pink-300 underline ml-1"
                       >
-                        {googleMeetLink}
+                        Unirse
                       </a>
                     </p>
                   )}
@@ -562,32 +682,29 @@ export default function PaymentSuccessPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5 }}
-              className="bg-gray-50 border border-gray-200 rounded-xl p-6 mb-8"
+              className="rounded-2xl p-6 mb-6 bg-white/[0.03] border border-white/[0.06]"
             >
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">
-                💳 Información del pago
+              <h3 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3">
+                Información del pago
               </h3>
-              <div className="grid md:grid-cols-2 gap-4 text-sm">
+              <div className="grid md:grid-cols-2 gap-4 text-[11px]">
                 <div>
-                  <p className="text-gray-600">
-                    <strong>ID de Pago:</strong> {String(paymentData.mercadopagoData.payment_id || 'N/A')}
+                  <p className="text-slate-400">
+                    <strong className="text-slate-300">ID de Pago:</strong> {String(paymentData.mercadopagoData.payment_id || 'N/A')}
                   </p>
-                  <p className="text-gray-600">
-                    <strong>Estado:</strong> {String(readablePaymentStatus || 'N/A')}
+                  <p className="text-slate-400">
+                    <strong className="text-slate-300">Estado:</strong> {String(readablePaymentStatus || 'N/A')}
                   </p>
-                  <p className="text-gray-600">
-                    <strong>Método:</strong> {String(paymentData.mercadopagoData.payment_type || 'N/A')}
+                  <p className="text-slate-400">
+                    <strong className="text-slate-300">Método:</strong> {String(paymentData.mercadopagoData.payment_type || 'MercadoPago')}
                   </p>
                 </div>
                 <div>
-                  <p className="text-gray-600">
-                    <strong>Referencia:</strong> {String(paymentData.mercadopagoData.external_reference || 'N/A')}
+                  <p className="text-slate-400">
+                    <strong className="text-slate-300">Referencia:</strong> {String(paymentData.mercadopagoData.external_reference || 'N/A')}
                   </p>
-                  <p className="text-gray-600">
-                    <strong>Orden:</strong> {String(paymentData.mercadopagoData.merchant_order_id || 'N/A')}
-                  </p>
-                  <p className="text-gray-600">
-                    <strong>Procesado:</strong> {new Date().toLocaleString('es-CL')}
+                  <p className="text-slate-400">
+                    <strong className="text-slate-300">Procesado:</strong> {new Date().toLocaleString('es-CL')}
                   </p>
                 </div>
               </div>
@@ -600,17 +717,17 @@ export default function PaymentSuccessPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5 }}
-              className="bg-green-50 border border-green-200 rounded-xl p-6 mb-8"
+              className="rounded-2xl p-6 mb-6 bg-emerald-500/[0.08] border border-emerald-500/20"
             >
-              <h3 className="text-lg font-semibold text-green-900 mb-3">
-                📧 Confirmación por email
+              <h3 className="text-sm font-bold text-emerald-300 mb-3">
+                Confirmación por email
               </h3>
-              <p className="text-green-800 mb-4">
+              <p className="text-slate-300 mb-4 text-sm">
                 Hemos enviado un email de confirmación a tu dirección de correo con todos los detalles de tu consulta.
               </p>
-              <div className="text-sm text-green-700 space-y-2">
+              <div className="text-xs text-slate-400 space-y-2">
                 <p>• Revisa tu bandeja de entrada y carpeta de spam</p>
-                <p>• Guarda este email como comprobante</p>
+                <p>• Un abogado te contactará por WhatsApp en menos de 2 horas</p>
                 <p>• Si no recibes el email en 10 minutos, contáctanos</p>
               </div>
             </motion.div>
@@ -619,18 +736,17 @@ export default function PaymentSuccessPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5 }}
-              className="bg-yellow-50 border border-yellow-200 rounded-xl p-6 mb-8"
+              className="rounded-2xl p-6 mb-6 bg-amber-500/[0.08] border border-amber-500/20"
             >
-              <h3 className="text-lg font-semibold text-yellow-900 mb-3">
-                📬 Confirmación pendiente
+              <h3 className="text-sm font-bold text-amber-300 mb-3">
+                Confirmación pendiente
               </h3>
-              <p className="text-yellow-800 mb-4">
-                Tu pago se encuentra en estado <strong>{String(readablePaymentStatus)}</strong>. Apenas Mercado Pago lo confirme te enviaremos un correo con todos los detalles.
+              <p className="text-slate-300 mb-4 text-sm">
+                Tu pago se encuentra en estado <strong className="text-amber-300">{String(readablePaymentStatus)}</strong>. Apenas Mercado Pago lo confirme te enviaremos un correo con todos los detalles.
               </p>
-              <div className="text-sm text-yellow-700 space-y-2">
+              <div className="text-xs text-slate-400 space-y-2">
                 <p>• Puedes cerrar esta ventana con tranquilidad, guardaremos tu reserva automáticamente.</p>
-                <p>• Si el pago cambia a aprobado recibirás un email de confirmación y WhatsApp de respaldo.</p>
-                <p>• Ante cualquier duda escríbenos a <a href="mailto:puntolegalelgolf@gmail.com" className="text-blue-600 hover:text-blue-700 underline">puntolegalelgolf@gmail.com</a> o llámanos al <a href="tel:+56962321883" className="text-blue-600 hover:text-blue-700 underline">+569 6232 1883</a>.</p>
+                <p>• Ante cualquier duda escríbenos a <a href="mailto:puntolegalelgolf@gmail.com" className="text-pink-400 hover:text-pink-300 underline">puntolegalelgolf@gmail.com</a> o WhatsApp <a href="tel:+56962321883" className="text-pink-400 hover:text-pink-300 underline">+569 6232 1883</a>.</p>
               </div>
             </motion.div>
           )}
@@ -640,103 +756,115 @@ export default function PaymentSuccessPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6 }}
-            className="bg-gray-50 border border-gray-200 rounded-xl p-6 mb-8"
+            className="rounded-2xl p-6 mb-6 bg-white/[0.03] border border-white/[0.06]"
           >
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">
+            <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-4">
               Próximos pasos
             </h3>
             <div className="space-y-3">
               <div className="flex items-start gap-3">
-                <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <span className="text-xs font-bold text-green-600">1</span>
+                <div className="w-6 h-6 rounded-full bg-emerald-500/20 flex items-center justify-center flex-shrink-0 mt-0.5 border border-emerald-500/30">
+                  <span className="text-[10px] font-bold text-emerald-400">1</span>
                 </div>
-                <p className="text-gray-700">Recibirás un email de confirmación con los detalles de tu consulta</p>
+                <p className="text-slate-300 text-sm">Recibirás un email de confirmación con los detalles</p>
               </div>
               <div className="flex items-start gap-3">
-                <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <span className="text-xs font-bold text-green-600">2</span>
+                <div className="w-6 h-6 rounded-full bg-emerald-500/20 flex items-center justify-center flex-shrink-0 mt-0.5 border border-emerald-500/30">
+                  <span className="text-[10px] font-bold text-emerald-400">2</span>
                 </div>
-                <p className="text-gray-700">Te contactaremos 24 horas antes de tu consulta para confirmar</p>
+                <p className="text-slate-300 text-sm">Un abogado te contactará por WhatsApp en menos de 2 horas</p>
               </div>
               <div className="flex items-start gap-3">
-                <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <span className="text-xs font-bold text-green-600">3</span>
+                <div className="w-6 h-6 rounded-full bg-emerald-500/20 flex items-center justify-center flex-shrink-0 mt-0.5 border border-emerald-500/30">
+                  <span className="text-[10px] font-bold text-emerald-400">3</span>
                 </div>
-                <p className="text-gray-700">Te enviaremos el link de la videollamada o la dirección de la oficina</p>
+                <p className="text-slate-300 text-sm">Coordinarás fecha y hora de tu sesión de 45 min</p>
               </div>
             </div>
           </motion.div>
 
-          {/* Información de contacto */}
+          {/* CTA Principal: Agendar sesión */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.7 }}
-            className="bg-gray-50 border border-gray-200 rounded-xl p-6 mb-8"
+            className="rounded-3xl p-6 mb-6 overflow-hidden"
+            style={{
+              background: 'rgba(255,255,255,0.04)',
+              border: '1px solid rgba(255,255,255,0.08)',
+              boxShadow: '0 4px 24px rgba(0,0,0,0.2)'
+            }}
           >
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">
-              ¿Necesitas ayuda?
-            </h3>
-            <p className="text-gray-700 mb-4">
-              Si tienes alguna duda o necesitas modificar tu reserva, no dudes en contactarnos.
+            <p className="text-[10px] text-slate-500 uppercase tracking-widest font-bold mb-3 text-center">
+              Siguiente paso
             </p>
-            <div className="grid md:grid-cols-2 gap-4 text-sm">
-              <div className="flex items-center gap-2">
-                <span className="font-medium">📧 Email:</span>
-                <a 
-                  href="mailto:puntolegalelgolf@gmail.com"
-                  className="text-blue-600 hover:text-blue-700 underline"
-                >
-                  puntolegalelgolf@gmail.com
-                </a>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="font-medium">📱 WhatsApp:</span>
-                <a 
-                  href="tel:+56962321883"
-                  className="text-blue-600 hover:text-blue-700 underline"
-                >
-                  +569 6232 1883
-                </a>
-              </div>
+            <p className="text-white font-semibold text-center mb-4">
+              Elige fecha y hora para tu sesión de 45 min
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <Link
+                to={agendarUrl}
+                className="inline-flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-4 px-6 rounded-xl transition-all duration-200"
+                style={{ boxShadow: '0 4px 20px rgba(79,70,229,0.4)' }}
+              >
+                <Calendar className="w-5 h-5" />
+                Agendar mi sesión
+              </Link>
+              <a
+                href={whatsappPostPago}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-4 px-6 rounded-xl transition-all duration-200"
+              >
+                <MessageCircle className="w-5 h-5" />
+                Hablar por WhatsApp
+              </a>
             </div>
           </motion.div>
 
-          {/* Botones de acción */}
+          {/* Botones secundarios */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.8 }}
-            className="flex flex-col sm:flex-row gap-4 justify-center"
+            className="flex flex-col sm:flex-row gap-3 justify-center"
           >
             <Link
               to="/"
-              className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200 hover:scale-105"
+              className="inline-flex items-center justify-center gap-2 bg-white/[0.06] hover:bg-white/[0.1] text-white font-medium py-3 px-6 rounded-xl border border-white/[0.08] transition-all"
             >
-              <Home className="w-5 h-5" />
+              <Home className="w-4 h-4" />
               Volver al inicio
             </Link>
-            
-            {paymentData?.reservation?.id && (
-              <Link
-                to={`/agendamiento?reserva=${paymentData.reservation.id}`}
-                className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200 hover:scale-105"
-              >
-                <Calendar className="w-5 h-5" />
-                Ver mi agendamiento
-              </Link>
-            )}
-            
             <Link
               to="/servicios"
-              className="inline-flex items-center gap-2 bg-white hover:bg-gray-50 text-gray-700 font-semibold py-3 px-6 rounded-xl border border-gray-300 transition-all duration-200 hover:scale-105"
+              className="inline-flex items-center justify-center gap-2 bg-white/[0.06] hover:bg-white/[0.1] text-white font-medium py-3 px-6 rounded-xl border border-white/[0.08] transition-all"
             >
               Ver más servicios
-              <ArrowRight className="w-5 h-5" />
+              <ArrowRight className="w-4 h-4" />
             </Link>
           </motion.div>
         </div>
       </div>
+
+      {/* WhatsApp flotante */}
+      <a
+        href={whatsappPostPago}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="fixed bottom-6 right-6 z-[100] flex items-center gap-3 group"
+      >
+        <div className="bg-slate-900/90 backdrop-blur-xl border border-slate-700 px-3 py-2 rounded-2xl text-white text-xs font-bold shadow-2xl flex items-center gap-2 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
+          <span className="relative flex h-2 w-2 flex-none">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+          </span>
+          Hablar ahora
+        </div>
+        <div className="w-14 h-14 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-full shadow-[0_10px_30px_rgba(16,185,129,0.5)] flex items-center justify-center transition-transform hover:scale-110 border border-emerald-300/50 group">
+          <MessageCircle className="w-7 h-7 text-white" />
+        </div>
+      </a>
     </>
   );
 } 

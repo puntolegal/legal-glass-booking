@@ -71,7 +71,8 @@ export const parsePendingPaymentData = (rawData: string): PendingPaymentData => 
       porcentajeDescuento: toStringValue(parsed.porcentajeDescuento) ?? null,
       method: toStringValue(parsed.method) ?? null,
       preferenceId: parsed.preferenceId ? String(parsed.preferenceId) : null,
-      timestamp: typeof parsed.timestamp === 'number' ? parsed.timestamp : Date.now()
+      timestamp: typeof parsed.timestamp === 'number' ? parsed.timestamp : Date.now(),
+      source: parsed.source ? String(parsed.source) : undefined
     };
   }
 

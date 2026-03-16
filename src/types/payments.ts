@@ -28,6 +28,7 @@ export interface PendingPaymentData {
   isVulnerable?: boolean;
   matter?: string | null;
   protectionType?: string | null;
+  source?: string;
 }
 
 export interface MercadoPagoMetadata {

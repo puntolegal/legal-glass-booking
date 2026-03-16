@@ -183,6 +183,55 @@ export const layoutConfigs: RouteLayoutRule[] = [
     }
   },
   
+  // 3e1. Layout de foco - Express / Centro (QR Calle, GovTech, cero distracciones)
+  {
+    pathPrefix: '/centro',
+    config: {
+      type: 'focus',
+      showHeader: false,
+      showFooter: false,
+      headerVariant: 'none',
+      footerVariant: 'none',
+      useMobileLayout: false,
+      seoConfig: {
+        titleSuffix: 'Consulta Legal Express',
+        defaultDescription: 'Consulta presencial validada. Cupo limitado. Resuelve tu problema legal hoy.'
+      }
+    }
+  },
+  {
+    path: '/express',
+    config: {
+      type: 'focus',
+      showHeader: false,
+      showFooter: false,
+      headerVariant: 'none',
+      footerVariant: 'none',
+      useMobileLayout: false,
+      seoConfig: {
+        titleSuffix: 'Consulta Legal Express',
+        defaultDescription: 'Consulta presencial validada. Cupo limitado. Resuelve tu problema legal hoy.'
+      }
+    }
+  },
+  
+  // 3e. Layout de foco - Urgencia Penal (Escudo Negro, cero distracciones)
+  {
+    pathPrefix: '/urgencia',
+    config: {
+      type: 'focus',
+      showHeader: false,
+      showFooter: false,
+      headerVariant: 'none',
+      footerVariant: 'none',
+      useMobileLayout: false,
+      seoConfig: {
+        titleSuffix: 'Urgencia Penal',
+        defaultDescription: 'Defensa legal inmediata en situaciones de detención. Intervención en comisaría.'
+      }
+    }
+  },
+  
   // 5a. Calculadora de Pensión - Squeeze Page (sin header ni footer para máxima conversión)
   {
     path: '/servicios/familia/calculadora',
