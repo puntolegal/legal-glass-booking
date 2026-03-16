@@ -209,10 +209,10 @@ export default function ExpressPage() {
 
   return (
     <>
-      <SEO
-        title="Consulta Legal $25.000 - Punto Legal | Centro"
-        description="Consulta presencial validada. Cupo limitado. Resuelve tu problema legal hoy."
-      />
+        <SEO
+          title="Consulta Legal Online $25.000 - Punto Legal | Centro"
+          description="Consulta legal telemática con contacto rápido. Un abogado te contactará para agendar tu reunión online."
+        />
 
       <div className="min-h-screen bg-[#FAFAFA] text-slate-900 font-sans antialiased pb-safe">
         {/* 1. Sticky Urgency Banner */}
