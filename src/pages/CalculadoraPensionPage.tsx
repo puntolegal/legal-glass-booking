@@ -1755,8 +1755,10 @@ const CalculadoraPensionPage: React.FC = () => {
                   {hasDebt && monthsOwed && monthsOwed > 0 && (() => {
                     const rawPension = parseInt(currentPension.replace(/\D/g, '')) || 0;
                     const currentPensionNum = rawPension > 0 && rawPension < 1000 ? 0 : rawPension;
-                    const baseDebt = currentPensionNum > 0 ? currentPensionNum : (parseInt(calculatedRange.min.replace(/\D/g, '')) || 0);
-                    const totalDebt = baseDebt * monthsOwed;
+                    // Deuda estimada: usamos el monto mensual exigible (calculatedRange.max) por meses impagos
+                    // (si hoy recibe algo, ese dato se usa para "fuga mensual", pero la deuda se calcula sobre lo exigible).
+                    const maxPensionNum = parseInt(calculatedRange.max.replace(/\D/g, '')) || 0;
+                    const totalDebt = Math.max(0, maxPensionNum) * monthsOwed;
                     const formattedTotalDebt = new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(totalDebt);
 
                     return (
@@ -1764,7 +1766,7 @@ const CalculadoraPensionPage: React.FC = () => {
                         className="rounded-2xl p-4 bg-white/[0.06] backdrop-blur-sm border border-blue-500/20"
                         style={{ boxShadow: '0 2px 12px rgba(0,0,0,0.15)' }}
                       >
-                        <span className="text-[11px] font-semibold text-blue-400/90 uppercase tracking-wider">Deuda acumulada</span>
+                        <span className="text-[11px] font-semibold text-blue-400/90 uppercase tracking-wider">Deuda acumulada estimada</span>
                         <p className="text-2xl font-bold text-white mt-2">
                           <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.3, duration: 0.5 }}>{formattedTotalDebt}</motion.span>
                         </p>
@@ -1780,10 +1782,14 @@ const CalculadoraPensionPage: React.FC = () => {
                   const currentPensionNum = rawPension > 0 && rawPension < 1000 ? 0 : rawPension;
                   const maxPensionNum = parseInt(calculatedRange.max.replace(/\D/g, '')) || 0;
                   const monthlyLoss = Math.max(0, maxPensionNum - currentPensionNum);
-                  const baseDebt = currentPensionNum > 0 ? currentPensionNum : (parseInt(calculatedRange.min.replace(/\D/g, '')) || 0);
-                  const totalDebt = hasDebt && monthsOwed ? baseDebt * monthsOwed : 0;
-                  const depositAmount = totalDebt > 0 ? totalDebt : (monthlyLoss > 0 ? monthlyLoss * 12 : 4600000);
+                  const totalDebt = hasDebt && monthsOwed ? Math.max(0, maxPensionNum) * monthsOwed : 0;
+                  // Sin fallback fijo: si no hay deuda ni fuga mensual, no mostrar este bloque.
+                  const depositAmount = totalDebt > 0 ? totalDebt : (monthlyLoss > 0 ? monthlyLoss * 12 : 0);
+                  if (depositAmount <= 0) return null;
                   const depositNum = new Intl.NumberFormat('es-CL', { maximumFractionDigits: 0 }).format(depositAmount);
+                  const caption = totalDebt > 0
+                    ? 'Indemnización estimada por meses impagos'
+                    : 'Potencial anual recuperable (diferencia vs. lo exigible)';
                   return (
                     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.35 }}
                       className="rounded-2xl p-4 mb-6 overflow-hidden relative"
@@ -1800,11 +1806,11 @@ const CalculadoraPensionPage: React.FC = () => {
                         <div className="flex-1 min-w-0">
                           <p className="text-emerald-400 font-bold text-lg">+{depositNum}</p>
                           <p className="text-[11px] text-slate-400 font-medium">
-                            Recibiste {depositNum} pesos gracias a Punto Legal
+                            {caption}
                           </p>
                         </div>
                       </div>
-                      <p className="text-[10px] text-slate-500 mt-2 font-medium">Depósito · Casos como el tuyo</p>
+                      <p className="text-[10px] text-slate-500 mt-2 font-medium">Estimación · Calculada con tus respuestas</p>
                     </motion.div>
                   );
                 })()}
@@ -1895,8 +1901,7 @@ const CalculadoraPensionPage: React.FC = () => {
                         <div className="flex gap-3 p-3 rounded-xl bg-slate-50 border border-slate-100">
                           <User className="w-5 h-5 text-indigo-600 shrink-0" />
                           <div>
-                            <p className="text-[11px] font-bold text-slate-900 leading-none">Abogado Senior Asignado</p>
-                            <p className="text-[10px] text-slate-500 mt-1">Especialista en {legalMatter === 'divorcio' ? 'Patrimonio' : 'Familia'}.</p>
+                            <p className="text-[11px] font-bold text-slate-900 leading-none">Abogado</p>
                           </div>
                         </div>
                         <div className="flex gap-3 p-3 rounded-xl bg-slate-50 border border-slate-100">
