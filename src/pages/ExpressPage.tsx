@@ -96,23 +96,43 @@ export default function ExpressPage() {
     const phoneDigits = getWhatsappDigits(whatsapp);
     const phone = `569${phoneDigits}`;
     const emailPlaceholder = `express-${phone}@puntolegal.online`;
+    const quizAnswers: Json = {
+      source: 'QR_CALLE_CENTRO',
+      nombre: nombre.trim(),
+      whatsapp: `+56 9 ${getWhatsappDigits(whatsapp).slice(0, 4)} ${getWhatsappDigits(whatsapp).slice(4, 8)}`.trim(),
+      materia,
+      precio: PRECIO_EXPRESS,
+      precio_original: PRECIO_ORIGINAL,
+    };
+    const payload = {
+      email: emailPlaceholder,
+      name: nombre.trim() || 'Express QR',
+      status: 'express_iniciado' as const,
+      quiz_answers: quizAnswers,
+    };
     try {
-      const quizAnswers: Json = {
-        source: 'QR_CALLE_CENTRO',
-        nombre: nombre.trim(),
-        whatsapp: `+56 9 ${getWhatsappDigits(whatsapp).slice(0, 4)} ${getWhatsappDigits(whatsapp).slice(4, 8)}`.trim(),
-        materia,
-        precio: PRECIO_EXPRESS,
-        precio_original: PRECIO_ORIGINAL,
-      };
-      const { error: insertErr } = await supabase.from('leads_quiz').insert([
-        {
-          email: emailPlaceholder,
-          name: nombre.trim() || 'Express QR',
-          status: 'express_iniciado',
-          quiz_answers: quizAnswers,
-        },
-      ]);
+      // Update-or-insert: si ya existe (mismo teléfono), actualizar; si no, insertar
+      const { data: updated } = await supabase
+        .from('leads_quiz')
+        .update({ status: 'express_iniciado', quiz_answers: quizAnswers, name: payload.name })
+        .eq('email', emailPlaceholder)
+        .select('id');
+      if (updated?.length) {
+        setLeadSaved(true);
+        trackMetaEvent({
+          event_name: 'Lead',
+          user_data: { ph: phone },
+          custom_data: {
+            content_name: 'Express QR Calle - Lead',
+            content_category: 'Express',
+            value: PRECIO_EXPRESS,
+            currency: 'CLP',
+          },
+        });
+        console.log('✅ Lead Express actualizado (ninja)');
+        return;
+      }
+      const { error: insertErr } = await supabase.from('leads_quiz').insert([payload]);
       if (!insertErr) {
         setLeadSaved(true);
         trackMetaEvent({
@@ -126,6 +146,8 @@ export default function ExpressPage() {
           },
         });
         console.log('✅ Lead Express guardado (ninja)');
+      } else {
+        console.warn('Lead save insert:', insertErr.message);
       }
     } catch (e) {
       console.warn('Lead save:', e);
