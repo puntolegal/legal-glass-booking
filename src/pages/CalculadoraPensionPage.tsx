@@ -213,8 +213,9 @@ const CalculadoraPensionPage: React.FC = () => {
   // Lógica de precios dinámicos — 3 niveles
   const isVulnerableProfile = (protectionType === 'vif' || protectionType === 'economica') && selectedIncome === 600000;
   const isVipProfile = selectedIncome === 4000000 || selectedIncome === 2250000 || hasComplexAssets === true;
-  const consultPrice = isVulnerableProfile ? 15000 : isVipProfile ? 75000 : 35000;
-  const consultOriginalPrice = isVulnerableProfile ? 35000 : isVipProfile ? 150000 : 70000;
+  // Pricing ajustado: mínimo $5.000, máximo $20.000 (según respuestas)
+  const consultPrice = isVulnerableProfile ? 5000 : isVipProfile ? 20000 : 12000;
+  const consultOriginalPrice = isVulnerableProfile ? 20000 : isVipProfile ? 75000 : 40000;
 
   const handleDirectPayment = async () => {
     setCountdownActive(false);
@@ -1450,7 +1451,10 @@ const CalculadoraPensionPage: React.FC = () => {
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <motion.button 
-                    onClick={() => setComplexAssets(true)}
+                    onClick={() => {
+                      setComplexAssets(true);
+                      scrollToNext('paso-resultado');
+                    }}
                     whileHover={{ y: -3, scale: 1.015 }}
                     whileTap={{ scale: 0.97, y: 0 }}
                     transition={{ type: 'spring', stiffness: 400, damping: 22 }}
@@ -1466,7 +1470,10 @@ const CalculadoraPensionPage: React.FC = () => {
                     <span className={`font-medium transition-colors ${hasComplexAssets === true ? 'text-white' : 'text-slate-300'}`}>Sí, patrimonio complejo</span>
                   </motion.button>
                   <motion.button 
-                    onClick={() => setComplexAssets(false)}
+                    onClick={() => {
+                      setComplexAssets(false);
+                      scrollToNext('paso-resultado');
+                    }}
                     whileHover={{ y: -3, scale: 1.015 }}
                     whileTap={{ scale: 0.97, y: 0 }}
                     transition={{ type: 'spring', stiffness: 400, damping: 22 }}
@@ -1484,6 +1491,16 @@ const CalculadoraPensionPage: React.FC = () => {
                 </div>
               </motion.div>
             )}
+
+            {/* Ancla + feedback inmediato post Paso 9 (evita sensación de “atasco”) */}
+            <div id="paso-resultado" style={{ scrollMarginTop: 140 }}>
+              {hasComplexAssets !== null && !isRevealed && (
+                <div className="mt-4 bg-white/5 backdrop-blur-2xl border border-white/10 rounded-3xl p-5 md:p-6">
+                  <p className="text-sm text-slate-200 font-semibold">Generando tu informe legal…</p>
+                  <p className="text-xs text-slate-400 mt-1">Esto puede tomar unos segundos. No cierres la página.</p>
+                </div>
+              )}
+            </div>
 
             {/* Tarjeta de Urgencia - Registro de Deudores (Solo si no hay resultado calculado) */}
             {!calculatedRange && (
