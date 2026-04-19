@@ -81,7 +81,7 @@ const ServiceSummaryCard: React.FC = () => {
               fontVariantNumeric: 'tabular-nums',
             }}
           >
-            {precioFinal === '0' || precioFinal === 0 ? 'Gratis' : `$${precioFinal}`}
+            {precioFinal === '0' ? 'Gratis' : `$${precioFinal}`}
           </span>
           {service.originalPrice && !isConvenioValido && precioFinal !== '0' && (
             <span className="text-base text-slate-500 line-through">${service.originalPrice}</span>
