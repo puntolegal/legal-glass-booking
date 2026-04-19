@@ -462,23 +462,26 @@ All colors MUST be HSL.
     border-radius: 1.25rem;
   }
 
-  /* === Service card — luxury 3D glass with per-card accent === */
+  /* === Service card — glassmorphism iOS limpio (sin "metálico") ===
+     Antes: triple radial-gradient con tintes accent al 18%/10% — esto creaba
+     una "lámina metálica" tintada. Ahora: glass casi puro con un solo radial
+     muy sutil (8%) y opacidad de fondo más baja para que se vea el navy del
+     landing-canvas a través del cristal. */
   .service-card {
     --card-accent: 139 92 246; /* rgb fallback (violet-500) */
     position: relative;
     isolation: isolate;
     background:
-      radial-gradient(120% 90% at 100% 0%, rgba(var(--card-accent), 0.18), transparent 55%),
-      radial-gradient(140% 100% at 0% 100%, rgba(var(--card-accent), 0.10), transparent 55%),
-      hsla(var(--la-surface-high) / 0.60);
-    -webkit-backdrop-filter: blur(32px) saturate(150%);
-    backdrop-filter: blur(32px) saturate(150%);
-    border: 1px solid hsla(var(--la-outline) / 0.12);
-    border-radius: 2rem;
+      radial-gradient(140% 100% at 100% 0%, rgba(var(--card-accent), 0.08), transparent 60%),
+      rgba(255, 255, 255, 0.035);
+    -webkit-backdrop-filter: blur(40px) saturate(160%);
+    backdrop-filter: blur(40px) saturate(160%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 1.75rem;
     box-shadow:
-      0 24px 48px rgba(0, 0, 0, 0.40),
-      inset 0 1px 0 hsla(var(--la-outline-warm) / 0.22),
-      inset 0 -1px 0 rgba(0, 0, 0, 0.20);
+      0 18px 44px -14px rgba(0, 0, 0, 0.50),
+      inset 0 1px 0 rgba(255, 255, 255, 0.06),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.16);
     transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1),
       box-shadow 0.45s ease, border-color 0.45s ease;
   }
@@ -500,36 +503,35 @@ All colors MUST be HSL.
     z-index: 1;
   }
   .service-card:hover {
-    transform: translateY(-6px) scale(1.01);
-    border-color: rgba(var(--card-accent), 0.40);
+    transform: translateY(-4px);
+    border-color: rgba(var(--card-accent), 0.30);
     box-shadow:
-      0 36px 72px rgba(0, 0, 0, 0.50),
-      0 0 0 1px rgba(var(--card-accent), 0.22),
-      0 0 80px -10px rgba(var(--card-accent), 0.45),
-      inset 0 1px 0 hsla(var(--la-outline-warm) / 0.30);
+      0 28px 56px -14px rgba(0, 0, 0, 0.55),
+      0 0 0 1px rgba(var(--card-accent), 0.16),
+      0 0 60px -16px rgba(var(--card-accent), 0.30),
+      inset 0 1px 0 rgba(255, 255, 255, 0.10);
   }
   .service-card:hover::before {
     opacity: 1;
   }
 
-  /* Featured card — premium gold treatment con glow más cálido */
+  /* Featured card — más sutil sin glow saturado */
   .service-card[data-featured="true"] {
     background:
-      radial-gradient(140% 100% at 100% 0%, rgba(var(--card-accent), 0.20), transparent 55%),
-      radial-gradient(140% 100% at 0% 100%, rgba(var(--card-accent), 0.10), transparent 55%),
-      hsla(var(--la-surface-highest) / 0.68);
+      radial-gradient(140% 100% at 100% 0%, rgba(var(--card-accent), 0.12), transparent 55%),
+      rgba(255, 255, 255, 0.045);
     box-shadow:
-      0 32px 64px rgba(0, 0, 0, 0.45),
-      0 0 0 1px rgba(var(--card-accent), 0.12),
-      inset 0 1px 0 hsla(var(--la-outline-warm) / 0.30),
-      inset 0 -1px 0 rgba(0, 0, 0, 0.20);
+      0 22px 52px -14px rgba(0, 0, 0, 0.55),
+      0 0 0 1px rgba(var(--card-accent), 0.10),
+      inset 0 1px 0 rgba(255, 255, 255, 0.10),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.18);
   }
   .service-card[data-featured="true"]:hover {
     box-shadow:
-      0 44px 88px rgba(0, 0, 0, 0.55),
-      0 0 0 1px rgba(var(--card-accent), 0.30),
-      0 0 100px -10px rgba(var(--card-accent), 0.50),
-      inset 0 1px 0 hsla(var(--la-outline-warm) / 0.36);
+      0 32px 68px -16px rgba(0, 0, 0, 0.60),
+      0 0 0 1px rgba(var(--card-accent), 0.20),
+      0 0 70px -18px rgba(var(--card-accent), 0.35),
+      inset 0 1px 0 rgba(255, 255, 255, 0.14);
   }
 
   /* Pill CTA per-card with accent gradient */
@@ -774,6 +776,168 @@ All colors MUST be HSL.
     }
   }
 
+  /* ============================================================ */
+  /* === MobileServiceCard — iOS list-row para móvil (sin carousel) === */
+  /* ============================================================ */
+  .mobile-service-card {
+    --card-accent: 59 130 246;
+    position: relative;
+    background: rgba(255, 255, 255, 0.04);
+    -webkit-backdrop-filter: blur(28px) saturate(150%);
+    backdrop-filter: blur(28px) saturate(150%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 1.25rem;
+    overflow: hidden;
+    box-shadow:
+      0 12px 28px -8px rgba(0, 0, 0, 0.45),
+      inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    transition: border-color 0.3s ease, background 0.3s ease;
+  }
+  .mobile-service-card[data-featured="true"] {
+    background:
+      radial-gradient(140% 100% at 100% 0%, rgba(var(--card-accent), 0.10), transparent 55%),
+      rgba(255, 255, 255, 0.05);
+    border-color: rgba(var(--card-accent), 0.18);
+  }
+  .mobile-service-card:active {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(var(--card-accent), 0.24);
+  }
+
+  .mobile-service-card__row {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.85rem 0.95rem;
+    background: transparent;
+    border: none;
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .mobile-service-card__tile {
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    box-shadow:
+      0 8px 16px -6px rgba(var(--card-accent), 0.55),
+      inset 0 1px 0 rgba(255, 255, 255, 0.32),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.18);
+  }
+
+  .mobile-service-card__body {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .mobile-service-card__title {
+    font-family: 'Manrope', 'Inter', sans-serif;
+    font-size: 14.5px;
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.015em;
+    color: white;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .mobile-service-card__badge {
+    flex-shrink: 0;
+    display: inline-block;
+    padding: 1px 6px;
+    border-radius: 9999px;
+    font-family: 'Inter', sans-serif;
+    font-size: 8.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.10em;
+    line-height: 1.4;
+    border: 1px solid;
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+  }
+
+  .mobile-service-card__hook {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    line-height: 1.35;
+    color: rgb(148 163 184);
+    /* Truncar a 2 líneas */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .mobile-service-card__price-col {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 1px;
+    margin-left: 0.25rem;
+  }
+
+  .mobile-service-card__price {
+    font-family: 'Manrope', 'Inter', sans-serif;
+    font-size: 15px;
+    font-weight: 800;
+    line-height: 1;
+    color: white;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em;
+  }
+
+  .mobile-service-card__price-before {
+    font-family: 'Manrope', sans-serif;
+    font-size: 10px;
+    font-weight: 500;
+    color: rgb(100 116 139);
+    text-decoration: line-through;
+    line-height: 1;
+    margin-top: 1px;
+  }
+
+  .mobile-service-card__discount {
+    display: inline-block;
+    margin-top: 2px;
+    padding: 1px 5px;
+    border-radius: 9999px;
+    background: rgba(34, 197, 94, 0.14);
+    color: rgb(74 222 128);
+    border: 1px solid rgba(34, 197, 94, 0.28);
+    font-family: 'Inter', sans-serif;
+    font-size: 9px;
+    font-weight: 700;
+    line-height: 1.3;
+  }
+
+  .mobile-service-card__chevron {
+    flex-shrink: 0;
+    color: rgb(100 116 139);
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .mobile-service-card__panel {
+    padding: 0 0.95rem 0.95rem 0.95rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    padding-top: 0.85rem;
+    margin-top: -0.15rem;
+  }
+
   /* === Floating Phone — ilustración 3D del Hero con halo cyan suave === */
   .floating-phone-stage {
     position: relative;
@@ -995,31 +1159,28 @@ All colors MUST be HSL.
     letter-spacing: -0.05em;
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.20);
   }
+  /* Punto del logo — sobrio, sin fluorescencia.
+     Glow sutil de cyan-200 para que se distinga de la P pero sin "neón". */
   .brand-mark__period {
     font-family: 'Manrope', 'Inter', sans-serif;
     font-size: 28px;
     font-weight: 900;
     line-height: 1;
-    color: rgb(207, 250, 254); /* cyan-100 */
+    color: rgb(186, 230, 253); /* sky-200 más sobrio que cyan-100 */
     margin-left: 1px;
-    text-shadow:
-      0 0 6px rgba(255, 255, 255, 0.85),
-      0 0 14px rgba(165, 243, 252, 0.7);
-    animation: brand-period-pulse 2.6s ease-in-out infinite;
+    text-shadow: 0 0 4px rgba(186, 230, 253, 0.45);
+    animation: brand-period-pulse 4s ease-in-out infinite;
   }
   @keyframes brand-period-pulse {
     0%, 100% {
       opacity: 0.85;
-      text-shadow:
-        0 0 4px rgba(255, 255, 255, 0.6),
-        0 0 10px rgba(165, 243, 252, 0.5);
+      text-shadow: 0 0 3px rgba(186, 230, 253, 0.35);
     }
     50% {
       opacity: 1;
       text-shadow:
-        0 0 8px rgba(255, 255, 255, 1),
-        0 0 22px rgba(165, 243, 252, 0.95),
-        0 0 32px rgba(34, 211, 238, 0.55);
+        0 0 4px rgba(186, 230, 253, 0.55),
+        0 0 10px rgba(186, 230, 253, 0.30);
     }
   }
   /* Reflejo de cristal en la esquina superior izquierda del tile */
@@ -1083,8 +1244,8 @@ All colors MUST be HSL.
     width: 5px;
     height: 5px;
     border-radius: 9999px;
-    background: rgb(34, 211, 238);
-    box-shadow: 0 0 8px rgba(34, 211, 238, 0.7);
+    background: rgb(125, 211, 252); /* sky-300 — más sobrio */
+    box-shadow: 0 0 4px rgba(125, 211, 252, 0.45);
     flex-shrink: 0;
   }
   /* Variantes de tamaño */
@@ -1356,29 +1517,29 @@ All colors MUST be HSL.
     );
   }
 
-  /* Color bleed accent — el color de la card se intensifica desde la esq. sup. derecha al hover */
+  /* Color bleed accent — sutil, sin "lavado metálico". Aparece sólo en hover. */
   .liquid-bleed {
     position: absolute;
     top: -40%;
     right: -25%;
-    width: 80%;
-    height: 80%;
+    width: 70%;
+    height: 70%;
     border-radius: 50%;
     background: radial-gradient(
       closest-side,
-      rgba(var(--card-accent), 0.32),
+      rgba(var(--card-accent), 0.18),
       transparent 70%
     );
-    filter: blur(28px);
+    filter: blur(32px);
     opacity: 0;
-    transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
     pointer-events: none;
     z-index: 0;
     mix-blend-mode: screen;
   }
   .service-card:hover .liquid-bleed {
-    opacity: 1;
-    transform: scale(1.1);
+    opacity: 0.7;
+    transform: scale(1.05);
   }
 
   /* Decorativo: 3 puntos al estilo "ventana de app" en iOS */
@@ -1567,21 +1728,22 @@ All colors MUST be HSL.
   .step-card {
     --card-accent: 59 130 246;
     position: relative;
-    /* Glassmorphism iOS — alineado con glass-ios-card-dark del resto del landing.
-       Cristal traslúcido con tinte cálido del accent, sin competir con el contenido. */
+    /* MUY transparente + blur denso — cristal nocturno sobre fondo navy.
+       El navy del landing-canvas se ve a través, dando sensación de profundidad
+       sin competir cromáticamente con el contenido. */
     background:
-      radial-gradient(120% 90% at 100% 0%, rgba(var(--card-accent), 0.10), transparent 55%),
-      radial-gradient(120% 90% at 0% 100%, rgba(var(--card-accent), 0.05), transparent 55%),
-      rgba(255, 255, 255, 0.04);
-    -webkit-backdrop-filter: blur(40px) saturate(180%);
-    backdrop-filter: blur(40px) saturate(180%);
-    border: 1px solid rgba(255, 255, 255, 0.10);
-    border-radius: 1.75rem;
+      radial-gradient(140% 100% at 100% 0%, rgba(var(--card-accent), 0.08), transparent 55%),
+      radial-gradient(140% 100% at 0% 100%, rgba(var(--card-accent), 0.04), transparent 55%),
+      rgba(8, 14, 30, 0.42);
+    -webkit-backdrop-filter: blur(56px) saturate(160%) brightness(0.95);
+    backdrop-filter: blur(56px) saturate(160%) brightness(0.95);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 2rem;
     padding: 1.75rem;
     box-shadow:
-      0 20px 50px -12px rgba(0, 0, 0, 0.55),
-      inset 0 1px 0 rgba(255, 255, 255, 0.10),
-      inset 0 -1px 0 rgba(0, 0, 0, 0.18);
+      0 28px 56px rgba(0, 0, 0, 0.45),
+      inset 0 1px 0 rgba(255, 255, 255, 0.08),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.20);
     transform-style: preserve-3d;
     transition:
       transform 0.7s cubic-bezier(0.16, 1, 0.3, 1),
@@ -1591,12 +1753,12 @@ All colors MUST be HSL.
     will-change: transform;
   }
   .step-card:hover {
-    border-color: rgba(var(--card-accent), 0.36);
+    border-color: rgba(var(--card-accent), 0.32);
     box-shadow:
-      0 36px 72px -16px rgba(0, 0, 0, 0.60),
-      0 0 0 1px rgba(var(--card-accent), 0.20),
-      0 0 80px -10px rgba(var(--card-accent), 0.30),
-      inset 0 1px 0 rgba(255, 255, 255, 0.14);
+      0 44px 80px rgba(0, 0, 0, 0.52),
+      0 0 0 1px rgba(var(--card-accent), 0.18),
+      0 0 80px -10px rgba(var(--card-accent), 0.32),
+      inset 0 1px 0 hsla(var(--la-outline-warm) / 0.30);
   }
   /* Numero gigante grabado al fondo — efecto Apple Keynote */
   .step-numeral {

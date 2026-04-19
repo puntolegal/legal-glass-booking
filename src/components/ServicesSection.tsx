@@ -8,6 +8,7 @@ import {
   Building2,
   Calculator,
   Check,
+  ChevronDown,
   Clock,
   FileSignature,
   FileWarning,
@@ -622,32 +623,29 @@ const ServicesSection = ({
           </div>
         </div>
 
-        {/* === MOBILE: snap carousel === */}
+        {/* === MOBILE: vertical stack iOS-style — sin carousel horizontal ===
+            Cada card ocupa 100% width, scroll vertical natural y cómodo.
+            Una sola CTA grande por card lleva directo al agendamiento. */}
         <div className="md:hidden">
           <AnimatePresence mode="wait">
             <motion.div
               key={`mobile-${audience}`}
-              initial={prefersReducedMotion ? false : { opacity: 0, y: 12 }}
+              initial={prefersReducedMotion ? false : { opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={prefersReducedMotion ? undefined : { opacity: 0, y: -6 }}
-              transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-              className="-mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-4 scrollbar-hide"
+              transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+              className="flex flex-col gap-3.5"
             >
               {filtered.map((s, idx) => (
-                <ServiceCard
+                <MobileServiceCard
                   key={s.plan}
                   service={s}
                   onClick={() => handleClick(s)}
-                  mobile
-                  featured={s.featured}
                   revealIndex={idx}
                 />
               ))}
             </motion.div>
           </AnimatePresence>
-          <p className="mt-3 text-center text-xs text-slate-400">
-            Desliza para ver más servicios
-          </p>
         </div>
 
         {/* === DESKTOP: grid 3-col limpio === */}
@@ -706,6 +704,201 @@ interface ServiceCardProps {
   /** Index dentro del grid filtrado — controla la cascada del unlock animation */
   revealIndex?: number;
 }
+
+interface MobileServiceCardProps {
+  service: InternalService;
+  onClick: () => void;
+  revealIndex?: number;
+}
+
+/**
+ * MobileServiceCard — versión iOS list-style optimizada para mobile.
+ *
+ * Diseño: una fila compacta tipo App Store con:
+ *   - Icon tile (48px, color del servicio)
+ *   - Title + hook breve (1-2 líneas)
+ *   - Price right-aligned + chevron expandible
+ *   - Tap en chevron → expande features + CTA
+ *   - Tap en cuerpo → directo al agendamiento
+ *
+ * Reemplaza el horizontal snap carousel (incómodo con 17 cards).
+ * Pensado para scroll vertical natural con thumb-zone óptima.
+ */
+const MobileServiceCard = ({
+  service,
+  onClick,
+  revealIndex = 0,
+}: MobileServiceCardProps) => {
+  const Icon = service.icon;
+  const prefersReducedMotion = useReducedMotion();
+  const [expanded, setExpanded] = useState(false);
+
+  const cascadeDelay = Math.min(revealIndex * 0.03, 0.18);
+
+  const discount = (() => {
+    if (!service.priceBefore || service.free) return null;
+    const cur = Number(service.price.replace(/\D/g, ""));
+    const before = Number(service.priceBefore.replace(/\D/g, ""));
+    if (!cur || !before || before <= cur) return null;
+    return Math.round(((before - cur) / before) * 100);
+  })();
+
+  return (
+    <motion.article
+      initial={prefersReducedMotion ? false : { opacity: 0, y: 10 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-30px" }}
+      transition={{
+        duration: 0.32,
+        delay: cascadeDelay,
+        ease: [0.16, 1, 0.3, 1],
+      }}
+      data-featured={service.featured ? "true" : undefined}
+      className="mobile-service-card"
+      style={{ ["--card-accent" as string]: service.accent }}
+    >
+      {/* Fila principal — tap para expandir features */}
+      <button
+        type="button"
+        onClick={() => setExpanded((e) => !e)}
+        className="mobile-service-card__row"
+        aria-expanded={expanded}
+        aria-label={`${service.title} — toca para ver detalles`}
+      >
+        <span
+          className="mobile-service-card__tile"
+          style={{
+            background: `linear-gradient(135deg, rgb(${service.accent}), rgba(${service.accent}, 0.72))`,
+          }}
+          aria-hidden
+        >
+          <Icon className="h-5 w-5" strokeWidth={2.2} />
+        </span>
+
+        <div className="mobile-service-card__body">
+          <div className="flex items-center gap-2">
+            <h3 className="mobile-service-card__title">
+              {service.shortName}
+            </h3>
+            {service.badge && (
+              <span
+                className="mobile-service-card__badge"
+                style={{
+                  color: `rgb(${service.accent})`,
+                  background: `rgba(${service.accent}, 0.12)`,
+                  borderColor: `rgba(${service.accent}, 0.30)`,
+                }}
+              >
+                {service.badge}
+              </span>
+            )}
+          </div>
+          <p className="mobile-service-card__hook">{service.hook}</p>
+        </div>
+
+        <div className="mobile-service-card__price-col">
+          <p
+            className={`mobile-service-card__price ${
+              service.free
+                ? "bg-gradient-to-r from-emerald-300 to-teal-200 bg-clip-text text-transparent"
+                : ""
+            }`}
+          >
+            {service.price}
+          </p>
+          {service.priceBefore && !service.free && (
+            <p className="mobile-service-card__price-before">
+              {service.priceBefore}
+            </p>
+          )}
+          {discount !== null && (
+            <span className="mobile-service-card__discount">−{discount}%</span>
+          )}
+        </div>
+
+        <ChevronDown
+          className={`mobile-service-card__chevron h-4 w-4 transition-transform ${
+            expanded ? "rotate-180" : ""
+          }`}
+          aria-hidden
+        />
+      </button>
+
+      {/* Expandible — features + CTA */}
+      <AnimatePresence initial={false}>
+        {expanded && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{
+              height: "auto",
+              opacity: 1,
+              transition: {
+                height: { type: "spring", stiffness: 280, damping: 32 },
+                opacity: { duration: 0.2, delay: 0.06 },
+              },
+            }}
+            exit={{
+              height: 0,
+              opacity: 0,
+              transition: {
+                height: { duration: 0.22, ease: [0.4, 0, 1, 1] },
+                opacity: { duration: 0.12 },
+              },
+            }}
+            style={{ overflow: "hidden" }}
+          >
+            <div className="mobile-service-card__panel">
+              <ul className="space-y-2">
+                {service.features.map((f) => (
+                  <li
+                    key={f}
+                    className="flex items-start gap-2 text-[13px] leading-snug text-slate-300"
+                  >
+                    <span
+                      className="mt-1 inline-block h-1 w-1 flex-shrink-0 rounded-full"
+                      style={{
+                        background: `rgb(${service.accent})`,
+                        boxShadow: `0 0 6px rgba(${service.accent}, 0.6)`,
+                      }}
+                      aria-hidden
+                    />
+                    <span>{f}</span>
+                  </li>
+                ))}
+              </ul>
+
+              <div className="mt-3 flex items-center gap-1.5 text-[10.5px] text-slate-500">
+                <Clock className="h-3 w-3" strokeWidth={2.2} aria-hidden />
+                45 min
+                <span className="mx-1">·</span>
+                <Video className="h-3 w-3" strokeWidth={2.2} aria-hidden />
+                Google Meet
+                <span className="mx-1">·</span>
+                Plan PDF
+              </div>
+
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onClick();
+                }}
+                className="service-card-cta cta-shimmer mt-4 w-full text-sm"
+                aria-label={`${service.ctaLabel} — ${service.shortName}${service.free ? " (gratis)" : ` desde ${service.price}`}`}
+              >
+                {service.ctaLabel}
+                <ArrowUpRight
+                  className="service-card-cta__arrow h-4 w-4"
+                  aria-hidden
+                />
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.article>
+  );
+};
 
 function getDesktopSizeClass(featured: boolean): string {
   if (featured) return "md:col-span-2 lg:col-span-2";

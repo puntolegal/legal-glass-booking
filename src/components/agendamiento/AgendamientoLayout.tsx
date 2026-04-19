@@ -6,6 +6,7 @@ import { useAgendamiento } from '@/contexts/AgendamientoContext';
 import { useMobile } from '@/hooks/useMobile';
 import ProgressBar from './ProgressBar';
 import ConversionSidebar from './ConversionSidebar';
+import BrandMark from '@/components/BrandMark';
 import SEO from '../SEO';
 import { getServiceTheme } from '@/config/serviceThemes';
 
@@ -48,67 +49,73 @@ const AgendamientoLayout: React.FC<AgendamientoLayoutProps> = ({ children }) => 
         description={`Agenda tu consulta estratégica de ${service.name} con nuestros expertos. Precio: $${service.price}. Garantía de satisfacción total y respuesta rápida.`}
       />
       
-      {/* Layout de Foco Premium - Estilo iOS con colores dinámicos del servicio */}
-      <div className="min-h-screen bg-slate-900 bg-gradient-to-br from-slate-900 via-slate-950 to-slate-900">
-        {/* Gradientes dinámicos según el servicio - Estilo iOS tenue y sobrio */}
-        <div 
+      {/* Layout de Foco Premium — dark navy + glassmorphism iOS, alineado con landing */}
+      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-slate-100">
+        {/* Tints dinámicos del servicio — radial muy sutil (3-4%) que no compite */}
+        <div
           className="fixed inset-0 pointer-events-none"
           style={{
             background: `radial-gradient(ellipse at top right, ${hexToRgba(serviceTheme.primary, 0.04)}, transparent 60%)`,
           }}
         />
-        <div 
+        <div
           className="fixed inset-0 pointer-events-none"
           style={{
             background: `radial-gradient(ellipse at bottom left, ${hexToRgba(serviceTheme.accent, 0.03)}, transparent 60%)`,
           }}
         />
-        <div 
-          className="fixed inset-0 pointer-events-none"
-          style={{
-            background: `radial-gradient(ellipse at center, ${hexToRgba(serviceTheme.secondary, 0.025)}, transparent 70%)`,
-          }}
-        />
 
-        {/* Main Content - Diseño de Dos Columnas Mejorado */}
-        <div className="relative px-4 pb-12 pt-4 md:pt-8">
+        {/* Header sticky con BrandMark + indicador de paso (consistente con landing) */}
+        <header className="sticky top-0 z-40 bg-slate-950/70 backdrop-blur-xl border-b border-white/[0.06]">
+          <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
+            <BrandMark size="sm" showChip={false} />
+            <div className="flex items-center gap-2 text-[11px] uppercase tracking-[0.18em] text-slate-400">
+              <span
+                className="h-1.5 w-1.5 rounded-full animate-pulse"
+                style={{ background: serviceTheme.primary }}
+                aria-hidden
+              />
+              Paso {step} de 3
+            </div>
+          </div>
+        </header>
+
+        {/* Main Content */}
+        <div className="relative px-4 pb-12 pt-5 md:pt-8">
           <div className="max-w-5xl mx-auto">
             {isMobile ? (
-              // ===== Versión móvil — flujo guiado de arriba a abajo =====
+              // ===== Versión móvil — flujo limpio sin info duplicada =====
               <div className="flex flex-col relative z-10 gap-4">
-                {/* 1. Resumen compacto superior — anchor visual del servicio */}
+                {/* 1. Resumen compacto del servicio */}
                 <div className="order-1">
                   <ConversionSidebar compact />
                 </div>
 
-                {/* 2. Formulario */}
+                {/* 2. ProgressBar + Formulario */}
                 <div className="order-2 space-y-4">
                   <div
                     id="agendamiento-form"
-                    className="bg-slate-900/80 backdrop-blur-md border border-slate-800/70 rounded-2xl p-3 shadow-2xl"
+                    className="rounded-2xl border border-white/[0.06] bg-white/[0.03] backdrop-blur-xl p-3 shadow-2xl"
                   >
                     <ProgressBar currentStep={step} totalSteps={3} />
                   </div>
                   <div className="relative z-10">{children}</div>
                 </div>
 
-                {/* 3. Datos completos al final — testimonial + beneficios completos */}
+                {/* 3. Sólo testimonial — sin duplicar el resumen completo */}
                 <div className="order-3 mt-2">
                   <ConversionSidebar />
                 </div>
               </div>
             ) : (
-              // Versión desktop - dos columnas
+              // Versión desktop — dos columnas
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {/* Columna Izquierda - Acción */}
                 <div className="space-y-6">
-                  <div className="bg-slate-900/80 backdrop-blur-md border border-slate-800/70 rounded-2xl p-6 shadow-2xl">
+                  <div className="rounded-2xl border border-white/[0.06] bg-white/[0.03] backdrop-blur-xl p-6 shadow-2xl">
                     <ProgressBar currentStep={step} totalSteps={3} />
                   </div>
                   {children}
                 </div>
-
-                {/* Columna Derecha - Confianza (Sticky) */}
                 <div className="hidden md:block">
                   <ConversionSidebar />
                 </div>
@@ -116,7 +123,6 @@ const AgendamientoLayout: React.FC<AgendamientoLayoutProps> = ({ children }) => 
             )}
           </div>
         </div>
-        
       </div>
     </>
   );

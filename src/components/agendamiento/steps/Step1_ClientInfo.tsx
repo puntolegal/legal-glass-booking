@@ -3,9 +3,11 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle, Sparkles, User, ArrowRight, CheckCircle2 } from 'lucide-react';
+import { useSearchParams } from 'react-router-dom';
 import { useAgendamiento } from '@/contexts/AgendamientoContext';
 import { validationRules } from '@/hooks/useFormValidation';
-import { serviceThemes } from '@/config/serviceThemes';
+import { getServiceTheme } from '@/config/serviceThemes';
+import { buildWhatsAppUrl } from '@/lib/whatsapp';
 import type { FormData } from '@/types/agendamiento';
 
 const Step1_ClientInfo: React.FC = () => {
@@ -17,12 +19,15 @@ const Step1_ClientInfo: React.FC = () => {
     formatRUT,
     priceCalculation,
   } = useAgendamiento();
-  
-  // Obtener tema del servicio para colores dinámicos
-  const serviceTheme = useMemo(() => {
-    const themeKey = service.category.toLowerCase() as keyof typeof serviceThemes;
-    return serviceThemes[themeKey] || serviceThemes.general;
-  }, [service.category]);
+
+  const [searchParams] = useSearchParams();
+  const plan = searchParams.get('plan');
+
+  // Tema dinámico — alineado con el accent del Plan PDF de la card
+  const serviceTheme = useMemo(
+    () => getServiceTheme(plan, service.category),
+    [plan, service.category],
+  );
   
   // Convertir hex a rgba para efectos soft
   const hexToRgba = (hex: string, alpha: number) => {
@@ -400,9 +405,9 @@ const Step1_ClientInfo: React.FC = () => {
             </motion.button>
           </form>
 
-          {/* Botón "Tienes dudas" - Abajo del botón continuar */}
+          {/* Botón "Tienes dudas" — usa helper centralizado de WhatsApp */}
           <a
-            href="https://wa.me/56962321883?text=Hola%2C%20estoy%20agendando%2C%20quisiera%20avanzar!"
+            href={buildWhatsAppUrl('agendando')}
             target="_blank"
             rel="noopener noreferrer"
             className="w-full flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.03] px-5 py-3 backdrop-blur-xl transition-colors hover:bg-white/[0.06] group mt-4"

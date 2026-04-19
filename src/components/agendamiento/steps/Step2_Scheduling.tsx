@@ -16,6 +16,7 @@ import { useAgendamiento } from '@/contexts/AgendamientoContext';
 import { useAvailability } from '@/hooks/useAvailability';
 import { getAvailableDates, getAvailableTimes } from '@/utils/agendamiento';
 import { getServiceTheme } from '@/config/serviceThemes';
+import { buildWhatsAppUrl } from '@/lib/whatsapp';
 import { useSearchParams } from 'react-router-dom';
 
 // Color de prestigio (slate frío) — sin amber/gold fluor que rompía la
@@ -407,9 +408,9 @@ const Step2_Scheduling: React.FC = () => {
       </motion.div>
 
       <div className="flex flex-col-reverse md:flex-row md:items-center md:justify-between gap-4">
-        {/* Botón "Tienes dudas" - Arriba del botón volver */}
+        {/* Botón "Tienes dudas" — usa helper centralizado de WhatsApp */}
         <a
-          href="https://wa.me/56962321883?text=Hola%2C%20estoy%20agendando%2C%20quisiera%20avanzar!"
+          href={buildWhatsAppUrl('agendando')}
           target="_blank"
           rel="noopener noreferrer"
           className="w-full md:w-auto flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.03] px-5 py-3 backdrop-blur-xl transition-colors hover:bg-white/[0.06] group"
