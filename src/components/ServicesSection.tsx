@@ -12,6 +12,7 @@ import {
   Clock,
   FileSignature,
   FileWarning,
+  Flame,
   Gavel,
   Heart,
   Landmark,
@@ -623,6 +624,17 @@ const ServicesSection = ({
           </div>
         </div>
 
+        {/* === Trending callout — "Lo más buscado esta semana" ===
+            Posicionado estratégicamente entre las categorías y el catálogo.
+            Capta atención del usuario justo cuando está decidiendo, con un
+            servicio de alta urgencia financiera (Defensa CAE). */}
+        <TrendingSpotlight
+          onAgendarClick={() => {
+            const cae = list.find((s) => s.plan === "cae-tesoreria");
+            if (cae) handleClick(cae);
+          }}
+        />
+
         {/* === MOBILE: vertical stack iOS-style — sin carousel horizontal ===
             Cada card ocupa 100% width, scroll vertical natural y cómodo.
             Una sola CTA grande por card lleva directo al agendamiento. */}
@@ -705,6 +717,86 @@ interface ServiceCardProps {
   revealIndex?: number;
 }
 
+/**
+ * TrendingSpotlight — banner-card de "Lo más buscado esta semana".
+ *
+ * Posición estratégica: entre las cat-bubbles y el catálogo de cards.
+ * Captura tráfico orgánico de alta intención (CAE = embargo TGR es una
+ * consulta en alza por el aumento de morosidad de créditos universitarios).
+ *
+ * Diseño: card horizontal con accent rojo del CAE, ícono Flame (trending)
+ * + Receipt (CAE), métrica social proof, CTA prominente.
+ */
+const TrendingSpotlight = ({
+  onAgendarClick,
+}: {
+  onAgendarClick: () => void;
+}) => {
+  const prefersReducedMotion = useReducedMotion();
+  return (
+    <motion.aside
+      initial={prefersReducedMotion ? false : { opacity: 0, y: 16 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-50px" }}
+      transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+      className="trending-spotlight relative z-10 mb-8 lg:mb-10"
+      aria-label="Servicio más buscado esta semana — Defensa CAE"
+    >
+      {/* Glow ambient sutil del color del servicio */}
+      <span className="trending-spotlight__glow" aria-hidden />
+
+      <div className="trending-spotlight__content">
+        {/* Ribbon trending superior */}
+        <div className="trending-spotlight__ribbon">
+          <Flame className="h-3 w-3" strokeWidth={2.4} aria-hidden />
+          <span>Lo más buscado esta semana</span>
+        </div>
+
+        <div className="trending-spotlight__row">
+          {/* Icon tile rojo CAE */}
+          <span className="trending-spotlight__tile" aria-hidden>
+            <Receipt className="h-6 w-6" strokeWidth={2.2} />
+          </span>
+
+          <div className="trending-spotlight__body">
+            <h3 className="trending-spotlight__title">
+              Defensa CAE frente a Tesorería
+            </h3>
+            <p className="trending-spotlight__hook">
+              ¿Te embargó la TGR por tu CAE moroso? Frenamos el embargo y
+              repactamos la deuda contigo. <strong>Casos reales este mes.</strong>
+            </p>
+
+            {/* Social proof microcopy */}
+            <div className="trending-spotlight__stats">
+              <span className="trending-spotlight__stat">
+                <span className="trending-spotlight__stat-value">+47</span>
+                consultas esta semana
+              </span>
+              <span className="trending-spotlight__stat-sep" aria-hidden />
+              <span className="trending-spotlight__stat">
+                <span className="trending-spotlight__stat-value">$109.000</span>
+                tarifa cerrada
+              </span>
+            </div>
+          </div>
+
+          {/* CTA principal */}
+          <button
+            type="button"
+            onClick={onAgendarClick}
+            className="trending-spotlight__cta cta-shimmer"
+            aria-label="Frenar mi embargo CAE — agendar consulta con Punto Legal"
+          >
+            <span>Frenar mi embargo</span>
+            <ArrowUpRight className="h-4 w-4" aria-hidden />
+          </button>
+        </div>
+      </div>
+    </motion.aside>
+  );
+};
+
 interface MobileServiceCardProps {
   service: InternalService;
   onClick: () => void;
@@ -757,6 +849,31 @@ const MobileServiceCard = ({
       className="mobile-service-card"
       style={{ ["--card-accent" as string]: service.accent }}
     >
+      {/* Badge SUPERIOR — banda full-width arriba del row.
+          Antes: estaba en línea con el título y truncaba "Tutela Laboral".
+          Ahora: banda independiente arriba (cuando existe) y el título tiene
+          todo el espacio horizontal disponible. */}
+      {service.badge && (
+        <div
+          className="mobile-service-card__badge-bar"
+          style={{
+            color: `rgb(${service.accent})`,
+            background: `linear-gradient(90deg, rgba(${service.accent}, 0.16), rgba(${service.accent}, 0.04))`,
+            borderColor: `rgba(${service.accent}, 0.22)`,
+          }}
+          aria-hidden
+        >
+          <span
+            className="mobile-service-card__badge-dot"
+            style={{
+              background: `rgb(${service.accent})`,
+              boxShadow: `0 0 6px rgba(${service.accent}, 0.7)`,
+            }}
+          />
+          {service.badge}
+        </div>
+      )}
+
       {/* Fila principal — tap para expandir features */}
       <button
         type="button"
@@ -776,23 +893,7 @@ const MobileServiceCard = ({
         </span>
 
         <div className="mobile-service-card__body">
-          <div className="flex items-center gap-2">
-            <h3 className="mobile-service-card__title">
-              {service.shortName}
-            </h3>
-            {service.badge && (
-              <span
-                className="mobile-service-card__badge"
-                style={{
-                  color: `rgb(${service.accent})`,
-                  background: `rgba(${service.accent}, 0.12)`,
-                  borderColor: `rgba(${service.accent}, 0.30)`,
-                }}
-              >
-                {service.badge}
-              </span>
-            )}
-          </div>
+          <h3 className="mobile-service-card__title">{service.shortName}</h3>
           <p className="mobile-service-card__hook">{service.hook}</p>
         </div>
 

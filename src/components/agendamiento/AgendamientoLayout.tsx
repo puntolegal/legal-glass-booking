@@ -1,12 +1,11 @@
 // RUTA: src/components/agendamiento/AgendamientoLayout.tsx
 
 import React, { useMemo } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { useAgendamiento } from '@/contexts/AgendamientoContext';
 import { useMobile } from '@/hooks/useMobile';
 import ProgressBar from './ProgressBar';
 import ConversionSidebar from './ConversionSidebar';
-import BrandMark from '@/components/BrandMark';
 import SEO from '../SEO';
 import { getServiceTheme } from '@/config/serviceThemes';
 
@@ -65,10 +64,17 @@ const AgendamientoLayout: React.FC<AgendamientoLayoutProps> = ({ children }) => 
           }}
         />
 
-        {/* Header sticky con BrandMark + indicador de paso (consistente con landing) */}
+        {/* Header sticky — wordmark "Punto Legal Chile" sobrio (sin tile P.) */}
         <header className="sticky top-0 z-40 bg-slate-950/70 backdrop-blur-xl border-b border-white/[0.06]">
-          <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
-            <BrandMark size="sm" showChip={false} />
+          <div className="max-w-5xl mx-auto px-4 py-3.5 flex items-center justify-between gap-4">
+            <Link
+              to="/"
+              className="agendamiento-wordmark"
+              aria-label="Punto Legal Chile — volver al inicio"
+            >
+              <span className="agendamiento-wordmark__name">Punto Legal</span>
+              <span className="agendamiento-wordmark__country">Chile</span>
+            </Link>
             <div className="flex items-center gap-2 text-[11px] uppercase tracking-[0.18em] text-slate-400">
               <span
                 className="h-1.5 w-1.5 rounded-full animate-pulse"

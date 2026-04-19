@@ -100,7 +100,7 @@ const FAQSection = () => {
           </span>
           <h2 className="font-display mt-6 text-[28px] font-bold leading-[1.06] tracking-tight text-white sm:text-[40px] lg:text-[48px]">
             <span className="bg-gradient-to-r from-white via-blue-100 to-cyan-100 bg-clip-text text-transparent">
-              Lo que la gente nos
+              Lo que la gente nos{" "}
               <br className="hidden sm:block" />
               suele preguntar antes de agendar.
             </span>

@@ -26,11 +26,11 @@ interface MobileSidebarProps {
 }
 
 const menuItems = [
-  { 
-    name: "Inicio", 
-    href: "/", 
+  {
+    name: "Inicio",
+    href: "/",
     icon: Home,
-    color: "from-orange-500 to-amber-600"
+    color: "from-cyan-500 to-blue-500"
   },
   { 
     name: "Derecho Laboral", 
@@ -80,11 +80,11 @@ const menuItems = [
     icon: Globe,
     color: "from-indigo-500 to-indigo-600"
   },
-  { 
-    name: "Herencias", 
+  {
+    name: "Herencias",
     href: "/herencias",
     icon: Scroll,
-    color: "from-amber-600 to-amber-700"
+    color: "from-slate-500 to-slate-600"
   },
   { 
     name: "Blog", 
@@ -158,8 +158,8 @@ export default function MobileSidebar({ open, onClose }: MobileSidebarProps) {
             
             {/* Modern Header */}
             <div className="relative flex-shrink-0 p-6 pb-4 border-b border-white/20 dark:border-gray-700/20">
-              {/* Background gradient */}
-              <div className="absolute inset-0 bg-gradient-to-br from-orange-50/50 to-amber-50/50 dark:from-orange-950/10 dark:to-amber-950/10" />
+              {/* Background gradient — alineado con paleta del landing (sky/blue) */}
+              <div className="absolute inset-0 bg-gradient-to-br from-sky-50/40 to-blue-50/40 dark:from-sky-950/10 dark:to-blue-950/10" />
               
               <div className="relative flex items-center justify-between">
                 {/* Logo with glow */}
@@ -170,15 +170,15 @@ export default function MobileSidebar({ open, onClose }: MobileSidebarProps) {
                     transition={{ delay: 0.1 }}
                     className="relative"
                   >
-                    <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl flex items-center justify-center shadow-lg relative overflow-hidden">
+                    <div className="w-12 h-12 bg-gradient-to-br from-cyan-400 via-blue-500 to-indigo-500 rounded-2xl flex items-center justify-center shadow-lg relative overflow-hidden">
                       <div className="absolute inset-0 bg-gradient-to-t from-white/0 to-white/20" />
-                      <span className="text-white font-bold text-xl relative z-10">P</span>
+                      <span className="text-white font-bold text-xl relative z-10">P.</span>
                     </div>
-                    <div className="absolute inset-0 rounded-2xl bg-orange-500/30 blur-xl" />
+                    <div className="absolute inset-0 rounded-2xl bg-cyan-400/25 blur-xl" />
                   </motion.div>
                   <div>
-                    <h2 className="text-lg font-bold text-foreground">Punto Legal</h2>
-                    <p className="text-xs text-muted-foreground">Menú Principal</p>
+                    <h2 className="text-lg font-bold text-foreground">Punto Legal Chile</h2>
+                    <p className="text-xs text-muted-foreground">Menú principal</p>
                   </div>
                 </div>
                 
@@ -200,7 +200,7 @@ export default function MobileSidebar({ open, onClose }: MobileSidebarProps) {
               className="flex-1 overflow-y-auto px-4 pb-6"
               style={{ 
                 scrollbarWidth: 'thin',
-                scrollbarColor: 'rgba(255, 107, 53, 0.3) rgba(0, 0, 0, 0.05)'
+                scrollbarColor: 'rgba(34, 211, 238, 0.30) rgba(0, 0, 0, 0.05)'
               }}
             >
               {/* Navigation with modern cards */}
