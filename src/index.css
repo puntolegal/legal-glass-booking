@@ -1567,22 +1567,21 @@ All colors MUST be HSL.
   .step-card {
     --card-accent: 59 130 246;
     position: relative;
-    /* MUY transparente + blur denso — cristal nocturno sobre fondo navy.
-       El navy del landing-canvas se ve a través, dando sensación de profundidad
-       sin competir cromáticamente con el contenido. */
+    /* Glassmorphism iOS — alineado con glass-ios-card-dark del resto del landing.
+       Cristal traslúcido con tinte cálido del accent, sin competir con el contenido. */
     background:
-      radial-gradient(140% 100% at 100% 0%, rgba(var(--card-accent), 0.08), transparent 55%),
-      radial-gradient(140% 100% at 0% 100%, rgba(var(--card-accent), 0.04), transparent 55%),
-      rgba(8, 14, 30, 0.42);
-    -webkit-backdrop-filter: blur(56px) saturate(160%) brightness(0.95);
-    backdrop-filter: blur(56px) saturate(160%) brightness(0.95);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    border-radius: 2rem;
+      radial-gradient(120% 90% at 100% 0%, rgba(var(--card-accent), 0.10), transparent 55%),
+      radial-gradient(120% 90% at 0% 100%, rgba(var(--card-accent), 0.05), transparent 55%),
+      rgba(255, 255, 255, 0.04);
+    -webkit-backdrop-filter: blur(40px) saturate(180%);
+    backdrop-filter: blur(40px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    border-radius: 1.75rem;
     padding: 1.75rem;
     box-shadow:
-      0 28px 56px rgba(0, 0, 0, 0.45),
-      inset 0 1px 0 rgba(255, 255, 255, 0.08),
-      inset 0 -1px 0 rgba(0, 0, 0, 0.20);
+      0 20px 50px -12px rgba(0, 0, 0, 0.55),
+      inset 0 1px 0 rgba(255, 255, 255, 0.10),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.18);
     transform-style: preserve-3d;
     transition:
       transform 0.7s cubic-bezier(0.16, 1, 0.3, 1),
@@ -1592,12 +1591,12 @@ All colors MUST be HSL.
     will-change: transform;
   }
   .step-card:hover {
-    border-color: rgba(var(--card-accent), 0.32);
+    border-color: rgba(var(--card-accent), 0.36);
     box-shadow:
-      0 44px 80px rgba(0, 0, 0, 0.52),
-      0 0 0 1px rgba(var(--card-accent), 0.18),
-      0 0 80px -10px rgba(var(--card-accent), 0.32),
-      inset 0 1px 0 hsla(var(--la-outline-warm) / 0.30);
+      0 36px 72px -16px rgba(0, 0, 0, 0.60),
+      0 0 0 1px rgba(var(--card-accent), 0.20),
+      0 0 80px -10px rgba(var(--card-accent), 0.30),
+      inset 0 1px 0 rgba(255, 255, 255, 0.14);
   }
   /* Numero gigante grabado al fondo — efecto Apple Keynote */
   .step-numeral {
