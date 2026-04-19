@@ -59,8 +59,8 @@ const SEO: React.FC<SEOProps> = ({
       <meta name="robots" content="index, follow" />
       <meta name="googlebot" content="index, follow" />
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <meta name="theme-color" content="#f59e0b" />
-      <meta name="msapplication-TileColor" content="#f59e0b" />
+      <meta name="theme-color" content="#041329" />
+      <meta name="msapplication-TileColor" content="#041329" />
       
       {/* Canonical URL */}
       <link rel="canonical" href={url} />
@@ -84,8 +84,8 @@ const SEO: React.FC<SEOProps> = ({
           "@type": "LegalService",
           "name": "Punto Legal",
           "description": description,
-          "url": "https://puntolegal.cl",
-          "logo": "https://puntolegal.cl/logo.png",
+          "url": "https://puntolegal.online",
+          "logo": "https://puntolegal.online/icon-192.png",
           "image": image,
           "address": {
             "@type": "PostalAddress",

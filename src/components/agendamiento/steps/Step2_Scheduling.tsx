@@ -15,10 +15,12 @@ import {
 import { useAgendamiento } from '@/contexts/AgendamientoContext';
 import { useAvailability } from '@/hooks/useAvailability';
 import { getAvailableDates, getAvailableTimes } from '@/utils/agendamiento';
-import { serviceThemes } from '@/config/serviceThemes';
+import { getServiceTheme } from '@/config/serviceThemes';
+import { useSearchParams } from 'react-router-dom';
 
-// Color de prestigio (amber/gold) - usado para elementos especiales como "Último del día"
-const prestigeAccent = 'rgba(250, 204, 21, 0.85)'; // amber-500 con opacidad
+// Color de prestigio (slate frío) — sin amber/gold fluor que rompía la
+// estética masculina dark-navy. Usado para elementos especiales como "Último del día".
+const prestigeAccent = 'rgba(186, 230, 253, 0.85)'; // sky-200 sobrio
 
 const Step2_Scheduling: React.FC = () => {
   const {
@@ -36,11 +38,14 @@ const Step2_Scheduling: React.FC = () => {
     isLoading,
   } = useAgendamiento();
   
-  // Obtener tema del servicio actual (usa el color del servicio dinámicamente)
-  const serviceTheme = useMemo(() => {
-    const themeKey = service.category.toLowerCase() as keyof typeof serviceThemes;
-    return serviceThemes[themeKey] || serviceThemes.general;
-  }, [service.category]);
+  const [searchParams] = useSearchParams();
+  const plan = searchParams.get('plan');
+
+  // Tema dinámico — alineado con el accent del servicio (Plan PDF de la card)
+  const serviceTheme = useMemo(
+    () => getServiceTheme(plan, service.category),
+    [plan, service.category],
+  );
   
   // Generar colores dinámicos basados en el servicio
   const primaryGradient = useMemo(() => 
@@ -310,15 +315,32 @@ const Step2_Scheduling: React.FC = () => {
                 } : {}}
               >
                 <div className="flex items-center gap-3">
-                  <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${selected ? 'bg-pink-500/20' : 'bg-slate-800/50'}`}>
-                    <Icon className={`w-5 h-5 ${selected ? 'text-white' : 'text-slate-400'}`} />
+                  <div
+                    className="w-9 h-9 rounded-xl flex items-center justify-center"
+                    style={
+                      selected
+                        ? { backgroundColor: hexToRgba(serviceTheme.primary, 0.20) }
+                        : { backgroundColor: 'rgba(30,41,59,0.5)' }
+                    }
+                  >
+                    <Icon
+                      className="w-5 h-5"
+                      style={{
+                        color: selected ? '#ffffff' : 'rgb(148 163 184)',
+                      }}
+                    />
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className={`text-sm font-medium truncate ${selected ? 'text-white' : 'text-slate-300'}`}>
                       {type.label.replace(' Privada', '').replace(' Telefónica', '').replace(' Boutique', '')}
                     </p>
                   </div>
-                  {selected && <CheckCircle className="w-4 h-4 text-pink-400 flex-shrink-0" />}
+                  {selected && (
+                    <CheckCircle
+                      className="w-4 h-4 flex-shrink-0"
+                      style={{ color: serviceTheme.primary }}
+                    />
+                  )}
                 </div>
               </motion.button>
             );

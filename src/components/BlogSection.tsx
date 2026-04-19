@@ -47,72 +47,61 @@ const BlogSection = ({ title = "Blog Legal", posts }: BlogSectionProps) => {
 
   return (
     <section id="blog" className="py-20 px-6 relative overflow-hidden">
-      {/* 3D Statistics Wallet Background */}
-      <div className="absolute inset-0 pointer-events-none">
-        <img 
-          src="/lovable-uploads/0720b7af-ea4a-425a-ab11-f9d60e3d2bd1.png" 
-          alt="3D Statistics Wallet" 
-          className="absolute top-20 left-10 w-64 h-64 opacity-20 animate-float"
-          style={{ animationDelay: '1.5s' }}
-        />
-      </div>
-      
       <div className="container mx-auto relative z-10">
         <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold mb-6">
-            <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-6">
+            <span className="bg-gradient-to-r from-sky-400 to-cyan-400 bg-clip-text text-transparent">
               {title}
             </span>
           </h2>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            Mantente informado con nuestros artículos especializados en derecho laboral, 
-            jurisprudencia y casos de éxito
+          <p className="text-base sm:text-lg md:text-xl text-slate-300 max-w-3xl mx-auto">
+            Mantente informado con nuestros artículos especializados en derecho laboral, jurisprudencia y casos de éxito.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
           {blogPostsList.map((post, index) => {
             const blogLinks = [
               "/blog/despido-injustificado",
-              "/blog/calculo-indemnizacion", 
+              "/blog/calculo-indemnizacion",
               "/blog/derechos-fundamentales",
               "/blog/casos-exito"
             ];
-            
+
             return (
-              <article 
-                key={index} 
-                className="glass rounded-2xl overflow-hidden hover:scale-105 transition-transform duration-300 group cursor-pointer"
-                onClick={() => window.location.href = blogLinks[index]}
+              <article
+                key={index}
+                className="glass-ios-card-dark overflow-hidden hover:-translate-y-1 transition-transform duration-300 group cursor-pointer"
+                onClick={() => (window.location.href = blogLinks[index])}
               >
                 <div className="relative overflow-hidden">
-                  <img 
-                    src={post.image} 
+                  <img
+                    src={post.image}
                     alt={post.title}
-                    className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-300"
+                    className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-500"
+                    loading="lazy"
+                    decoding="async"
                   />
                   {post.category && (
-                    <div className="absolute top-4 left-4 bg-primary text-primary-foreground px-3 py-1 rounded-full text-sm font-medium">
+                    <div className="absolute top-4 left-4 bg-sky-500/90 text-white px-3 py-1 rounded-full text-xs font-semibold backdrop-blur-sm">
                       {post.category}
                     </div>
                   )}
                 </div>
-                
+
                 <div className="p-6">
-                  <h3 className="text-lg font-bold text-foreground mb-3 group-hover:text-primary transition-colors">
+                  <h3 className="text-base lg:text-lg font-bold text-slate-100 mb-3 group-hover:text-sky-300 transition-colors">
                     {post.title}
                   </h3>
-                  <p className="text-muted-foreground text-sm mb-4 leading-relaxed">
+                  <p className="text-slate-300 text-sm mb-4 leading-relaxed line-clamp-3">
                     {post.excerpt}
                   </p>
-                  
+
                   <div className="flex items-center justify-between">
                     {post.readTime && (
-                      <span className="text-xs text-muted-foreground">
-                        {post.readTime}
-                      </span>
+                      <span className="text-xs text-slate-400">{post.readTime}</span>
                     )}
-                    <button className="text-primary hover:text-accent transition-colors text-sm font-medium">
+                    <button className="text-sky-300 hover:text-cyan-300 transition-colors text-sm font-medium">
                       Leer más →
                     </button>
                   </div>
@@ -123,14 +112,13 @@ const BlogSection = ({ title = "Blog Legal", posts }: BlogSectionProps) => {
         </div>
 
         <div className="text-center mt-16">
-          <button 
-            className="glass-intense bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white px-8 py-3 rounded-xl font-semibold hover:scale-105 transition-all duration-300 border border-orange-400/20 backdrop-blur-xl shadow-lg"
+          <button
+            className="cta-secondary px-8 py-3 text-base"
             onClick={() => {
-              // Navigate to blog page with all articles
               window.location.href = "/blog";
             }}
           >
-            Ver Todos los Artículos
+            Ver todos los artículos
           </button>
         </div>
       </div>

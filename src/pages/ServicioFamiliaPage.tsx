@@ -20,7 +20,7 @@
     Minus,
     Scale
   } from 'lucide-react';
-  import { Link } from 'react-router-dom';
+  import { Link, useNavigate } from 'react-router-dom';
   import SEO from '../components/SEO';
   import DecisionHelperModal from '../components/DecisionHelperModal';
   import Header from '../components/Header';
@@ -148,8 +148,8 @@
     },
     {
     id: 'familia-elite',
-    name: 'Blindaje Familiar Elite',
-    shortName: 'Elite',
+    name: 'Representación de Alta Complejidad',
+    shortName: 'Alta complejidad',
     price: '$1.700.000',
     originalPrice: '$3.400.000',
     discount: '50%',
@@ -221,7 +221,7 @@
     amount: '100%',
     case: 'Custodia completa obtenida',
     client: 'María S., 38 años',
-    plan: 'Elite',
+    plan: 'Alta complejidad',
     icon: Heart
     }
   ];
@@ -337,6 +337,7 @@ const CountdownTimer = () => {
   };
 
 export default function ServicioFamiliaPage() {
+    const navigate = useNavigate();
     const [showQuiz, setShowQuiz] = useState(false);
     const [showEliteModal, setShowEliteModal] = useState(false);
     const [showExitModal, setShowExitModal] = useState(false);
@@ -432,13 +433,13 @@ export default function ServicioFamiliaPage() {
               <div className="mx-auto max-w-3xl text-center">
                 <span className="mb-4 inline-flex items-center justify-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1 text-[11px] font-semibold uppercase tracking-[0.35em] text-slate-300">
                   <Sparkles className="h-3.5 w-3.5 text-sky-300" />
-                  3 caminos diseñados para ti
+                  2 caminos diseñados para ti
                 </span>
                 <h2 className="text-3xl font-bold text-white md:text-4xl">
                   Encuentra tu camino hacia la tranquilidad
                 </h2>
                 <p className="mt-4 text-lg text-slate-400">
-                  Hemos diseñado rutas claras para cada etapa del proceso familiar. Parte gratis, avanza con IA o agenda directo con tu abogado especializado.
+                  Hemos diseñado rutas claras para cada etapa del proceso familiar. Parte gratis con nuestra calculadora o agenda directo con tu abogado especializado.
                 </p>
               </div>
 
@@ -456,37 +457,36 @@ export default function ServicioFamiliaPage() {
                   colorClass="from-pink-500/20 to-amber-500/25"
                 />
 
-                <div className="relative z-10 grid items-stretch gap-6 md:grid-cols-3 md:gap-8">
-                  {/* Izquierda: Diagnóstico Gratis */}
+                <div className="relative z-10 mx-auto grid max-w-5xl items-stretch gap-6 md:grid-cols-2 md:gap-8">
+                  {/* Izquierda: Calculadora de Pensión (herramienta gratis) */}
                   <div className="order-1">
                     <ToolCard
                       icon={Sparkles}
-                      title="Descubre tu Plan Ideal"
-                      description="¿No tienes claro por dónde empezar? Responde 3 preguntas y recibe una recomendación de plan <strong>gratis</strong> y sin compromiso."
-                      context="Ideal si estás explorando opciones o necesitas claridad inicial."
+                      title="Calculadora de Pensión de Alimentos"
+                      description="Calcula en <strong>3 minutos</strong> cuánto te corresponde según la Ley 14.908 e IMM 2026. <strong>Gratis, confidencial</strong> y sin registro."
+                      context="Diagnóstico legal real: monto sugerido, deuda acumulada y medidas de apremio aplicables a tu caso."
                       price="$0"
-                      ctaText="Empezar el Quiz Gratis"
-                      onClick={() => setShowQuiz(true)}
+                      ctaText="Calcular mi Pensión Gratis"
+                      onClick={() => navigate('/servicios/familia/calculadora')}
                       badge="Empieza aquí si tienes dudas"
                     />
                   </div>
 
 
                   {/* Derecha: Estrategia Personalizada */}
-                  <div className="order-2 md:order-3">
+                  <div className="order-2">
                     <PremiumHeroCard
                       title="Consulta Estratégica con Abogado"
-                      description="Agenda 1 hora de trabajo <strong>directo con tu abogado especialista</strong> para ordenar tu caso, definir un <strong>Plan de Acción claro</strong> y saber exactamente qué hacer en los próximos 30 días."
+                      description="Agenda <strong>30 minutos</strong> de trabajo <strong>directo con tu abogado especialista</strong> para ordenar tu caso, definir un <strong>Plan de Acción claro</strong> y evaluar contigo qué <strong>medidas de apremio</strong> (arresto, retención de sueldo, arraigo) podemos deducir para hacer cumplir la pensión."
                       context="Para quienes quieren acompañamiento completo, ejecución y seguimiento experto."
                       price="$35.000"
                       priceTag="Consulta preferente Cyber"
                       originalPrice="$70.000"
                       priceDetails="Se descuenta íntegramente del plan final y asegura prioridad en agenda."
-                      deliverableLabel="PDF + asesoría"
                       ctaText="Agendar Pack con Garantía"
                       href="/agendamiento?plan=consulta-estrategica-familia"
                       testimonial={{
-                        quote: 'En 1 hora me dio más claridad que meses de incertidumbre. Valió cada peso.',
+                        quote: 'En 30 minutos me dio más claridad que meses de incertidumbre. Valió cada peso.',
                         author: 'Conztanza M., Las Condes',
                       }}
                       highlightLabel="El Camino Directo al Éxito"
@@ -689,7 +689,7 @@ export default function ServicioFamiliaPage() {
                   const ButtonIcon = pkg.id === 'familia-elite' ? Scale : Sparkles;
                   const buttonLabel =
                     pkg.id === 'familia-elite'
-                      ? 'Blindaje Elite Personalizado'
+                      ? 'Elegir plan de alta complejidad'
                       : pkg.id === 'familia-premium'
                       ? 'Elegir Plan Premium (Recomendado)'
                       : 'Elegir Plan Integral';
@@ -835,16 +835,16 @@ export default function ServicioFamiliaPage() {
                   <p className="mt-4 max-w-2xl mx-auto text-lg text-pink-100">No dejes que las dudas te paralicen. Elige el primer paso que te acomode hoy.</p>
                   <div className="mt-8 flex flex-col md:flex-row justify-center items-center gap-4">
                     <Link
-                      to="/agendamiento?plan=general"
+                      to="/agendamiento?plan=consulta-estrategica-familia"
                       className="bg-white text-pink-600 font-bold py-3 px-8 rounded-lg hover:bg-pink-50 transition-transform hover:scale-105 inline-block shadow-lg w-full md:w-auto"
                     >
-                      Agenda con Nosotros
+                      Agendar Consulta · $35.000
                     </Link>
                     <Link
-                      to="/agendamiento?plan=consulta-estrategica-familia"
+                      to="/agendamiento?plan=familia-integral"
                       className="bg-white/10 border border-white/30 text-white font-bold py-3 px-8 rounded-lg hover:bg-white/20 transition-all w-full md:w-auto"
                     >
-                      Agendar Pack de Inicio (Garantizado)
+                      Ver Plan Integral
                     </Link>
                   </div>
                 </div>
@@ -930,7 +930,7 @@ export default function ServicioFamiliaPage() {
           <button onClick={onClose} className="absolute top-4 right-4 text-muted-foreground hover:text-foreground">
             <X size={20} />
           </button>
-          <h3 className="text-xl font-bold mb-4">Modal Elite (Próximamente)</h3>
+          <h3 className="text-xl font-bold mb-4">Alta complejidad (Próximamente)</h3>
           <p className="text-muted-foreground">Formulario para Nombre y Teléfono irá aquí.</p>
         </div>
       </div>

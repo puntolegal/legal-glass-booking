@@ -3,6 +3,15 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Registro de la propiedad personalizada para animar gradientes cónicos
+   de forma performante (acelerada por GPU) en .liquid-shine.
+   Soportado: Chrome 85+, Safari 16.4+, Edge 85+. Fallback: degrada a opacidad estática. */
+@property --shine-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
 /* Estilos para scrollbar personalizada */
 .scrollbar-hide {
   -ms-overflow-style: none;  /* IE and Edge */
@@ -190,6 +199,14 @@ All colors MUST be HSL.
     animation: float 10s ease-in-out infinite reverse, pulse-glow 6s ease-in-out infinite;
   }
 
+  /* En el landing oscuro (data-route="/") suavizamos los orbes naranjas
+     para que no compitan con el canvas slate. */
+  body[data-route="/"]::before,
+  body[data-route="/"]::after {
+    opacity: 0.18;
+    animation: none;
+  }
+
   /* Efectos de orbe neón premium - modo oscuro */
   .dark body::before {
     background: radial-gradient(circle, hsl(22 100% 50% / 0.25) 0%, hsl(16 90% 45% / 0.15) 40%, hsl(22 95% 65% / 0.08) 70%, transparent 100%);
@@ -264,7 +281,1907 @@ All colors MUST be HSL.
   .dark .glass-card:hover {
     box-shadow: 0 16px 48px rgba(0, 0, 0, 0.6);
   }
-  
+
+  /* iOS-style frosted glass (landing / selectors) */
+  .glass-ios-panel {
+    background: rgba(255, 255, 255, 0.72);
+    -webkit-backdrop-filter: blur(24px);
+    backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.45);
+    box-shadow:
+      0 4px 24px rgba(0, 0, 0, 0.06),
+      inset 0 1px 0 rgba(255, 255, 255, 0.55);
+    border-radius: 1.25rem;
+  }
+
+  .glass-ios-card {
+    background: rgba(255, 255, 255, 0.55);
+    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    box-shadow: 0 2px 16px rgba(0, 0, 0, 0.05);
+    border-radius: 1rem;
+  }
+
+  .dark .glass-ios-panel {
+    background: rgba(28, 28, 30, 0.72);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow:
+      0 8px 32px rgba(0, 0, 0, 0.45),
+      inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  }
+
+  .dark .glass-ios-card {
+    background: rgba(28, 28, 30, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.35);
+  }
+
+  /* === Luminescent Authority — design tokens ===
+     "The Digital Atrium" — depth, frosted glass, refracted light. */
+  :root {
+    /* Foundation: deep navy void, no #000 ever */
+    --la-bg: 217 80% 8%;                /* #041329 — primary surface */
+    --la-bg-2: 220 70% 6%;              /* deeper sink */
+    --la-surface: 218 50% 11%;          /* surface */
+    --la-surface-low: 218 45% 13%;      /* surface_container_low */
+    --la-surface-mid: 218 40% 16%;      /* surface_container */
+    --la-surface-high: 218 35% 19%;     /* surface_container_high */
+    --la-surface-highest: 218 30% 22%;  /* surface_container_highest */
+
+    /* Text */
+    --la-fg: 213 31% 91%;               /* on_surface — near white */
+    --la-fg-muted: 215 20% 70%;         /* secondary */
+    --la-fg-soft: 215 16% 55%;          /* tertiary metadata */
+
+    /* Signature gradients — sober "estudio jurídico" palette */
+    --la-accent-from: 217 91% 60%;      /* blue-500 — neutral primary, technical */
+    --la-accent-to: 188 95% 55%;        /* cyan-400 — electric edge */
+    --la-trust-from: 198 93% 65%;       /* sky tertiary */
+    --la-trust-to: 215 100% 40%;        /* deep blue */
+    --la-premium-from: 48 96% 64%;      /* yellow-300 — refined gold (no orange) */
+    --la-premium-to: 38 95% 55%;        /* amber-400 — warm gold */
+
+    /* Outlines / ghost borders */
+    --la-outline: 0 0% 100%;            /* applied with low alpha */
+    --la-outline-warm: 220 30% 80%;     /* primary_fixed for inner top */
+
+    /* Backwards compat alias used by existing CTA helpers */
+    --landing-bg: var(--la-bg);
+    --landing-bg-2: var(--la-bg-2);
+    --landing-fg: var(--la-fg);
+    --landing-accent-from: var(--la-accent-from);
+    --landing-accent-to: var(--la-accent-to);
+  }
+
+  /* === Landing canvas — deep navy unified, sin spotlights brillantes ===
+     Fondo más oscuro y consistente de arriba a abajo (alineado con el
+     vibe de la sección FAQ). Los acentos cyan/blue ahora son MUY sutiles
+     para no romper la sobriedad del estudio jurídico. */
+  .landing-canvas {
+    color: hsl(var(--la-fg));
+    font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+      'Segoe UI', Roboto, sans-serif;
+    /* Base: navy profundo sin gradiente vertical brillante.
+       Spots ambient muy bajos en opacidad (0.05–0.07) para textura,
+       no para iluminación. Esto evita el "glow" que hacía ver el top más claro. */
+    background:
+      radial-gradient(ellipse 80% 60% at 50% -10%, rgba(15, 23, 42, 0.85), transparent 70%),
+      radial-gradient(ellipse 60% 40% at 15% 20%, rgba(59, 130, 246, 0.06), transparent 60%),
+      radial-gradient(ellipse 60% 40% at 85% 30%, rgba(34, 211, 238, 0.05), transparent 60%),
+      radial-gradient(ellipse 70% 50% at 50% 100%, rgba(30, 41, 59, 0.5), transparent 70%),
+      hsl(var(--la-bg));
+    background-attachment: fixed;
+  }
+
+  /* Transición visual entre secciones del landing.
+     Cada <section> dentro del landing-canvas comparte un mismo "hilo" cromático,
+     con bordes superiores/inferiores blends suaves que evitan cortes duros. */
+  .landing-canvas section {
+    position: relative;
+  }
+  /* Sutil hairline luminoso entre secciones (estilo iOS group separators) */
+  .landing-canvas section + section::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 12%;
+    right: 12%;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.06),
+      transparent
+    );
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* === Section flow — bridges cromáticos entre Hero, HowItWorks y Services ===
+     Cada `<section class="section-flow">` puede declarar `__top` y/o `__bottom`
+     para crear gradientes que se "derraman" en la siguiente sección,
+     eliminando cortes visuales y dando sensación de página continua. */
+  .section-flow {
+    position: relative;
+    isolation: isolate;
+  }
+  .section-flow__top,
+  .section-flow__bottom {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 160px;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .section-flow__top {
+    top: 0;
+    background:
+      radial-gradient(ellipse 60% 100% at 50% 0%, rgba(34, 211, 238, 0.06), transparent 70%),
+      linear-gradient(180deg, rgba(8, 14, 30, 0.55) 0%, transparent 100%);
+  }
+  .section-flow__bottom {
+    bottom: 0;
+    background:
+      radial-gradient(ellipse 60% 100% at 50% 100%, rgba(59, 130, 246, 0.05), transparent 70%),
+      linear-gradient(0deg, rgba(8, 14, 30, 0.55) 0%, transparent 100%);
+  }
+
+  /* Display headlines (Manrope, tightly tracked) */
+  .landing-canvas h1,
+  .landing-canvas h2,
+  .landing-canvas h3,
+  .landing-canvas .font-display {
+    font-family: 'Manrope', 'Inter', ui-sans-serif, system-ui, sans-serif;
+    letter-spacing: -0.02em;
+  }
+
+  /* === Luminescent panels (frosted glass + ghost border + 3D inner-stroke) ===
+     Spec: surface_container @ 60%, blur 32px, corners xl (32px),
+     ghost border outline_variant @ 15%, inner top stroke for 3D. */
+  .glass-ios-panel-dark {
+    background: hsla(var(--la-surface-mid) / 0.55);
+    -webkit-backdrop-filter: blur(32px) saturate(140%);
+    backdrop-filter: blur(32px) saturate(140%);
+    border: 1px solid hsla(var(--la-outline) / 0.10);
+    box-shadow:
+      0 20px 40px rgba(0, 0, 0, 0.40),
+      inset 0 1px 0 hsla(var(--la-outline-warm) / 0.20);
+    border-radius: 2rem;
+  }
+
+  .glass-ios-card-dark {
+    background: hsla(var(--la-surface-low) / 0.55);
+    -webkit-backdrop-filter: blur(24px) saturate(140%);
+    backdrop-filter: blur(24px) saturate(140%);
+    border: 1px solid hsla(var(--la-outline) / 0.10);
+    box-shadow:
+      0 12px 32px rgba(0, 0, 0, 0.30),
+      inset 0 1px 0 hsla(var(--la-outline-warm) / 0.18);
+    border-radius: 1.25rem;
+  }
+
+  /* === Service card — luxury 3D glass with per-card accent === */
+  .service-card {
+    --card-accent: 139 92 246; /* rgb fallback (violet-500) */
+    position: relative;
+    isolation: isolate;
+    background:
+      radial-gradient(120% 90% at 100% 0%, rgba(var(--card-accent), 0.18), transparent 55%),
+      radial-gradient(140% 100% at 0% 100%, rgba(var(--card-accent), 0.10), transparent 55%),
+      hsla(var(--la-surface-high) / 0.60);
+    -webkit-backdrop-filter: blur(32px) saturate(150%);
+    backdrop-filter: blur(32px) saturate(150%);
+    border: 1px solid hsla(var(--la-outline) / 0.12);
+    border-radius: 2rem;
+    box-shadow:
+      0 24px 48px rgba(0, 0, 0, 0.40),
+      inset 0 1px 0 hsla(var(--la-outline-warm) / 0.22),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.20);
+    transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+      box-shadow 0.45s ease, border-color 0.45s ease;
+  }
+  /* Specular highlight glide on hover */
+  .service-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: linear-gradient(
+      125deg,
+      transparent 30%,
+      rgba(255, 255, 255, 0.06) 48%,
+      transparent 60%
+    );
+    opacity: 0;
+    transition: opacity 0.45s ease;
+    pointer-events: none;
+    z-index: 1;
+  }
+  .service-card:hover {
+    transform: translateY(-6px) scale(1.01);
+    border-color: rgba(var(--card-accent), 0.40);
+    box-shadow:
+      0 36px 72px rgba(0, 0, 0, 0.50),
+      0 0 0 1px rgba(var(--card-accent), 0.22),
+      0 0 80px -10px rgba(var(--card-accent), 0.45),
+      inset 0 1px 0 hsla(var(--la-outline-warm) / 0.30);
+  }
+  .service-card:hover::before {
+    opacity: 1;
+  }
+
+  /* Featured card — premium gold treatment con glow más cálido */
+  .service-card[data-featured="true"] {
+    background:
+      radial-gradient(140% 100% at 100% 0%, rgba(var(--card-accent), 0.20), transparent 55%),
+      radial-gradient(140% 100% at 0% 100%, rgba(var(--card-accent), 0.10), transparent 55%),
+      hsla(var(--la-surface-highest) / 0.68);
+    box-shadow:
+      0 32px 64px rgba(0, 0, 0, 0.45),
+      0 0 0 1px rgba(var(--card-accent), 0.12),
+      inset 0 1px 0 hsla(var(--la-outline-warm) / 0.30),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.20);
+  }
+  .service-card[data-featured="true"]:hover {
+    box-shadow:
+      0 44px 88px rgba(0, 0, 0, 0.55),
+      0 0 0 1px rgba(var(--card-accent), 0.30),
+      0 0 100px -10px rgba(var(--card-accent), 0.50),
+      inset 0 1px 0 hsla(var(--la-outline-warm) / 0.36);
+  }
+
+  /* Pill CTA per-card with accent gradient */
+  .service-card-cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.875rem 1.5rem;
+    border-radius: 9999px;
+    font-weight: 600;
+    color: white;
+    background-image: linear-gradient(
+      135deg,
+      rgb(var(--card-accent)),
+      rgba(var(--card-accent), 0.78)
+    );
+    box-shadow:
+      0 14px 32px -10px rgba(var(--card-accent), 0.65),
+      inset 0 1px 0 rgba(255, 255, 255, 0.20);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .service-card-cta:hover {
+    transform: translateY(-1px);
+    box-shadow:
+      0 18px 40px -10px rgba(var(--card-accent), 0.75),
+      inset 0 1px 0 rgba(255, 255, 255, 0.24);
+  }
+  .service-card-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.3rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: rgb(var(--card-accent));
+    background: rgba(var(--card-accent), 0.12);
+    border: 1px solid rgba(var(--card-accent), 0.30);
+  }
+
+  /* === CTAs neutrales del landing (pill, primary brand gradient) === */
+  .cta-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.875rem 1.625rem;
+    border-radius: 9999px;
+    font-weight: 600;
+    color: white;
+    background-image: linear-gradient(
+      135deg,
+      hsl(var(--la-accent-from)),
+      hsl(var(--la-accent-to))
+    );
+    box-shadow:
+      0 20px 44px -12px rgba(59, 130, 246, 0.55),
+      inset 0 1px 0 rgba(255, 255, 255, 0.22);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+  }
+  .cta-primary:hover {
+    transform: translateY(-1px);
+    box-shadow:
+      0 24px 52px -10px rgba(34, 211, 238, 0.55),
+      inset 0 1px 0 rgba(255, 255, 255, 0.26);
+  }
+  .cta-primary:focus-visible {
+    outline: none;
+    box-shadow:
+      0 0 0 3px rgba(59, 130, 246, 0.45),
+      0 20px 44px -12px rgba(59, 130, 246, 0.55);
+  }
+
+  /* ============================================================ */
+  /* === CTA HERO — masculino, glassmorphism, alto impacto      === */
+  /* ============================================================ */
+
+  /* Base compartida — ambas variantes (primary + ghost) heredan estructura */
+  .cta-hero {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.65rem;
+    padding: 1rem 1.85rem;
+    border-radius: 16px;
+    font-family: 'Inter', 'Manrope', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    letter-spacing: -0.005em;
+    line-height: 1.1;
+    cursor: pointer;
+    isolation: isolate;
+    overflow: hidden;
+    -webkit-tap-highlight-color: transparent;
+    transition:
+      transform 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+      box-shadow 0.45s ease,
+      border-color 0.4s ease,
+      background 0.4s ease;
+  }
+  .cta-hero:focus-visible {
+    outline: none;
+  }
+  .cta-hero__arrow {
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .cta-hero:hover .cta-hero__arrow {
+    transform: translateY(2px);
+  }
+
+  /* === Variante PRIMARY — masculina, navy profundo, sin fluor ===
+     Paleta sobria: slate-950 → blue-900 → blue-700.
+     El "alto impacto" lo dan la profundidad multi-capa, el edge highlight
+     y el sweep diagonal — no la saturación cromática. */
+  .cta-hero--primary {
+    color: white;
+    background:
+      linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.08) 0%,
+        rgba(255, 255, 255, 0.01) 100%
+      ),
+      linear-gradient(
+        135deg,
+        rgb(2, 6, 23) 0%,        /* slate-950 — negro profundo */
+        rgb(15, 23, 42) 30%,     /* slate-900 */
+        rgb(30, 41, 59) 60%,     /* slate-800 */
+        rgb(30, 58, 138) 100%    /* blue-900 — azul tinta, no fluor */
+      );
+    border: 1px solid rgba(148, 163, 184, 0.20); /* slate-400 sutil */
+    box-shadow:
+      0 18px 40px -12px rgba(2, 6, 23, 0.85),
+      0 1px 0 rgba(255, 255, 255, 0.14) inset,
+      0 -2px 0 rgba(0, 0, 0, 0.40) inset,
+      0 0 0 1px rgba(255, 255, 255, 0.03);
+  }
+  .cta-hero--primary:hover {
+    transform: translateY(-2px);
+    border-color: rgba(148, 163, 184, 0.36);
+    box-shadow:
+      0 24px 52px -12px rgba(2, 6, 23, 0.95),
+      0 1px 0 rgba(255, 255, 255, 0.22) inset,
+      0 -2px 0 rgba(0, 0, 0, 0.42) inset,
+      0 0 0 1px rgba(255, 255, 255, 0.06),
+      0 0 50px -14px rgba(59, 130, 246, 0.30);
+  }
+  .cta-hero--primary:focus-visible {
+    box-shadow:
+      0 0 0 3px rgba(148, 163, 184, 0.40),
+      0 18px 40px -12px rgba(2, 6, 23, 0.85);
+  }
+  /* Sweep brillante diagonal — refuerza la masculinidad metálica */
+  .cta-hero--primary::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      105deg,
+      transparent 30%,
+      rgba(255, 255, 255, 0.20) 48%,
+      transparent 65%
+    );
+    transform: translateX(-110%);
+    transition: transform 0.85s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none;
+    z-index: 1;
+    mix-blend-mode: screen;
+  }
+  .cta-hero--primary:hover::after {
+    transform: translateX(110%);
+  }
+  /* Top edge highlight — línea de luz superior estilo iOS botón presionable */
+  .cta-hero--primary::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 18%;
+    right: 18%;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.55),
+      transparent
+    );
+    pointer-events: none;
+    z-index: 2;
+  }
+  .cta-hero--primary > * {
+    position: relative;
+    z-index: 3;
+  }
+
+  /* === Variante GHOST — glassmorphism puro, secundario === */
+  .cta-hero--ghost {
+    color: hsl(var(--la-fg));
+    background:
+      radial-gradient(120% 90% at 30% 20%, rgba(255, 255, 255, 0.06), transparent 55%),
+      hsla(var(--la-surface-mid) / 0.50);
+    -webkit-backdrop-filter: blur(20px) saturate(140%);
+    backdrop-filter: blur(20px) saturate(140%);
+    border: 1px solid hsla(var(--la-outline) / 0.14);
+    box-shadow:
+      0 14px 32px -10px rgba(0, 0, 0, 0.45),
+      inset 0 1px 0 hsla(var(--la-outline-warm) / 0.18);
+  }
+  .cta-hero--ghost:hover {
+    transform: translateY(-2px);
+    border-color: hsla(var(--la-outline) / 0.28);
+    background:
+      radial-gradient(120% 90% at 30% 20%, rgba(34, 211, 238, 0.10), transparent 55%),
+      hsla(var(--la-surface-high) / 0.65);
+    color: white;
+    box-shadow:
+      0 22px 44px -10px rgba(0, 0, 0, 0.55),
+      0 0 0 1px rgba(34, 211, 238, 0.18),
+      inset 0 1px 0 hsla(var(--la-outline-warm) / 0.24);
+  }
+  .cta-hero--ghost:focus-visible {
+    box-shadow:
+      0 0 0 3px rgba(34, 211, 238, 0.30),
+      0 14px 32px -10px rgba(0, 0, 0, 0.45);
+  }
+  .cta-hero--ghost > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cta-hero,
+    .cta-hero__arrow {
+      transition: none;
+    }
+    .cta-hero--primary::after {
+      display: none;
+    }
+  }
+
+  /* === Floating Phone — ilustración 3D del Hero con halo cyan suave === */
+  .floating-phone-stage {
+    position: relative;
+    isolation: isolate;
+    width: 100%;
+    /* En desktop, el contenedor es alto; en mobile no se renderiza (lg:col-span-4) */
+    aspect-ratio: 4 / 5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .floating-phone-glow {
+    position: absolute;
+    inset: 8% 4%;
+    border-radius: 50%;
+    background:
+      radial-gradient(closest-side, rgba(34, 211, 238, 0.20), transparent 70%),
+      radial-gradient(closest-side, rgba(59, 130, 246, 0.16), transparent 75%);
+    filter: blur(40px);
+    z-index: 0;
+    pointer-events: none;
+    animation: phone-glow-breath 6s ease-in-out infinite;
+  }
+  @keyframes phone-glow-breath {
+    0%, 100% {
+      opacity: 0.65;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.95;
+      transform: scale(1.04);
+    }
+  }
+  .floating-phone-img {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* La sombra inferior simula que el teléfono "levita" sobre la página */
+    filter: drop-shadow(0 30px 40px rgba(0, 0, 0, 0.55))
+      drop-shadow(0 8px 16px rgba(34, 211, 238, 0.18));
+  }
+  .floating-phone-img img {
+    width: 100%;
+    height: 100%;
+    max-height: 520px;
+    object-fit: contain;
+    user-select: none;
+    -webkit-user-drag: none;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .floating-phone-glow {
+      animation: none;
+    }
+  }
+
+  /* === CTA WhatsApp — verde oficial, glassmorphism + pulse halo === */
+  .cta-whatsapp {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.875rem 1.5rem;
+    border-radius: 9999px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    color: white;
+    background-image: linear-gradient(
+      135deg,
+      rgb(37, 211, 102),
+      rgb(18, 140, 67)
+    );
+    box-shadow:
+      0 16px 36px -10px rgba(37, 211, 102, 0.55),
+      inset 0 1.5px 0 rgba(255, 255, 255, 0.28),
+      inset 0 -2px 0 rgba(0, 0, 0, 0.16);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    isolation: isolate;
+    overflow: hidden;
+    transition:
+      transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+      box-shadow 0.3s ease;
+  }
+  .cta-whatsapp:hover {
+    transform: translateY(-2px);
+    box-shadow:
+      0 22px 48px -10px rgba(37, 211, 102, 0.7),
+      inset 0 1.5px 0 rgba(255, 255, 255, 0.34),
+      inset 0 -2px 0 rgba(0, 0, 0, 0.18);
+  }
+  .cta-whatsapp:focus-visible {
+    outline: none;
+    box-shadow:
+      0 0 0 3px rgba(37, 211, 102, 0.45),
+      0 16px 36px -10px rgba(37, 211, 102, 0.55);
+  }
+  /* Halo de pulso suave — sugiere "vivo, esperándote" sin distraer */
+  .cta-whatsapp__pulse {
+    position: absolute;
+    inset: -2px;
+    border-radius: inherit;
+    border: 2px solid rgba(37, 211, 102, 0.45);
+    opacity: 0;
+    animation: cta-wa-pulse 2.4s ease-out infinite;
+    pointer-events: none;
+    z-index: -1;
+  }
+  @keyframes cta-wa-pulse {
+    0% {
+      transform: scale(1);
+      opacity: 0.55;
+    }
+    100% {
+      transform: scale(1.18);
+      opacity: 0;
+    }
+  }
+  /* Sweep brillo en hover — refinado, no chillón */
+  .cta-whatsapp::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      100deg,
+      transparent 30%,
+      rgba(255, 255, 255, 0.22) 48%,
+      transparent 65%
+    );
+    transform: translateX(-110%);
+    transition: transform 0.75s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none;
+    z-index: 1;
+    mix-blend-mode: overlay;
+  }
+  .cta-whatsapp:hover::after {
+    transform: translateX(110%);
+  }
+  .cta-whatsapp > * {
+    position: relative;
+    z-index: 2;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .cta-whatsapp__pulse {
+      animation: none;
+      opacity: 0;
+    }
+    .cta-whatsapp::after {
+      display: none;
+    }
+  }
+
+  /* === BrandMark "P." — alto impacto. La "P." es la firma de Punto Legal:
+        el punto cyan pulsa sutilmente como signo distintivo. === */
+  .brand-mark {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.85rem;
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .brand-mark:hover {
+    transform: translateY(-1px);
+  }
+  .brand-mark__tile {
+    position: relative;
+    width: 52px;
+    height: 52px;
+    border-radius: 15px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(
+      135deg,
+      rgb(34, 211, 238),
+      rgb(59, 130, 246) 70%,
+      rgb(99, 102, 241)
+    );
+    box-shadow:
+      0 16px 36px -10px rgba(34, 211, 238, 0.55),
+      0 0 0 1px rgba(255, 255, 255, 0.10),
+      inset 0 1.5px 0 rgba(255, 255, 255, 0.36),
+      inset 0 -2px 0 rgba(0, 0, 0, 0.20);
+    overflow: hidden;
+    transition: box-shadow 0.5s ease, transform 0.5s ease;
+  }
+  /* Wrapper interno que mantiene la "P." óptica y geométricamente centrada
+     dentro del tile, compensando el desplazamiento natural del punto. */
+  .brand-mark__glyph {
+    position: relative;
+    display: inline-flex;
+    align-items: baseline;
+    justify-content: center;
+    line-height: 1;
+    /* Compensación óptica del punto: el "." se sitúa fuera del bloque,
+       por eso desplazamos -3px a la izquierda para que la "P" quede
+       centrada visualmente respecto al tile. */
+    transform: translateX(-3px);
+    z-index: 2;
+  }
+  .brand-mark:hover .brand-mark__tile {
+    transform: rotate(-2deg) scale(1.04);
+    box-shadow:
+      0 24px 52px -10px rgba(34, 211, 238, 0.7),
+      0 0 0 1px rgba(255, 255, 255, 0.16),
+      inset 0 2px 0 rgba(255, 255, 255, 0.42),
+      inset 0 -2px 0 rgba(0, 0, 0, 0.22);
+  }
+  .brand-mark__P {
+    font-family: 'Manrope', 'Inter', sans-serif;
+    font-size: 28px;
+    font-weight: 800;
+    line-height: 1;
+    color: white;
+    letter-spacing: -0.05em;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.20);
+  }
+  .brand-mark__period {
+    font-family: 'Manrope', 'Inter', sans-serif;
+    font-size: 28px;
+    font-weight: 900;
+    line-height: 1;
+    color: rgb(207, 250, 254); /* cyan-100 */
+    margin-left: 1px;
+    text-shadow:
+      0 0 6px rgba(255, 255, 255, 0.85),
+      0 0 14px rgba(165, 243, 252, 0.7);
+    animation: brand-period-pulse 2.6s ease-in-out infinite;
+  }
+  @keyframes brand-period-pulse {
+    0%, 100% {
+      opacity: 0.85;
+      text-shadow:
+        0 0 4px rgba(255, 255, 255, 0.6),
+        0 0 10px rgba(165, 243, 252, 0.5);
+    }
+    50% {
+      opacity: 1;
+      text-shadow:
+        0 0 8px rgba(255, 255, 255, 1),
+        0 0 22px rgba(165, 243, 252, 0.95),
+        0 0 32px rgba(34, 211, 238, 0.55);
+    }
+  }
+  /* Reflejo de cristal en la esquina superior izquierda del tile */
+  .brand-mark__shine {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 70%;
+    height: 60%;
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.36),
+      transparent 60%
+    );
+    border-radius: inherit;
+    pointer-events: none;
+    z-index: 1;
+  }
+  .brand-mark__text {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    line-height: 1;
+  }
+  .brand-mark__name {
+    font-family: 'Manrope', sans-serif;
+    font-size: 17px;
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    line-height: 1;
+    color: white;
+    background: linear-gradient(
+      90deg,
+      #ffffff,
+      rgb(207, 250, 254) 70%,
+      rgb(186, 230, 253)
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .brand-mark__chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    width: fit-content;
+    font-family: 'Inter', sans-serif;
+    font-size: 9.5px;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: hsl(var(--la-fg-muted));
+    padding: 3px 9px 3px 7px;
+    border-radius: 9999px;
+    background: hsla(var(--la-surface-low) / 0.55);
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
+    border: 1px solid hsla(var(--la-outline) / 0.10);
+  }
+  .brand-mark__chip-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 9999px;
+    background: rgb(34, 211, 238);
+    box-shadow: 0 0 8px rgba(34, 211, 238, 0.7);
+    flex-shrink: 0;
+  }
+  /* Variantes de tamaño */
+  .brand-mark--sm .brand-mark__tile {
+    width: 36px;
+    height: 36px;
+    border-radius: 11px;
+  }
+  .brand-mark--sm .brand-mark__P,
+  .brand-mark--sm .brand-mark__period {
+    font-size: 19px;
+  }
+  .brand-mark--sm .brand-mark__name {
+    font-size: 14px;
+  }
+  .brand-mark--sm .brand-mark__chip {
+    font-size: 8.5px;
+    padding: 2px 7px 2px 5px;
+  }
+
+  .brand-mark--lg .brand-mark__tile {
+    width: 64px;
+    height: 64px;
+    border-radius: 18px;
+  }
+  .brand-mark--lg .brand-mark__P,
+  .brand-mark--lg .brand-mark__period {
+    font-size: 34px;
+  }
+  .brand-mark--lg .brand-mark__name {
+    font-size: 20px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .brand-mark__period {
+      animation: none;
+      opacity: 1;
+    }
+    .brand-mark:hover .brand-mark__tile {
+      transform: none;
+    }
+  }
+
+  /* === Card details — hairline glow + ambient orbs === */
+  .hairline-top {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.30),
+      transparent
+    );
+  }
+  .ambient-orb {
+    position: absolute;
+    border-radius: 9999px;
+    filter: blur(48px);
+    mix-blend-mode: screen;
+    pointer-events: none;
+  }
+
+  /* Pricing well: soft inset surface for the price zone */
+  .price-well {
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.04) 0%,
+      rgba(255, 255, 255, 0.01) 100%
+    );
+    border-top: 1px solid hsla(var(--la-outline) / 0.10);
+    border-radius: 0;
+    padding-top: 1.1rem;
+    margin-top: 0.5rem;
+  }
+
+  /* Mini info-card inside service card — más sutil */
+  .info-strip {
+    background: hsla(var(--la-surface-low) / 0.35);
+    border: 1px solid hsla(var(--la-outline) / 0.05);
+    border-radius: 0.875rem;
+  }
+
+  /* === iOS App Store–style rating strip (universal trust signal) === */
+  .rating-strip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.4rem 0.7rem;
+    border-radius: 9999px;
+    background: hsla(var(--la-surface-low) / 0.55);
+    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(16px);
+    border: 1px solid hsla(var(--la-outline) / 0.08);
+    font-family: 'Inter', sans-serif;
+    font-size: 11.5px;
+    font-weight: 600;
+    color: hsl(var(--la-fg));
+    box-shadow: inset 0 1px 0 hsla(var(--la-outline-warm) / 0.10);
+    line-height: 1;
+    white-space: nowrap;
+  }
+  .rating-strip__stars {
+    display: inline-flex;
+    align-items: center;
+    gap: 1px;
+    color: rgb(250 204 21); /* yellow-400 — gold restrained */
+  }
+  .rating-strip__count {
+    color: hsl(var(--la-fg-muted));
+    font-weight: 500;
+  }
+  .rating-strip__sep {
+    width: 2px;
+    height: 2px;
+    border-radius: 9999px;
+    background: hsl(var(--la-fg-muted) / 0.5);
+  }
+
+  /* Refined service-card-cta — flecha animada (slide+spring) */
+  .service-card-cta__arrow {
+    transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .service-card-cta:hover .service-card-cta__arrow {
+    transform: translate(3px, -3px);
+  }
+
+  /* Featured price savings badge — etiqueta verde de descuento */
+  .price-savings {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.2rem 0.55rem;
+    border-radius: 9999px;
+    font-family: 'Inter', sans-serif;
+    font-size: 10.5px;
+    font-weight: 700;
+    line-height: 1;
+    color: rgb(74 222 128); /* green-400 */
+    background: rgba(34, 197, 94, 0.12);
+    border: 1px solid rgba(34, 197, 94, 0.30);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  /* === iOS-grade label badge — refined, restrained, dotted indicator === */
+  .badge-ios {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.32rem 0.7rem;
+    border-radius: 9999px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    line-height: 1;
+    background: hsla(var(--la-surface-low) / 0.55);
+    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
+    border: 1px solid hsla(var(--la-outline) / 0.10);
+    box-shadow: inset 0 1px 0 hsla(var(--la-outline-warm) / 0.14);
+    color: hsl(var(--la-fg));
+  }
+  .badge-ios::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 9999px;
+    background: currentColor;
+    box-shadow: 0 0 10px currentColor;
+    flex-shrink: 0;
+  }
+  .badge-ios--accent {
+    background: rgba(var(--card-accent), 0.10);
+    border-color: rgba(var(--card-accent), 0.30);
+    color: rgb(var(--card-accent));
+  }
+
+  /* ============================================================ */
+  /* === v9 — LIQUID GLASS APP CARDS (iOS 18 / Vision OS vibe) === */
+  /* ============================================================ */
+
+  /* Stage para 3D tilt: aplica perspective al wrapper, no a la card.
+     La card vive dentro y rota libremente sin romper su backdrop-filter. */
+  .tilt-stage {
+    perspective: 1400px;
+    perspective-origin: 50% 50%;
+    transform-style: preserve-3d;
+    will-change: transform;
+  }
+
+  /* Conic gradient ring animado — recorre el borde de la card.
+     Usa @property para animar el ángulo de forma performante (GPU). */
+  .liquid-shine {
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    padding: 1.5px;
+    background: conic-gradient(
+      from var(--shine-angle, 0deg),
+      transparent 0%,
+      rgba(var(--card-accent), 0.55) 22%,
+      rgba(var(--card-accent), 0.05) 50%,
+      rgba(var(--card-accent), 0.45) 78%,
+      transparent 100%
+    );
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    z-index: 3;
+  }
+  /* Movimiento reducido — el shine sólo aparece al hover, sin loop continuo en featured */
+  .service-card:hover .liquid-shine {
+    opacity: 0.85;
+    animation: liquid-shine-spin 8s linear infinite;
+  }
+  .service-card[data-featured="true"] .liquid-shine {
+    opacity: 0.45;
+    /* Sin animación por defecto — sólo gradiente estático, evita parpadeo permanente */
+  }
+  .service-card[data-featured="true"]:hover .liquid-shine {
+    opacity: 0.9;
+    animation: liquid-shine-spin 8s linear infinite;
+  }
+  @keyframes liquid-shine-spin {
+    to {
+      --shine-angle: 360deg;
+    }
+  }
+
+  /* Edge highlight superior — captura luz tipo cristal líquido */
+  .liquid-edge {
+    position: absolute;
+    top: 0;
+    left: 12%;
+    right: 12%;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.45),
+      transparent
+    );
+    pointer-events: none;
+    z-index: 4;
+    opacity: 0.7;
+  }
+  .service-card:hover .liquid-edge {
+    opacity: 1;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(var(--card-accent), 0.55),
+      rgba(255, 255, 255, 0.6),
+      rgba(var(--card-accent), 0.55),
+      transparent
+    );
+  }
+
+  /* Color bleed accent — el color de la card se intensifica desde la esq. sup. derecha al hover */
+  .liquid-bleed {
+    position: absolute;
+    top: -40%;
+    right: -25%;
+    width: 80%;
+    height: 80%;
+    border-radius: 50%;
+    background: radial-gradient(
+      closest-side,
+      rgba(var(--card-accent), 0.32),
+      transparent 70%
+    );
+    filter: blur(28px);
+    opacity: 0;
+    transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    pointer-events: none;
+    z-index: 0;
+    mix-blend-mode: screen;
+  }
+  .service-card:hover .liquid-bleed {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+
+  /* Decorativo: 3 puntos al estilo "ventana de app" en iOS */
+  .app-meta-dots {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: hsl(var(--la-fg-muted));
+    opacity: 0.4;
+    transition: opacity 0.3s ease;
+  }
+  .service-card:hover .app-meta-dots {
+    opacity: 0.85;
+  }
+  .app-meta-dots span {
+    width: 5px;
+    height: 5px;
+    border-radius: 9999px;
+    background: currentColor;
+  }
+
+  /* Feature pills — más App Store que checklist legal */
+  .feature-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.4rem 0.75rem;
+    border-radius: 9999px;
+    background: rgba(var(--card-accent), 0.08);
+    border: 1px solid rgba(var(--card-accent), 0.18);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.2;
+    color: rgb(241 245 249);
+    white-space: nowrap;
+    transition:
+      background 0.25s ease,
+      border-color 0.25s ease,
+      transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .feature-pill:hover {
+    background: rgba(var(--card-accent), 0.16);
+    border-color: rgba(var(--card-accent), 0.32);
+    transform: translateY(-1px);
+  }
+  .feature-pill__dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 9999px;
+    background: rgb(var(--card-accent));
+    box-shadow: 0 0 8px rgba(var(--card-accent), 0.6);
+    flex-shrink: 0;
+  }
+  /* Variante con check icon — mantiene el "ya incluido" feel */
+  .feature-pill__check {
+    width: 14px;
+    height: 14px;
+    border-radius: 9999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(var(--card-accent), 0.22);
+    color: rgb(var(--card-accent));
+    flex-shrink: 0;
+  }
+
+  /* Trust pills — fila de chips compactos (rating, duración, meet) */
+  .trust-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.35rem 0.65rem;
+    border-radius: 9999px;
+    background: hsla(var(--la-surface-low) / 0.6);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+    backdrop-filter: blur(14px) saturate(140%);
+    border: 1px solid hsla(var(--la-outline) / 0.08);
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    line-height: 1;
+    color: hsl(var(--la-fg));
+    white-space: nowrap;
+    box-shadow: inset 0 1px 0 hsla(var(--la-outline-warm) / 0.10);
+  }
+  .trust-pill__icon {
+    width: 12px;
+    height: 12px;
+    flex-shrink: 0;
+  }
+  .trust-pill--rating {
+    color: rgb(250 204 21);
+  }
+  .trust-pill--rating .trust-pill__value {
+    color: hsl(var(--la-fg));
+    font-weight: 600;
+  }
+  .trust-pill--rating .trust-pill__count {
+    color: hsl(var(--la-fg-muted));
+    font-weight: 500;
+  }
+
+  /* CTA shimmer — barrido de luz al hover */
+  .cta-shimmer {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+  }
+  .cta-shimmer::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      100deg,
+      transparent 30%,
+      rgba(255, 255, 255, 0.28) 48%,
+      transparent 65%
+    );
+    transform: translateX(-110%);
+    transition: transform 0.75s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none;
+    z-index: 1;
+    mix-blend-mode: overlay;
+  }
+  .cta-shimmer:hover::after {
+    transform: translateX(110%);
+  }
+  .cta-shimmer > * {
+    position: relative;
+    z-index: 2;
+  }
+
+  /* Avatar circular del testimonial (gradient + initial) */
+  .testimonial-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 9999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    color: white;
+    background: linear-gradient(
+      135deg,
+      rgb(var(--card-accent)),
+      rgba(var(--card-accent), 0.6)
+    );
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.32),
+      0 4px 12px -2px rgba(var(--card-accent), 0.55);
+    flex-shrink: 0;
+  }
+
+  /* Price ticker — número grande con tabular-nums para alineación perfecta */
+  .price-ticker {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum" 1, "ss01" 1;
+    letter-spacing: -0.02em;
+  }
+
+  /* Reduced motion — desactiva las animaciones costosas */
+  @media (prefers-reduced-motion: reduce) {
+    .service-card:hover .liquid-shine,
+    .service-card[data-featured="true"] .liquid-shine {
+      animation: none;
+      opacity: 0.5;
+    }
+    .cta-shimmer::after {
+      display: none;
+    }
+    .liquid-bleed {
+      transition: none;
+    }
+  }
+
+  /* === Step card 3D Apple Keynote — depth, layered, springy === */
+  .step-stage {
+    perspective: 1400px;
+    perspective-origin: 50% 60%;
+  }
+  .step-card {
+    --card-accent: 59 130 246;
+    position: relative;
+    /* MUY transparente + blur denso — cristal nocturno sobre fondo navy.
+       El navy del landing-canvas se ve a través, dando sensación de profundidad
+       sin competir cromáticamente con el contenido. */
+    background:
+      radial-gradient(140% 100% at 100% 0%, rgba(var(--card-accent), 0.08), transparent 55%),
+      radial-gradient(140% 100% at 0% 100%, rgba(var(--card-accent), 0.04), transparent 55%),
+      rgba(8, 14, 30, 0.42);
+    -webkit-backdrop-filter: blur(56px) saturate(160%) brightness(0.95);
+    backdrop-filter: blur(56px) saturate(160%) brightness(0.95);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 2rem;
+    padding: 1.75rem;
+    box-shadow:
+      0 28px 56px rgba(0, 0, 0, 0.45),
+      inset 0 1px 0 rgba(255, 255, 255, 0.08),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.20);
+    transform-style: preserve-3d;
+    transition:
+      transform 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+      box-shadow 0.5s ease,
+      border-color 0.5s ease,
+      background 0.5s ease;
+    will-change: transform;
+  }
+  .step-card:hover {
+    border-color: rgba(var(--card-accent), 0.32);
+    box-shadow:
+      0 44px 80px rgba(0, 0, 0, 0.52),
+      0 0 0 1px rgba(var(--card-accent), 0.18),
+      0 0 80px -10px rgba(var(--card-accent), 0.32),
+      inset 0 1px 0 hsla(var(--la-outline-warm) / 0.30);
+  }
+  /* Numero gigante grabado al fondo — efecto Apple Keynote */
+  .step-numeral {
+    font-family: 'Manrope', sans-serif;
+    font-weight: 900;
+    font-size: clamp(8rem, 16vw, 13rem);
+    line-height: 0.82;
+    letter-spacing: -0.07em;
+    background: linear-gradient(
+      180deg,
+      rgba(var(--card-accent), 0.36),
+      rgba(var(--card-accent), 0) 78%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-stroke: 1.5px rgba(var(--card-accent), 0.50);
+    pointer-events: none;
+    user-select: none;
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .step-card:hover .step-numeral {
+    transform: scale(1.04) translateY(-2px);
+  }
+
+  /* Step label — pill iOS con accent del paso */
+  .step-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.32rem 0.7rem;
+    border-radius: 9999px;
+    font-family: 'Inter', sans-serif;
+    font-size: 10.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    line-height: 1;
+    border: 1px solid;
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.10);
+  }
+
+  /* Icon "tile" con depth real — capas apiladas */
+  .step-icon-tile {
+    position: relative;
+    width: 64px;
+    height: 64px;
+    border-radius: 1.35rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    background: linear-gradient(
+      135deg,
+      rgb(var(--card-accent)),
+      rgba(var(--card-accent), 0.72)
+    );
+    box-shadow:
+      0 18px 36px -10px rgba(var(--card-accent), 0.65),
+      inset 0 1.5px 0 rgba(255, 255, 255, 0.30),
+      inset 0 -2px 0 rgba(0, 0, 0, 0.18);
+    transform: translateZ(20px);
+  }
+  .step-icon-tile::after {
+    content: "";
+    position: absolute;
+    inset: 4px;
+    border-radius: 1rem;
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.18),
+      transparent 50%
+    );
+    pointer-events: none;
+  }
+  /* Brand wordmark — Punto Legal Chile (Apple-styled lockup) */
+  .brand-lockup {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.4rem 0.95rem;
+    border-radius: 9999px;
+    background: hsla(var(--la-surface-low) / 0.45);
+    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
+    border: 1px solid hsla(var(--la-outline) / 0.10);
+    box-shadow: inset 0 1px 0 hsla(var(--la-outline-warm) / 0.16);
+  }
+  .brand-lockup__logo {
+    width: 22px;
+    height: 22px;
+    border-radius: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(
+      135deg,
+      hsl(var(--la-accent-from)),
+      hsl(var(--la-accent-to))
+    );
+    box-shadow:
+      0 6px 14px -4px hsl(var(--la-accent-from) / 0.55),
+      inset 0 1px 0 rgba(255, 255, 255, 0.25);
+    color: white;
+    font-family: 'Manrope', sans-serif;
+    font-weight: 800;
+    font-size: 11px;
+    letter-spacing: -0.04em;
+  }
+  .brand-lockup__name {
+    font-family: 'Manrope', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: -0.01em;
+    color: white;
+  }
+  .brand-lockup__sep {
+    width: 3px;
+    height: 3px;
+    border-radius: 9999px;
+    background: hsl(var(--la-fg-muted) / 0.7);
+  }
+  .brand-lockup__country {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.20em;
+    color: hsl(var(--la-fg-muted));
+  }
+  /* Connecting dotted path entre steps (desktop) */
+  .step-connector {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background-image: radial-gradient(
+      circle,
+      hsla(var(--la-outline) / 0.20) 1px,
+      transparent 1.2px
+    );
+    background-size: 8px 1px;
+    background-repeat: repeat-x;
+    transform: translateY(-50%);
+    pointer-events: none;
+  }
+
+  /* === Apple Watch–style FAQ bubbles (round, soft, springy) === */
+  .faq-bubble {
+    position: relative;
+    background:
+      radial-gradient(120% 90% at 100% 0%, rgba(59, 130, 246, 0.10), transparent 55%),
+      hsla(var(--la-surface-mid) / 0.55);
+    -webkit-backdrop-filter: blur(28px) saturate(140%);
+    backdrop-filter: blur(28px) saturate(140%);
+    border: 1px solid hsla(var(--la-outline) / 0.10);
+    border-radius: 2rem;
+    overflow: hidden;
+    box-shadow:
+      0 12px 32px rgba(0, 0, 0, 0.32),
+      inset 0 1px 0 hsla(var(--la-outline-warm) / 0.18);
+    transition:
+      border-color 0.4s ease,
+      background 0.4s ease,
+      box-shadow 0.4s ease,
+      transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .faq-bubble:hover {
+    border-color: hsla(var(--la-outline) / 0.18);
+    transform: translateY(-2px);
+    box-shadow:
+      0 18px 40px rgba(0, 0, 0, 0.40),
+      inset 0 1px 0 hsla(var(--la-outline-warm) / 0.22);
+  }
+  .faq-bubble[data-open="true"] {
+    background:
+      radial-gradient(120% 90% at 100% 0%, rgba(34, 211, 238, 0.14), transparent 55%),
+      hsla(var(--la-surface-high) / 0.65);
+    border-color: hsla(var(--la-outline) / 0.20);
+    box-shadow:
+      0 22px 48px rgba(0, 0, 0, 0.44),
+      0 0 0 1px hsla(var(--la-outline) / 0.06),
+      inset 0 1px 0 hsla(var(--la-outline-warm) / 0.26);
+  }
+  .faq-bubble__trigger {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.9rem;
+    padding: 1.1rem 1.35rem;
+    text-align: left;
+    background: transparent;
+    border: none;
+    color: hsl(var(--la-fg));
+    font-family: 'Inter', sans-serif;
+    font-size: 0.92rem;
+    font-weight: 500;
+    line-height: 1.4;
+    cursor: pointer;
+    /* Mata el focus ring por defecto del navegador (era el "naranja") */
+    outline: none;
+    -webkit-tap-highlight-color: transparent;
+    transition: color 0.2s ease;
+  }
+  .faq-bubble__trigger:hover {
+    color: white;
+  }
+  .faq-bubble__trigger:focus-visible {
+    box-shadow: inset 0 0 0 2px hsla(var(--la-accent-to) / 0.45);
+    border-radius: inherit;
+  }
+  .faq-bubble__icon {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    border-radius: 9999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: hsla(var(--la-surface-low) / 0.65);
+    border: 1px solid hsla(var(--la-outline) / 0.08);
+    color: hsl(var(--la-fg-muted));
+    transition:
+      transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1),
+      background 0.3s ease,
+      color 0.3s ease;
+  }
+  .faq-bubble[data-open="true"] .faq-bubble__icon {
+    transform: rotate(45deg);
+    background: linear-gradient(
+      135deg,
+      hsla(var(--la-accent-from) / 0.40),
+      hsla(var(--la-accent-to) / 0.40)
+    );
+    color: white;
+  }
+  .faq-bubble__panel {
+    padding: 0 1.4rem 1.3rem 1.4rem;
+    color: hsl(var(--la-fg-muted));
+    font-size: 0.9rem;
+    line-height: 1.65;
+  }
+  .faq-bubble__panel-inner {
+    padding-top: 0.25rem;
+    border-top: 1px solid hsla(var(--la-outline) / 0.08);
+    padding-top: 0.85rem;
+  }
+
+  .cta-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.375rem;
+    border-radius: 9999px;
+    font-weight: 600;
+    color: hsl(var(--la-fg));
+    background: hsla(var(--la-surface-mid) / 0.40);
+    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
+    border: 1px solid hsla(var(--la-outline) / 0.12);
+    transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  }
+  .cta-secondary:hover {
+    background: hsla(var(--la-surface-mid) / 0.60);
+    color: white;
+    border-color: hsla(var(--la-outline) / 0.22);
+  }
+  .cta-secondary:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.35);
+  }
+
+  /* Filtros de categoría (pill chips) */
+  .category-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 1rem;
+    border-radius: 9999px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: hsl(var(--la-fg-muted));
+    background: hsla(var(--la-surface-low) / 0.45);
+    border: 1px solid hsla(var(--la-outline) / 0.08);
+    transition: all 0.25s ease;
+    white-space: nowrap;
+  }
+  .category-chip:hover {
+    background: hsla(var(--la-surface-mid) / 0.60);
+    border-color: hsla(var(--la-outline) / 0.18);
+    color: white;
+  }
+  .category-chip[data-active="true"] {
+    background: linear-gradient(
+      135deg,
+      hsl(var(--la-accent-from) / 0.22),
+      hsl(var(--la-accent-to) / 0.22)
+    );
+    border-color: hsl(var(--la-accent-from) / 0.50);
+    color: white;
+    box-shadow:
+      0 8px 22px -8px hsl(var(--la-accent-from) / 0.60),
+      inset 0 1px 0 rgba(255, 255, 255, 0.10);
+  }
+
+  /* === Apple Watch–style category bubbles === */
+  .cat-stage {
+    position: relative;
+    perspective: 1200px;
+    perspective-origin: 50% 80%;
+  }
+
+  /* Honeycomb stagger — items pares se desplazan hacia abajo */
+  .cat-grid {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 0.85rem;
+    padding: 1rem 0.5rem 1.25rem;
+    flex-wrap: nowrap;
+  }
+  @media (min-width: 640px) {
+    .cat-grid {
+      gap: 1.4rem;
+    }
+  }
+  .cat-grid > *:nth-child(even) {
+    transform: translateY(28px);
+  }
+  @media (min-width: 640px) {
+    .cat-grid > *:nth-child(even) {
+      transform: translateY(36px);
+    }
+  }
+
+  .cat-bubble {
+    --bubble-accent: 59 130 246;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.55rem;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    /* Kill TODO browser default highlights — el "recuadro naranjo" venía de aquí */
+    outline: none !important;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-appearance: none;
+    appearance: none;
+    accent-color: transparent;
+    color: inherit;
+    font: inherit;
+    will-change: transform;
+  }
+  .cat-bubble:focus,
+  .cat-bubble:active,
+  .cat-bubble:focus-within {
+    outline: none !important;
+    box-shadow: none;
+  }
+  /* Focus visible accesible — sutil ring del propio accent (azul/violeta/teal),
+     nunca naranja porque la paleta de bubbles es 100% fría. */
+  .cat-bubble:focus-visible .cat-bubble__ring {
+    box-shadow:
+      0 0 0 3px rgba(var(--bubble-accent), 0.40),
+      0 18px 36px -12px rgba(0, 0, 0, 0.5);
+  }
+
+  /* Anillo glass exterior — se ilumina cuando active */
+  .cat-bubble__ring {
+    position: relative;
+    width: 76px;
+    height: 76px;
+    border-radius: 9999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background:
+      radial-gradient(120% 90% at 30% 20%, rgba(255, 255, 255, 0.12), transparent 55%),
+      hsla(var(--la-surface-mid) / 0.55);
+    -webkit-backdrop-filter: blur(28px) saturate(150%);
+    backdrop-filter: blur(28px) saturate(150%);
+    border: 1px solid hsla(var(--la-outline) / 0.10);
+    box-shadow:
+      0 18px 36px -14px rgba(0, 0, 0, 0.55),
+      inset 0 1px 0 hsla(var(--la-outline-warm) / 0.18);
+    transition:
+      box-shadow 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+      border-color 0.4s ease,
+      background 0.4s ease;
+  }
+  @media (min-width: 640px) {
+    .cat-bubble__ring {
+      width: 92px;
+      height: 92px;
+    }
+  }
+
+  /* Tile 3D que SOBRESALE del anillo — el icono "flota" hacia adelante */
+  .cat-bubble__tile {
+    position: relative;
+    width: 50px;
+    height: 50px;
+    border-radius: 1.1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    background: linear-gradient(
+      135deg,
+      rgb(var(--bubble-accent)),
+      rgba(var(--bubble-accent), 0.72)
+    );
+    box-shadow:
+      0 18px 32px -8px rgba(var(--bubble-accent), 0.55),
+      0 2px 0 rgba(0, 0, 0, 0.18),
+      inset 0 1.5px 0 rgba(255, 255, 255, 0.32),
+      inset 0 -2px 0 rgba(0, 0, 0, 0.18);
+    transform: translateY(-2px);
+    transition:
+      transform 0.55s cubic-bezier(0.34, 1.56, 0.64, 1),
+      box-shadow 0.5s ease;
+  }
+  @media (min-width: 640px) {
+    .cat-bubble__tile {
+      width: 60px;
+      height: 60px;
+      border-radius: 1.25rem;
+    }
+  }
+  .cat-bubble__tile::after {
+    content: "";
+    position: absolute;
+    inset: 4px;
+    border-radius: 0.85rem;
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.22),
+      transparent 55%
+    );
+    pointer-events: none;
+  }
+
+  /* Estado ACTIVO — el ring brilla con breathing glow + tile elevado */
+  .cat-bubble[data-active="true"] .cat-bubble__ring {
+    background:
+      radial-gradient(120% 90% at 30% 20%, rgba(var(--bubble-accent), 0.22), transparent 55%),
+      hsla(var(--la-surface-high) / 0.70);
+    border-color: rgba(var(--bubble-accent), 0.55);
+    box-shadow:
+      0 26px 52px -14px rgba(var(--bubble-accent), 0.55),
+      0 0 0 1px rgba(var(--bubble-accent), 0.20),
+      0 0 70px -8px rgba(var(--bubble-accent), 0.40),
+      inset 0 1px 0 hsla(var(--la-outline-warm) / 0.28);
+    animation: cat-breathing 3.6s ease-in-out infinite;
+  }
+  @keyframes cat-breathing {
+    0%, 100% {
+      box-shadow:
+        0 26px 52px -14px rgba(var(--bubble-accent), 0.55),
+        0 0 0 1px rgba(var(--bubble-accent), 0.20),
+        0 0 70px -8px rgba(var(--bubble-accent), 0.40),
+        inset 0 1px 0 hsla(var(--la-outline-warm) / 0.28);
+    }
+    50% {
+      box-shadow:
+        0 30px 60px -14px rgba(var(--bubble-accent), 0.65),
+        0 0 0 1px rgba(var(--bubble-accent), 0.30),
+        0 0 90px -6px rgba(var(--bubble-accent), 0.55),
+        inset 0 1px 0 hsla(var(--la-outline-warm) / 0.32);
+    }
+  }
+  .cat-bubble[data-active="true"] .cat-bubble__tile {
+    transform: translateY(-7px) scale(1.05);
+    box-shadow:
+      0 26px 44px -10px rgba(var(--bubble-accent), 0.75),
+      0 3px 0 rgba(0, 0, 0, 0.22),
+      inset 0 2px 0 rgba(255, 255, 255, 0.40),
+      inset 0 -3px 0 rgba(0, 0, 0, 0.22);
+  }
+  .cat-bubble:hover .cat-bubble__tile {
+    transform: translateY(-5px) scale(1.02);
+  }
+  .cat-bubble[data-active="true"]:hover .cat-bubble__tile {
+    transform: translateY(-9px) scale(1.06);
+  }
+
+  /* Mini-badge con count de servicios */
+  .cat-bubble__count {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    min-width: 22px;
+    height: 22px;
+    padding: 0 6px;
+    border-radius: 9999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: hsla(var(--la-surface-high) / 0.85);
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
+    border: 1px solid hsla(var(--la-outline) / 0.16);
+    color: hsl(var(--la-fg));
+    font-family: 'Manrope', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1;
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.35);
+    transition: all 0.4s ease;
+  }
+  .cat-bubble[data-active="true"] .cat-bubble__count {
+    background: linear-gradient(
+      135deg,
+      rgb(var(--bubble-accent)),
+      rgba(var(--bubble-accent), 0.78)
+    );
+    color: white;
+    border-color: rgba(255, 255, 255, 0.20);
+    box-shadow: 0 8px 18px -4px rgba(var(--bubble-accent), 0.55);
+  }
+
+  /* Label debajo del bubble */
+  .cat-bubble__label {
+    font-family: 'Manrope', sans-serif;
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: -0.005em;
+    color: hsl(var(--la-fg-muted));
+    transition: color 0.3s ease;
+    text-align: center;
+    line-height: 1.1;
+  }
+  @media (min-width: 640px) {
+    .cat-bubble__label {
+      font-size: 12.5px;
+    }
+  }
+  .cat-bubble:hover .cat-bubble__label {
+    color: white;
+  }
+  .cat-bubble[data-active="true"] .cat-bubble__label {
+    color: white;
+    text-shadow: 0 1px 12px rgba(var(--bubble-accent), 0.45);
+  }
+
+  /* Indicador "dot" debajo del bubble activo (estilo iOS dock) */
+  .cat-bubble__dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 9999px;
+    background: rgb(var(--bubble-accent));
+    opacity: 0;
+    box-shadow: 0 0 8px rgba(var(--bubble-accent), 0.65);
+    transition: opacity 0.3s ease, transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transform: scale(0.6);
+  }
+  .cat-bubble[data-active="true"] .cat-bubble__dot {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cat-bubble,
+    .cat-bubble__ring,
+    .cat-bubble__tile,
+    .cat-bubble__label,
+    .cat-bubble__count,
+    .cat-bubble__dot {
+      transition: none;
+    }
+    .cat-bubble[data-active="true"] .cat-bubble__ring {
+      animation: none;
+    }
+  }
+
   /* Bullets animados para navegación - Premium */
   .neon-bullet {
     position: relative;

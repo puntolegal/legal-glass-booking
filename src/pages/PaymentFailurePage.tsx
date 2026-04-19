@@ -1,38 +1,45 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link, useSearchParams } from 'react-router-dom';
-import { XCircle, ArrowLeft, RefreshCw, Home, CreditCard } from 'lucide-react';
+import {
+  ArrowLeft,
+  CreditCard,
+  Home,
+  RefreshCw,
+  XCircle,
+} from 'lucide-react';
 import SEO from '../components/SEO';
+import BrandMark from '@/components/BrandMark';
 import { supabase } from '@/integrations/supabase/client';
 
 export default function PaymentFailurePage() {
   const [searchParams] = useSearchParams();
   const [checking, setChecking] = useState(true);
-  
+
   useEffect(() => {
-    // Auto-redirect si el pago realmente fue aprobado
+    // Auto-redirect si el pago realmente fue aprobado.
     const checkPaymentStatus = async () => {
       try {
         const externalRef = searchParams.get('external_reference');
         const status = searchParams.get('status');
-        
-        // Si el status dice que fue aprobado, redirigir
+
         if (status === 'approved' && externalRef) {
-          console.log('🔄 Pago aprobado detectado, redirigiendo a success...');
           window.location.href = `/payment-success?external_reference=${externalRef}`;
           return;
         }
-        
-        // Verificar en la base de datos si la reserva fue confirmada
+
         if (externalRef) {
           const { data: reserva } = await supabase
             .from('reservas')
             .select('estado, pago_estado')
             .eq('external_reference', externalRef)
             .maybeSingle();
-          
-          if (reserva && (reserva.estado === 'confirmada' || reserva.pago_estado === 'approved')) {
-            console.log('🔄 Reserva confirmada detectada en BD, redirigiendo...');
+
+          if (
+            reserva &&
+            (reserva.estado === 'confirmada' ||
+              reserva.pago_estado === 'approved')
+          ) {
             window.location.href = `/payment-success?external_reference=${externalRef}`;
             return;
           }
@@ -43,183 +50,176 @@ export default function PaymentFailurePage() {
         setChecking(false);
       }
     };
-    
+
     checkPaymentStatus();
   }, [searchParams]);
-  
+
   if (checking) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-red-50 via-rose-50 to-pink-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-500 mx-auto mb-4"></div>
-          <p className="text-gray-600">Verificando estado del pago...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-2 border-rose-500/30 border-t-rose-400 mx-auto mb-4" />
+          <p className="text-slate-300 text-sm">Verificando estado del pago…</p>
         </div>
       </div>
     );
   }
-  
+
   return (
     <>
-      <SEO 
-        title="Error en el Pago - Punto Legal"
-        description="Hubo un problema procesando tu pago. Intenta nuevamente o contacta con nosotros."
+      <SEO
+        title="Error en el pago — Punto Legal"
+        description="Hubo un problema procesando tu pago. No te preocupes, no se cobró nada. Intenta nuevamente o escríbenos."
       />
-      
-      <div className="min-h-screen bg-gradient-to-br from-red-50 via-rose-50 to-pink-50">
-        <div className="max-w-4xl mx-auto px-4 py-16">
+
+      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-slate-100">
+        {/* Header consistente con el resto de la app */}
+        <header className="sticky top-0 z-50 bg-slate-950/70 backdrop-blur-xl border-b border-white/[0.06]">
+          <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
+            <BrandMark size="sm" />
+            <div className="flex items-center gap-2 text-xs text-rose-300/90">
+              <span className="w-1.5 h-1.5 rounded-full bg-rose-400 animate-pulse" />
+              Pago no procesado
+            </div>
+          </div>
+        </header>
+
+        <div className="max-w-3xl mx-auto px-4 py-10 md:py-16">
           {/* Header de error */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-center mb-12"
+            transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+            className="text-center mb-10"
           >
-            <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <XCircle className="w-10 h-10 text-red-600" />
+            <div
+              className="w-20 h-20 rounded-2xl mx-auto mb-6 flex items-center justify-center border border-rose-500/30"
+              style={{
+                background:
+                  'linear-gradient(135deg, rgba(244,63,94,0.22), rgba(244,63,94,0.10))',
+                boxShadow:
+                  '0 18px 36px -10px rgba(244,63,94,0.45), inset 0 1.5px 0 rgba(255,255,255,0.18)',
+              }}
+            >
+              <XCircle className="w-10 h-10 text-rose-300" strokeWidth={1.8} />
             </div>
-            <h1 className="text-4xl font-bold text-gray-900 mb-4">
-              Error en el Pago
+            <h1 className="font-display text-3xl md:text-4xl font-bold text-white tracking-tight">
+              No pudimos procesar tu pago
             </h1>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Hubo un problema procesando tu pago. No te preocupes, no se ha cobrado nada.
+            <p className="mt-4 text-base md:text-lg text-slate-300 max-w-xl mx-auto leading-relaxed">
+              Tranquilo: <strong className="text-white">no se cobró nada</strong>. Puedes
+              reintentar en segundos o escribirnos y resolvemos contigo.
             </p>
           </motion.div>
 
-          {/* Información del error */}
+          {/* ¿Qué pasó? */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 border border-red-200/50 shadow-xl mb-8"
+            transition={{ duration: 0.45, delay: 0.08, ease: [0.16, 1, 0.3, 1] }}
+            className="rounded-3xl p-6 md:p-8 mb-6 backdrop-blur-xl"
+            style={{
+              background: 'rgba(255,255,255,0.04)',
+              border: '1px solid rgba(255,255,255,0.08)',
+              boxShadow:
+                '0 24px 48px rgba(0,0,0,0.40), inset 0 1px 0 rgba(255,255,255,0.06)',
+            }}
           >
-            <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
-              <CreditCard className="w-6 h-6 text-red-600" />
-              ¿Qué pasó?
+            <h2 className="text-lg md:text-xl font-bold text-white mb-5 flex items-center gap-3">
+              <CreditCard className="w-5 h-5 text-rose-300" />
+              ¿Qué pudo haber pasado?
             </h2>
-            
-            <div className="space-y-4 text-gray-700">
-              <p>El pago no pudo ser procesado por alguna de las siguientes razones:</p>
-              <ul className="list-disc list-inside space-y-2 ml-4">
-                <li>Datos de la tarjeta incorrectos o expirada</li>
-                <li>Fondos insuficientes en la cuenta</li>
-                <li>Problema temporal con el banco</li>
-                <li>Error de conexión con MercadoPago</li>
-                <li>Tarjeta bloqueada o restringida</li>
-              </ul>
-            </div>
+            <ul className="space-y-2.5 text-[14.5px] leading-relaxed text-slate-300">
+              {[
+                'Datos de la tarjeta incorrectos o expirada.',
+                'Fondos insuficientes en la cuenta.',
+                'Problema temporal con el banco emisor.',
+                'Conexión interrumpida durante la transacción.',
+                'Tarjeta bloqueada o restringida para compras online.',
+              ].map((item) => (
+                <li key={item} className="flex items-start gap-3">
+                  <span
+                    className="mt-2 inline-block h-1.5 w-1.5 rounded-full bg-rose-400 flex-shrink-0"
+                    aria-hidden
+                  />
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
           </motion.div>
 
           {/* Soluciones */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            className="bg-blue-50 border border-blue-200 rounded-xl p-6 mb-8"
+            transition={{ duration: 0.45, delay: 0.16, ease: [0.16, 1, 0.3, 1] }}
+            className="rounded-3xl p-6 md:p-8 mb-6 backdrop-blur-xl"
+            style={{
+              background:
+                'linear-gradient(135deg, rgba(34,211,238,0.06), rgba(59,130,246,0.04))',
+              border: '1px solid rgba(34,211,238,0.18)',
+              boxShadow:
+                '0 18px 40px rgba(0,0,0,0.30), inset 0 1px 0 rgba(255,255,255,0.06)',
+            }}
           >
-            <h3 className="text-lg font-semibold text-blue-900 mb-4">
-              💡 Soluciones
+            <h3 className="text-base font-semibold text-white mb-4 uppercase tracking-[0.18em]">
+              Cómo seguir
             </h3>
-            <div className="space-y-3">
-              <div className="flex items-start gap-3">
-                <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <span className="text-xs font-bold text-blue-600">1</span>
-                </div>
-                <p className="text-blue-800">Verifica que los datos de tu tarjeta sean correctos</p>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <span className="text-xs font-bold text-blue-600">2</span>
-                </div>
-                <p className="text-blue-800">Asegúrate de tener fondos suficientes</p>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <span className="text-xs font-bold text-blue-600">3</span>
-                </div>
-                <p className="text-blue-800">Intenta con otra tarjeta o método de pago</p>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <span className="text-xs font-bold text-blue-600">4</span>
-                </div>
-                <p className="text-blue-800">Contacta a tu banco si el problema persiste</p>
-              </div>
-            </div>
+            <ol className="space-y-3 text-[14.5px] leading-relaxed text-slate-300">
+              <li className="flex gap-3">
+                <span className="font-display font-bold text-cyan-300 w-6 flex-shrink-0">
+                  1.
+                </span>
+                <span>Verifica los datos de tu tarjeta y reintenta el pago.</span>
+              </li>
+              <li className="flex gap-3">
+                <span className="font-display font-bold text-cyan-300 w-6 flex-shrink-0">
+                  2.
+                </span>
+                <span>Prueba con otra tarjeta o billetera digital aceptada por MercadoPago.</span>
+              </li>
+              <li className="flex gap-3">
+                <span className="font-display font-bold text-cyan-300 w-6 flex-shrink-0">
+                  3.
+                </span>
+                <span>Si el problema persiste, escríbenos por WhatsApp y te coordinamos otro medio de pago.</span>
+              </li>
+            </ol>
           </motion.div>
 
-          {/* Información importante - Reserva registrada */}
+          {/* CTAs */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6 }}
-            className="bg-green-50 border border-green-200 rounded-xl p-6 mb-8"
+            transition={{ duration: 0.45, delay: 0.24, ease: [0.16, 1, 0.3, 1] }}
+            className="flex flex-col sm:flex-row gap-3 justify-center"
           >
-            <h3 className="text-lg font-semibold text-green-900 mb-4">
-              ✅ Tu consulta fue registrada
-            </h3>
-            <p className="text-green-800">
-              Aunque hubo un problema con el pago, <strong>tu consulta se registró exitosamente en nuestro sistema</strong>. 
-              Nuestro equipo revisará tu caso y se pondrá en contacto contigo a la brevedad para coordinar el pago y confirmar tu cita.
-            </p>
-          </motion.div>
-
-          {/* Información de contacto */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.7 }}
-            className="bg-gray-50 border border-gray-200 rounded-xl p-6 mb-8"
-          >
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">
-              ¿Necesitas ayuda?
-            </h3>
-            <p className="text-gray-700 mb-4">
-              Si el problema persiste, no dudes en contactarnos. Estamos aquí para ayudarte.
-            </p>
-            <div className="grid md:grid-cols-2 gap-4 text-sm">
-              <div className="flex items-center gap-2">
-                <span className="font-medium">📧 Email:</span>
-                <a 
-                  href="mailto:puntolegalelgolf@gmail.com"
-                  className="text-blue-600 hover:text-blue-700 underline"
-                >
-                  puntolegalelgolf@gmail.com
-                </a>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="font-medium">📱 WhatsApp:</span>
-                <a 
-                  href="tel:+56962321883"
-                  className="text-blue-600 hover:text-blue-700 underline"
-                >
-                  +569 6232 1883
-                </a>
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Botones de acción */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.8 }}
-            className="flex flex-col sm:flex-row gap-4 justify-center"
-          >
+            <button
+              type="button"
+              onClick={() => window.history.back()}
+              className="cta-hero cta-hero--primary"
+            >
+              <RefreshCw className="h-5 w-5" aria-hidden />
+              <span>Reintentar el pago</span>
+            </button>
+            <Link to="/" className="cta-hero cta-hero--ghost">
+              <Home className="h-5 w-5" aria-hidden />
+              <span>Volver al inicio</span>
+            </Link>
             <Link
               to="/agendamiento"
-              className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200 hover:scale-105"
+              className="cta-hero cta-hero--ghost"
+              aria-label="Volver al agendamiento"
             >
-              <RefreshCw className="w-5 h-5" />
-              Intentar nuevamente
-            </Link>
-            
-            <Link
-              to="/"
-              className="inline-flex items-center gap-2 bg-white hover:bg-gray-50 text-gray-700 font-semibold py-3 px-6 rounded-xl border border-gray-300 transition-all duration-200 hover:scale-105"
-            >
-              <Home className="w-5 h-5" />
-              Volver al inicio
+              <ArrowLeft className="h-5 w-5" aria-hidden />
+              <span>Volver al agendamiento</span>
             </Link>
           </motion.div>
+
+          {/* Microcopy footer */}
+          <p className="mt-10 text-center text-[11.5px] uppercase tracking-[0.2em] text-slate-500">
+            Pago seguro vía MercadoPago · Sin cargos ocultos
+          </p>
         </div>
       </div>
     </>

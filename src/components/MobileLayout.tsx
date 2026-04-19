@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import MobileSidebar from './MobileSidebar';
 import ApuntesHeader from './ApuntesHeader';
 import { useSidebar } from '@/contexts/SidebarContext';
@@ -19,6 +20,8 @@ export const MobileLayout: React.FC<MobileLayoutProps> = ({
   const [isHeaderVisible, setIsHeaderVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   const { isOpen, closeSidebar } = useSidebar();
+  const location = useLocation();
+  const isLanding = location.pathname === '/';
 
   useEffect(() => {
     if (!showHeader) return;
@@ -42,11 +45,19 @@ export const MobileLayout: React.FC<MobileLayoutProps> = ({
   }, [lastScrollY, showHeader]);
 
   return (
-    <div className="lg:hidden min-h-screen relative bg-[#F5F7FA] dark:bg-[#0B1121] text-slate-900 dark:text-slate-100 selection:bg-indigo-500/30 selection:text-slate-900 overflow-hidden">
-      <div
-        className="pointer-events-none absolute inset-0 bg-noise opacity-40 mix-blend-soft-light"
-        aria-hidden="true"
-      />
+    <div
+      className={`lg:hidden min-h-screen relative ${
+        isLanding
+          ? 'bg-transparent text-slate-100 selection:bg-sky-500/30 selection:text-white'
+          : 'bg-[#F5F7FA] dark:bg-[#0B1121] text-slate-900 dark:text-slate-100 selection:bg-indigo-500/30 selection:text-slate-900'
+      } overflow-hidden`}
+    >
+      {!isLanding && (
+        <div
+          className="pointer-events-none absolute inset-0 bg-noise opacity-40 mix-blend-soft-light"
+          aria-hidden="true"
+        />
+      )}
       <div className="relative z-10 min-h-screen">
         {showHeader && headerVariant === 'apuntes' && <ApuntesHeader />}
 

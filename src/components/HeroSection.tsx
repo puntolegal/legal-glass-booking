@@ -1,429 +1,304 @@
-import { Button } from "@/components/ui/button";
-import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
-import { Clock, Shield, Users } from "lucide-react";
-import ReservationForm from "./ReservationForm";
+import { motion, useReducedMotion } from "framer-motion";
+import {
+  ArrowDown,
+  Award,
+  Calendar,
+  Compass,
+  ShieldCheck,
+  Users,
+  type LucideIcon,
+} from "lucide-react";
+import { trackMetaEvent } from "@/services/metaConversionsService";
 
 interface HeroSectionProps {
   title?: string;
   subtitle?: string;
   showForm?: boolean;
   setShowForm?: (show: boolean) => void;
-  servicePrice?: string;
+  servicePrice?: string | null;
   serviceName?: string;
 }
 
-const HeroSection = ({ title, subtitle, showForm, setShowForm, servicePrice = "$35.000 CLP", serviceName = "Consulta Legal" }: HeroSectionProps) => {
-  const [internalShowForm, internalSetShowForm] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
-  const isControlled = typeof showForm === 'boolean' && typeof setShowForm === 'function';
-  const actualShowForm = isControlled ? showForm : internalShowForm;
-  const actualSetShowForm = isControlled ? setShowForm : internalSetShowForm;
+/**
+ * Stagger orquestado — rápido pero ordenado.
+ * Sensación gratificante sin esperas que cansen la vista.
+ * Total: ~600ms desde el primer elemento hasta el último.
+ */
+const STAGGER: Record<string, number> = {
+  badge: 0,
+  title: 0.05,
+  subtitle: 0.12,
+  desc: 0.20,
+  ctas: 0.28,
+  microcopy: 0.38,
+  trust: 0.32,
+};
 
-  const defaultTitle = "Asesoría Legal Especializada";
-  const defaultSubtitle = "en Derecho Laboral";
+const HeroSection = ({
+  title = "Tu abogado especialista,",
+  subtitle = "online y en minutos.",
+}: HeroSectionProps) => {
+  const prefersReducedMotion = useReducedMotion();
 
-  // Detectar móvil
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 1024);
-    };
-    
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
+  const goToServices = () => {
+    void trackMetaEvent({
+      event_name: "InitiateCheckout",
+      custom_data: {
+        content_type: "service_plan",
+        content_category: "Landing Page",
+        content_ids: ["picker"],
+        content_name: "Hero — Ver consultas",
+        source: "hero_desktop",
+      },
+    });
+    document.getElementById("servicios")?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  const goToHowItWorks = () => {
+    document
+      .getElementById("como-funciona")
+      ?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  /** Helper: motion props con stagger según la key */
+  const reveal = (key: keyof typeof STAGGER) =>
+    prefersReducedMotion
+      ? { initial: false }
+      : {
+          initial: { opacity: 0, y: 12 },
+          animate: { opacity: 1, y: 0 },
+          transition: {
+            duration: 0.45,
+            delay: STAGGER[key],
+            ease: [0.16, 1, 0.3, 1] as [number, number, number, number],
+          },
+        };
 
   return (
-    <section id="inicio" className="min-h-screen flex items-center justify-center pt-16 lg:pt-16 px-4 relative overflow-hidden">
-      <div className="container mx-auto relative z-10">
-        {/* Layout de dos columnas en desktop */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-          
-          {/* Columna izquierda - Imagen optimizada para móvil */}
-          <div className="order-2 lg:order-1 flex justify-center lg:justify-start">
-            <motion.div 
-              className="relative group"
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.8, type: "spring", stiffness: 100 }}
+    <section
+      id="inicio"
+      className="section-flow relative flex min-h-[72vh] items-center justify-start px-6 pt-28 pb-20 sm:px-10 lg:min-h-[68vh] lg:px-16 lg:pb-24"
+    >
+      {/* Bridge inferior — gradiente que se "derrama" hacia HowItWorks */}
+      <span className="section-flow__bottom" aria-hidden />
+      <div className="container relative z-10 mx-auto max-w-7xl">
+        <div className="grid items-end gap-10 lg:grid-cols-12">
+          <div className="lg:col-span-8">
+            {/* Status pill — pulso verde "vivo hoy" */}
+            <motion.span
+              {...reveal("badge")}
+              className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3.5 py-1.5 text-[11px] font-medium uppercase tracking-[0.16em] text-slate-300 backdrop-blur-md"
             >
-              {/* Imagen principal con efectos adaptativos */}
-              <motion.div 
-                className="relative transform transition-all duration-700 ease-out"
-                whileHover={!isMobile ? { scale: 1.05 } : {}}
+              <span className="relative flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+              </span>
+              Atención hoy · 09:00 a 22:00 · Cupos limitados
+            </motion.span>
+
+            {/* Headline en dos líneas con gradient distinto por línea (foco visual) */}
+            <h1 className="font-display mt-6 text-[44px] font-bold leading-[0.96] tracking-tight text-white sm:text-[64px] lg:text-[84px]">
+              <motion.span
+                {...reveal("title")}
+                className="block bg-gradient-to-r from-white via-blue-100 to-cyan-100 bg-clip-text text-transparent"
               >
-                <img 
-                  src="/no_bg_image.png" 
-                  alt="Asesoría Legal Especializada" 
-                  className={`w-full object-contain drop-shadow-2xl ${
-                    isMobile 
-                      ? 'max-w-xs h-auto' 
-                      : 'max-w-md lg:max-w-lg h-auto animate-float-premium'
-                  }`}
-                  loading="eager"
+                {title}
+              </motion.span>
+              <motion.span
+                {...reveal("subtitle")}
+                className="mt-1 block bg-gradient-to-r from-blue-300 via-cyan-200 to-sky-100 bg-clip-text text-transparent"
+              >
+                {subtitle}
+              </motion.span>
+            </h1>
+
+            <motion.p
+              {...reveal("desc")}
+              className="mt-7 max-w-[58ch] text-base leading-relaxed text-slate-300 sm:text-lg"
+            >
+              45 minutos por Google Meet con un abogado especialista en tu caso.
+              Diagnóstico, estrategia y un{" "}
+              <strong className="text-white">plan de acción claro</strong>. Sin
+              filas, sin trámites confusos, sin sorpresas en la cuenta.
+            </motion.p>
+
+            {/* CTAs — primario (agendar) + secundario (cómo funciona, scroll a 3 pasos) */}
+            <motion.div
+              {...reveal("ctas")}
+              className="mt-9 flex flex-wrap items-center gap-3"
+            >
+              <button
+                type="button"
+                onClick={goToServices}
+                className="cta-hero cta-hero--primary"
+              >
+                <Calendar className="h-5 w-5" aria-hidden />
+                <span>Ver consultas y agendar</span>
+                <ArrowDown
+                  className="cta-hero__arrow h-4 w-4 opacity-80"
+                  aria-hidden
                 />
-                
-                {/* Efectos de brillo adaptativos */}
-                {!isMobile && (
-                  <>
-                    <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-transparent to-primary/10 rounded-3xl blur-2xl opacity-40 group-hover:opacity-60 transition-opacity duration-500"></div>
-                    <div className="absolute top-0 left-1/4 w-1/2 h-1/3 bg-gradient-to-br from-white/30 via-primary/20 to-transparent rounded-full blur-xl opacity-40 animate-shimmer-premium"></div>
-                  </>
-                )}
-              </motion.div>
-              
-              {/* Orbes flotantes decorativos - solo desktop */}
-              {!isMobile && (
-                <>
-                  <motion.div 
-                    className="absolute -top-4 -right-4 w-8 h-8 bg-gradient-to-br from-primary to-primary/80 rounded-full blur-sm opacity-70"
-                    animate={{ y: [0, -10, 0] }}
-                    transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-                  />
-                  <motion.div 
-                    className="absolute -bottom-6 -left-6 w-12 h-12 bg-gradient-to-br from-primary/80 to-primary rounded-full blur-md opacity-50"
-                    animate={{ y: [0, 10, 0] }}
-                    transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
-                  />
-                </>
-              )}
+              </button>
+
+              <button
+                type="button"
+                onClick={goToHowItWorks}
+                className="cta-hero cta-hero--ghost"
+                aria-label="Ver cómo funciona el proceso en 3 pasos"
+              >
+                <Compass className="h-5 w-5" aria-hidden />
+                <span>Cómo funciona</span>
+              </button>
             </motion.div>
+
+            <motion.p
+              {...reveal("microcopy")}
+              className="mt-5 text-[11.5px] uppercase tracking-[0.18em] text-slate-500"
+            >
+              Pago seguro · Cancelación gratis · Especialistas certificados
+            </motion.p>
           </div>
 
-          {/* Columna derecha - Contenido optimizado para móvil */}
-          <motion.div 
-            className="order-1 lg:order-2 text-center lg:text-left"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-          >
-            {/* Hero Title optimizado para móvil */}
-            <div className="mb-6 lg:mb-8">
-              <motion.h1 
-                className={`font-bold mb-4 lg:mb-6 leading-tight tracking-tight ${
-                  isMobile 
-                    ? 'text-2xl sm:text-3xl' 
-                    : 'text-3xl sm:text-4xl lg:text-5xl xl:text-6xl'
-                }`}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.3 }}
-              >
-                <span className="bg-gradient-to-r from-primary via-primary to-primary/80 bg-clip-text text-transparent block">
-                  {title || defaultTitle}
-                </span>
-                <span className={`text-foreground font-medium block mt-2 ${
-                  isMobile 
-                    ? 'text-xl sm:text-2xl' 
-                    : 'text-2xl sm:text-3xl lg:text-4xl xl:text-5xl'
-                }`}>
-                  {subtitle || defaultSubtitle}
-                </span>
-              </motion.h1>
-              
-              {/* Badge premium optimizado para móvil */}
-              <motion.div 
-                className="flex justify-center lg:justify-start mb-4"
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5, delay: 0.4 }}
-              >
-                <span className={`backdrop-blur-sm px-4 py-2 rounded-full font-medium shadow-sm border flex items-center gap-2 ${
-                  isMobile 
-                    ? 'bg-background/80 border-border text-foreground text-sm' 
-                    : 'bg-white/80 border-gray-100 text-primary text-sm'
-                }`}>
-                  <svg className="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <circle cx="12" cy="12" r="10" strokeWidth="2" />
-                    <path d="M12 8v4l3 3" strokeWidth="2" />
-                  </svg>
-                  +10 años de experiencia
-                </span>
-              </motion.div>
-            </div>
-            
-            {/* Subtitle with Pricing optimizado */}
-            <motion.div 
-              className="mb-6 lg:mb-8 space-y-2"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.5 }}
-            >
-              <p className={`text-secondary-foreground leading-relaxed ${
-                isMobile ? 'text-sm sm:text-base' : 'text-base sm:text-lg'
-              }`}>
-                Agenda y paga tu sesión de{" "}
-                <span className={`text-primary font-bold px-3 py-1 rounded-lg bg-primary/10 inline-block ${
-                  isMobile ? 'text-base sm:text-lg' : 'text-lg sm:text-xl'
-                }`}>
-                  {servicePrice}
-                </span>
-              </p>
-              <p className={`text-muted-foreground ${
-                isMobile ? 'text-xs sm:text-sm' : 'text-sm sm:text-base'
-              }`}>
-                Recibe asesoría legal profesional por Google Meet
-              </p>
-            </motion.div>
-            
-            {/* CTA Buttons optimizados para móvil */}
-            <motion.div 
-              className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start items-center mb-8 lg:mb-12"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.6 }}
-            >
-              {/* Botón principal optimizado */}
-              <motion.button 
-                onClick={() => {
-                  // Redirigir a asesoría laboral por $35.000
-                  window.location.href = '/agendamiento?plan=laboral';
-                }}
-                className={`group relative overflow-hidden bg-gradient-to-r from-orange-500 via-amber-500 to-yellow-500 hover:from-orange-600 hover:via-amber-600 hover:to-yellow-600 text-white rounded-xl shadow-lg hover:shadow-xl hover:shadow-orange-500/25 font-semibold transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-orange-500/30 backdrop-blur-sm border border-orange-500/20 hover:border-orange-400/30 w-full sm:w-auto ${
-                  isMobile 
-                    ? 'px-6 py-3 text-base' 
-                    : 'px-8 py-4 text-lg hover:scale-[1.02]'
-                }`}
-                whileHover={!isMobile ? { scale: 1.02 } : {}}
-                whileTap={{ scale: 0.98 }}
-              >
-                <svg className="w-5 h-5 mr-2 inline group-hover:translate-x-0.5 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 002 2z" />
-                </svg>
-                Agendar Ahora
-                {!isMobile && (
-                  <span className="absolute left-0 top-0 w-full h-full pointer-events-none">
-                    <span className="block w-1/3 h-full bg-white/20 blur-lg animate-shimmer opacity-50"></span>
-                  </span>
-                )}
-              </motion.button>
-              
-              <Button 
-                variant="outline"
-                className={`w-full sm:w-auto rounded-2xl font-medium transition-all duration-200 group ${
-                  isMobile 
-                    ? 'px-4 py-3 text-sm bg-background/50 backdrop-blur-sm border-border text-foreground hover:text-primary hover:bg-background/80 hover:border-primary/20' 
-                    : 'px-6 py-4 text-base bg-white/50 backdrop-blur-sm border-gray-200 text-foreground hover:text-primary hover:bg-white/80 hover:border-primary/20'
-                }`}
-                onClick={() => {
-                  const element = document.getElementById('casos-exito');
-                  if (element) {
-                    element.scrollIntoView({ behavior: 'smooth' });
-                  }
-                }}
-              >
-                <svg className="w-5 h-5 mr-2 group-hover:scale-105 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                Ver Casos de Éxito
-              </Button>
-            </motion.div>
+          {/* Columna derecha: Phone 3D flotando + trust chips */}
+          <div className="relative lg:col-span-4">
+            {/* Imagen 3D flotando con animación suave (loop infinito) */}
+            <FloatingPhone />
 
-            {/* Features Grid optimizado para móvil oscuro */}
-            <motion.div 
-              className="grid grid-cols-1 sm:grid-cols-3 gap-4"
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1.2, delay: 0.7, ease: "easeOut" }}
+            {/* Trust chips bajo la imagen */}
+            <motion.div
+              {...reveal("trust")}
+              className="mt-6 grid grid-cols-3 gap-3 lg:gap-4"
             >
-              {[
-                { icon: "clock", title: "Consulta en 24h", desc: "Agenda tu sesión y recibe atención inmediata", color: "slate" },
-                { icon: "shield", title: "100% Seguro", desc: "Pago protegido y confidencialidad garantizada", color: "zinc" },
-                { icon: "users", title: "Expertos", desc: "Abogados especializados en derecho laboral", color: "stone" }
-              ].map((feature, index) => (
-                <motion.div 
-                  key={feature.title}
-                  className="relative group"
-                  initial={{ opacity: 0, y: 40, scale: 0.8 }}
-                  animate={{ 
-                    opacity: 1, 
-                    y: 0, 
-                    scale: 1,
-                  }}
-                  transition={{ 
-                    duration: 1.5, 
-                    delay: 1.0 + index * 0.3,
-                    ease: [0.16, 1, 0.3, 1] // Curva de animación lujosa
-                  }}
-                  whileHover={!isMobile ? { 
-                    scale: 1.05,
-                    y: -5,
-                    transition: { duration: 0.8, ease: "easeOut" }
-                  } : {}}
-                >
-                  {/* Card optimizada para móvil oscuro con efectos lujosos */}
-                  <motion.div 
-                    className={`relative rounded-2xl p-6 text-center border overflow-hidden ${
-                      isMobile 
-                        ? 'bg-muted/20 backdrop-blur-xl border-border/50' 
-                        : 'bg-gradient-to-br from-white/40 via-white/20 to-white/10 backdrop-blur-md border-white/20'
-                    }`}
-                    animate={isMobile ? {
-                      boxShadow: [
-                        "0 4px 20px rgba(0, 0, 0, 0.1)",
-                        "0 8px 40px rgba(0, 0, 0, 0.15)",
-                        "0 4px 20px rgba(0, 0, 0, 0.1)"
-                      ],
-                      y: [0, -3, 0],
-                      rotateX: [0, 2, 0],
-                      rotateY: [0, 1, 0]
-                    } : {}}
-                    transition={{
-                      duration: 6,
-                      repeat: Infinity,
-                      ease: "easeInOut",
-                      delay: index * 0.8
-                    }}
-                    whileHover={isMobile ? {
-                      backgroundColor: "rgba(var(--muted), 0.4)",
-                      scale: 1.03,
-                      y: -5,
-                      transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] }
-                    } : {}}
-                  >
-                    
-                    {/* Efectos visuales adaptativos */}
-                    {!isMobile && (
-                      <>
-                        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent"></div>
-                        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/5 opacity-50 group-hover:opacity-70 transition-opacity duration-500"></div>
-                        <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-transparent transform translate-x-full group-hover:translate-x-0 transition-transform duration-700"></div>
-                      </>
-                    )}
-                    
-                    {/* Efectos de brillo para móvil */}
-                    {isMobile && (
-                      <>
-                        <motion.div 
-                          className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/10 to-transparent opacity-40"
-                          animate={{
-                            x: ["-100%", "100%"],
-                            opacity: [0, 0.6, 0]
-                          }}
-                          transition={{
-                            duration: 3,
-                            repeat: Infinity,
-                            ease: "easeInOut",
-                            delay: index * 2
-                          }}
-                        />
-                        <motion.div 
-                          className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent"
-                          animate={{
-                            opacity: [0.3, 0.8, 0.3]
-                          }}
-                          transition={{
-                            duration: 2.5,
-                            repeat: Infinity,
-                            ease: "easeInOut",
-                            delay: index * 1.5
-                          }}
-                        />
-                      </>
-                    )}
-                    
-                    {/* Contenido */}
-                    <div className="relative z-10">
-                      <motion.div 
-                        className={`w-14 h-14 rounded-xl flex items-center justify-center mx-auto mb-4 shadow-lg ${
-                          feature.color === 'slate' ? 'bg-slate-500/20 shadow-slate-500/20' :
-                          feature.color === 'zinc' ? 'bg-zinc-500/20 shadow-zinc-500/20' :
-                          'bg-stone-500/20 shadow-stone-500/20'
-                        }`}
-                        animate={isMobile ? {
-                          scale: [1, 1.1, 1],
-                          rotate: [0, 5, -5, 0],
-                          boxShadow: [
-                            "0 4px 15px rgba(0, 0, 0, 0.1)",
-                            "0 8px 30px rgba(0, 0, 0, 0.2)",
-                            "0 4px 15px rgba(0, 0, 0, 0.1)"
-                          ]
-                        } : {}}
-                        transition={{
-                          duration: 5,
-                          repeat: Infinity,
-                          ease: "easeInOut",
-                          delay: index * 1.2
-                        }}
-                        whileHover={!isMobile ? { scale: 1.1 } : {}}
-                      >
-                        {feature.icon === 'clock' && (
-                          <Clock className={`w-7 h-7 drop-shadow-sm ${
-                            feature.color === 'slate' ? 'text-slate-400' :
-                            feature.color === 'zinc' ? 'text-zinc-400' :
-                            'text-stone-400'
-                          }`} />
-                        )}
-                        {feature.icon === 'shield' && (
-                          <Shield className={`w-7 h-7 drop-shadow-sm ${
-                            feature.color === 'slate' ? 'text-slate-400' :
-                            feature.color === 'zinc' ? 'text-zinc-400' :
-                            'text-stone-400'
-                          }`} />
-                        )}
-                        {feature.icon === 'users' && (
-                          <Users className={`w-7 h-7 drop-shadow-sm ${
-                            feature.color === 'slate' ? 'text-slate-400' :
-                            feature.color === 'zinc' ? 'text-zinc-400' :
-                            'text-stone-400'
-                          }`} />
-                        )}
-                      </motion.div>
-                      <motion.h3 
-                        className={`font-medium mb-2 drop-shadow-sm ${
-                          isMobile ? 'text-sm text-foreground' : 'text-sm text-foreground'
-                        }`}
-                        animate={isMobile ? {
-                          opacity: [0.8, 1, 0.8],
-                          y: [0, -1, 0]
-                        } : {}}
-                        transition={{
-                          duration: 4,
-                          repeat: Infinity,
-                          ease: "easeInOut",
-                          delay: index * 1.5
-                        }}
-                      >
-                        {feature.title}
-                      </motion.h3>
-                      <motion.p 
-                        className={`text-muted-foreground ${
-                          isMobile ? 'text-xs' : 'text-xs'
-                        }`}
-                        animate={isMobile ? {
-                          opacity: [0.7, 1, 0.7],
-                          y: [0, -0.5, 0]
-                        } : {}}
-                        transition={{
-                          duration: 3.5,
-                          repeat: Infinity,
-                          ease: "easeInOut",
-                          delay: index * 1.8
-                        }}
-                      >
-                        {feature.desc}
-                      </motion.p>
-                    </div>
-                    
-                    {/* Borde brillante inferior - solo desktop */}
-                    {!isMobile && (
-                      <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent"></div>
-                    )}
-                  </motion.div>
-                  
-                  {/* Sombra de cristal - solo desktop */}
-                  {!isMobile && (
-                    <div className="absolute inset-0 -z-10 bg-gradient-to-b from-primary/10 to-primary/5 blur-xl transform translate-y-2 group-hover:translate-y-3 transition-transform duration-500"></div>
-                  )}
-                </motion.div>
-              ))}
+              <TrustChip
+                icon={Users}
+                value="+1.200"
+                label="casos resueltos"
+                delay={0}
+              />
+              <TrustChip
+                icon={Award}
+                value="4.9 / 5"
+                label="satisfacción"
+                delay={0.08}
+              />
+              <TrustChip
+                icon={ShieldCheck}
+                value="100%"
+                label="confidencial"
+                delay={0.16}
+              />
             </motion.div>
-          </motion.div>
+          </div>
         </div>
       </div>
     </section>
+  );
+};
+
+/**
+ * Phone illustration 3D flotando con animación de "levitación" suave.
+ * La imagen debe colocarse en /public/hero-phone-3d.png (PNG con fondo
+ * transparente). Si la imagen no existe, el componente degrada
+ * silenciosamente sin romper el layout.
+ */
+const FloatingPhone = () => {
+  const prefersReducedMotion = useReducedMotion();
+  return (
+    <div className="floating-phone-stage">
+      {/* Glow radial detrás de la imagen — sutil halo cyan */}
+      <div className="floating-phone-glow" aria-hidden />
+
+      <motion.div
+        initial={prefersReducedMotion ? false : { opacity: 0, y: 16, scale: 0.95 }}
+        animate={
+          prefersReducedMotion
+            ? { opacity: 1 }
+            : {
+                opacity: 1,
+                y: [0, -10, 0],
+                scale: 1,
+                rotate: [-1.2, 1.2, -1.2],
+              }
+        }
+        transition={
+          prefersReducedMotion
+            ? { duration: 0.45 }
+            : {
+                opacity: { duration: 0.7, ease: [0.16, 1, 0.3, 1] },
+                scale: { duration: 0.7, ease: [0.16, 1, 0.3, 1] },
+                y: {
+                  duration: 5.5,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                },
+                rotate: {
+                  duration: 7.5,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                },
+              }
+        }
+        className="floating-phone-img"
+      >
+        <img
+          src="/hero-phone-3d.png"
+          alt="Aplicación móvil de Punto Legal con perfil de abogado y reseñas"
+          loading="eager"
+          decoding="async"
+          draggable={false}
+          onError={(e) => {
+            (e.currentTarget.parentElement as HTMLElement).style.display = "none";
+          }}
+        />
+      </motion.div>
+    </div>
+  );
+};
+
+/** Chip de confianza con micro-spring al hover (Apple-style). */
+const TrustChip = ({
+  icon: Icon,
+  value,
+  label,
+  delay = 0,
+}: {
+  icon: LucideIcon;
+  value: string;
+  label: string;
+  delay?: number;
+}) => {
+  const prefersReducedMotion = useReducedMotion();
+  return (
+    <motion.div
+      initial={prefersReducedMotion ? false : { opacity: 0, y: 10, scale: 0.97 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{
+        duration: 0.4,
+        delay: STAGGER.trust + delay,
+        ease: [0.16, 1, 0.3, 1],
+      }}
+      whileHover={
+        prefersReducedMotion
+          ? undefined
+          : {
+              y: -4,
+              transition: {
+                type: "spring",
+                stiffness: 320,
+                damping: 22,
+              },
+            }
+      }
+      className="trust-chip glass-ios-card-dark group flex flex-col items-start gap-1.5 p-4"
+    >
+      <Icon className="h-4 w-4 text-cyan-300 transition-colors group-hover:text-cyan-200" />
+      <span className="font-display text-xl font-bold leading-none text-white sm:text-2xl">
+        {value}
+      </span>
+      <span className="text-[10px] uppercase tracking-[0.16em] text-slate-400">
+        {label}
+      </span>
+    </motion.div>
   );
 };
 

@@ -1,415 +1,979 @@
-interface Service {
+import { useMemo, useState } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import {
+  ArrowUpRight,
+  Award,
+  Banknote,
+  BriefcaseBusiness,
+  Building2,
+  Calculator,
+  Check,
+  Clock,
+  FileSignature,
+  FileWarning,
+  Gavel,
+  Heart,
+  Landmark,
+  LayoutGrid,
+  Plane,
+  Receipt,
+  Scale,
+  ShieldAlert,
+  ShieldCheck,
+  Stamp,
+  Video,
+  type LucideIcon,
+} from "lucide-react";
+
+interface ExternalService {
   title: string;
   description: string;
-  icon: string;
-  regularPrice?: string;
-  promoPrice?: string;
+  icon?: string;
   price?: string;
+  plan?: string;
+  features?: string[];
 }
 
 interface ServicesSectionProps {
   title?: string;
-  services?: Service[];
-  onAgendarClick?: (service: { title: string; promoPrice?: string; price?: string }) => void;
+  services?: ExternalService[];
+  onAgendarClick?: (service: { title: string; promoPrice?: string; price?: string; plan?: string }) => void;
 }
 
-const ServicesSection = ({ title = "Elige el servicio legal que necesitas", services, onAgendarClick }: ServicesSectionProps) => {
-  const defaultServices = [
-    // Derecho Laboral
-    {
-      icon: (
-        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-        </svg>
-      ),
-      title: "Punto Legal Laboral",
-      description: "Protección ante vulneraciones de derechos fundamentales, despidos y asesoría Ley Karin.",
-      features: ["Tutela de derechos", "Nulidad del despido", "Ley Karin"],
-      regularPrice: "$60.000",
-      promoPrice: "$30.000"
-    },
-    // Derecho de Familia
-    {
-      icon: (
-        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-        </svg>
-      ),
-      title: "Punto Legal Familia",
-      description: "Asesoría integral en divorcios, pensiones alimenticias y temas familiares.",
-      features: ["Divorcios", "Pensiones alimenticias", "Mediación familiar"],
-      regularPrice: "$70.000",
-      promoPrice: "$35.000"
-    },
-    // Herencias y Sucesiones
-    {
-      icon: (
-        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-        </svg>
-      ),
-      title: "Punto Legal Sucesorio",
-      description: "Gestión completa de herencias, testamentos y trámites sucesorios.",
-      features: ["Testamentos", "Posesión efectiva", "Particiones"],
-      regularPrice: "$60.000",
-      promoPrice: "$30.000"
-    },
-    // Inmobiliario
-    {
-      icon: (
-        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2v0zm8 0V5a2 2 0 012-2h2a2 2 0 012 2v2m-4 4h4" />
-        </svg>
-      ),
-      title: "Punto Legal Inmobiliario",
-      description: "Contratos de compraventa, arrendamientos, desalojos y litigios inmobiliarios.",
-      features: ["Compraventas", "Arrendamientos", "Desalojos"],
-      regularPrice: "$90.000",
-      promoPrice: "$45.000"
-    },
-    // Empresarial
-    {
-      icon: (
-        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-        </svg>
-      ),
-      title: "Punto Legal Empresarial",
-      description: "Constitución de sociedades, modificaciones estatutarias y compliance corporativo.",
-      features: ["Constitución de sociedades", "Modificaciones", "Compliance"],
-      regularPrice: "$90.000",
-      promoPrice: "$45.000"
-    },
-    // Contratos
-    {
-      icon: (
-        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-        </svg>
-      ),
-      title: "Punto Legal Contratos",
-      description: "Redacción express de contratos de servicios, NDA, licencias y franquicias.",
-      features: ["Contratos de servicios", "NDA", "Licencias"],
-      regularPrice: "$30.000",
-      promoPrice: "$15.000"
-    },
-    // Administración Pública
-    {
-      icon: (
-        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z" />
-        </svg>
-      ),
-      title: "Punto Legal Administración Pública",
-      description: "Impugnación de multas, recursos y defensa en fiscalizaciones administrativas.",
-      features: ["Impugnación multas", "Recursos", "Fiscalizaciones"],
-      regularPrice: "$50.000",
-      promoPrice: "$25.000"
-    },
-    // Tributario
-    {
-      icon: (
-        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
-        </svg>
-      ),
-      title: "Punto Legal Tributario",
-      description: "Asesoría fiscal, planificación tributaria y recursos contra liquidaciones del SII.",
-      features: ["Planificación fiscal", "Recursos SII", "Optimización"],
-      regularPrice: "$60.000",
-      promoPrice: "$30.000"
-    },
-    // Compliance & Riesgo
-    {
-      icon: (
-        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-        </svg>
-      ),
-      title: "Punto Legal Compliance",
-      description: "Programas de cumplimiento, políticas internas y gestión de riesgos corporativos.",
-      features: ["Programas compliance", "Auditorías", "Políticas internas"],
-      regularPrice: "$80.000",
-      promoPrice: "$40.000"
-    },
-    // Migratorio
-    {
-      icon: (
-        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5a2 2 0 002 2h1a2 2 0 012 2 2 2 0 002 2v1.995M15 8.5V11M12 8V12M16 12h3M8 12L5 9l3-3" />
-        </svg>
-      ),
-      title: "Punto Legal Migratorio",
-      description: "Visas de trabajo y residencia, reagrupación familiar y recursos migratorios.",
-      features: ["Visas de trabajo", "Residencia", "Reagrupación familiar"],
-      regularPrice: "$55.000",
-      promoPrice: "$27.500"
-    },
-    // Propiedad Intelectual
-    {
-      icon: (
-        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-        </svg>
-      ),
-      title: "Punto Legal Propiedad Intelectual",
-      description: "Registro de marcas y patentes, derechos de autor y defensa contra infracciones.",
-      features: ["Registro marcas", "Patentes", "Derechos de autor"],
-      regularPrice: "$65.000",
-      promoPrice: "$32.500"
-    },
-    // Protección del Consumidor
-    {
-      icon: (
-        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-        </svg>
-      ),
-      title: "Punto Legal Consumidor",
-      description: "Reclamos ante SERNAC, defensa en juicios y asesoría en cláusulas abusivas.",
-      features: ["Reclamos SERNAC", "Garantías", "Cláusulas abusivas"],
-      regularPrice: "$45.000",
-      promoPrice: "$22.500"
-    },
-    // Penal Económico
-    {
-      icon: (
-        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-        </svg>
-      ),
-      title: "Punto Legal Penal Económico",
-      description: "Defensa en delitos económicos, societarios y acuerdos de colaboración.",
-      features: ["Delitos económicos", "Defensa penal", "Colaboración eficaz"],
-      regularPrice: "$90.000",
-      promoPrice: "$45.000"
-    }
-  ];
+type Audience = "all" | "personas" | "empresas" | "patrimonio";
 
-  // Función para renderizar el icono basado en string
-  const renderIcon = (iconName: string) => {
-    const iconMap: { [key: string]: JSX.Element } = {
-      briefcase: (
-        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2-2v2m8 0H8m8 0v2a2 2 0 01-2 2H10a2 2 0 01-2-2V6m8 0V4a2 2 0 00-2-2h-4a2 2 0 00-2-2v2m8 0H8" />
-        </svg>
-      ),
-      shield: (
-        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-        </svg>
-      ),
-      scale: (
-        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" />
-        </svg>
-      ),
-      "heart-crack": (
-        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-        </svg>
-      ),
-      users: (
-        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-        </svg>
-      ),
-      baby: (
-        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 4V2a1 1 0 011-1h8a1 1 0 011 1v2m-9 0h10m-9 0v16l9-9V4" />
-        </svg>
-      ),
-      scroll: (
-        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-        </svg>
-      ),
-      "file-text": (
-        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-        </svg>
-      ),
-      "check-circle": (
-        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-      )
-    };
-    return iconMap[iconName] || iconMap.briefcase;
+interface InternalService {
+  title: string;
+  shortName: string;
+  /** Una línea de gancho — orientada al outcome del cliente */
+  hook: string;
+  /** Descripción rica en HTML (con <strong>) */
+  descriptionHtml: string;
+  /** Etiqueta CTA — verbo + beneficio */
+  ctaLabel: string;
+  price: string;
+  priceBefore?: string;
+  priceFootnote?: string;
+  /** Slug del plan — corresponde a /agendamiento?plan=<plan> */
+  plan: string;
+  icon: LucideIcon;
+  features: string[];
+  audience: Exclude<Audience, "all">;
+  /** RGB triplet usado por --card-accent en .service-card */
+  accent: string;
+  /** Badge único — sólo en español */
+  badge?: string;
+  featured?: boolean;
+  /** Testimonial corto sólo para featured */
+  testimonial?: { quote: string; author: string };
+  /** Plan gratuito (cambia el render del precio) */
+  free?: boolean;
+}
+
+const internalServices: InternalService[] = [
+  // ========== PERSONAS ==========
+  {
+    title: "Punto Legal Tutela Laboral",
+    shortName: "Tutela Laboral",
+    hook: "Si te despidieron sin justificación o sufriste acoso laboral, te decimos cuánto te corresponde. El diagnóstico es gratis.",
+    descriptionHtml:
+      "Calculamos tu <strong>indemnización por despido injustificado</strong>, evaluamos casos de tutela laboral, Ley Karin y nulidad del despido. Si tu caso tiene mérito, lo tomamos a porcentaje: pagas sólo cuando recuperas.",
+    ctaLabel: "Pedir mi diagnóstico gratis",
+    price: "Gratis",
+    plan: "tutela-laboral",
+    icon: Scale,
+    free: true,
+    features: [
+      "Diagnóstico gratuito de tu caso",
+      "Cálculo real de indemnización",
+      "Tutela laboral, Ley Karin y nulidad del despido",
+      "Honorarios sólo si recuperamos",
+    ],
+    audience: "personas",
+    accent: "16 185 129", // emerald-500 — éxito + recuperación
+    badge: "Diagnóstico gratis",
+    featured: true,
+    testimonial: {
+      quote:
+        "“Gracias a Punto Legal conseguí una indemnización de 18 millones. Chao jefe.”",
+      author: "Felipe R.",
+    },
+  },
+  // CAE en posición destacada — alta urgencia, conversión inmediata
+  {
+    title: "Punto Legal Defensa CAE",
+    shortName: "Defensa CAE",
+    hook: "¿Te embargó la Tesorería por tu CAE moroso? Frenamos el embargo y repactamos la deuda contigo.",
+    descriptionHtml:
+      "Defensa de deudores morosos del <strong>Crédito con Aval del Estado (CAE) frente a la Tesorería General de la República</strong>. Frenamos embargos, repactamos saldos y solicitamos rebajas o condonaciones.",
+    ctaLabel: "Frenar mi embargo",
+    price: "$109.000",
+    plan: "cae-tesoreria",
+    icon: Receipt,
+    features: [
+      "Frenar embargo de la TGR",
+      "Repactación y plan de pago",
+      "Solicitud de rebajas y condonaciones",
+    ],
+    audience: "patrimonio",
+    accent: "239 68 68", // red-500 — urgencia financiera
+    badge: "Urgente",
+  },
+  {
+    title: "Punto Legal Familia",
+    shortName: "Familia",
+    hook: "Calculamos tu pensión de alimentos, ordenamos tu divorcio y te decimos qué hacer en cada paso.",
+    descriptionHtml:
+      "Calculamos tu <strong>pensión de alimentos según Ley 14.908</strong>, evaluamos tu causa de divorcio o cuidado personal, y te entregamos un plan de acción por escrito.",
+    ctaLabel: "Agendar mi consulta",
+    price: "$89.000",
+    priceBefore: "$149.000",
+    plan: "familia",
+    icon: Heart,
+    features: [
+      "Cálculo de pensión y deuda acumulada",
+      "Estrategia de divorcio o cuidado personal",
+      "Plan de acción por escrito",
+    ],
+    audience: "personas",
+    accent: "129 140 248", // indigo-400
+  },
+  {
+    title: "Punto Legal Sucesorio",
+    shortName: "Sucesorio",
+    hook: "Posesión efectiva, testamento y partición de herencia con plazos claros y honorarios cerrados.",
+    descriptionHtml:
+      "Tramitamos tu <strong>posesión efectiva</strong> intestada o testada, redactamos testamentos y resolvemos particiones con presupuesto cerrado desde la primera reunión.",
+    ctaLabel: "Ordenar mi herencia",
+    price: "$89.000",
+    plan: "sucesorio",
+    icon: Stamp,
+    features: [
+      "Posesión efectiva intestada o testada",
+      "Testamento abierto o cerrado",
+      "Partición y cesión de derechos",
+    ],
+    audience: "personas",
+    accent: "100 116 139", // slate-500
+  },
+  {
+    title: "Punto Legal Migratorio",
+    shortName: "Migratorio",
+    hook: "Visa de trabajo, residencia definitiva o nacionalización chilena con plazos reales y seguimiento al Servicio Nacional de Migraciones.",
+    descriptionHtml:
+      "Te acompañamos en <strong>visa temporaria, visa de responsabilidad democrática, residencia definitiva y nacionalización</strong>. Armamos el expediente, calculamos tiempos reales y respondemos los requerimientos.",
+    ctaLabel: "Asesorar mi caso migratorio",
+    price: "$129.000",
+    plan: "migratorio",
+    icon: Plane,
+    features: [
+      "Visa temporaria y de trabajo",
+      "Residencia definitiva y nacionalización",
+      "Recursos contra rechazos o expulsión",
+    ],
+    audience: "personas",
+    accent: "6 182 212", // cyan-500
+  },
+  {
+    title: "Punto Legal Penal",
+    shortName: "Penal",
+    hook: "Defensa penal con un abogado litigante en juicio oral, querellas y salidas alternativas.",
+    descriptionHtml:
+      "Asumimos <strong>defensas en delitos económicos, contra las personas y la propiedad</strong>. Negociamos suspensión condicional y acuerdos reparatorios, y vamos a juicio oral cuando corresponde.",
+    ctaLabel: "Defender mi caso",
+    price: "$169.000",
+    plan: "penal",
+    icon: Gavel,
+    features: [
+      "Defensa en juicio oral",
+      "Querellas y representación de víctimas",
+      "Suspensión condicional y acuerdos",
+    ],
+    audience: "personas",
+    accent: "190 18 60", // rose-700 — gravedad
+    badge: "Atención inmediata",
+  },
+
+  // ========== EMPRESAS ==========
+  {
+    title: "Punto Legal Empresarial",
+    shortName: "Empresarial",
+    hook: "Constituye tu SpA en 72 horas y queda con un abogado que te acompaña todos los meses.",
+    descriptionHtml:
+      "<strong>Constituimos tu SpA o EIRL en 72 horas</strong>, redactamos pactos de socios y entregamos asesoría legal todos los meses con un abogado dedicado.",
+    ctaLabel: "Asesorar mi empresa",
+    price: "$149.000",
+    plan: "empresarial",
+    icon: Building2,
+    features: [
+      "Constitución de SpA o EIRL en 72 h",
+      "Pactos de socios y estatutos",
+      "Asesoría legal mensual",
+    ],
+    audience: "empresas",
+    accent: "139 92 246", // violet-500
+  },
+  {
+    title: "Punto Legal Tributario",
+    shortName: "Tributario",
+    hook: "Pagas los impuestos justos y respondes al SII con un abogado tributarista a tu lado.",
+    descriptionHtml:
+      "Planificación tributaria personal y para PYME, recursos administrativos y representación frente al SII. <strong>Pagas lo justo, ni un peso más.</strong>",
+    ctaLabel: "Optimizar mis impuestos",
+    price: "$99.000",
+    plan: "tributario",
+    icon: Calculator,
+    features: [
+      "Planificación tributaria personal y PYME",
+      "Recursos y reposiciones ante el SII",
+      "Defensa frente a fiscalizaciones",
+    ],
+    audience: "empresas",
+    accent: "8 145 178", // cyan-700
+  },
+  {
+    title: "Punto Legal Contratos",
+    shortName: "Contratos",
+    hook: "Redactamos o revisamos tu contrato en 24 horas, con cláusulas claras y sin sorpresas.",
+    descriptionHtml:
+      "Redactamos y revisamos <strong>contratos civiles y comerciales</strong> con cláusulas a tu medida. Te explicamos cada riesgo antes de que firmes.",
+    ctaLabel: "Revisar mi contrato",
+    price: "$59.000",
+    plan: "contratos",
+    icon: FileSignature,
+    features: [
+      "Redacción a medida o revisión en 24 h",
+      "Acuerdos de confidencialidad",
+      "Asesoría en negociación",
+    ],
+    audience: "empresas",
+    accent: "59 130 246", // blue-500
+    badge: "24 horas",
+  },
+  {
+    title: "Punto Legal Comparendos",
+    shortName: "Comparendos DT",
+    hook: "Te representamos en comparendos ante la Dirección del Trabajo y negociamos avenimientos favorables.",
+    descriptionHtml:
+      "Comparecemos por tu empresa en <strong>conciliaciones ante la Dirección del Trabajo</strong>. Preparamos la estrategia, calculamos riesgos reales y negociamos avenimientos que te convengan.",
+    ctaLabel: "Asesorar mi comparendo",
+    price: "$130.000",
+    plan: "comparendos",
+    icon: Gavel,
+    features: [
+      "Representación en comparendo DT",
+      "Cálculo de riesgo y contingencia laboral",
+      "Negociación de avenimiento",
+    ],
+    audience: "empresas",
+    accent: "168 85 247", // purple-500
+  },
+  {
+    title: "Punto Legal Fiscalizaciones DT",
+    shortName: "Fiscalizaciones DT",
+    hook: "Defensa en fiscalizaciones de la Dirección del Trabajo y reconsideración de multas administrativas.",
+    descriptionHtml:
+      "Te asistimos durante la <strong>fiscalización de la Dirección del Trabajo</strong>, presentamos descargos y solicitudes de reconsideración de multas. También recurrimos al juez en sede laboral cuando corresponde.",
+    ctaLabel: "Defender a mi empresa",
+    price: "$110.000",
+    plan: "fiscalizaciones-dt",
+    icon: ShieldAlert,
+    features: [
+      "Asistencia durante la fiscalización",
+      "Descargos y reconsideración de multas",
+      "Reclamación judicial de multas",
+    ],
+    audience: "empresas",
+    accent: "236 72 153", // pink-500
+  },
+  {
+    title: "Punto Legal Defensa Empresarial",
+    shortName: "Defensa Empresarial",
+    hook: "Defendemos a tu empresa frente a demandas de trabajadores: despido, tutela, indemnizaciones y nulidad.",
+    descriptionHtml:
+      "Asumimos la <strong>defensa de tu empresa en juicios laborales</strong>: despidos, tutelas, demandas por indemnizaciones y nulidad. Audiencias preparatoria y de juicio en Juzgados del Trabajo.",
+    ctaLabel: "Proteger a mi empresa",
+    price: "$189.000",
+    plan: "defensa-laboral-empresarial",
+    icon: BriefcaseBusiness,
+    features: [
+      "Defensa en juicios por despido y tutela",
+      "Audiencia preparatoria y de juicio",
+      "Estrategia conciliatoria o contenciosa",
+    ],
+    audience: "empresas",
+    accent: "67 56 202", // indigo-700
+  },
+  {
+    title: "Punto Legal Ley Karin",
+    shortName: "Ley Karin",
+    hook: "Implementación del protocolo Ley Karin, capacitación al equipo y defensa frente a denuncias.",
+    descriptionHtml:
+      "Diseñamos e implementamos tu <strong>protocolo Ley Karin</strong> (Ley 21.643), capacitamos a jefaturas y RRHH, y te asesoramos cuando llega una denuncia interna o ante la Dirección del Trabajo.",
+    ctaLabel: "Implementar Ley Karin",
+    price: "$169.000",
+    plan: "ley-karin",
+    icon: ShieldCheck,
+    features: [
+      "Diseño e implementación del protocolo",
+      "Capacitación a jefaturas y RRHH",
+      "Defensa frente a denuncias",
+    ],
+    audience: "empresas",
+    accent: "124 58 237", // violet-600
+    badge: "Obligación legal",
+  },
+  {
+    title: "Punto Legal Cumplimiento",
+    shortName: "Cumplimiento",
+    hook: "Modelo de prevención del delito (Ley 20.393) y protección de datos personales para tu empresa.",
+    descriptionHtml:
+      "Diseñamos tu <strong>modelo de prevención del delito según Ley 20.393</strong>, programas de cumplimiento normativo y protocolos de protección de datos personales (Ley 19.628).",
+    ctaLabel: "Asesorar el cumplimiento",
+    price: "$179.000",
+    plan: "cumplimiento",
+    icon: ShieldCheck,
+    features: [
+      "Modelo de prevención Ley 20.393",
+      "Protección de datos personales",
+      "Capacitación y protocolos internos",
+    ],
+    audience: "empresas",
+    accent: "147 51 234", // purple-600
+  },
+  {
+    title: "Punto Legal Marcas",
+    shortName: "Marcas",
+    hook: "Registra tu marca en INAPI, defiende oposiciones y protege tu nombre comercial.",
+    descriptionHtml:
+      "Búsqueda de antecedentes, redacción de la solicitud y <strong>registro de marca ante INAPI</strong>. También te defendemos frente a oposiciones y resolvemos disputas por nombre comercial.",
+    ctaLabel: "Registrar mi marca",
+    price: "$89.000",
+    plan: "marcas",
+    icon: Award,
+    features: [
+      "Registro de marca en INAPI",
+      "Oposiciones y defensa de marca",
+      "Búsqueda de antecedentes",
+    ],
+    audience: "empresas",
+    accent: "236 72 153", // pink-500 (compartido visual con fiscalización OK)
+  },
+
+  // ========== PATRIMONIO ==========
+  {
+    title: "Punto Legal Inmobiliario",
+    shortName: "Inmobiliario",
+    hook: "Antes de firmar una promesa, compraventa o arriendo, revisamos cada cláusula contigo.",
+    descriptionHtml:
+      "<strong>Estudio de títulos en 72 horas</strong>, redacción de compraventas, promesas y arriendos, y resolución de conflictos de propiedad y comunidades.",
+    ctaLabel: "Proteger mi inversión",
+    price: "$119.000",
+    plan: "inmobiliario",
+    icon: Landmark,
+    features: [
+      "Estudio de títulos y antecedentes",
+      "Compraventa y promesa con cláusulas claras",
+      "Contratos de arriendo a tu medida",
+    ],
+    audience: "patrimonio",
+    accent: "20 184 166", // teal-500
+  },
+  {
+    title: "Punto Legal Cobranza",
+    shortName: "Cobranza",
+    hook: "Recupera facturas impagas, cheques protestados y pagarés con juicio ejecutivo y embargo.",
+    descriptionHtml:
+      "Cobranza extrajudicial inicial y <strong>juicio ejecutivo</strong> de facturas, pagarés y cheques. Embargamos bienes, ejecutamos garantías y te representamos en remates.",
+    ctaLabel: "Recuperar mi dinero",
+    price: "$109.000",
+    plan: "cobranza",
+    icon: Banknote,
+    features: [
+      "Juicio ejecutivo y embargos",
+      "Cobranza extrajudicial inicial",
+      "Ejecución de pagarés y cheques",
+    ],
+    audience: "patrimonio",
+    accent: "34 197 94", // green-500
+  },
+];
+
+interface CategoryDef {
+  id: Audience;
+  label: string;
+  sublabel: string;
+  icon: LucideIcon;
+  /** RGB triplet — paleta fría profesional */
+  accent: string;
+}
+
+const categories: CategoryDef[] = [
+  {
+    id: "all",
+    label: "Todas",
+    sublabel: "Ver todo el catálogo legal",
+    icon: LayoutGrid,
+    accent: "186 230 253", // sky-200
+  },
+  {
+    id: "personas",
+    label: "Personas",
+    sublabel: "Tutela laboral, familia, sucesorio, migratorio y penal",
+    icon: Heart,
+    accent: "96 165 250", // blue-400
+  },
+  {
+    id: "empresas",
+    label: "Empresas",
+    sublabel: "Sociedades, tributario, laboral empresarial, Ley Karin y marcas",
+    icon: Building2,
+    accent: "167 139 250", // violet-400
+  },
+  {
+    id: "patrimonio",
+    label: "Patrimonio",
+    sublabel: "Inmobiliario, cobranza y defensa CAE",
+    icon: Landmark,
+    accent: "45 212 191", // teal-400
+  },
+];
+
+const ServicesSection = ({
+  title = "Elige tu consulta legal",
+  services,
+  onAgendarClick,
+}: ServicesSectionProps) => {
+  const [audience, setAudience] = useState<Audience>("all");
+
+  const list = useMemo<InternalService[]>(() => {
+    if (services && services.length > 0) {
+      return services.map((s, i) => {
+        const fallback = internalServices[i % internalServices.length];
+        return {
+          ...fallback,
+          title: s.title,
+          shortName: s.title.replace("Punto Legal ", ""),
+          descriptionHtml: s.description,
+          hook: s.description,
+          price: s.price ?? fallback.price,
+          plan: s.plan ?? fallback.plan,
+          features: s.features ?? fallback.features,
+        };
+      });
+    }
+    return internalServices;
+  }, [services]);
+
+  const filtered = useMemo(
+    () => (audience === "all" ? list : list.filter((s) => s.audience === audience)),
+    [list, audience]
+  );
+
+  /** Count de servicios por categoría */
+  const counts = useMemo(() => {
+    return {
+      all: list.length,
+      personas: list.filter((s) => s.audience === "personas").length,
+      empresas: list.filter((s) => s.audience === "empresas").length,
+      patrimonio: list.filter((s) => s.audience === "patrimonio").length,
+    } as Record<Audience, number>;
+  }, [list]);
+
+  const prefersReducedMotion = useReducedMotion();
+
+  const handleClick = (s: InternalService) => {
+    if (onAgendarClick) {
+      onAgendarClick({ title: s.title, price: s.price, plan: s.plan });
+    } else {
+      // Fallback: routing directo si no hay handler externo
+      window.location.href = `/agendamiento?plan=${s.plan}`;
+    }
   };
 
-  // Si services viene con iconos string, los convertimos
-  const servicesList = services ? services.map(service => ({
-    ...service,
-    icon: renderIcon(service.icon),
-    features: ["Asesoría especializada", "Seguimiento del caso", "Defensa legal completa"],
-    price: service.price
-  })) : defaultServices;
+  const activeCategory =
+    categories.find((c) => c.id === audience) ?? categories[0];
 
   return (
-    <section id="servicios" className="py-8 lg:py-16 px-4 relative overflow-hidden">
-      {/* 3D Copper Ball Background */}
-      <div className="absolute inset-0 pointer-events-none">
-        <img 
-          src="/lovable-uploads/208a984c-a991-439e-9065-377f14a69080.png" 
-          alt="3D Copper Ball" 
-          className="absolute bottom-10 right-10 w-60 h-60 lg:w-80 lg:h-80 opacity-15 animate-float"
-          style={{ animationDelay: '0.5s' }}
-        />
+    <section
+      id="servicios"
+      className="section-flow relative overflow-hidden px-4 py-16 sm:py-20 lg:py-24 scroll-mt-20"
+    >
+      {/* Bridge superior — conecta con HowItWorks suavemente */}
+      <span className="section-flow__top" aria-hidden />
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute -left-32 top-12 h-72 w-72 rounded-full bg-blue-500/[0.06] blur-3xl" />
+        <div className="absolute -right-24 bottom-6 h-64 w-64 rounded-full bg-cyan-500/[0.05] blur-3xl" />
       </div>
-      
-      <div className="container mx-auto relative z-10">
-        <div className="text-center mb-8 lg:mb-12">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 lg:mb-6">
-            <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+
+      <div className="container relative z-10 mx-auto max-w-7xl">
+        <div className="mx-auto mb-8 max-w-3xl text-center lg:mb-10">
+          <span className="badge-ios" style={{ color: "rgb(186 230 253)" }}>
+            Online · Google Meet · Chile
+          </span>
+          <h2 className="font-display mt-6 text-[34px] font-bold leading-[1.05] tracking-tight text-white sm:text-5xl lg:text-[56px]">
+            <span className="bg-gradient-to-r from-white via-blue-100 to-cyan-100 bg-clip-text text-transparent">
               {title}
             </span>
           </h2>
-          <p className="text-sm sm:text-base md:text-lg lg:text-xl text-muted-foreground max-w-3xl mx-auto">
-            Sesiones de 45 minutos con abogados especializados. Oferta de lanzamiento: 50% de descuento.
-            <span className="block text-xs sm:text-sm mt-2 text-primary">Pago seguro y reunión inmediata por Google Meet</span>
+          <p className="mx-auto mt-5 max-w-xl text-base leading-relaxed text-slate-300 sm:text-lg">
+            45 minutos por Google Meet con un abogado especialista. Diagnóstico,
+            estrategia y un{" "}
+            <strong className="text-white">plan de acción por escrito</strong>.
           </p>
         </div>
 
-        {/* Mobile-first horizontal scroll-snap cards - Optimizado */}
-        <div className="block md:hidden">
-          <div className="flex gap-3 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide -mx-4 px-4">
-            {servicesList.map((service, index) => (
-              <div key={index} className="flex-none w-72 snap-start">
-                <div className="glass rounded-2xl p-4 h-full border border-primary/10 hover:border-primary/20 bg-gradient-to-br from-primary/5 to-transparent backdrop-blur-xl transition-all duration-300 hover:scale-[1.02]">
-                  
-                {/* Header with icon and title Mobile - Optimizado */}
-                <div className="flex items-center space-x-3 mb-3">
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-lg shadow-primary/20">
-                    <div className="text-white scale-75">
-                      {service.icon}
-                    </div>
-                  </div>
-                  <h3 className="text-base font-bold text-foreground leading-tight">
-                    {service.title}
-                  </h3>
-                </div>
+        {/* === Apple Watch–style category bubbles === */}
+        <div
+          className="cat-stage mb-8 lg:mb-12"
+          role="tablist"
+          aria-label="Filtrar consultas por categoría"
+        >
+          <div className="cat-grid">
+            {categories.map((c, idx) => {
+              const Icon = c.icon;
+              const isActive = audience === c.id;
+              const count = counts[c.id] ?? 0;
+              return (
+                <motion.button
+                  key={c.id}
+                  type="button"
+                  role="tab"
+                  aria-selected={isActive}
+                  aria-pressed={isActive}
+                  aria-label={`${c.label}: ${count} consulta${count === 1 ? "" : "s"}`}
+                  onClick={() => setAudience(c.id)}
+                  data-active={isActive ? "true" : undefined}
+                  className="cat-bubble"
+                  style={{ ["--bubble-accent" as string]: c.accent }}
+                  initial={
+                    prefersReducedMotion
+                      ? false
+                      : { opacity: 0, y: 14, scale: 0.94 }
+                  }
+                  whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{
+                    duration: 0.5,
+                    delay: idx * 0.06,
+                    ease: [0.16, 1, 0.3, 1],
+                  }}
+                  whileTap={
+                    prefersReducedMotion
+                      ? undefined
+                      : {
+                          scale: 0.92,
+                          transition: {
+                            type: "spring",
+                            stiffness: 600,
+                            damping: 28,
+                          },
+                        }
+                  }
+                  whileHover={
+                    prefersReducedMotion
+                      ? undefined
+                      : {
+                          y: -3,
+                          transition: {
+                            type: "spring",
+                            stiffness: 300,
+                            damping: 20,
+                          },
+                        }
+                  }
+                >
+                  <span className="cat-bubble__ring" aria-hidden>
+                    <span className="cat-bubble__tile" aria-hidden>
+                      <Icon
+                        className="relative z-10 h-6 w-6 sm:h-7 sm:w-7"
+                        strokeWidth={2.2}
+                      />
+                    </span>
+                    <span className="cat-bubble__count" aria-hidden>
+                      {count}
+                    </span>
+                  </span>
+                  <span className="cat-bubble__label">{c.label}</span>
+                  <span className="cat-bubble__dot" aria-hidden />
+                </motion.button>
+              );
+            })}
+          </div>
 
-                {/* Price and CTA Mobile - Optimizado */}
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex flex-col">
-                    {service.regularPrice && service.promoPrice ? (
-                      <>
-                        <div className="text-xs text-muted-foreground line-through opacity-60">
-                          {service.regularPrice}
-                        </div>
-                        <div className="text-primary font-bold text-base">
-                          {service.promoPrice}
-                        </div>
-                      </>
-                    ) : service.price && (
-                      <div className="text-primary font-bold text-sm">
-                        {service.price}
-                      </div>
-                    )}
-                    <div className="text-xs text-muted-foreground mt-1">
-                      Oferta por tiempo limitado
-                    </div>
-                  </div>
-                  <button 
-                    onClick={() => onAgendarClick?.(service)}
-                    className="glass bg-gradient-to-r from-primary/80 to-primary/60 hover:from-primary hover:to-primary/80 text-white px-3 py-2 rounded-lg text-xs font-medium hover:scale-[1.02] transition-all duration-200 backdrop-blur-sm border border-primary/20 shadow-lg shadow-primary/20"
-                  >
-                    Agendar
-                  </button>
-                </div>
-                  
-                  {/* Description - Optimizado */}
-                  <p className="text-secondary-foreground mb-3 text-xs leading-relaxed">
-                    {service.description}
-                  </p>
-                  
-                  {/* Features list - Optimizado */}
-                  <div className="space-y-1">
-                    {service.features.slice(0, 3).map((feature, featureIndex) => (
-                      <div key={featureIndex} className="flex items-center space-x-2">
-                        <div className="w-1 h-1 rounded-full bg-primary flex-shrink-0" />
-                        <span className="text-secondary-foreground text-xs">{feature}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            ))}
+          {/* Sublabel contextual */}
+          <div className="mt-4 flex justify-center">
+            <AnimatePresence mode="wait">
+              <motion.p
+                key={activeCategory.id}
+                initial={prefersReducedMotion ? false : { opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={prefersReducedMotion ? undefined : { opacity: 0, y: -6 }}
+                transition={{ duration: 0.32, ease: [0.16, 1, 0.3, 1] }}
+                className="text-center text-[12px] uppercase tracking-[0.22em]"
+                style={{ color: `rgb(${activeCategory.accent})` }}
+              >
+                {activeCategory.sublabel} ·{" "}
+                <span className="text-slate-400">
+                  {counts[activeCategory.id]} consultas
+                </span>
+              </motion.p>
+            </AnimatePresence>
           </div>
         </div>
 
-        {/* Desktop grid layout - Optimizado */}
-        <div className="hidden md:grid grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
-          {servicesList.map((service, index) => (
-            <div key={index} className="group">
-              <div className="glass rounded-2xl lg:rounded-3xl p-4 lg:p-6 h-full border border-primary/10 hover:border-primary/20 bg-gradient-to-br from-primary/5 to-transparent backdrop-blur-xl transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-primary/5">
-                
-                {/* Header with icon - Optimizado */}
-                <div className="flex items-center justify-between mb-3 lg:mb-4">
-                  <div className="w-12 h-12 lg:w-14 lg:h-14 rounded-xl lg:rounded-2xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-lg shadow-primary/20">
-                    <div className="text-white scale-90 lg:scale-100">
-                      {service.icon}
-                    </div>
-                  </div>
-                  
-                  {/* Price display - Optimizado */}
-                  <div className="text-right">
-                    {service.regularPrice && service.promoPrice ? (
-                      <div className="flex flex-col items-end">
-                        <div className="text-xs text-muted-foreground line-through opacity-60">
-                          {service.regularPrice}
-                        </div>
-                        <div className="text-primary font-bold text-base lg:text-lg">
-                          {service.promoPrice}
-                        </div>
-                      </div>
-                    ) : service.price && (
-                      <div className="px-2 py-1 lg:px-3 lg:py-1 rounded-full bg-primary/10 border border-primary/20">
-                        <span className="text-primary font-bold text-xs lg:text-sm">{service.price}</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-                
-                {/* Title - Optimizado */}
-                <h3 className="text-lg lg:text-xl font-bold text-foreground mb-3 leading-tight">
-                  {service.title}
-                </h3>
-                
-                {/* Description - Optimizado */}
-                <p className="text-secondary-foreground mb-3 lg:mb-4 text-xs lg:text-sm leading-relaxed">
-                  {service.description}
-                </p>
-                
-                {/* Features - Optimizado */}
-                <div className="space-y-1 lg:space-y-2 mb-4 lg:mb-6">
-                  {service.features.slice(0, 3).map((feature, featureIndex) => (
-                    <div key={featureIndex} className="flex items-center space-x-2 p-1 lg:p-2 rounded-lg hover:bg-primary/5 transition-colors">
-                      <div className="w-1 h-1 lg:w-1.5 lg:h-1.5 rounded-full bg-primary flex-shrink-0" />
-                      <span className="text-secondary-foreground text-xs">{feature}</span>
-                    </div>
-                  ))}
-                </div>
+        {/* === MOBILE: snap carousel === */}
+        <div className="md:hidden">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={`mobile-${audience}`}
+              initial={prefersReducedMotion ? false : { opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={prefersReducedMotion ? undefined : { opacity: 0, y: -6 }}
+              transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+              className="-mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-4 scrollbar-hide"
+            >
+              {filtered.map((s, idx) => (
+                <ServiceCard
+                  key={s.plan}
+                  service={s}
+                  onClick={() => handleClick(s)}
+                  mobile
+                  featured={s.featured}
+                  revealIndex={idx}
+                />
+              ))}
+            </motion.div>
+          </AnimatePresence>
+          <p className="mt-3 text-center text-xs text-slate-400">
+            Desliza para ver más servicios
+          </p>
+        </div>
 
-                {/* CTA Button - Optimizado */}
-                <div className="mt-auto">
-                  <button 
-                    onClick={() => onAgendarClick?.(service)}
-                    className="glass bg-gradient-to-r from-primary/80 to-primary/60 hover:from-primary hover:to-primary/80 text-white w-full px-3 py-2 lg:px-4 lg:py-3 rounded-lg lg:rounded-xl text-xs lg:text-sm font-medium hover:scale-[1.02] transition-all duration-200 backdrop-blur-sm border border-primary/20 shadow-lg shadow-primary/20"
-                  >
-                    Agendar {service.title.replace('Punto Legal ', '')}
-                  </button>
-                  <div className="text-center text-xs text-muted-foreground mt-2">
-                    Oferta válida por tiempo limitado
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
+        {/* === DESKTOP: grid 3-col limpio === */}
+        <div className="hidden md:block">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={`desktop-${audience}`}
+              initial={prefersReducedMotion ? false : { opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={prefersReducedMotion ? undefined : { opacity: 0, y: -8 }}
+              transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+              className="grid auto-rows-fr gap-5 md:grid-cols-2 lg:grid-cols-3 lg:gap-6"
+            >
+              {filtered.map((s, idx) => (
+                <ServiceCard
+                  key={s.plan}
+                  service={s}
+                  onClick={() => handleClick(s)}
+                  featured={
+                    s.featured &&
+                    audience !== "patrimonio" &&
+                    audience !== "empresas"
+                  }
+                  revealIndex={idx}
+                />
+              ))}
+            </motion.div>
+          </AnimatePresence>
+        </div>
+
+        {/* Trust strip al final */}
+        <div className="relative z-10 mt-10 flex flex-col items-center gap-3 text-[12px] text-slate-500 md:flex-row md:justify-center md:gap-6">
+          <span className="inline-flex items-center gap-2">
+            <span className="h-1 w-1 rounded-full bg-emerald-400" />
+            +1.200 consultas resueltas
+          </span>
+          <span className="hidden md:inline-flex h-1 w-1 rounded-full bg-slate-700" aria-hidden />
+          <span className="inline-flex items-center gap-2">
+            Cupos limitados por agenda
+          </span>
+          <span className="hidden md:inline-flex h-1 w-1 rounded-full bg-slate-700" aria-hidden />
+          <span className="inline-flex items-center gap-2">
+            Pago seguro · Cancelación gratuita
+          </span>
         </div>
       </div>
     </section>
+  );
+};
+
+interface ServiceCardProps {
+  service: InternalService;
+  onClick: () => void;
+  featured?: boolean;
+  mobile?: boolean;
+  /** Index dentro del grid filtrado — controla la cascada del unlock animation */
+  revealIndex?: number;
+}
+
+function getDesktopSizeClass(featured: boolean): string {
+  if (featured) return "md:col-span-2 lg:col-span-2";
+  return "";
+}
+
+const ServiceCard = ({
+  service,
+  onClick,
+  featured = false,
+  mobile = false,
+  revealIndex = 0,
+}: ServiceCardProps) => {
+  const Icon = service.icon;
+  const prefersReducedMotion = useReducedMotion();
+
+  const sizeClass = mobile
+    ? "w-[20rem] flex-none snap-start"
+    : getDesktopSizeClass(featured);
+
+  // Calcula descuento si hay priceBefore
+  const discount = (() => {
+    if (!service.priceBefore || service.free) return null;
+    const cur = Number(service.price.replace(/\D/g, ""));
+    const before = Number(service.priceBefore.replace(/\D/g, ""));
+    if (!cur || !before || before <= cur) return null;
+    return Math.round(((before - cur) / before) * 100);
+  })();
+
+  const authorInitial = service.testimonial?.author?.[0] ?? "";
+
+  /**
+   * Reveal cascada — rápido y gratificante, sin cansar la vista.
+   * delay máx 240ms (3 cards visibles entran casi simultáneamente),
+   * duración 0.4s. Sigue siendo un "unlock" pero sin esperas perceptibles.
+   */
+  const cascadeDelay = Math.min(revealIndex * 0.04, 0.24);
+
+  return (
+    <motion.div
+      initial={
+        prefersReducedMotion
+          ? false
+          : { opacity: 0, y: 16, scale: 0.98 }
+      }
+      whileInView={{
+        opacity: 1,
+        y: 0,
+        scale: 1,
+      }}
+      viewport={{ once: true, margin: "-40px" }}
+      transition={{
+        duration: 0.4,
+        delay: cascadeDelay,
+        ease: [0.16, 1, 0.3, 1],
+      }}
+      className={`relative ${sizeClass}`}
+    >
+      <article
+        data-featured={featured ? "true" : undefined}
+        className="service-card group relative flex h-full flex-col overflow-hidden p-6 lg:p-7"
+        style={{ ["--card-accent" as string]: service.accent }}
+      >
+        {/* Liquid glass overlays */}
+        <span className="liquid-bleed" aria-hidden />
+        <span className="liquid-shine" aria-hidden />
+        <span className="liquid-edge" aria-hidden />
+
+        {featured && (
+          <span
+            className="ambient-orb -left-16 -bottom-16 h-52 w-52"
+            style={{ background: `rgba(${service.accent}, 0.20)` }}
+            aria-hidden
+          />
+        )}
+
+        {featured && (
+          <svg
+            className="pointer-events-none absolute inset-0 h-full w-full opacity-[0.05]"
+            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden
+          >
+            <filter id={`noise-${service.plan}`}>
+              <feTurbulence
+                type="fractalNoise"
+                baseFrequency="0.85"
+                numOctaves="3"
+                stitchTiles="stitch"
+              />
+            </filter>
+            <rect
+              width="100%"
+              height="100%"
+              filter={`url(#noise-${service.plan})`}
+            />
+          </svg>
+        )}
+
+        {/* === HEADER: icon tile + badge === */}
+        <div className="relative z-10 flex items-start justify-between gap-3">
+          <span
+            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl text-white lg:h-14 lg:w-14"
+            style={{
+              background: `linear-gradient(135deg, rgb(${service.accent}), rgba(${service.accent}, 0.72))`,
+              boxShadow: `0 18px 36px -12px rgba(${service.accent}, 0.6), inset 0 1.5px 0 rgba(255,255,255,0.32), inset 0 -2px 0 rgba(0,0,0,0.20)`,
+            }}
+            aria-hidden
+          >
+            <Icon className="h-5 w-5 lg:h-6 lg:w-6" strokeWidth={2.2} />
+          </span>
+
+          {service.badge && (
+            <span
+              className="badge-ios badge-ios--accent shrink-0"
+              style={{
+                ["--card-accent" as string]: service.accent,
+              }}
+            >
+              {service.badge}
+            </span>
+          )}
+        </div>
+
+        {/* === Title + hook + descripción === */}
+        <div className="relative z-10 mt-5 min-w-0">
+          <h3
+            className={`font-display font-bold leading-[1.06] tracking-tight text-white ${
+              featured
+                ? "text-[24px] lg:text-[30px]"
+                : "text-[19px] lg:text-[22px]"
+            }`}
+          >
+            {service.title}
+          </h3>
+          <p
+            className={`mt-2 leading-snug text-slate-200/90 ${
+              featured
+                ? "text-[15px] font-medium lg:text-[16px]"
+                : "text-[13.5px] font-medium"
+            }`}
+          >
+            {service.hook}
+          </p>
+          <p
+            className="mt-3 max-w-[48ch] text-[13.5px] leading-relaxed text-slate-400 lg:text-[14px]"
+            dangerouslySetInnerHTML={{ __html: service.descriptionHtml }}
+          />
+        </div>
+
+        {/* === Features como pills === */}
+        <ul className="relative z-10 mt-5 flex flex-wrap gap-2">
+          {service.features.map((f) => (
+            <li key={f} className="feature-pill">
+              <span className="feature-pill__check" aria-hidden>
+                <Check className="h-2.5 w-2.5" strokeWidth={3.2} />
+              </span>
+              <span>{f}</span>
+            </li>
+          ))}
+        </ul>
+
+        {/* === Testimonial — sólo featured, SIN estrellas === */}
+        {featured && service.testimonial && (
+          <figure className="relative z-10 mt-6 flex flex-col items-end gap-2.5">
+            <blockquote
+              className="relative max-w-md rounded-[22px] rounded-br-[8px] border border-white/10 px-4 py-3 text-[13.5px] leading-[1.55] text-slate-100 backdrop-blur-md"
+              style={{
+                background: `rgba(255, 255, 255, 0.06)`,
+                boxShadow: `0 20px 44px -16px rgba(${service.accent}, 0.32), inset 0 1px 0 rgba(255,255,255,0.08)`,
+              }}
+            >
+              {service.testimonial.quote}
+            </blockquote>
+            <figcaption className="flex items-center gap-2 text-[11.5px] font-medium tracking-wide text-slate-400">
+              <span className="testimonial-avatar" aria-hidden>
+                {authorInitial}
+              </span>
+              <span className="text-slate-300">
+                {service.testimonial.author}
+              </span>
+              <span className="text-slate-600">·</span>
+              <span className="text-slate-500">cliente verificado</span>
+            </figcaption>
+          </figure>
+        )}
+
+        {/* Spacer */}
+        <div className="flex-1" />
+
+        {/* === Trust pills (sin estrellas — sólo duración + modalidad + diagnóstico) === */}
+        <div className="relative z-10 mt-5 flex flex-wrap items-center gap-2">
+          <span className="trust-pill" aria-label="Duración">
+            <Clock className="trust-pill__icon" strokeWidth={2.2} aria-hidden />
+            45 min
+          </span>
+          <span className="trust-pill" aria-label="Modalidad">
+            <Video className="trust-pill__icon" strokeWidth={2.2} aria-hidden />
+            Google Meet
+          </span>
+          <span
+            className="trust-pill"
+            aria-label="Plan de acción"
+            style={{
+              color: `rgb(${service.accent})`,
+              borderColor: `rgba(${service.accent}, 0.30)`,
+              background: `rgba(${service.accent}, 0.08)`,
+            }}
+          >
+            <FileWarning
+              className="trust-pill__icon"
+              strokeWidth={2.2}
+              aria-hidden
+            />
+            Plan PDF
+          </span>
+        </div>
+
+        {/* === Price + CTA === */}
+        <div className="price-well relative z-10 mt-4 pt-4">
+          <div className="mb-4 flex items-end justify-between gap-3">
+            <div>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-slate-400">
+                {service.free ? "Diagnóstico" : "Desde"}
+              </p>
+              <div className="mt-1 flex items-end gap-2.5">
+                <p
+                  className={`price-ticker font-display font-bold leading-none ${
+                    service.free
+                      ? "bg-gradient-to-r from-emerald-300 to-teal-200 bg-clip-text text-transparent"
+                      : "text-white"
+                  } ${
+                    featured
+                      ? "text-[34px] lg:text-[42px]"
+                      : "text-[26px] lg:text-[32px]"
+                  }`}
+                >
+                  {service.price}
+                </p>
+                {service.priceBefore && !service.free && (
+                  <p className="price-ticker mb-1 text-[12px] font-medium text-slate-500 line-through">
+                    {service.priceBefore}
+                  </p>
+                )}
+              </div>
+            </div>
+            {discount !== null && (
+              <span className="price-savings mb-1">−{discount}%</span>
+            )}
+          </div>
+
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onClick();
+            }}
+            className="service-card-cta cta-shimmer w-full text-sm"
+            aria-label={`${service.ctaLabel} — ${service.shortName}${service.free ? " (gratis)" : ` desde ${service.price}`}`}
+          >
+            {service.ctaLabel}
+            <ArrowUpRight
+              className="service-card-cta__arrow h-4 w-4"
+              aria-hidden
+            />
+          </button>
+        </div>
+      </article>
+    </motion.div>
   );
 };
 

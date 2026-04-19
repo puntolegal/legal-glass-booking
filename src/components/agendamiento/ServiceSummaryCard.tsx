@@ -28,8 +28,24 @@ const ServiceSummaryCard: React.FC = () => {
   
   const Icon = getCategoryIcon();
 
+  // Badge tinted del color del servicio (no fluor pink) — coincide con la
+  // tarjeta de origen: el "Plan PDF" de la card usa el mismo accent.
+  const hexToRgba = (hex: string, alpha: number) => {
+    if (!hex || !hex.startsWith('#')) return `rgba(34,211,238,${alpha})`;
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    return `rgba(${r},${g},${b},${alpha})`;
+  };
   const DiscountBadge = ({ label }: { label: string }) => (
-    <span className="inline-flex items-center gap-1 rounded-full border px-3 py-1 text-xs font-semibold text-pink-200 bg-pink-500/10 border-pink-500/30">
+    <span
+      className="inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold backdrop-blur-md"
+      style={{
+        color: serviceColor,
+        background: hexToRgba(serviceColor, 0.10),
+        borderColor: hexToRgba(serviceColor, 0.32),
+      }}
+    >
       <Sparkles className="w-3.5 h-3.5" />
       {label}
     </span>
@@ -57,13 +73,20 @@ const ServiceSummaryCard: React.FC = () => {
         
       <div className="mt-6 space-y-3">
         <div className="flex flex-wrap items-baseline gap-3">
-          <span className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-sky-400">
-              ${precioFinal}
-            </span>
-            {service.originalPrice && !isConvenioValido && (
+          {/* Precio: usa el color del servicio en gradiente sutil (sin pink fluor) */}
+          <span
+            className="text-4xl font-bold text-transparent bg-clip-text"
+            style={{
+              backgroundImage: `linear-gradient(135deg, #ffffff, ${serviceColor})`,
+              fontVariantNumeric: 'tabular-nums',
+            }}
+          >
+            {precioFinal === '0' || precioFinal === 0 ? 'Gratis' : `$${precioFinal}`}
+          </span>
+          {service.originalPrice && !isConvenioValido && precioFinal !== '0' && (
             <span className="text-base text-slate-500 line-through">${service.originalPrice}</span>
-            )}
-          </div>
+          )}
+        </div>
           
         {(isAdminValido || isConvenioValido || (service.discount && !isAdminValido && !isConvenioValido)) && (
           <div className="flex flex-wrap items-center gap-2">

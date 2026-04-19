@@ -251,34 +251,35 @@ const QuizModal: React.FC<QuizModalProps> = ({ isOpen, onClose }) => {
     delete newAnswers.calculatorChildren;
     setAnswers(newAnswers);
     
-    // Scroll suave a la siguiente pregunta si no es la última - usando el contenedor principal del modal
+    // Scroll suave a la siguiente pregunta si no es la última.
+    // En desktop el scroll real ocurre en [data-quiz-content] (overflow-y-auto)
+    // En móvil ocurre en [data-quiz-modal] (overflow-y-auto del fixed inset-0)
     if (questionId < questions.length - 1) {
       setTimeout(() => {
         const nextQuestionElement = document.getElementById(`question-${questionId + 1}`);
-        const scrollContainer = document.querySelector('[data-quiz-modal]');
-        
-        if (nextQuestionElement && scrollContainer) {
-          // Calcular posición relativa al contenedor scrollable principal
+        if (!nextQuestionElement) return;
+
+        const contentScroller = document.querySelector('[data-quiz-content]') as HTMLElement | null;
+        const modalScroller = document.querySelector('[data-quiz-modal]') as HTMLElement | null;
+        const scrollContainer =
+          contentScroller && contentScroller.scrollHeight > contentScroller.clientHeight
+            ? contentScroller
+            : modalScroller;
+
+        if (scrollContainer) {
           const containerRect = scrollContainer.getBoundingClientRect();
           const elementRect = nextQuestionElement.getBoundingClientRect();
-          const scrollTop = scrollContainer.scrollTop;
-          const offset = 100; // Offset desde arriba del contenedor
-          
-          const targetScroll = scrollTop + (elementRect.top - containerRect.top) - offset;
-          
-          scrollContainer.scrollTo({
-            top: Math.max(0, targetScroll),
-            behavior: 'smooth'
-          });
-        } else if (nextQuestionElement) {
-          // Fallback si no se encuentra el contenedor
-          nextQuestionElement.scrollIntoView({ 
-            behavior: 'smooth', 
+          const offset = 80;
+          const targetScroll = scrollContainer.scrollTop + (elementRect.top - containerRect.top) - offset;
+          scrollContainer.scrollTo({ top: Math.max(0, targetScroll), behavior: 'smooth' });
+        } else {
+          nextQuestionElement.scrollIntoView({
+            behavior: 'smooth',
             block: 'center',
             inline: 'nearest'
           });
         }
-      }, 350); // Delay para permitir que la animación del botón termine
+      }, 350);
     }
   };
   
@@ -350,12 +351,12 @@ const QuizModal: React.FC<QuizModalProps> = ({ isOpen, onClose }) => {
       }
       
       setShowResult(true);
-      // Scroll al inicio cuando se muestra el resultado
+      // Scroll al inicio cuando se muestra el resultado (sirve para ambos contenedores)
       setTimeout(() => {
-        const modalContainer = document.querySelector('[data-quiz-modal]');
-        if (modalContainer) {
-          modalContainer.scrollTo({ top: 0, behavior: 'smooth' });
-        }
+        const contentScroller = document.querySelector('[data-quiz-content]') as HTMLElement | null;
+        const modalScroller = document.querySelector('[data-quiz-modal]') as HTMLElement | null;
+        contentScroller?.scrollTo({ top: 0, behavior: 'smooth' });
+        modalScroller?.scrollTo({ top: 0, behavior: 'smooth' });
       }, 150);
       setCurrentStep(6);
       toast.success('Te enviamos el plan recomendado a tu email.');
@@ -574,33 +575,39 @@ const QuizModal: React.FC<QuizModalProps> = ({ isOpen, onClose }) => {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: -20 }}
             transition={{ type: 'spring', duration: 0.4, bounce: 0.2 }}
-              className="w-full max-w-2xl bg-slate-900/95 backdrop-blur-xl rounded-none sm:rounded-2xl md:rounded-3xl border-0 sm:border border-slate-700/50 
-                         shadow-2xl shadow-black/50 flex flex-col relative
+              className="w-full max-w-2xl bg-slate-900/95 backdrop-blur-xl rounded-none sm:rounded-2xl md:rounded-3xl border-0 sm:border border-slate-800
+                         shadow-2xl shadow-black/50 flex flex-col relative overflow-hidden
                          min-h-screen sm:min-h-[500px] md:min-h-0 md:max-h-[90vh] md:my-auto"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Header */}
-            <div className="relative p-4 sm:p-6 border-b border-slate-700/50 flex-shrink-0 bg-gradient-to-r from-pink-500/5 to-rose-500/5">
+            {/* Header iOS sobrio */}
+            <div className="relative p-5 sm:p-6 border-b border-slate-800 flex-shrink-0">
               <button
                 onClick={onClose}
-                className="absolute right-3 top-3 sm:right-4 sm:top-4 p-2 rounded-full bg-slate-800/50 hover:bg-slate-700/50 
-                         transition-colors duration-200 z-10 border border-slate-700/50"
+                className="absolute right-3 top-3 sm:right-4 sm:top-4 p-2 rounded-full bg-slate-800/80 hover:bg-slate-700/80
+                         transition-colors duration-200 z-10 border border-slate-700/60"
                 aria-label="Cerrar modal"
               >
-                <X className="w-5 h-5 text-slate-300" />
+                <X className="w-4 h-4 text-slate-300" />
               </button>
-              
+
               <motion.div
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.1 }}
-                className="pr-8"
+                className="pr-10"
               >
-                <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">
-                  ¿Qué nivel de protección legal necesitas realmente?
+                <div className="inline-flex items-center gap-2 rounded-full px-2.5 py-1 mb-3 bg-pink-500/10 border border-pink-500/30">
+                  <span aria-hidden="true">✨</span>
+                  <span className="text-[11px] font-semibold uppercase tracking-[0.25em] text-pink-200">
+                    Diagnóstico gratis · 60 segundos
+                  </span>
+                </div>
+                <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-1.5 leading-tight">
+                  ¿Qué nivel de protección legal necesitas?
                 </h2>
-                <p className="text-slate-400">
-                  Descúbrelo en 60 segundos con nuestro diagnóstico inteligente
+                <p className="text-slate-400 text-sm">
+                  Responde 3 preguntas y recibe tu plan recomendado al instante.
                 </p>
               </motion.div>
             </div>
@@ -618,7 +625,11 @@ const QuizModal: React.FC<QuizModalProps> = ({ isOpen, onClose }) => {
             )}
 
             {/* Contenido - Scrollable */}
-            <div className="p-4 sm:p-6 pb-8 sm:pb-6 flex-1 min-h-0" data-quiz-content>
+            <div
+              className="p-4 sm:p-6 pb-8 sm:pb-6 flex-1 min-h-0 overflow-y-auto overscroll-contain"
+              data-quiz-content
+              style={{ WebkitOverflowScrolling: 'touch' as any }}
+            >
               <AnimatePresence mode="wait">
                 {/* PASO CERO - Mensaje de Bienvenida + Captura de Email */}
                 {!showResult && currentStep === -1 && (
@@ -1011,13 +1022,15 @@ const QuizModal: React.FC<QuizModalProps> = ({ isOpen, onClose }) => {
                       <motion.button
                         onClick={() => {
                           onClose();
-                          navigate(`/agendamiento?plan=general&email=${encodeURIComponent(email)}`);
+                          navigate(
+                            `/agendamiento?plan=consulta-estrategica-familia&email=${encodeURIComponent(email)}`
+                          );
                         }}
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
                         className="w-full py-4 px-6 rounded-2xl font-semibold text-white bg-gradient-to-r from-pink-500 to-rose-600 hover:from-pink-600 hover:to-rose-700 transition-all shadow-xl shadow-pink-500/40 text-base md:text-lg"
                       >
-                        Agendar Consulta - $35.000
+                        Agendar Consulta · $35.000
                       </motion.button>
                     </div>
                     
@@ -1042,42 +1055,29 @@ const QuizModal: React.FC<QuizModalProps> = ({ isOpen, onClose }) => {
                         </div>
                       </div>
 
-                      {/* Testimonio específico del plan - PRUEBA SOCIAL */}
+                      {/* Testimonio específico — burbuja iOS estilo Familia */}
                       {testimonialsByPlan[recommendation.plan as keyof typeof testimonialsByPlan] && (
                         <motion.div
                           initial={{ opacity: 0, y: 10 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: 0.3 }}
-                          className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-4 mt-4"
+                          className="bg-slate-900/60 border border-slate-800 p-5 rounded-3xl mt-5 shadow-md shadow-slate-950/40"
                         >
-                          {/* Estrellas Premium - Diseño mejorado */}
-                          <div className="flex gap-1 mb-3">
-                            {[...Array(testimonialsByPlan[recommendation.plan as keyof typeof testimonialsByPlan].rating)].map((_, i) => (
-                              <svg 
-                                key={i} 
-                                className="w-5 h-5 text-pink-400 transition-transform duration-200 hover:scale-110" 
-                                fill="currentColor" 
-                                viewBox="0 0 24 24" 
-                                style={{ transitionDelay: `${i * 50}ms` }}
-                              >
-                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                              </svg>
-                            ))}
-                          </div>
-                          {/* Cita */}
-                          <p className="text-sm text-slate-300 italic mb-2">
-                            "{testimonialsByPlan[recommendation.plan as keyof typeof testimonialsByPlan].quote}"
-                          </p>
-                          {/* Autor */}
-                          <div className="text-xs">
-                            <span className="text-white font-semibold">
-                              {testimonialsByPlan[recommendation.plan as keyof typeof testimonialsByPlan].author}
-                            </span>
-                            <span className="text-slate-500"> • </span>
-                            <span className="text-slate-400">
+                          <div className="flex items-center justify-between mb-3">
+                            <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-slate-800/90 border border-slate-700">
+                              <span className="text-xs" aria-hidden="true">⭐️⭐️⭐️⭐️⭐️</span>
+                              <span className="text-[11px] font-medium text-slate-200">Experiencia verificada</span>
+                            </div>
+                            <span className="text-[11px] text-slate-500">
                               {testimonialsByPlan[recommendation.plan as keyof typeof testimonialsByPlan].role}
                             </span>
                           </div>
+                          <p className="text-sm text-slate-300 mb-3 italic leading-relaxed">
+                            “{testimonialsByPlan[recommendation.plan as keyof typeof testimonialsByPlan].quote}”
+                          </p>
+                          <p className="text-sm font-semibold text-slate-100">
+                            {testimonialsByPlan[recommendation.plan as keyof typeof testimonialsByPlan].author}
+                          </p>
                         </motion.div>
                       )}
                     </div>

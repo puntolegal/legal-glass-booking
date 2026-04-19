@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { CheckCircle, Calendar, Clock, User, Mail, Phone, ArrowRight, Home, CreditCard, MessageCircle, Shield } from 'lucide-react';
+import { CheckCircle, Calendar, Clock, User, Mail, Phone, ArrowRight, Home, CreditCard, MessageCircle } from 'lucide-react';
 import SEO from '../components/SEO';
+import BrandMark from '@/components/BrandMark';
 import { sendRealBookingEmails, type BookingEmailData, type EmailResult } from '@/services/realEmailService';
 import { findReservaByCriteria, updatePaymentStatus, type Reserva } from '../services/supabaseBooking';
 import { supabase } from '@/integrations/supabase/client';
@@ -406,12 +407,7 @@ export default function PaymentSuccessPage() {
         <div className="min-h-screen bg-black text-white font-sans antialiased">
           <header className="sticky top-0 z-50 bg-black/95 backdrop-blur border-b border-white/10">
             <div className="max-w-lg mx-auto px-4 py-4 flex justify-center">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center border border-white/20">
-                  <Shield className="w-4 h-4 text-white" />
-                </div>
-                <span className="text-sm font-semibold tracking-tight text-white">Punto Legal</span>
-              </div>
+              <BrandMark size="sm" />
             </div>
           </header>
           <main className="max-w-lg mx-auto px-4 py-8">
@@ -451,7 +447,7 @@ export default function PaymentSuccessPage() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center">
         <div className="text-center max-w-md mx-auto px-4">
-          <div className="animate-spin rounded-full h-12 w-12 border-2 border-pink-500/30 border-t-pink-500 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-2 border-cyan-500/30 border-t-cyan-400 mx-auto mb-4"></div>
           <h2 className="text-xl font-semibold text-white mb-2">
             {isProcessing ? 'Procesando pago...' : 'Cargando confirmación...'}
           </h2>
@@ -489,13 +485,8 @@ export default function PaymentSuccessPage() {
       <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
         <header className="sticky top-0 z-50 bg-slate-950/70 backdrop-blur-xl border-b border-white/[0.06]">
           <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
-            <Link to="/" className="flex items-center gap-3">
-              <div className="w-9 h-9 bg-white/10 backdrop-blur-xl rounded-xl flex items-center justify-center border border-white/10">
-                <Shield className="w-4 h-4 text-white/90" />
-              </div>
-              <span className="text-lg font-semibold text-white/95 tracking-tight">Punto Legal</span>
-            </Link>
-            <div className="flex items-center gap-2 text-xs text-slate-400">
+            <BrandMark size="sm" />
+            <div className="flex items-center gap-2 text-xs text-emerald-300/90">
               <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></div>
               Pago confirmado
             </div>
@@ -660,12 +651,12 @@ export default function PaymentSuccessPage() {
                   )}
                   {googleMeetLink && (
                     <p className="text-[11px] text-slate-500">
-                      <strong className="text-slate-400">Link de Google Meet:</strong> 
-                      <a 
-                        href={googleMeetLink} 
-                        target="_blank" 
+                      <strong className="text-slate-400">Link de Google Meet:</strong>
+                      <a
+                        href={googleMeetLink}
+                        target="_blank"
                         rel="noopener noreferrer"
-                        className="text-pink-400 hover:text-pink-300 underline ml-1"
+                        className="text-cyan-300 hover:text-cyan-200 underline ml-1"
                       >
                         Unirse
                       </a>
@@ -746,7 +737,7 @@ export default function PaymentSuccessPage() {
               </p>
               <div className="text-xs text-slate-400 space-y-2">
                 <p>• Puedes cerrar esta ventana con tranquilidad, guardaremos tu reserva automáticamente.</p>
-                <p>• Ante cualquier duda escríbenos a <a href="mailto:puntolegalelgolf@gmail.com" className="text-pink-400 hover:text-pink-300 underline">puntolegalelgolf@gmail.com</a> o WhatsApp <a href="tel:+56962321883" className="text-pink-400 hover:text-pink-300 underline">+569 6232 1883</a>.</p>
+                <p>• Ante cualquier duda escríbenos a <a href="mailto:puntolegalelgolf@gmail.com" className="text-cyan-300 hover:text-cyan-200 underline">puntolegalelgolf@gmail.com</a> o WhatsApp <a href="tel:+56962321883" className="text-cyan-300 hover:text-cyan-200 underline">+569 6232 1883</a>.</p>
               </div>
             </motion.div>
           )}

@@ -3,11 +3,12 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { MessageCircle, DollarSign, Users, Baby, Sparkles, Mail, Shield, ShieldCheck, Scale, Zap, Landmark, AlertTriangle, Star, User, Phone, Lock, Gavel, TrendingDown, CheckCircle, ArrowRight, Heart, PiggyBank, FileText } from 'lucide-react';
+import { MessageCircle, DollarSign, Users, Baby, Sparkles, Mail, Shield, ShieldCheck, Scale, Zap, Landmark, AlertTriangle, User, Phone, Lock, Gavel, TrendingDown, CheckCircle, ArrowRight, Heart, PiggyBank, FileText } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { trackMetaEvent } from '@/services/metaConversionsService';
 import { toast } from 'sonner';
+import { Helmet } from 'react-helmet-async';
 import SEO from '@/components/SEO';
 
 // Componente de contador animado (reutilizado de QuizModal)
@@ -166,8 +167,6 @@ const CalculadoraPensionPage: React.FC = () => {
   const [isRevealed, setIsRevealed] = useState(false); // Estado de revelación de resultados
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [loadingText, setLoadingText] = useState("Iniciando conexión segura...");
-  const [countdownActive, setCountdownActive] = useState(false);
-  const [countdownSeconds, setCountdownSeconds] = useState(15);
   const [calculatedRange, setCalculatedRange] = useState<{ 
     min: string; 
     max: string; 
@@ -218,7 +217,6 @@ const CalculadoraPensionPage: React.FC = () => {
   const consultOriginalPrice = isVulnerableProfile ? 20000 : isVipProfile ? 75000 : 40000;
 
   const handleDirectPayment = async () => {
-    setCountdownActive(false);
     trackMetaEvent({
       event_name: 'InitiateCheckout',
       user_data: { em: email },
@@ -342,25 +340,14 @@ const CalculadoraPensionPage: React.FC = () => {
     });
   }, []);
 
-  // Countdown visual (sin redirección automática — el usuario paga por clic)
+  // Validación de WhatsApp — permisiva: cualquier número chileno con 8 dígitos
+  // útiles (después del 9). Acepta: 98765432, +56987654321, 56987654321,
+  // 9 8765 4321, etc. Nunca dejamos al usuario "atrapado" por formato.
   useEffect(() => {
-    if (!isRevealed || !calculatedRange) return;
-    const t = setTimeout(() => setCountdownActive(true), 3000);
-    return () => clearTimeout(t);
-  }, [isRevealed, calculatedRange]);
-
-  useEffect(() => {
-    if (!countdownActive) return;
-    const id = setInterval(() => {
-      setCountdownSeconds((s) => (s <= 1 ? 0 : s - 1));
-    }, 1000);
-    return () => clearInterval(id);
-  }, [countdownActive]);
-
-  // Validación de WhatsApp (formato +569)
-  useEffect(() => {
-    const whatsappRegex = /^\+569\d{8}$/;
-    const isValid = whatsappRegex.test(whatsapp.replace(/\s/g, ''));
+    const digitsOnly = whatsapp.replace(/\D/g, '');
+    // Tomar los últimos 8 dígitos como número de móvil chileno (después del 9 inicial).
+    // Aceptamos si hay al menos 8 dígitos en total (móvil chileno completo es 9 dígitos: 9XXXXXXXX).
+    const isValid = digitsOnly.length >= 8 && digitsOnly.length <= 13;
     setWhatsappValid(isValid);
   }, [whatsapp]);
 
@@ -523,7 +510,9 @@ const CalculadoraPensionPage: React.FC = () => {
   useEffect(() => {
     const isContactReady = name.trim() !== '' && emailValid && whatsappValid;
     const isBaseReady = selectedIncome !== null && selectedChildren !== null && currentPension !== '' && hidesIncome !== null;
-    const isDebtReady = hasDebt === false || (hasDebt === true && monthsOwed !== null && monthsOwed > 0);
+    // Importante: NO bloqueamos el diagnóstico si marcó "Sí, me debe meses" pero no escribió el número.
+    // monthsOwed es opcional (solo enriquece la "deuda acumulada"). Cualquier respuesta de hasDebt desbloquea.
+    const isDebtReady = hasDebt !== null;
     const isProtectionReady = protectionType !== null;
     const isAssetsReady = hasComplexAssets !== null;
     const isReadyToCalculate = legalMatter !== null && isContactReady && isBaseReady && isDebtReady && isProtectionReady && isAssetsReady;
@@ -692,10 +681,85 @@ const CalculadoraPensionPage: React.FC = () => {
 
   return (
     <>
-      <SEO 
-        title="Diagnóstico Legal de Familia 2026 - Punto Legal"
-        description="Resuelve tu caso de familia en 3 minutos. Pensión de alimentos, divorcio, tuición, VIF y más. Plan de acción legal personalizado con abogados especializados."
+      <SEO
+        title="Calculadora Pensión de Alimentos Chile 2026 - Gratis | Ley 14.908"
+        description="Calcula GRATIS cuánto te corresponde de pensión alimenticia en Chile según Ley 14.908 e IMM 2026. Resultado en 3 minutos. Incluye tabla de montos mínimos por hijo, medidas de apremio (Ley 21.389) y plan de acción legal."
+        keywords="calculadora pension alimentos chile, pension alimentos 2026, ley 14.908, cuanto es la pension por 1 hijo, IMM 2026, registro nacional deudores pension, ley 21.389, calcular pension alimenticia segun sueldo, pension minima por hijo chile"
       />
+
+      {/* Schema Markup adicional: FAQPage + SoftwareApplication */}
+      <Helmet>
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": [
+              {
+                "@type": "Question",
+                "name": "¿Cuánto es la pensión de alimentos por 1 hijo en Chile 2026?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "El mínimo legal es 40% del Ingreso Mínimo Mensual ($215.600 en 2026 con IMM de $539.000). Si el demandado gana más, el juez puede fijar montos superiores basándose en la canasta de crianza ($594.883 por hijo según MIDEPLAN)."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "¿Cómo se calcula la pensión de alimentos según el sueldo del padre?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Se calcula la proporción de gastos del menor según los ingresos de ambos padres. El techo legal es 50% del sueldo del demandado. Por ejemplo, si gana $1.500.000, la pensión máxima sería $750.000 distribuida entre todos los hijos."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "¿Qué pasa si no pagan la pensión de alimentos en Chile?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "La Ley 21.389 (Registro Nacional de Deudores) permite activar medidas de apremio inmediatas: arresto hasta 15 días por mes impago, retención de sueldo vía AFP, arraigo nacional, embargo de cuentas, retención de impuestos por SII y suspensión de licencia de conducir."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "¿Cuánto demora una demanda de pensión de alimentos en Chile?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Con la nueva ley puedes obtener una pensión provisoria en 2 a 4 semanas. La pensión definitiva se fija en audiencia única, generalmente entre 45 y 90 días desde la presentación de la demanda."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "¿Se puede aumentar la pensión de alimentos?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Sí. Si aumentaron los gastos del menor o los ingresos del demandado, puedes pedir aumento de pensión. Se calcula el retroactivo desde la fecha de presentación de la demanda."
+                }
+              }
+            ]
+          })}
+        </script>
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "SoftwareApplication",
+            "name": "Calculadora de Pensión de Alimentos Chile 2026",
+            "applicationCategory": "FinanceApplication",
+            "operatingSystem": "Web",
+            "description": "Herramienta gratuita para calcular el monto estimado de pensión de alimentos en Chile según la Ley 14.908 y el IMM 2026.",
+            "offers": {
+              "@type": "Offer",
+              "price": "0",
+              "priceCurrency": "CLP"
+            },
+            "aggregateRating": {
+              "@type": "AggregateRating",
+              "ratingValue": "4.9",
+              "ratingCount": "1240",
+              "bestRating": "5",
+              "worstRating": "1"
+            }
+          })}
+        </script>
+      </Helmet>
       
       <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
         <style>{`footer, .footer, [data-testid="footer"] { display: none !important; }`}</style>
@@ -704,11 +768,14 @@ const CalculadoraPensionPage: React.FC = () => {
           <>
         <header className="sticky top-0 z-50 bg-slate-950/60 backdrop-blur-2xl border-b border-white/5">
           <div className="max-w-5xl mx-auto px-4 py-4">
-            <Link to="/" className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-white/10 backdrop-blur-xl rounded-2xl flex items-center justify-center border border-white/10 shadow-lg">
+            <Link to="/" className="flex items-center gap-3 group">
+              <div className="w-10 h-10 bg-white/10 backdrop-blur-xl rounded-2xl flex items-center justify-center border border-white/10 shadow-lg transition-transform group-hover:scale-105">
                 <Shield className="w-5 h-5 text-white/90" />
               </div>
-              <span className="text-xl font-semibold text-white/95 tracking-tight">Punto Legal</span>
+              <div className="flex flex-col leading-none">
+                <span className="text-lg sm:text-xl font-semibold text-white/95 tracking-tight">Punto Legal</span>
+                <span className="text-[10px] sm:text-[11px] font-medium text-slate-400 tracking-[0.25em] uppercase mt-0.5">Chile</span>
+              </div>
             </Link>
           </div>
         </header>
@@ -734,48 +801,58 @@ const CalculadoraPensionPage: React.FC = () => {
 
         {/* Contenido Principal */}
         <main className={`max-w-5xl mx-auto px-4 ${isRevealed ? 'pt-6 pb-8 md:pt-8 md:pb-12' : 'py-8 md:py-12'}`}>
-          {/* Hero/Título — oculto en checkout para foco total en el resultado */}
+          {/* Hero — propuesta de valor clara + trust signals */}
           {!isRevealed && (
-          <motion.div
+          <motion.header
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-            className="text-center mb-8 md:mb-12"
+            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+            className="text-center mb-6 md:mb-8"
           >
-            <div className="inline-flex items-center gap-2 bg-white/5 backdrop-blur-xl rounded-full px-4 py-2 mb-6 border border-white/10 shadow-lg">
-              <Scale className="w-4 h-4 text-pink-400" />
-              <span className="text-xs md:text-sm font-semibold text-slate-200">Diagnóstico Legal Gratuito · Familia · 2026</span>
+            {/* Eyebrow badge */}
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-pink-500/10 border border-pink-500/20 mb-4">
+              <span className="relative flex h-1.5 w-1.5">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-pink-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-pink-500"></span>
+              </span>
+              <span className="text-[10px] sm:text-[11px] font-semibold text-pink-200 uppercase tracking-[0.2em]">
+                Ley 14.908 · IMM 2026
+              </span>
             </div>
-            
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-white mb-4 tracking-tight leading-tight">
-              Resuelve tu Problema Legal de <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-rose-400">Familia</span>
+
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-white mb-3 tracking-tight leading-[1.05]">
+              Calcula tu{' '}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-400 via-rose-400 to-pink-300">
+                Pensión de Alimentos
+              </span>
+              <br className="hidden sm:block" />
+              <span className="text-slate-300 font-bold">en 3 minutos</span>
             </h1>
-            <p className="text-base md:text-lg text-slate-400 max-w-2xl mx-auto leading-relaxed mb-6 font-medium">
-              Responde 3 preguntas y obtén un diagnóstico legal personalizado. Pensión de alimentos, divorcio, tuición o protección urgente — nuestros abogados activan tu caso en menos de 24 horas.
+
+            <p className="text-sm md:text-base lg:text-lg text-slate-400 max-w-2xl mx-auto leading-relaxed font-medium">
+              Diagnóstico legal personalizado según tu caso real: <span className="text-slate-200 font-semibold">cuánto te corresponde, qué deuda puedes cobrar y qué medidas de apremio activar</span> con un abogado especialista.
             </p>
 
-            {/* Social Proof con Avatares */}
-            <div className="flex items-center justify-center gap-6 mt-4 flex-wrap">
-              <div className="flex items-center gap-2">
-                <div className="flex -space-x-2">
-                  {['bg-pink-400', 'bg-rose-400', 'bg-amber-400', 'bg-sky-400'].map((color, i) => (
-                    <div key={i} className={`w-7 h-7 rounded-full ${color} border-2 border-slate-900 flex items-center justify-center text-[10px] font-bold text-slate-900`}>
-                      {['M','D','C','P'][i]}
-                    </div>
-                  ))}
-                </div>
-                <span className="text-xs text-slate-400 font-medium">+1.240 casos resueltos este mes</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                {[1,2,3,4,5].map(s => <Star key={s} className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />)}
-                <span className="text-xs text-slate-400 font-medium">4.9 · Google Reviews</span>
-              </div>
+            {/* Trust bar — narrativa con autoridad */}
+            <div className="flex items-center justify-center gap-2 sm:gap-3 mt-5 flex-wrap text-[11px] sm:text-xs text-slate-300 font-medium">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/[0.04] border border-white/[0.06]">
+                <span className="text-emerald-400" aria-hidden="true">●</span> 100% gratis
+              </span>
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/[0.04] border border-white/[0.06]">
+                <span aria-hidden="true">⏱️</span> Resultado en 3 min
+              </span>
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/[0.04] border border-white/[0.06]">
+                <span aria-hidden="true">🔒</span> Confidencial · sin registro
+              </span>
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/[0.04] border border-white/[0.06]">
+                <span className="text-amber-300" aria-hidden="true">⭐️</span> 4.9 · 1.240 casos resueltos
+              </span>
             </div>
-          </motion.div>
+          </motion.header>
           )}
 
-          {/* Formulario - 4 Pasos en la misma pantalla */}
-          <div className="max-w-2xl mx-auto">
+          {/* Formulario - 4 Pasos en la misma pantalla (above-the-fold por diseño) */}
+          <div id="paso-materia" className="max-w-2xl mx-auto">
             <div className={`space-y-5 md:space-y-6 transition-all duration-1000 ${isAnalyzing ? 'blur-md opacity-20 pointer-events-none select-none' : ''} ${isRevealed ? 'hidden' : ''}`}>
             {/* Paso 0: Selector de Materia Legal */}
             <motion.div
@@ -975,19 +1052,23 @@ const CalculadoraPensionPage: React.FC = () => {
                     id="tel"
                     value={whatsapp}
                     onChange={(e) => {
-                      let val = e.target.value.replace(/[^\d+]/g, '');
-                      if (val.startsWith('569')) val = '+' + val;
-                      if (val.startsWith('9') && val.length === 9) val = '+56' + val;
-                      if (!val.startsWith('+569') && val.length >= 8) val = '+569' + val.slice(-8);
-                      setWhatsapp(val);
+                      // Normalización suave: solo eliminamos caracteres extraños,
+                      // pero NO forzamos el formato +569 (eso solo confunde al usuario).
+                      const cleaned = e.target.value.replace(/[^\d+\s]/g, '');
+                      setWhatsapp(cleaned);
                     }}
-                    placeholder="+56912345678"
+                    placeholder="+56 9 1234 5678"
                     className="w-full pl-12 pr-12 py-4 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 text-white placeholder-slate-500 focus:outline-none focus:border-pink-500/50 focus:ring-2 focus:ring-pink-500/20 transition-all text-base"
                     autoComplete="tel"
                     style={{
                       boxShadow: 'inset 0 2px 4px rgba(0, 0, 0, 0.1)'
                     }}
                   />
+                  {whatsapp.length > 0 && !whatsappValid && (
+                    <p className="text-[11px] text-amber-400/90 mt-2 font-medium pl-1">
+                      Ingresa al menos 8 dígitos. Ej: 9 1234 5678
+                    </p>
+                  )}
                 </div>
 
               </div>
@@ -1492,14 +1573,69 @@ const CalculadoraPensionPage: React.FC = () => {
               </motion.div>
             )}
 
-            {/* Ancla + feedback inmediato post Paso 9 (evita sensación de “atasco”) */}
+            {/* Ancla + feedback inteligente post Paso 9 (evita sensación de "atasco") */}
             <div id="paso-resultado" style={{ scrollMarginTop: 140 }}>
-              {hasComplexAssets !== null && !isRevealed && (
-                <div className="mt-4 bg-white/5 backdrop-blur-2xl border border-white/10 rounded-3xl p-5 md:p-6">
-                  <p className="text-sm text-slate-200 font-semibold">Generando tu informe legal…</p>
-                  <p className="text-xs text-slate-400 mt-1">Esto puede tomar unos segundos. No cierres la página.</p>
-                </div>
-              )}
+              {hasComplexAssets !== null && !isRevealed && !isAnalyzing && (() => {
+                // Detectar qué falta para que el cálculo se dispare automáticamente.
+                const missing: string[] = [];
+                if (!name.trim()) missing.push('tu nombre');
+                if (!emailValid) missing.push('un email válido');
+                if (!whatsappValid) missing.push('un WhatsApp con al menos 8 dígitos');
+                if (legalMatter === null) missing.push('la materia legal');
+                if (selectedIncome === null) missing.push('los ingresos del demandado');
+                if (selectedChildren === null) missing.push('la cantidad de hijos');
+                if (currentPension === '') missing.push('lo que recibes hoy');
+
+                if (missing.length === 0) {
+                  // Todo está listo: feedback de "generando"
+                  return (
+                    <div className="mt-4 bg-white/5 backdrop-blur-2xl border border-white/10 rounded-3xl p-5 md:p-6">
+                      <div className="flex items-center gap-3">
+                        <div className="w-5 h-5 rounded-full border-2 border-pink-500/30 border-t-pink-500 animate-spin flex-none"></div>
+                        <div>
+                          <p className="text-sm text-slate-200 font-semibold">Generando tu informe legal…</p>
+                          <p className="text-xs text-slate-400 mt-1">Esto puede tomar unos segundos. No cierres la página.</p>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                }
+
+                // Faltan datos: mostrar lista clara y botón para volver al primer campo faltante
+                return (
+                  <div className="mt-4 bg-amber-500/[0.04] backdrop-blur-2xl border border-amber-500/20 rounded-3xl p-5 md:p-6">
+                    <div className="flex items-start gap-3">
+                      <AlertTriangle className="w-5 h-5 text-amber-400 flex-none mt-0.5" />
+                      <div className="flex-1">
+                        <p className="text-sm text-white font-semibold mb-1">Casi listo · Faltan {missing.length} dato{missing.length > 1 ? 's' : ''}</p>
+                        <p className="text-xs text-slate-300 leading-relaxed">
+                          Para mostrarte tu diagnóstico necesitamos: <span className="text-amber-200 font-semibold">{missing.join(', ')}</span>.
+                        </p>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const targetId =
+                              !name.trim() || !emailValid || !whatsappValid ? 'paso-contacto'
+                              : legalMatter === null ? 'paso-materia'
+                              : selectedIncome === null ? 'paso-ingresos'
+                              : selectedChildren === null ? 'paso-hijos'
+                              : 'paso-pension';
+                            const el = document.getElementById(targetId);
+                            if (el) {
+                              const y = el.getBoundingClientRect().top + window.scrollY - 120;
+                              window.scrollTo({ top: y, behavior: 'smooth' });
+                            }
+                          }}
+                          className="mt-3 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-amber-100 text-xs font-semibold transition-all"
+                        >
+                          Ir al campo faltante
+                          <ArrowRight className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
             </div>
 
             {/* Tarjeta de Urgencia - Registro de Deudores (Solo si no hay resultado calculado) */}
@@ -1705,10 +1841,10 @@ const CalculadoraPensionPage: React.FC = () => {
                       )}
                     </div>
                     <p className="text-[11px] text-slate-500 uppercase tracking-widest mb-3 font-medium">
-                      {legalMatter === 'divorcio' ? 'Capacidad de pago mensual exigible'
-                        : legalMatter === 'aumento' ? 'Monto máximo al que tienes derecho hoy'
-                        : legalMatter === 'tuicion' ? 'Pensión máxima asociada a la tuición'
-                        : 'Lo que la ley indica que debes recibir cada mes'}
+                      {legalMatter === 'divorcio' ? 'Pensión proporcional sugerida'
+                        : legalMatter === 'aumento' ? 'Pensión actualizada que te corresponde'
+                        : legalMatter === 'tuicion' ? 'Pensión proporcional asociada a la tuición'
+                        : 'Pensión mensual que la ley sugiere para tu caso'}
                     </p>
                     <motion.h3
                       initial={{ opacity: 0, scale: 0.95 }}
@@ -1716,8 +1852,14 @@ const CalculadoraPensionPage: React.FC = () => {
                       transition={{ delay: 0.3, type: 'spring', stiffness: 200, damping: 18 }}
                       className="text-5xl sm:text-6xl md:text-7xl font-bold text-white tracking-tight leading-none"
                     >
-                      <AnimatedCounter value={calculatedRange.max} delay={400} />
+                      <AnimatedCounter value={calculatedRange.min} delay={400} />
                     </motion.h3>
+                    <div className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/[0.04] border border-white/[0.08]">
+                      <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest">Techo legal exigible</span>
+                      <span className="text-xs font-bold text-emerald-300">
+                        hasta {calculatedRange.max}
+                      </span>
+                    </div>
                     <p className="text-[11px] text-slate-500 mt-3 font-medium">
                       Ley 14.908 · UTM Marzo 2026 · {selectedChildren} hijo{(selectedChildren || 0) > 1 ? 's' : ''} · {name.trim().split(' ')[0]}
                     </p>
@@ -1729,8 +1871,8 @@ const CalculadoraPensionPage: React.FC = () => {
                   {currentPension && (() => {
                     const rawPension = parseInt(currentPension.replace(/\D/g, '')) || 0;
                     const currentPensionNum = rawPension > 0 && rawPension < 1000 ? 0 : rawPension;
-                    const maxPensionNum = parseInt(calculatedRange.max.replace(/\D/g, '')) || 0;
-                    const monthlyLoss = Math.max(0, maxPensionNum - currentPensionNum);
+                    const suggestedNum = parseInt(calculatedRange.min.replace(/\D/g, '')) || 0;
+                    const monthlyLoss = Math.max(0, suggestedNum - currentPensionNum);
                     if (monthlyLoss <= 0) return null;
 
                     return (
@@ -1753,12 +1895,10 @@ const CalculadoraPensionPage: React.FC = () => {
                   })()}
 
                   {hasDebt && monthsOwed && monthsOwed > 0 && (() => {
-                    const rawPension = parseInt(currentPension.replace(/\D/g, '')) || 0;
-                    const currentPensionNum = rawPension > 0 && rawPension < 1000 ? 0 : rawPension;
-                    // Deuda estimada: usamos el monto mensual exigible (calculatedRange.max) por meses impagos
-                    // (si hoy recibe algo, ese dato se usa para "fuga mensual", pero la deuda se calcula sobre lo exigible).
-                    const maxPensionNum = parseInt(calculatedRange.max.replace(/\D/g, '')) || 0;
-                    const totalDebt = Math.max(0, maxPensionNum) * monthsOwed;
+                    // Deuda estimada conservadora: usamos el monto sugerido (calculatedRange.min)
+                    // por los meses impagos para mantener credibilidad ante el cliente.
+                    const suggestedNum = parseInt(calculatedRange.min.replace(/\D/g, '')) || 0;
+                    const totalDebt = Math.max(0, suggestedNum) * monthsOwed;
                     const formattedTotalDebt = new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(totalDebt);
 
                     return (
@@ -1780,9 +1920,9 @@ const CalculadoraPensionPage: React.FC = () => {
                 {(() => {
                   const rawPension = parseInt(currentPension?.replace(/\D/g, '') || '0') || 0;
                   const currentPensionNum = rawPension > 0 && rawPension < 1000 ? 0 : rawPension;
-                  const maxPensionNum = parseInt(calculatedRange.max.replace(/\D/g, '')) || 0;
-                  const monthlyLoss = Math.max(0, maxPensionNum - currentPensionNum);
-                  const totalDebt = hasDebt && monthsOwed ? Math.max(0, maxPensionNum) * monthsOwed : 0;
+                  const suggestedNum = parseInt(calculatedRange.min.replace(/\D/g, '')) || 0;
+                  const monthlyLoss = Math.max(0, suggestedNum - currentPensionNum);
+                  const totalDebt = hasDebt && monthsOwed ? Math.max(0, suggestedNum) * monthsOwed : 0;
                   // Sin fallback fijo: si no hay deuda ni fuga mensual, no mostrar este bloque.
                   const depositAmount = totalDebt > 0 ? totalDebt : (monthlyLoss > 0 ? monthlyLoss * 12 : 0);
                   if (depositAmount <= 0) return null;
@@ -1907,8 +2047,8 @@ const CalculadoraPensionPage: React.FC = () => {
                         <div className="flex gap-3 p-3 rounded-xl bg-slate-50 border border-slate-100">
                           <Gavel className="w-5 h-5 text-indigo-600 shrink-0" />
                           <div>
-                            <p className="text-[11px] font-bold text-slate-900 leading-none">Estrategia de Choque</p>
-                            <p className="text-[10px] text-slate-500 mt-1">Plan de embargos y medidas cautelares.</p>
+                            <p className="text-[11px] font-bold text-slate-900 leading-none">Estrategia Jurídica</p>
+                            <p className="text-[10px] text-slate-500 mt-1">Incluye arrestos, embargos y otras medidas cautelares con nosotros.</p>
                           </div>
                         </div>
                         <div className="flex gap-3 p-3 rounded-xl bg-slate-50 border border-slate-100">
@@ -1930,29 +2070,6 @@ const CalculadoraPensionPage: React.FC = () => {
                         {new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(consultPrice)}
                       </p>
                     </div>
-                    {/* Countdown visual (sin redirección automática) */}
-                    {countdownActive && countdownSeconds > 0 && (
-                      <div className="rounded-xl p-4 bg-indigo-50 border border-indigo-100">
-                        <p className="text-xs font-bold text-slate-700 mb-2">
-                          Redirigiendo al pago en {countdownSeconds} segundos...
-                        </p>
-                        <div className="h-2 bg-slate-200 rounded-full overflow-hidden mb-2">
-                          <motion.div
-                            className="h-full bg-indigo-500 rounded-full"
-                            initial={{ width: '100%' }}
-                            animate={{ width: `${(countdownSeconds / 15) * 100}%` }}
-                            transition={{ duration: 0.3 }}
-                          />
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => setCountdownActive(false)}
-                          className="text-[10px] text-slate-500 hover:text-slate-700 font-medium"
-                        >
-                          Cancelar
-                        </button>
-                      </div>
-                    )}
                     <motion.button
                       onClick={handleDirectPayment}
                       whileHover={{ scale: 1.02 }}
@@ -1995,8 +2112,8 @@ const CalculadoraPensionPage: React.FC = () => {
                 {(() => {
                   const byMatter: Record<string, { n: string; l: string; t: string }[]> = {
                     alimentos: [
-                      { n: 'María José H.', l: 'Las Condes', t: 'Logré cobrar $8.000.000 de deuda. Activaron la retención AFP sin que él se enterara. Definitivo.' },
-                      { n: 'Valentina S.', l: 'Puente Alto', t: 'Me debían 14 meses. El abogado activó retención de sueldo el mismo día de la consulta. Increíble.' }
+                      { n: 'Constanza R.', l: 'Maipú', t: 'Logré cobrar $8.000.000 de deuda. Activaron la retención AFP sin que él se enterara. Definitivo.' },
+                      { n: 'Javiera P.', l: 'San Miguel', t: 'Me debían 14 meses. El abogado activó retención de sueldo el mismo día de la consulta. Increíble.' }
                     ],
                     divorcio: [
                       { n: 'Daniela T.', l: 'La Florida', t: 'Me divorció en 60 días y aseguró mi parte del departamento antes de que él lo pasara a su empresa.' },
@@ -2047,6 +2164,115 @@ const CalculadoraPensionPage: React.FC = () => {
               </motion.div>
             )}
 
+            {/* === SECCIÓN EDUCATIVA POST-RESULTADO ===
+                Solo se muestra cuando el usuario YA tiene su número.
+                Aquí el engagement es máximo y el contenido es contextual. */}
+            {isRevealed && calculatedRange && (
+              <section className="mt-14 max-w-3xl mx-auto space-y-6 border-t border-white/5 pt-10">
+                <div className="text-center mb-6">
+                  <h2 className="text-2xl font-bold text-white mb-2">
+                    ¿Cómo funciona la pensión de alimentos en Chile?
+                  </h2>
+                  <p className="text-sm text-slate-400">
+                    Ahora que conoces tu monto, entiende cómo la ley protege tus derechos.
+                  </p>
+                </div>
+
+                {/* Cómo se calculó tu monto */}
+                <article className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-6 md:p-8">
+                  <h3 className="text-lg md:text-xl font-bold text-white mb-4">
+                    Base legal de tu cálculo (Ley 14.908)
+                  </h3>
+                  <div className="space-y-3 text-slate-300 text-sm leading-relaxed">
+                    <p>
+                      Tu rango de <strong className="text-white">{calculatedRange.min}</strong> a <strong className="text-white">{calculatedRange.max}</strong> se calculó usando los siguientes parámetros vigentes en 2026:
+                    </p>
+                    <ul className="space-y-2 pl-1">
+                      <li className="flex gap-2">
+                        <span className="text-pink-400 mt-0.5" aria-hidden="true">•</span>
+                        <span><strong className="text-white">IMM 2026:</strong> $539.000 (piso mínimo legal).</span>
+                      </li>
+                      <li className="flex gap-2">
+                        <span className="text-pink-400 mt-0.5" aria-hidden="true">•</span>
+                        <span><strong className="text-white">Canasta de Crianza:</strong> $594.883 por hijo (MIDEPLAN).</span>
+                      </li>
+                      <li className="flex gap-2">
+                        <span className="text-pink-400 mt-0.5" aria-hidden="true">•</span>
+                        <span><strong className="text-white">Techo del 50%:</strong> Máximo embargable del sueldo del demandado.</span>
+                      </li>
+                      <li className="flex gap-2">
+                        <span className="text-pink-400 mt-0.5" aria-hidden="true">•</span>
+                        <span><strong className="text-white">Proporción de ingresos:</strong> Según lo que aporta cada padre.</span>
+                      </li>
+                    </ul>
+                  </div>
+                </article>
+
+                {/* Medidas de apremio (Ley 21.389) */}
+                <article className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-6 md:p-8">
+                  <h3 className="text-lg md:text-xl font-bold text-white mb-4">
+                    Si no pagan: medidas de apremio (Ley 21.389)
+                  </h3>
+                  <div className="grid md:grid-cols-2 gap-3">
+                    {[
+                      { title: 'Arresto por apremio', desc: 'Hasta 15 días por cada mes impago.' },
+                      { title: 'Retención de sueldo', desc: 'Descuento directo desde AFP/empleador.' },
+                      { title: 'Arraigo nacional', desc: 'No puede salir del país.' },
+                      { title: 'Retención SII', desc: 'Devolución de impuestos automática.' },
+                      { title: 'Embargo bancario', desc: 'Bloqueo de cuentas y fondos.' },
+                      { title: 'Suspensión de licencia', desc: 'Licencia de conducir retenida.' }
+                    ].map((item) => (
+                      <div key={item.title} className="flex gap-3 p-3 rounded-xl bg-white/5">
+                        <CheckCircle className="w-5 h-5 text-emerald-400 flex-none mt-0.5" />
+                        <div>
+                          <p className="font-semibold text-white text-sm">{item.title}</p>
+                          <p className="text-xs text-slate-400 mt-1 leading-relaxed">{item.desc}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </article>
+
+                {/* Tabla de montos mínimos */}
+                <article className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-6 md:p-8">
+                  <h3 className="text-lg md:text-xl font-bold text-white mb-4">
+                    Montos mínimos legales por hijo (2026)
+                  </h3>
+                  <div className="overflow-x-auto -mx-2 px-2">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b border-white/10">
+                          <th className="text-left py-3 px-4 text-slate-400 font-semibold">Hijos</th>
+                          <th className="text-left py-3 px-4 text-slate-400 font-semibold">Mínimo</th>
+                          <th className="text-left py-3 px-4 text-slate-400 font-semibold">Base</th>
+                        </tr>
+                      </thead>
+                      <tbody className="text-slate-300">
+                        <tr className="border-b border-white/5">
+                          <td className="py-3 px-4">1 hijo</td>
+                          <td className="py-3 px-4 font-bold text-white whitespace-nowrap">$215.600</td>
+                          <td className="py-3 px-4 text-xs">40% IMM</td>
+                        </tr>
+                        <tr className="border-b border-white/5">
+                          <td className="py-3 px-4">2 hijos</td>
+                          <td className="py-3 px-4 font-bold text-white whitespace-nowrap">$323.400</td>
+                          <td className="py-3 px-4 text-xs">30% × 2</td>
+                        </tr>
+                        <tr>
+                          <td className="py-3 px-4">3 o más hijos</td>
+                          <td className="py-3 px-4 font-bold text-white whitespace-nowrap">$485.100+</td>
+                          <td className="py-3 px-4 text-xs">30% × cantidad</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <p className="text-xs text-slate-500 mt-4">
+                    *El juez puede fijar montos superiores según los ingresos reales del demandado.
+                  </p>
+                </article>
+              </section>
+            )}
+
             {isRevealed && (
             <div className="mt-16 border-t border-white/5 pt-12">
               <h3 className="text-xl font-bold text-white mb-6 text-center">Preguntas frecuentes sobre tu caso</h3>
@@ -2071,6 +2297,48 @@ const CalculadoraPensionPage: React.FC = () => {
             </div>
             )}
           </div>
+
+          {/* === FAQ FINAL — SIEMPRE VISIBLE (indexable para SEO, colapsada por UX) ===
+              Mantiene el contenido en el DOM para Googlebot sin tapar el formulario. */}
+          {!isAnalyzing && (
+            <section className="mt-16 max-w-3xl mx-auto border-t border-white/5 pt-10 pb-4">
+              <h2 className="text-2xl font-bold text-white mb-6 text-center">
+                Preguntas frecuentes sobre pensión de alimentos
+              </h2>
+              <div className="space-y-3">
+                {[
+                  {
+                    q: '¿Cuánto es la pensión de alimentos por 1 hijo en Chile 2026?',
+                    a: 'El mínimo legal es $215.600 (40% del IMM $539.000). Si el demandado gana más, el juez puede fijar montos superiores basándose en la canasta de crianza ($594.883 por hijo según MIDEPLAN).'
+                  },
+                  {
+                    q: '¿Cómo se calcula la pensión según el sueldo del padre?',
+                    a: 'Se usa una proporción de gastos según los ingresos de ambos padres. El techo legal es 50% del sueldo del demandado. Ejemplo: si gana $1.500.000, el máximo total entre todos los hijos sería $750.000.'
+                  },
+                  {
+                    q: '¿Qué pasa si no pagan la pensión de alimentos en Chile?',
+                    a: 'La Ley 21.389 permite arresto hasta 15 días por mes impago, retención de sueldo vía AFP, arraigo nacional, embargo de cuentas, retención de impuestos por SII y suspensión de licencia de conducir.'
+                  },
+                  {
+                    q: '¿Cuánto demora una demanda de pensión de alimentos?',
+                    a: 'La pensión provisoria se obtiene en 2 a 4 semanas. La definitiva se fija en audiencia única, generalmente 45 a 90 días desde la presentación de la demanda.'
+                  },
+                  {
+                    q: '¿Se puede aumentar la pensión de alimentos?',
+                    a: 'Sí. Si aumentaron los gastos del menor o los ingresos del demandado puedes pedir aumento. El retroactivo se calcula desde la fecha de presentación de la demanda.'
+                  }
+                ].map((faq) => (
+                  <details key={faq.q} className="group bg-white/5 border border-white/10 rounded-2xl overflow-hidden">
+                    <summary className="flex items-center justify-between gap-3 cursor-pointer list-none p-5 hover:bg-white/[0.02] transition-colors">
+                      <h3 className="font-semibold text-slate-100 text-sm md:text-base">{faq.q}</h3>
+                      <span className="flex-none w-6 h-6 rounded-full bg-white/10 grid place-items-center text-slate-300 text-sm transition-transform group-open:rotate-45" aria-hidden="true">+</span>
+                    </summary>
+                    <p className="text-sm text-slate-400 leading-relaxed px-5 pb-5">{faq.a}</p>
+                  </details>
+                ))}
+              </div>
+            </section>
+          )}
         </main>
 
         {/* Botón Flotante de Contacto WhatsApp */}

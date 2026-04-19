@@ -1,6 +1,6 @@
 // RUTA: src/components/layout/MainLayout.tsx
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useLocation, Outlet } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { AnimatePresence } from 'framer-motion';
@@ -13,21 +13,35 @@ import { getLayoutForPath } from '@/config/layoutConfig';
 const MainLayout: React.FC = () => {
   const location = useLocation();
   const config = getLayoutForPath(location.pathname);
-  
+
+  // Marca la ruta actual en <body> para que index.css pueda atenuar
+  // los orbes naranja en el landing oscuro.
+  useEffect(() => {
+    document.body.setAttribute('data-route', location.pathname);
+    return () => {
+      document.body.removeAttribute('data-route');
+    };
+  }, [location.pathname]);
+
   // Verificación explícita para rutas de agendamiento
   const isAgendamientoRoute = location.pathname.startsWith('/agendamiento') || 
                                location.pathname.startsWith('/mercadopago') ||
                                location.pathname.startsWith('/pago') ||
                                location.pathname.startsWith('/payment');
-  
-  const baseBackgroundClass =
-    'relative min-h-screen bg-[#FAFAF9] dark:bg-[#0B1121] text-stone-800 dark:text-stone-100 selection:bg-stone-200 selection:text-stone-900 overflow-hidden';
-  const NoiseOverlay = () => (
-    <div
-      className="paper-noise"
-      aria-hidden="true"
-    />
-  );
+
+  // En el landing (`/`) delegamos el fondo al canvas slate de Index;
+  // el resto de rutas conserva el fondo crema/oscuro tradicional.
+  const isLanding = location.pathname === '/';
+  const baseBackgroundClass = isLanding
+    ? 'relative min-h-screen bg-transparent text-slate-100 selection:bg-sky-500/30 selection:text-white overflow-hidden'
+    : 'relative min-h-screen bg-[#FAFAF9] dark:bg-[#0B1121] text-stone-800 dark:text-stone-100 selection:bg-stone-200 selection:text-stone-900 overflow-hidden';
+  const NoiseOverlay = () =>
+    isLanding ? null : (
+      <div
+        className="paper-noise"
+        aria-hidden="true"
+      />
+    );
   
   // SEO base
   const seoTitle = config.seoConfig?.titleSuffix 

@@ -1,788 +1,763 @@
-import { motion } from 'framer-motion'
-import { Building2, FileText, Users, TrendingUp, Shield, Globe, CheckCircle, Star, Clock, Award, LogIn, BarChart3, Calendar, AlertTriangle, X } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
+import {
+  Building2,
+  FileText,
+  Users,
+  TrendingUp,
+  Shield,
+  Globe,
+  CheckCircle,
+  Calendar,
+  BarChart3,
+  AlertTriangle,
+  LogIn,
+  X,
+  ArrowRight,
+  Plus,
+  Minus,
+  Clock,
+  Award,
+} from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useState } from 'react'
 import SEO from '../components/SEO'
-import Header from '../components/Header'
-import { MobileLayout } from '../components/MobileLayout'
+import ServicioPageShell from '@/components/servicios/ServicioPageShell'
+import { useServicioTheme } from '@/components/servicios/servicioThemeContext'
+import TestimonialBubble from '@/components/servicios/TestimonialBubble'
 import CorporateLoginSimple from '../components/CorporateLoginSimple'
 import CorporateDashboard from '../components/CorporateDashboard'
 
 const services = [
   {
     icon: Building2,
-    title: 'Constitución de Sociedades',
-    description: 'Creación de empresas en 24 horas con todos los trámites incluidos.',
-    features: ['SpA en 1 día', 'SRL express', 'Sociedades anónimas', 'Modificaciones societarias']
+    title: 'Constitución de sociedades',
+    description: 'SpA, SRL y SA en 24 horas con todos los trámites incluidos.',
+    features: ['SpA en 1 día', 'SRL express', 'Sociedades anónimas', 'Modificaciones societarias'],
   },
   {
     icon: FileText,
-    title: 'Contratos Comerciales',
-    description: 'Redacción y revisión de contratos para proteger tus intereses.',
-    features: ['Contratos de compraventa', 'Acuerdos de confidencialidad', 'Joint ventures', 'Licencias']
+    title: 'Contratos comerciales',
+    description: 'Redacción y revisión de contratos para proteger los intereses de tu empresa.',
+    features: ['Compraventa comercial', 'Confidencialidad (NDA)', 'Joint ventures', 'Licencias'],
   },
   {
     icon: Users,
-    title: 'Fusiones y Adquisiciones',
+    title: 'Fusiones y adquisiciones',
     description: 'Asesoría completa en procesos de M&A y due diligence.',
-    features: ['Due diligence legal', 'Estructuración de deals', 'Negociación', 'Post-merger']
+    features: ['Due diligence legal', 'Estructuración de deals', 'Negociación', 'Post-merger'],
   },
   {
     icon: TrendingUp,
-    title: 'Inversión Extranjera',
-    description: 'Facilitamos la entrada de capital extranjero cumpliendo normativas.',
-    features: ['Capítulo XIV', 'Estructuras de inversión', 'Compliance regulatorio', 'Repatriación']
+    title: 'Inversión extranjera',
+    description: 'Facilitamos la entrada de capital extranjero cumpliendo normativa chilena.',
+    features: ['Capítulo XIV', 'Estructuras de inversión', 'Compliance regulatorio', 'Repatriación'],
   },
   {
     icon: Shield,
-    title: 'Gobierno Corporativo',
-    description: 'Implementación de mejores prácticas y compliance corporativo.',
-    features: ['Directorios', 'Políticas internas', 'Códigos de ética', 'Gestión de riesgos']
+    title: 'Gobierno corporativo',
+    description: 'Buenas prácticas y compliance para directores y ejecutivos.',
+    features: ['Directorio', 'Políticas internas', 'Códigos de ética', 'Gestión de riesgos'],
   },
   {
     icon: Globe,
-    title: 'Comercio Internacional',
-    description: 'Asesoría en importaciones, exportaciones y acuerdos internacionales.',
-    features: ['Contratos internacionales', 'Incoterms', 'Resolución de disputas', 'Arbitraje']
-  }
+    title: 'Comercio internacional',
+    description: 'Contratos, Incoterms y resolución de disputas transfronterizas.',
+    features: ['Contratos internacionales', 'Incoterms', 'Resolución de disputas', 'Arbitraje'],
+  },
 ]
 
 const testimonials = [
   {
     name: 'Carlos Mendoza',
     role: 'CEO, TechStart Chile',
-    content: 'Su desempeño contra las fiscalizaciones de la Dirección del Trabajo fueron impecables. Nos ayudaron a implementar políticas de compliance que nos ahorraron multas millonarias. El equipo de Punto Legal manejó toda la complejidad legal con maestría y nos dieron tranquilidad total durante todo el proceso.',
-    rating: 5
+    content:
+      'Implementaron políticas de compliance que nos ahorraron multas millonarias. El equipo manejó toda la complejidad con maestría y nos dieron tranquilidad total.',
+    rating: 5,
   },
   {
     name: 'María Fernández',
     role: 'Directora, Grupo Inmobiliario MF',
-    content: 'Me ayudaron en un proceso de reestructuración corporativa que era crítico para nuestro cambio de rumbo al sector inmobiliario. La asesoría en la fusión con nuestro competidor fue clave y manejaron toda la complejidad legal con profesionalismo excepcional. Su conocimiento del sector inmobiliario nos dio confianza total.',
-    rating: 5
+    content:
+      'La asesoría en la fusión con nuestro competidor fue clave. Manejaron toda la complejidad legal con profesionalismo excepcional y conocimiento del sector.',
+    rating: 5,
   },
   {
     name: 'Roberto Silva',
-    role: 'Inversionista Internacional',
-    content: 'Me ayudaron a estructurar mi inversión en Chile de forma óptima. Su excelente conocimiento del Capítulo XIV y las regulaciones de inversión extranjera me permitió maximizar beneficios y minimizar riesgos. El equipo demostró un dominio excepcional de las normativas internacionales.',
-    rating: 5
-  }
+    role: 'Inversionista internacional',
+    content:
+      'Me ayudaron a estructurar mi inversión en Chile de forma óptima. Excelente manejo del Capítulo XIV y las regulaciones internacionales.',
+    rating: 5,
+  },
 ]
 
 const stats = [
   { number: '500+', label: 'Empresas constituidas' },
   { number: '50M+', label: 'USD en deals cerrados' },
   { number: '24h', label: 'Constitución express' },
-  { number: '98%', label: 'Clientes satisfechos' }
+  { number: '98%', label: 'Clientes satisfechos' },
+]
+
+const corporativoFaq = [
+  {
+    question: '¿En cuánto tiempo se constituye una SpA en Chile?',
+    answer:
+      'Una SpA puede constituirse en 24 a 48 horas hábiles mediante escritura pública electrónica en el Repertorio Electrónico Notarial. Incluye estatutos, publicación en el Diario Oficial, inscripción en el Registro de Comercio y obtención del RUT.',
+  },
+  {
+    question: '¿Qué es el due diligence y cuándo es necesario?',
+    answer:
+      'Es un proceso de revisión legal, financiera y operativa de una empresa antes de una compra, fusión o inversión significativa. Es indispensable para identificar pasivos ocultos, litigios pendientes y riesgos regulatorios antes de cerrar un deal.',
+  },
+  {
+    question: '¿Qué incluye el Panel de Control Empresarial?',
+    answer:
+      'El portal corporativo incluye seguimiento de causas laborales y civiles, gestión de comparendos ante la Inspección del Trabajo, redacción de contratos y cartas de amonestación, proyecciones de resultados y línea directa con el abogado dedicado.',
+  },
+  {
+    question: '¿Qué es el Capítulo XIV del BCCH?',
+    answer:
+      'Regula los créditos, inversiones y aportes de capital desde y hacia Chile. Su cumplimiento es obligatorio para operaciones internacionales que superen los USD 10.000. El incumplimiento implica multas significativas del Banco Central.',
+  },
+  {
+    question: '¿Cómo funciona la consulta inicial para empresas?',
+    answer:
+      'Es una sesión de 1 hora con el abogado corporativo asignado donde evaluamos la situación societaria, contratos vigentes y riesgos identificados. Se entrega un informe con recomendaciones y la propuesta de plan más adecuado.',
+  },
 ]
 
 export default function ServicioCorporativoPage() {
-  const [showLogin, setShowLogin] = useState(false);
-  const [showDashboard, setShowDashboard] = useState(false);
-  const [currentUser, setCurrentUser] = useState(null);
+  const [showLogin, setShowLogin] = useState(false)
+  const [showDashboard, setShowDashboard] = useState(false)
+  const [currentUser, setCurrentUser] = useState<Record<string, unknown> | null>(null)
 
-  const handleLoginSuccess = (user: any) => {
-    setCurrentUser(user);
-    setShowLogin(false);
-    setShowDashboard(true);
-  };
+  const handleLoginSuccess = (user: Record<string, unknown>) => {
+    setCurrentUser(user)
+    setShowLogin(false)
+    setShowDashboard(true)
+  }
 
   const handleLogout = () => {
-    setCurrentUser(null);
-    setShowDashboard(false);
-  };
+    setCurrentUser(null)
+    setShowDashboard(false)
+  }
 
-  // Si el usuario está logueado, mostrar el dashboard sin layout
   if (showDashboard && currentUser) {
     return (
       <>
-        <SEO 
-          title="Portal Corporativo - Punto Legal"
+        <SEO
+          title="Portal Corporativo — Punto Legal"
           description="Panel de administración corporativo para gestión de causas legales y comparendos."
         />
         <CorporateDashboard user={currentUser} onLogout={handleLogout} />
       </>
-    );
+    )
   }
-
-  const pageContent = (
-    <div className="bg-gradient-to-b from-background to-background/95">
-        {/* Hero Section */}
-        <section className="relative py-20 overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-transparent to-primary/10" />
-          
-          <div className="container mx-auto px-4 relative z-10">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              className="text-center max-w-4xl mx-auto"
-            >
-              <div className="inline-flex items-center gap-2 bg-primary/10 rounded-full px-4 py-2 mb-6">
-                <Building2 className="w-5 h-5 text-primary" />
-                <span className="text-sm font-medium text-primary">Especialistas en Derecho Corporativo</span>
-              </div>
-              
-              <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent">
-                Potencia tu Empresa con Asesoría Legal Experta
-              </h1>
-              
-              <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
-                Desde la constitución hasta operaciones complejas de M&A, somos tu socio estratégico 
-                para el crecimiento empresarial con seguridad jurídica total.
-              </p>
-              
-              <div className="flex flex-wrap gap-4 justify-center">
-                <Link
-                  to="/agendamiento?plan=corporativo"
-                  className="px-8 py-4 bg-primary text-white rounded-xl font-semibold hover:bg-primary/90 transition-all duration-300 shadow-lg hover:shadow-xl"
-                >
-                  Consulta por $35.000
-                </Link>
-                <button
-                  onClick={() => setShowLogin(true)}
-                  className="px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-xl font-semibold hover:from-amber-600 hover:to-orange-700 transition-all duration-300 shadow-lg hover:shadow-xl flex items-center gap-2"
-                >
-                  <LogIn className="w-5 h-5" />
-                  Iniciar Sesión Empresa
-                </button>
-              </div>
-            </motion.div>
-          </div>
-        </section>
-
-        {/* Corporate Subscription Section */}
-        <section className="py-20 bg-gradient-to-b from-amber-500/5 to-orange-500/5">
-          <div className="container mx-auto px-4">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              className="text-center mb-12"
-            >
-              <h2 className="text-4xl font-bold mb-4">Suscripción Corporativa Premium</h2>
-              <p className="text-xl text-muted-foreground">Acceso completo al seguimiento de causas y gestión legal integral</p>
-            </motion.div>
-
-            <div className="max-w-4xl mx-auto">
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.1 }}
-                className="bg-gradient-to-r from-amber-500 to-orange-600 rounded-3xl p-8 text-white relative overflow-hidden"
-              >
-                <div className="absolute inset-0 bg-grid-white/10" />
-                <div className="relative z-10">
-                  <div className="grid md:grid-cols-2 gap-8">
-                    <div>
-                      <h3 className="text-2xl font-bold mb-4">Panel de Control Empresarial</h3>
-                      <div className="space-y-4">
-                        <div className="flex items-center gap-3">
-                          <BarChart3 className="w-6 h-6 text-amber-200" />
-                          <span>Seguimiento completo de causas</span>
-                        </div>
-                        <div className="flex items-center gap-3">
-                          <Calendar className="w-6 h-6 text-amber-200" />
-                          <span>Comparendos ante Inspección del Trabajo</span>
-                        </div>
-                        <div className="flex items-center gap-3">
-                          <FileText className="w-6 h-6 text-amber-200" />
-                          <span>Redacción de contratos y amonestaciones</span>
-                        </div>
-                        <div className="flex items-center gap-3">
-                          <AlertTriangle className="w-6 h-6 text-amber-200" />
-                          <span>Gestión de despidos y otros procesos</span>
-                        </div>
-                        <div className="flex items-center gap-3">
-                          <TrendingUp className="w-6 h-6 text-amber-200" />
-                          <span>Proyecciones de resultados en juicio</span>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-4xl font-bold mb-2">$800.000</div>
-                      <div className="text-amber-200 mb-6">Mensual</div>
-                      <button
-                        onClick={() => setShowLogin(true)}
-                        className="px-8 py-4 bg-white text-amber-600 rounded-xl font-semibold hover:bg-white/90 transition-all duration-300 shadow-lg hover:shadow-xl"
-                      >
-                        Acceder al Panel
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-            </div>
-          </div>
-        </section>
-
-        {/* Stats Section */}
-        <section className="py-16 border-y border-white/10">
-          <div className="container mx-auto px-4">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-              {stats.map((stat, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: index * 0.1 }}
-                  className="text-center"
-                >
-                  <div className="text-4xl font-bold text-primary mb-2">{stat.number}</div>
-                  <div className="text-sm text-muted-foreground">{stat.label}</div>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Pricing Packages */}
-        <section className="py-20">
-          <div className="container mx-auto px-4">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              className="text-center mb-12"
-            >
-              <h2 className="text-4xl font-bold mb-4">Paquetes de Servicios Corporativos</h2>
-              <p className="text-xl text-muted-foreground">Elige el plan que mejor se adapte a tu empresa</p>
-            </motion.div>
-
-            <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-              {/* Básico */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.1 }}
-                className="relative bg-white/5 backdrop-blur-sm rounded-2xl p-8 border border-white/10 hover:border-primary/30 transition-all duration-300"
-              >
-                <div className="text-center mb-6">
-                  <h3 className="text-2xl font-bold mb-2">Básico</h3>
-                  <p className="text-muted-foreground mb-4">Para emprendedores</p>
-                  <div className="text-4xl font-bold text-primary mb-2">$350.000</div>
-                  <p className="text-sm text-muted-foreground">Pago único</p>
-                </div>
-                
-                <ul className="space-y-3 mb-8">
-                  <li className="flex items-start gap-2">
-                    <CheckCircle className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-                    <span className="text-sm">Constitución SpA o EIRL</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-                    <span className="text-sm">Estatutos estándar</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-                    <span className="text-sm">Inscripción CBR</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-                    <span className="text-sm">RUT empresa</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-                    <span className="text-sm">1 mes soporte básico</span>
-                  </li>
-                </ul>
-                
-                <Link
-                  to="/agendamiento?plan=basico"
-                  className="w-full bg-primary/10 text-primary border border-primary/30 rounded-xl py-3 px-6 font-semibold hover:bg-primary/20 transition-all duration-300 text-center block"
-                >
-                  Agendar Consulta
-                </Link>
-              </motion.div>
-
-              {/* Premium */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.2 }}
-                className="relative bg-white/5 backdrop-blur-sm rounded-2xl p-8 border-2 border-primary/50 hover:border-primary transition-all duration-300"
-              >
-                <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                  <div className="bg-gradient-to-r from-primary to-primary/80 text-white px-4 py-1 rounded-full text-sm font-semibold">
-                    Más Popular
-                  </div>
-                </div>
-                
-                <div className="text-center mb-6">
-                  <h3 className="text-2xl font-bold mb-2">Premium</h3>
-                  <p className="text-muted-foreground mb-4">Para empresas en crecimiento</p>
-                  <div className="text-4xl font-bold text-primary mb-2">$800.000</div>
-                  <p className="text-sm text-muted-foreground">Pago único</p>
-                </div>
-                
-                <ul className="space-y-3 mb-8">
-                  <li className="flex items-start gap-2">
-                    <CheckCircle className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-                    <span className="text-sm">Todo lo del plan Básico</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-                    <span className="text-sm">Estatutos personalizados</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-                    <span className="text-sm">3 contratos comerciales</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-                    <span className="text-sm">Políticas internas básicas</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-                    <span className="text-sm">6 meses soporte legal</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-                    <span className="text-sm">Asesoría tributaria inicial</span>
-                  </li>
-                </ul>
-                
-                <Link
-                  to="/agendamiento?plan=premium"
-                  className="w-full bg-primary text-white rounded-xl py-3 px-6 font-semibold hover:bg-primary/90 transition-all duration-300 text-center block"
-                >
-                  Agendar Consulta
-                </Link>
-              </motion.div>
-
-              {/* Enterprise */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.3 }}
-                className="relative bg-white/5 backdrop-blur-sm rounded-2xl p-8 border border-white/10 hover:border-primary/30 transition-all duration-300"
-              >
-                <div className="text-center mb-6">
-                  <h3 className="text-2xl font-bold mb-2">Enterprise</h3>
-                  <p className="text-muted-foreground mb-4">Para grandes empresas</p>
-                  <div className="text-4xl font-bold text-primary mb-2">$1.500.000</div>
-                  <p className="text-sm text-muted-foreground">Pago único</p>
-                </div>
-                
-                <ul className="space-y-3 mb-8">
-                  <li className="flex items-start gap-2">
-                    <CheckCircle className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-                    <span className="text-sm">Todo lo del plan Premium</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-                    <span className="text-sm">Due diligence completo</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-                    <span className="text-sm">Estructuración M&A</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-                    <span className="text-sm">Compliance corporativo</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-                    <span className="text-sm">12 meses soporte premium</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-                    <span className="text-sm">Abogado dedicado</span>
-                  </li>
-                </ul>
-                
-                <Link
-                  to="/agendamiento?plan=enterprise"
-                  className="w-full bg-gradient-to-r from-primary to-primary/80 text-white rounded-xl py-3 px-6 font-semibold hover:from-primary/90 hover:to-primary/70 transition-all duration-300 text-center block"
-                >
-                  Agendar Consulta
-                </Link>
-              </motion.div>
-            </div>
-          </div>
-        </section>
-
-        {/* Services Grid */}
-        <section className="py-20 bg-gradient-to-b from-primary/5 to-transparent">
-          <div className="container mx-auto px-4">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              className="text-center mb-12"
-            >
-              <h2 className="text-4xl font-bold mb-4">Servicios Adicionales</h2>
-              <p className="text-xl text-muted-foreground">Servicios específicos para necesidades puntuales</p>
-            </motion.div>
-
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {services.map((service, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: index * 0.1 }}
-                  className="group relative"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-primary/10 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                  
-                  <div className="relative bg-white/5 backdrop-blur-sm rounded-2xl p-8 border border-white/10 hover:border-primary/30 transition-all duration-300">
-                    <div className="w-16 h-16 bg-gradient-to-br from-primary/30 to-primary/10 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-                      <service.icon className="w-8 h-8 text-primary" />
-                    </div>
-                    
-                    <h3 className="text-2xl font-bold mb-3">{service.title}</h3>
-                    <p className="text-muted-foreground mb-6">{service.description}</p>
-                    
-                    <ul className="space-y-2 mb-6">
-                      {service.features.map((feature, idx) => (
-                        <li key={idx} className="flex items-start gap-2">
-                          <CheckCircle className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-                          <span className="text-sm">{feature}</span>
-                        </li>
-                      ))}
-                    </ul>
-                    
-                    <div className="border-t border-white/10 pt-4">
-                      <p className="text-lg font-bold text-primary mb-2">
-                        Desde $
-                        {index === 0 ? '250.000' : 
-                         index === 1 ? '180.000' : 
-                         index === 2 ? '1.200.000' : 
-                         index === 3 ? '400.000' : 
-                         index === 4 ? '350.000' : '500.000'}
-                      </p>
-                      <Link
-                        to="/agendamiento?plan=corporativo"
-                        className="w-full bg-primary text-white rounded-lg py-2 px-4 text-sm font-semibold hover:bg-primary/90 transition-all duration-300 text-center block shadow-lg hover:shadow-xl"
-                      >
-                        Agendar Consulta
-                      </Link>
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Process Section */}
-        <section className="py-20 bg-gradient-to-b from-primary/5 to-transparent">
-          <div className="container mx-auto px-4">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              className="text-center mb-16"
-            >
-              <h2 className="text-4xl font-bold mb-4">Proceso Simple y Transparente</h2>
-              <p className="text-xl text-muted-foreground">Te acompañamos en cada paso</p>
-            </motion.div>
-
-            <div className="grid md:grid-cols-4 gap-12 max-w-6xl mx-auto relative">
-              {/* Líneas punteadas mejoradas con efectos */}
-              <div className="hidden md:block absolute top-12 left-[12.5%] w-[25%] h-1 border-t-4 border-dashed border-primary/60 z-0 animate-pulse"></div>
-              <div className="hidden md:block absolute top-12 left-[37.5%] w-[25%] h-1 border-t-4 border-dashed border-primary/60 z-0 animate-pulse"></div>
-              <div className="hidden md:block absolute top-12 left-[62.5%] w-[25%] h-1 border-t-4 border-dashed border-primary/60 z-0 animate-pulse"></div>
-              
-              {[
-                { step: '1', title: 'Consulta Inicial', desc: 'Evaluamos tu caso sin costo', icon: Clock },
-                { step: '2', title: 'Propuesta', desc: 'Plan de acción y honorarios claros', icon: FileText },
-                { step: '3', title: 'Ejecución', desc: 'Implementamos la solución legal', icon: TrendingUp },
-                { step: '4', title: 'Seguimiento', desc: 'Soporte continuo post-servicio', icon: Award }
-              ].map((item, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: index * 0.1 }}
-                  className="text-center relative z-10 group"
-                >
-                  <div className="relative mx-auto w-24 h-24 mb-6">
-                    <div className="absolute inset-0 bg-primary/20 rounded-full blur-xl group-hover:blur-2xl transition-all duration-300" />
-                    <div className="relative bg-gradient-to-br from-primary to-primary/80 rounded-full flex items-center justify-center text-white font-bold text-3xl shadow-lg group-hover:shadow-xl group-hover:scale-110 transition-all duration-300">
-                      {item.step}
-                    </div>
-                  </div>
-                  <h3 className="text-xl font-bold mb-3 text-white group-hover:text-primary transition-colors">{item.title}</h3>
-                  <p className="text-muted-foreground leading-relaxed group-hover:text-white/80 transition-colors">{item.desc}</p>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Testimonials */}
-        <section className="py-20">
-          <div className="container mx-auto px-4">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              className="text-center mb-16"
-            >
-              <h2 className="text-4xl font-bold mb-4">Lo que Dicen Nuestros Clientes</h2>
-              <p className="text-xl text-muted-foreground">Casos de éxito reales</p>
-            </motion.div>
-
-            <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-              {testimonials.map((testimonial, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: index * 0.1 }}
-                  className="relative group"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-transparent rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                  
-                  <div className="relative bg-white/5 backdrop-blur-sm rounded-2xl p-8 border border-white/10 hover:border-primary/30 transition-all duration-300 h-full group">
-                    <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                    
-                    <div className="relative z-10">
-                      <div className="mb-6">
-                        <h4 className="font-bold text-white text-lg mb-1 group-hover:text-primary transition-colors">{testimonial.name}</h4>
-                        <p className="text-sm text-muted-foreground group-hover:text-white/80 transition-colors">{testimonial.role}</p>
-                      </div>
-                      
-                      <div className="flex gap-1 mb-6">
-                        {[...Array(testimonial.rating)].map((_, i) => (
-                          <Star key={i} className="w-5 h-5 fill-primary text-primary group-hover:scale-110 transition-transform duration-200" />
-                        ))}
-                      </div>
-                      
-                      <blockquote className="text-muted-foreground italic text-justify leading-relaxed text-base group-hover:text-white/90 transition-colors">
-                        "{testimonial.content}"
-                      </blockquote>
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Contingent Blogs Section */}
-        <section className="py-20 bg-gradient-to-b from-primary/5 to-transparent">
-          <div className="container mx-auto px-4">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              className="text-center mb-12"
-            >
-              <h2 className="text-4xl font-bold mb-4">Temas Legales de Actualidad</h2>
-              <p className="text-xl text-muted-foreground">Mantente informado sobre cambios normativos y tendencias corporativas</p>
-            </motion.div>
-
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
-              {[
-                {
-                  title: "Nueva Ley de Modernización Tributaria 2025",
-                  excerpt: "Cambios importantes en el régimen tributario que afectan a las empresas chilenas...",
-                  date: "15 Enero 2025",
-                  readTime: "5 min",
-                  category: "Tributario",
-                  urgent: true,
-                  link: "/blog/ley-modernizacion-tributaria-2025"
-                },
-                {
-                  title: "Reforma al Código de Comercio: Nuevas Obligaciones",
-                  excerpt: "Las modificaciones al código de comercio que entran en vigencia este año...",
-                  date: "12 Enero 2025", 
-                  readTime: "7 min",
-                  category: "Comercial",
-                  urgent: false,
-                  link: "/blog/reforma-codigo-comercio-2025"
-                },
-                {
-                  title: "ESG y Compliance: Obligatorio para Grandes Empresas",
-                  excerpt: "Nuevos requerimientos de sostenibilidad y gobierno corporativo...",
-                  date: "10 Enero 2025",
-                  readTime: "6 min", 
-                  category: "Compliance",
-                  urgent: true,
-                  link: "/blog/esg-compliance-2025"
-                },
-                {
-                  title: "Startups: Cambios en Inversión Extranjera",
-                  excerpt: "Nuevas facilidades para la inversión extranjera en startups chilenas...",
-                  date: "8 Enero 2025",
-                  readTime: "4 min",
-                  category: "Inversión",
-                  urgent: false,
-                  link: "/blog/inversion-extranjera-startups"
-                },
-                {
-                  title: "Ley de Protección de Datos: Multas Récord",
-                  excerpt: "Primeras multas millonarias por incumplimiento de la ley de datos...",
-                  date: "5 Enero 2025",
-                  readTime: "8 min",
-                  category: "Datos",
-                  urgent: true,
-                  link: "/blog/multas-proteccion-datos"
-                },
-                {
-                  title: "Sociedades Benefit: La Nueva Tendencia",
-                  excerpt: "Cómo constituir una sociedad de beneficio e impacto en Chile...",
-                  date: "3 Enero 2025",
-                  readTime: "6 min",
-                  category: "Innovación",
-                  urgent: false,
-                  link: "/blog/sociedades-benefit-chile"
-                }
-              ].map((article, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: index * 0.1 }}
-                  className="group relative"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-primary/10 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                  
-                  <Link 
-                    to={article.link}
-                    className="relative block bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:border-primary/30 transition-all duration-300"
-                  >
-                    {article.urgent && (
-                      <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
-                        URGENTE
-                      </div>
-                    )}
-                    
-                    <div className="flex items-center gap-2 mb-3">
-                      <span className="bg-primary/20 text-primary px-2 py-1 rounded-full text-xs font-semibold">
-                        {article.category}
-                      </span>
-                      <span className="text-xs text-muted-foreground">{article.date}</span>
-                      <span className="text-xs text-muted-foreground">• {article.readTime}</span>
-                    </div>
-                    
-                    <h3 className="text-lg font-bold mb-3 group-hover:text-primary transition-colors">
-                      {article.title}
-                    </h3>
-                    
-                    <p className="text-sm text-muted-foreground mb-4 line-clamp-3">
-                      {article.excerpt}
-                    </p>
-                    
-                    <div className="flex items-center gap-2 text-primary text-sm font-semibold">
-                      <span>Leer más</span>
-                      <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
-                    </div>
-                  </Link>
-                </motion.div>
-              ))}
-            </div>
-            
-            <div className="text-center mt-12">
-              <Link
-                to="/blog?categoria=corporativo"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-primary/10 text-primary border border-primary/30 rounded-xl font-semibold hover:bg-primary/20 transition-all duration-300"
-              >
-                Ver Todos los Artículos Corporativos
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                </svg>
-              </Link>
-            </div>
-          </div>
-        </section>
-
-        {/* CTA Section */}
-        <section className="py-20">
-          <div className="container mx-auto px-4">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-primary to-primary/80 p-12 text-center"
-            >
-              <div className="absolute inset-0 bg-grid-white/10" />
-              
-              <div className="relative z-10 max-w-3xl mx-auto">
-                <h2 className="text-4xl font-bold text-white mb-4">
-                  ¿Listo para Llevar tu Empresa al Siguiente Nivel?
-                </h2>
-                <p className="text-xl text-white/90 mb-8">
-                  Agenda una consulta especializada por $35.000 con nuestros expertos en derecho corporativo
-                </p>
-                
-                <div className="flex flex-wrap gap-4 justify-center">
-                  <Link
-                    to="/agendamiento?plan=premium"
-                    className="px-8 py-4 bg-white text-primary rounded-xl font-semibold hover:bg-white/90 transition-all duration-300 shadow-lg hover:shadow-xl"
-                  >
-                    Agendar Consulta
-                  </Link>
-                  <button
-                    onClick={() => setShowLogin(true)}
-                    className="px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-xl font-semibold hover:from-amber-600 hover:to-orange-700 transition-all duration-300 shadow-lg hover:shadow-xl"
-                  >
-                    Acceder al Panel
-                  </button>
-                </div>
-              </div>
-            </motion.div>
-          </div>
-        </section>
-
-        {/* Admin Access Info */}
-        {/* Sección eliminada por solicitud del usuario */}
-      </div>
-    );
 
   return (
     <>
-      <SEO 
-        title="Derecho Corporativo - Abogados Especialistas | Punto Legal"
-        description="Expertos en derecho corporativo: constitución de sociedades, M&A, contratos comerciales y gobierno corporativo. Asesoría legal empresarial de primer nivel."
+      <SEO
+        title="Abogado corporativo en Chile: sociedades, contratos y M&A | Punto Legal"
+        description="Expertos en derecho corporativo: constitución de SpA en 24h, contratos comerciales, M&A y gobierno corporativo. Asesoría legal empresarial de primer nivel."
       />
-      
-      {/* Desktop Layout */}
-      <div className="hidden lg:block min-h-screen">
-        <Header />
-        <div className="pt-20">
-          {pageContent}
-        </div>
-      </div>
+      <ServicioPageShell
+        theme="corporativo"
+        contentName="Punto Legal — Derecho Corporativo"
+        contentCategory="Servicios Legales — Derecho Corporativo"
+      >
+        <ServicioCorporativoInner
+          showLogin={showLogin}
+          setShowLogin={setShowLogin}
+          onLoginSuccess={handleLoginSuccess}
+        />
+      </ServicioPageShell>
+    </>
+  )
+}
 
-      {/* Mobile Layout */}
-      <div className="lg:hidden min-h-screen">
-        <MobileLayout>
-          {pageContent}
-        </MobileLayout>
-      </div>
+function ServicioCorporativoInner({
+  showLogin,
+  setShowLogin,
+  onLoginSuccess,
+}: {
+  showLogin: boolean
+  setShowLogin: (v: boolean) => void
+  onLoginSuccess: (user: Record<string, unknown>) => void
+}) {
+  const t = useServicioTheme()
 
-       {/* Login Modal - Posicionamiento fijo para móvil */}
-       {showLogin && (
-         <div className="fixed inset-0 z-50 flex items-start justify-center p-4 bg-black/50 backdrop-blur-sm sm:items-center">
-           <motion.div
-             initial={{ opacity: 0, scale: 0.9, y: -20 }}
-             animate={{ opacity: 1, scale: 1, y: 0 }}
-             exit={{ opacity: 0, scale: 0.9, y: -20 }}
-             transition={{ duration: 0.3, type: "spring", stiffness: 300 }}
-             className="relative w-full max-w-md max-h-[90vh] overflow-y-auto mt-4 sm:mt-0"
-           >
-            {/* Botón de cerrar */}
-            <button
-              onClick={() => setShowLogin(false)}
-              className="absolute top-4 right-4 z-10 w-8 h-8 rounded-full bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm flex items-center justify-center shadow-lg hover:bg-white dark:hover:bg-gray-700 transition-colors"
-            >
-              <X className="w-4 h-4 text-gray-600 dark:text-gray-300" />
-            </button>
+  return (
+    <>
+      {/* Hero */}
+      <section className="relative pt-8 md:pt-14 pb-10 md:pb-16 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-950 to-slate-900" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-indigo-900/12 via-transparent to-transparent pointer-events-none" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_var(--tw-gradient-stops))] from-slate-700/8 via-transparent to-transparent pointer-events-none" />
 
-            {/* Contenido del modal */}
-            <CorporateLoginSimple
-              onClose={() => setShowLogin(false)}
-              onLoginSuccess={handleLoginSuccess}
-              isModal={true}
-            />
+        <div className="container mx-auto px-4 relative z-10">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="text-center max-w-4xl mx-auto"
+          >
+            <div className={`inline-flex items-center gap-2 rounded-full px-4 py-2 mb-6 backdrop-blur-xl ${t.chip}`}>
+              <Building2 className={`w-5 h-5 ${t.accent}`} />
+              <span className="text-sm font-medium text-slate-200">Especialistas en derecho corporativo (Chile)</span>
+            </div>
+
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white mb-6 leading-tight">
+              Potencia tu empresa con asesoría legal experta
+            </h1>
+
+            <p className="text-lg md:text-xl text-slate-400 mb-8 leading-relaxed">
+              Desde la constitución de tu SpA hasta operaciones complejas de M&A: somos tu socio estratégico
+              con seguridad jurídica total.
+            </p>
+
+            <div className="flex flex-wrap gap-4 justify-center">
+              <Link
+                to="/agendamiento?plan=corporativo"
+                className={`px-8 py-4 rounded-xl font-semibold transition-all duration-300 shadow-lg inline-flex items-center gap-2 text-white ${t.btnPrimary} ${t.btnPrimaryHover}`}
+              >
+                <Calendar className="w-5 h-5" />
+                Consulta corporativa
+              </Link>
+              <button
+                onClick={() => setShowLogin(true)}
+                className={`px-8 py-4 rounded-xl font-semibold transition-all duration-300 inline-flex items-center gap-2 ${t.btnOutline} ${t.btnOutlineHover}`}
+              >
+                <LogIn className="w-5 h-5" />
+                Portal empresa
+              </button>
+            </div>
           </motion.div>
         </div>
-      )}
+      </section>
+
+      {/* Stats */}
+      <section className="py-14 border-y border-slate-800/80 bg-slate-950/40">
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            {stats.map((stat, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+                className="text-center"
+              >
+                <div className={`text-3xl md:text-4xl font-bold mb-2 ${t.stat}`}>{stat.number}</div>
+                <div className="text-sm text-slate-500">{stat.label}</div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Portal corporativo highlight */}
+      <section className={`py-14 md:py-16 ${t.sectionWash}`}>
+        <div className="container mx-auto px-4 max-w-5xl">
+          <div
+            className={`rounded-[28px] border border-white/10 bg-gradient-to-r from-indigo-600/90 to-slate-700/90 backdrop-blur-2xl p-8 md:p-10 shadow-2xl shadow-indigo-950/50`}
+          >
+            <div className="grid md:grid-cols-2 gap-8 text-white">
+              <div>
+                <span className="inline-block text-[11px] font-bold uppercase tracking-[0.35em] mb-3 text-indigo-200">
+                  Panel corporativo
+                </span>
+                <h2 className="text-2xl md:text-3xl font-bold mb-5">
+                  Control total de tu gestión legal empresarial
+                </h2>
+                <ul className="space-y-3">
+                  {[
+                    { icon: BarChart3, text: 'Seguimiento completo de causas' },
+                    { icon: Calendar, text: 'Comparendos Inspección del Trabajo' },
+                    { icon: FileText, text: 'Contratos y amonestaciones' },
+                    { icon: AlertTriangle, text: 'Gestión de despidos y procesos' },
+                    { icon: TrendingUp, text: 'Proyecciones de resultado en juicio' },
+                  ].map(({ icon: Icon, text }) => (
+                    <li key={text} className="flex items-center gap-3">
+                      <Icon className="w-5 h-5 text-indigo-300 shrink-0" />
+                      <span className="text-white/90 text-sm">{text}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="flex flex-col items-center justify-center text-center gap-4 bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10">
+                <p className="text-indigo-200 text-sm uppercase tracking-widest">Suscripción mensual</p>
+                <div className="text-5xl font-bold">$800.000</div>
+                <p className="text-indigo-200 text-sm max-w-xs">
+                  Acceso ilimitado al portal + abogado dedicado durante todo el mes.
+                </p>
+                <button
+                  onClick={() => setShowLogin(true)}
+                  className="mt-2 px-6 py-3 bg-white text-indigo-700 rounded-xl font-bold hover:bg-indigo-50 transition-colors shadow-lg"
+                >
+                  Acceder al panel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Paquetes */}
+      <section className="py-16 md:py-20">
+        <div className="container mx-auto px-4">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-12"
+          >
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Paquetes corporativos</h2>
+            <p className="text-lg text-slate-400 max-w-2xl mx-auto">
+              Elige el plan que mejor se adapta al tamaño y necesidades de tu empresa.
+            </p>
+          </motion.div>
+
+          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            {[
+              {
+                name: 'Básico',
+                sub: 'Para emprendedores',
+                price: '$350.000',
+                popular: false,
+                plan: 'corporativo-basico',
+                features: [
+                  'Constitución SpA o EIRL',
+                  'Estatutos estándar',
+                  'Inscripción CBR',
+                  'RUT empresa',
+                  '1 mes soporte básico',
+                ],
+                badge: '',
+              },
+              {
+                name: 'Premium',
+                sub: 'Para empresas en crecimiento',
+                price: '$800.000',
+                popular: true,
+                plan: 'corporativo-premium',
+                features: [
+                  'Todo lo del plan Básico',
+                  'Estatutos personalizados',
+                  '3 contratos comerciales',
+                  'Políticas internas básicas',
+                  '6 meses soporte legal',
+                  'Asesoría tributaria inicial',
+                ],
+                badge: 'Más popular',
+              },
+              {
+                name: 'Enterprise',
+                sub: 'Para grandes empresas',
+                price: '$1.500.000',
+                popular: false,
+                plan: 'corporativo-enterprise',
+                features: [
+                  'Todo lo del plan Premium',
+                  'Due diligence completo',
+                  'Estructuración M&A',
+                  'Compliance corporativo',
+                  '12 meses soporte premium',
+                  'Abogado dedicado',
+                ],
+                badge: '',
+              },
+            ].map((pkg, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+                className={`relative rounded-2xl p-8 transition-all duration-300 ${t.cardGlass} ${
+                  pkg.popular ? t.cardPopularRing : t.cardHover
+                }`}
+              >
+                {pkg.popular && (
+                  <div className="absolute -top-4 left-1/2 -translate-x-1/2">
+                    <div className={`${t.btnPrimary} text-white px-4 py-1 rounded-full text-sm font-semibold shadow-lg`}>
+                      {pkg.badge}
+                    </div>
+                  </div>
+                )}
+
+                <div className="text-center mb-6">
+                  <h3 className="text-2xl font-bold text-white mb-1">{pkg.name}</h3>
+                  <p className="text-slate-400 text-sm mb-4">{pkg.sub}</p>
+                  <div className={`text-4xl font-bold mb-2 ${t.stat}`}>{pkg.price}</div>
+                  <p className="text-sm text-slate-500">Pago único</p>
+                </div>
+
+                <ul className="space-y-3 mb-8">
+                  {pkg.features.map((f) => (
+                    <li key={f} className="flex items-start gap-2">
+                      <CheckCircle className={`w-5 h-5 mt-0.5 shrink-0 ${t.accent}`} />
+                      <span className="text-sm text-slate-300">{f}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                <Link
+                  to={`/agendamiento?plan=${pkg.plan}`}
+                  className={`w-full rounded-xl py-3 px-6 font-semibold transition-all duration-300 text-center block text-white ${t.btnPrimary} ${t.btnPrimaryHover}`}
+                >
+                  Agendar consulta
+                </Link>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Servicios adicionales */}
+      <section className={`py-16 md:py-20 ${t.sectionWash}`}>
+        <div className="container mx-auto px-4">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-12"
+          >
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Servicios adicionales</h2>
+            <p className="text-lg text-slate-400">Soluciones puntuales para necesidades específicas.</p>
+          </motion.div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {services.map((service, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: index * 0.07 }}
+                className={`rounded-2xl p-6 transition-all duration-300 group ${t.cardGlass} ${t.cardHover}`}
+              >
+                <div
+                  className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-5 group-hover:scale-105 transition-transform duration-300 ${t.iconBox}`}
+                >
+                  <service.icon className={`w-7 h-7 ${t.accent}`} />
+                </div>
+
+                <h3 className="text-xl font-bold text-white mb-3">{service.title}</h3>
+                <p className="text-slate-400 mb-5 text-sm leading-relaxed">{service.description}</p>
+
+                <ul className="space-y-2 mb-5">
+                  {service.features.map((f, fi) => (
+                    <li key={fi} className="flex items-center gap-2 text-sm text-slate-300">
+                      <CheckCircle className={`w-4 h-4 shrink-0 ${t.accent}`} />
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+
+                <Link
+                  to="/agendamiento?plan=corporativo"
+                  className={`w-full rounded-lg py-2 px-4 text-sm font-semibold text-center block border ${t.accentBorder} bg-indigo-500/10 ${t.accent} hover:bg-indigo-500/15 transition-colors`}
+                >
+                  Consultar
+                </Link>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Proceso */}
+      <section className="py-16 md:py-20">
+        <div className="container mx-auto px-4">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-14"
+          >
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Proceso simple y transparente</h2>
+            <p className="text-lg text-slate-400">Te acompañamos en cada etapa.</p>
+          </motion.div>
+
+          <div className="grid md:grid-cols-4 gap-8 max-w-5xl mx-auto">
+            {[
+              { step: '1', title: 'Consulta inicial', desc: 'Evaluamos tu caso sin costo', icon: Clock },
+              { step: '2', title: 'Propuesta', desc: 'Plan de acción y honorarios claros', icon: FileText },
+              { step: '3', title: 'Ejecución', desc: 'Implementamos la solución legal', icon: TrendingUp },
+              { step: '4', title: 'Seguimiento', desc: 'Soporte continuo post-servicio', icon: Award },
+            ].map((item, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1 }}
+                className="text-center group"
+              >
+                <div className="relative mx-auto w-20 h-20 mb-5">
+                  <div className={`absolute inset-0 rounded-full blur-xl ${t.progressBg}`} />
+                  <div
+                    className={`relative w-full h-full rounded-full flex items-center justify-center text-white font-bold text-2xl bg-gradient-to-br from-indigo-600 to-slate-500 shadow-lg group-hover:scale-110 transition-transform duration-300`}
+                  >
+                    {item.step}
+                  </div>
+                </div>
+                <h3 className="text-xl font-bold text-white mb-2">{item.title}</h3>
+                <p className="text-slate-400 text-sm">{item.desc}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonios — burbuja iOS */}
+      <section className={`py-16 md:py-20 ${t.sectionWash}`}>
+        <div className="container mx-auto px-4">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-12"
+          >
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-3">
+              Empresas que crecen con Punto Legal 💬
+            </h2>
+            <p className="text-slate-400 max-w-xl mx-auto">
+              Compañías y holdings que confían en nuestro equipo para sus operaciones.
+            </p>
+          </motion.div>
+
+          <div className="grid md:grid-cols-3 gap-6 md:gap-8 max-w-6xl mx-auto">
+            {testimonials.map((testimonial, index) => (
+              <TestimonialBubble key={index} testimonial={testimonial} index={index} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Blog corporativo */}
+      <section className="py-16 md:py-20">
+        <div className="container mx-auto px-4">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-12"
+          >
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Actualidad corporativa</h2>
+            <p className="text-lg text-slate-400 max-w-2xl mx-auto">Cambios normativos que impactan a tu empresa.</p>
+          </motion.div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
+            {[
+              {
+                tag: 'Tributario',
+                urgent: true,
+                title: 'Modernización tributaria 2025',
+                date: '15 ene 2025',
+                read: '5 min',
+                to: '/blog/ley-modernizacion-tributaria-2025',
+              },
+              {
+                tag: 'Compliance',
+                urgent: true,
+                title: 'ESG: obligatorio para grandes empresas',
+                date: '10 ene 2025',
+                read: '6 min',
+                to: '/blog/esg-compliance-2025',
+              },
+              {
+                tag: 'Inversión',
+                urgent: false,
+                title: 'Facilidades para inversión extranjera en startups',
+                date: '8 ene 2025',
+                read: '4 min',
+                to: '/blog/inversion-extranjera-startups',
+              },
+            ].map((article, i) => (
+              <motion.article
+                key={article.to}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.05 }}
+                className={`rounded-2xl p-6 transition-all group ${t.cardGlass} ${t.cardHover}`}
+              >
+                <div className="flex items-center gap-2 mb-4">
+                  {article.urgent && (
+                    <span className="px-3 py-1 bg-red-500/15 text-red-400 rounded-full text-xs font-semibold">
+                      Urgente
+                    </span>
+                  )}
+                  <span className="text-xs text-slate-500">{article.tag}</span>
+                </div>
+                <h3 className="text-lg font-bold mb-2 text-slate-100 transition-colors group-hover:text-indigo-300">
+                  {article.title}
+                </h3>
+                <div className="flex items-center gap-4 text-sm text-slate-500 mb-3">
+                  <span>{article.date}</span>
+                  <span>• {article.read}</span>
+                </div>
+                <Link
+                  to={article.to}
+                  className={`font-medium flex items-center gap-2 group/link ${t.link} ${t.linkHover}`}
+                >
+                  Leer más
+                  <ArrowRight className="w-4 h-4 group-hover/link:translate-x-1 transition-transform" />
+                </Link>
+              </motion.article>
+            ))}
+          </div>
+
+          <div className="text-center">
+            <Link
+              to="/blog/categoria/corporativo"
+              className={`inline-flex items-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all border ${t.accentBorder} bg-indigo-500/10 ${t.accent}`}
+            >
+              Ver todos los artículos corporativos
+              <ArrowRight className="w-5 h-5" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section className="py-16 md:py-20 border-t border-slate-800/80 bg-slate-950/40">
+        <div className="container mx-auto px-4 max-w-3xl">
+          <h2 className="text-2xl md:text-3xl font-bold text-white text-center mb-10">
+            Preguntas frecuentes — derecho corporativo en Chile
+          </h2>
+          <div>
+            {corporativoFaq.map((item, i) => (
+              <CorporativoFaqItem key={i} item={item} accentClass={t.accent} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Final */}
+      <section className={`py-16 md:py-24 bg-gradient-to-r ${t.stripeCta}`}>
+        <div className="container mx-auto px-4">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.98 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            className="max-w-4xl mx-auto text-center rounded-3xl border border-white/10 bg-slate-950/70 backdrop-blur-xl p-10 md:p-12"
+          >
+            <h2 className="text-3xl lg:text-4xl font-bold text-white mb-6">
+              ¿Listo para llevar tu empresa al siguiente nivel?
+            </h2>
+            <p className="text-lg text-slate-400 mb-8">
+              Agenda una consulta especializada con nuestros expertos en derecho corporativo.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link
+                to="/agendamiento?plan=corporativo"
+                className={`inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl font-semibold text-white ${t.btnPrimary} ${t.btnPrimaryHover}`}
+              >
+                <Calendar className="w-5 h-5" />
+                Consulta corporativa
+              </Link>
+              <button
+                onClick={() => setShowLogin(true)}
+                className={`inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl font-semibold ${t.btnOutline} ${t.btnOutlineHover}`}
+              >
+                <LogIn className="w-5 h-5" />
+                Acceder al portal empresa
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      <footer className="border-t border-slate-800 py-8">
+        <div className="container mx-auto px-6 text-center text-slate-500 text-sm">
+          <p>&copy; {new Date().getFullYear()} Punto Legal Online. Todos los derechos reservados.</p>
+          <p className="mt-2 text-xs max-w-2xl mx-auto">
+            Información orientativa. Para evaluar tu caso,{' '}
+            <Link to="/agendamiento?plan=corporativo" className={`${t.link} underline`}>
+              agenda una consulta
+            </Link>
+            .
+          </p>
+        </div>
+      </footer>
+
+      {/* Modal login empresa */}
+      <AnimatePresence>
+        {showLogin && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-start justify-center p-4 bg-black/60 backdrop-blur-sm sm:items-center"
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: -20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: -20 }}
+              transition={{ duration: 0.3, type: 'spring', stiffness: 300 }}
+              className="relative w-full max-w-md max-h-[90vh] overflow-y-auto mt-4 sm:mt-0"
+            >
+              <button
+                onClick={() => setShowLogin(false)}
+                className="absolute top-4 right-4 z-10 w-8 h-8 rounded-full bg-slate-800/90 backdrop-blur-sm flex items-center justify-center shadow-lg hover:bg-slate-700 transition-colors"
+              >
+                <X className="w-4 h-4 text-slate-300" />
+              </button>
+              <CorporateLoginSimple
+                onClose={() => setShowLogin(false)}
+                onLoginSuccess={onLoginSuccess}
+                isModal={true}
+              />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
-  );
-} 
+  )
+}
+
+function CorporativoFaqItem({
+  item,
+  accentClass,
+}: {
+  item: { question: string; answer: string }
+  accentClass: string
+}) {
+  const [open, setOpen] = useState(false)
+  return (
+    <div className="border-b border-slate-700/90">
+      <button
+        type="button"
+        className="w-full flex justify-between items-center text-left py-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/40 rounded-lg"
+        onClick={() => setOpen(!open)}
+      >
+        <h3 className="text-lg font-medium text-slate-200 pr-4 hover:text-indigo-300 transition-colors">
+          {item.question}
+        </h3>
+        <motion.div animate={{ rotate: open ? 45 : 0 }} transition={{ duration: 0.2 }}>
+          {open ? (
+            <Minus className={`h-5 w-5 shrink-0 ${accentClass}`} />
+          ) : (
+            <Plus className="text-slate-400 h-5 w-5 shrink-0" />
+          )}
+        </motion.div>
+      </button>
+      <AnimatePresence initial={false}>
+        {open && (
+          <motion.div
+            key="content"
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.28, ease: [0.04, 0.62, 0.23, 0.98] }}
+            className="overflow-hidden"
+          >
+            <p className="pb-4 text-slate-400 pr-2 leading-relaxed">{item.answer}</p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  )
+}

@@ -96,7 +96,7 @@ export const PremiumHeroCard: React.FC<PremiumHeroCardProps> = ({
             </div>
             <div>
               <p className="text-xs uppercase tracking-[0.35em] text-pink-100/80">Atención Experta</p>
-              <p className="text-[11px] text-slate-300/80">Tu abogado especializado en 60 minutos</p>
+              <p className="text-[11px] text-slate-300/80">Tu abogado especialista en 30 minutos</p>
             </div>
           </div>
 

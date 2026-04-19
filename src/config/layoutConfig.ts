@@ -249,7 +249,8 @@ export const layoutConfigs: RouteLayoutRule[] = [
     }
   },
   
-  // 5b. Página de inicio (sin header ni footer en móvil)
+  // 5b. Página de inicio (landing limpio: sin footer ni header global; el Hero
+  // y secciones llevan toda la conversión)
   {
     path: '/',
     config: {

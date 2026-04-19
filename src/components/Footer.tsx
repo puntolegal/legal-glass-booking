@@ -12,11 +12,6 @@ interface FooterProps {
 const Footer: React.FC<FooterProps> = ({ variant = 'default' }) => {
   const location = useLocation();
 
-  // No renderizar footer en página de inicio (landing)
-  if (location.pathname === '/') {
-    return null;
-  }
-
   // No renderizar footer en rutas de foco (agendamiento, pago, etc.)
   if (location.pathname.startsWith('/agendamiento')) {
     return null;

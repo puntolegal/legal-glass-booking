@@ -45,9 +45,10 @@ const HeaderService: React.FC<HeaderServiceProps> = ({ theme, transparentOnTop =
   const [lastScrollY, setLastScrollY] = useState(0);
   const [showServicesDropdown, setShowServicesDropdown] = useState(false);
   const { theme: colorTheme, toggleTheme } = useTheme();
-  
+
   const navigate = useNavigate();
   const location = useLocation();
+  const isLanding = location.pathname === '/';
 
   useEffect(() => {
     const handleScroll = () => {
@@ -116,10 +117,38 @@ const HeaderService: React.FC<HeaderServiceProps> = ({ theme, transparentOnTop =
     { label: 'Ver todos', href: '/servicios', icon: '👁️', slug: '' }
   ];
 
-  const notifications = [
-    { id: 1, title: '50% OFF Cyber', message: `Promoción especial en ${theme.serviceName}`, time: 'Hace 2h' },
-    { id: 2, title: 'Nueva calculadora', message: 'Herramientas gratuitas disponibles', time: 'Hace 1d' },
-    { id: 3, title: 'Horario extendido', message: 'Atención hasta las 22:00 hrs', time: 'Hace 3d' }
+  const notifications: Array<{
+    id: number
+    title: string
+    message: string
+    time: string
+    href?: string
+    emoji?: string
+  }> = [
+    {
+      id: 1,
+      emoji: '🔥',
+      title: '50% OFF Cyber',
+      message: `Promoción especial en ${theme.serviceName}`,
+      time: 'Hace 2h',
+      href: `/agendamiento?plan=${theme.serviceSlug}`,
+    },
+    {
+      id: 2,
+      emoji: '🧮',
+      title: 'Calculadora de Pensión Gratis',
+      message: 'Estima cuánto te corresponde según la Ley 14.908',
+      time: 'Hace 1d',
+      href: '/servicios/familia/calculadora',
+    },
+    {
+      id: 3,
+      emoji: '⏰',
+      title: 'Horario extendido',
+      message: 'Atención hasta las 22:00 hrs',
+      time: 'Hace 3d',
+      href: '/agendamiento',
+    },
   ];
 
   return (
@@ -137,11 +166,15 @@ const HeaderService: React.FC<HeaderServiceProps> = ({ theme, transparentOnTop =
           <motion.div
             className={`
               relative mx-auto max-w-6xl rounded-2xl border transition-all duration-500
-              ${isScrolled 
-                ? 'bg-slate-900/70 backdrop-blur-2xl border-slate-700/50 shadow-2xl shadow-black/20' 
-                : transparentOnTop
-                  ? 'bg-slate-900/50 backdrop-blur-xl border-slate-700/30 shadow-xl'
-                  : 'bg-slate-900/70 backdrop-blur-2xl border-slate-700/50 shadow-xl'
+              ${isLanding
+                ? isScrolled
+                  ? 'bg-slate-900/70 backdrop-blur-2xl border-white/10 shadow-2xl shadow-black/30'
+                  : 'bg-slate-900/40 backdrop-blur-xl border-white/5 shadow-xl'
+                : isScrolled
+                  ? 'bg-slate-900/70 backdrop-blur-2xl border-slate-700/50 shadow-2xl shadow-black/20'
+                  : transparentOnTop
+                    ? 'bg-slate-900/50 backdrop-blur-xl border-slate-700/30 shadow-xl'
+                    : 'bg-slate-900/70 backdrop-blur-2xl border-slate-700/50 shadow-xl'
               }
             `}
             style={{
@@ -149,17 +182,18 @@ const HeaderService: React.FC<HeaderServiceProps> = ({ theme, transparentOnTop =
               '--service-glow': theme.glow,
             } as React.CSSProperties}
           >
-            {/* Efectos de fondo con colores del servicio */}
+            {/* Efectos de fondo con colores del servicio (sin partículas en landing) */}
             <div className="absolute inset-0 rounded-2xl overflow-hidden">
-              <div 
-                className="absolute inset-0 opacity-50" 
+              <div
+                className="absolute inset-0 opacity-50"
                 style={{
-                  background: `linear-gradient(to right, ${theme.primary}15, transparent, ${theme.secondary}15)`
+                  background: isLanding
+                    ? 'linear-gradient(to right, rgba(56,189,248,0.10), transparent, rgba(34,211,238,0.10))'
+                    : `linear-gradient(to right, ${theme.primary}15, transparent, ${theme.secondary}15)`
                 }}
               />
-              
-              {/* Partículas con color del servicio */}
-              {[...Array(3)].map((_, i) => (
+
+              {!isLanding && [...Array(3)].map((_, i) => (
                 <motion.div
                   key={i}
                   className="absolute w-1 h-1 rounded-full"
@@ -326,12 +360,13 @@ const HeaderService: React.FC<HeaderServiceProps> = ({ theme, transparentOnTop =
 
               {/* Lado derecho - Acciones */}
               <div className="flex items-center gap-2">
-                {/* Búsqueda */}
+                {/* Búsqueda - Oculta en móvil */}
                 <motion.button
                   onClick={() => setShowSearch(!showSearch)}
-                  className="p-2.5 rounded-xl bg-slate-800/50 hover:bg-slate-700/50 border border-slate-700/50 hover:border-slate-600/50 transition-all duration-300 group"
+                  className="hidden sm:flex p-2.5 rounded-xl bg-slate-800/50 hover:bg-slate-700/50 border border-slate-700/50 hover:border-slate-600/50 transition-all duration-300 group items-center justify-center"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
+                  aria-label="Buscar"
                 >
                   <Search className="w-4 h-4 text-slate-300 transition-colors hover:text-white" />
                 </motion.button>
@@ -366,18 +401,48 @@ const HeaderService: React.FC<HeaderServiceProps> = ({ theme, transparentOnTop =
                           <h3 className="text-sm font-bold text-slate-100">Notificaciones</h3>
                         </div>
                         <div className="max-h-96 overflow-y-auto">
-                          {notifications.map((notif) => (
-                            <div
-                              key={notif.id}
-                              className="p-4 border-b border-slate-800/50 hover:bg-slate-800/30 transition-colors cursor-pointer"
-                            >
-                              <h4 className="text-sm font-semibold" style={{ color: theme.primary }}>
-                                {notif.title}
-                              </h4>
-                              <p className="text-xs text-slate-400 mt-1">{notif.message}</p>
-                              <span className="text-xs text-slate-500 mt-2 block">{notif.time}</span>
-                            </div>
-                          ))}
+                          {notifications.map((notif) => {
+                            const content = (
+                              <>
+                                <div className="flex items-start gap-3">
+                                  {notif.emoji && (
+                                    <span className="text-lg leading-none mt-0.5" aria-hidden="true">
+                                      {notif.emoji}
+                                    </span>
+                                  )}
+                                  <div className="flex-1 min-w-0">
+                                    <h4 className="text-sm font-semibold" style={{ color: theme.primary }}>
+                                      {notif.title}
+                                    </h4>
+                                    <p className="text-xs text-slate-400 mt-1">{notif.message}</p>
+                                    <span className="text-xs text-slate-500 mt-2 block">{notif.time}</span>
+                                  </div>
+                                </div>
+                              </>
+                            )
+
+                            if (notif.href) {
+                              return (
+                                <Link
+                                  key={notif.id}
+                                  to={notif.href}
+                                  onClick={() => setShowNotifications(false)}
+                                  className="block p-4 border-b border-slate-800/50 hover:bg-slate-800/30 transition-colors"
+                                >
+                                  {content}
+                                </Link>
+                              )
+                            }
+
+                            return (
+                              <div
+                                key={notif.id}
+                                className="p-4 border-b border-slate-800/50 hover:bg-slate-800/30 transition-colors"
+                              >
+                                {content}
+                              </div>
+                            )
+                          })}
                         </div>
                         <div className="p-3 text-center border-t border-slate-700/50">
                           <button 

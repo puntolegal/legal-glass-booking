@@ -1,12 +1,13 @@
 // RUTA: src/components/agendamiento/AgendamientoLayout.tsx
 
 import React, { useMemo } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useAgendamiento } from '@/contexts/AgendamientoContext';
 import { useMobile } from '@/hooks/useMobile';
 import ProgressBar from './ProgressBar';
 import ConversionSidebar from './ConversionSidebar';
 import SEO from '../SEO';
-import { serviceThemes } from '@/config/serviceThemes';
+import { getServiceTheme } from '@/config/serviceThemes';
 
 interface AgendamientoLayoutProps {
   children: React.ReactNode;
@@ -15,12 +16,15 @@ interface AgendamientoLayoutProps {
 const AgendamientoLayout: React.FC<AgendamientoLayoutProps> = ({ children }) => {
   const { step, service } = useAgendamiento();
   const isMobile = useMobile();
-  
-  // Obtener tema del servicio para colores dinámicos
-  const serviceTheme = useMemo(() => {
-    const category = service.category.toLowerCase();
-    return serviceThemes[category as keyof typeof serviceThemes] || serviceThemes.general;
-  }, [service.category]);
+  const [searchParams] = useSearchParams();
+  const plan = searchParams.get('plan');
+
+  // Tema dinámico — prioriza el slug del plan (cae-tesoreria, ley-karin…)
+  // y degrada por categoría legacy (Familia, Laboral Empresarial…)
+  const serviceTheme = useMemo(
+    () => getServiceTheme(plan, service.category),
+    [plan, service.category],
+  );
   
   const hexToRgba = (hex: string, alpha: number) => {
     const r = parseInt(hex.slice(1, 3), 16);
@@ -70,23 +74,28 @@ const AgendamientoLayout: React.FC<AgendamientoLayoutProps> = ({ children }) => 
         <div className="relative px-4 pb-12 pt-4 md:pt-8">
           <div className="max-w-5xl mx-auto">
             {isMobile ? (
-              // Versión móvil - Formulario primero (order-1), Sidebar después (order-2)
-              <div className="flex flex-col relative z-10">
-                {/* Formulario - Aparece primero en móvil */}
-                <div className="order-1 space-y-4">
-                  <div id="agendamiento-form" className="bg-slate-900/80 backdrop-blur-md border border-slate-800/70 rounded-2xl p-3 shadow-2xl">
-                    <ProgressBar currentStep={step} totalSteps={3} />
-                  </div>
-                  <div className="relative z-10">
-                    {children}
-                  </div>
-                </div>
-                
-                {/* Sidebar de conversión - Aparece después en móvil */}
-                <div className="order-2 mt-6">
-                  <ConversionSidebar />
+              // ===== Versión móvil — flujo guiado de arriba a abajo =====
+              <div className="flex flex-col relative z-10 gap-4">
+                {/* 1. Resumen compacto superior — anchor visual del servicio */}
+                <div className="order-1">
+                  <ConversionSidebar compact />
                 </div>
 
+                {/* 2. Formulario */}
+                <div className="order-2 space-y-4">
+                  <div
+                    id="agendamiento-form"
+                    className="bg-slate-900/80 backdrop-blur-md border border-slate-800/70 rounded-2xl p-3 shadow-2xl"
+                  >
+                    <ProgressBar currentStep={step} totalSteps={3} />
+                  </div>
+                  <div className="relative z-10">{children}</div>
+                </div>
+
+                {/* 3. Datos completos al final — testimonial + beneficios completos */}
+                <div className="order-3 mt-2">
+                  <ConversionSidebar />
+                </div>
               </div>
             ) : (
               // Versión desktop - dos columnas
