@@ -2,9 +2,12 @@ import React, { useState } from 'react';
 import { trackMetaEvent } from '@/services/metaConversionsService';
 
 /**
- * Página de prueba para Meta Conversions API
- * Usa el código de prueba: TEST2065
+ * Página de prueba para Meta Conversions API.
+ * Configura `VITE_META_TEST_EVENT_CODE` en `.env.local` con el código que muestra
+ * Meta en Events Manager → Probar eventos (ej. TEST53498).
  */
+const META_TEST_CODE = import.meta.env.VITE_META_TEST_EVENT_CODE?.trim();
+
 const TestMetaPixel: React.FC = () => {
   const [testResults, setTestResults] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -20,7 +23,6 @@ const TestMetaPixel: React.FC = () => {
     try {
       await trackMetaEvent({
         event_name: eventName,
-        test_event_code: 'TEST2065',
         user_data: {
           em: 'test@example.com',
           ph: '+56912345678',
@@ -50,7 +52,14 @@ const TestMetaPixel: React.FC = () => {
           <div className="flex items-center justify-between mb-3">
             <div>
               <p className="text-sm text-slate-300 mb-1">
-                <strong>Código de prueba:</strong> <span className="font-mono bg-slate-700 px-2 py-1 rounded">TEST2065</span>
+                <strong>Código de prueba (CAPI):</strong>{' '}
+                {META_TEST_CODE ? (
+                  <span className="font-mono bg-slate-700 px-2 py-1 rounded">{META_TEST_CODE}</span>
+                ) : (
+                  <span className="text-amber-300 text-xs">
+                    No configurado — añade VITE_META_TEST_EVENT_CODE en .env.local (ej. TEST53498)
+                  </span>
+                )}
               </p>
               <p className="text-xs text-slate-400">
                 <strong>Pixel ID:</strong> 1101807351995991 | <strong>Dataset ID:</strong> 930048081990153
@@ -62,7 +71,9 @@ const TestMetaPixel: React.FC = () => {
               <strong>⚠️ Importante:</strong> Mantén abierta la página "Probar eventos" en Meta Events Manager mientras pruebas.
             </p>
             <p className="text-xs text-slate-400">
-              Los eventos aparecerán en tiempo real en Meta Events Manager con el código TEST2065.
+              {META_TEST_CODE
+                ? `Los eventos CAPI usarán test_event_code=${META_TEST_CODE} (también en el resto del sitio si la variable está definida).`
+                : 'Sin VITE_META_TEST_EVENT_CODE, los eventos van a producción de datos; el panel "Probar eventos" puede no listarlos.'}
             </p>
           </div>
         </div>
@@ -155,7 +166,7 @@ const TestMetaPixel: React.FC = () => {
               <li>Mantén esa página abierta</li>
               <li>Haz clic en cualquier botón de evento arriba</li>
               <li>Los eventos aparecerán en tiempo real en Meta Events Manager</li>
-              <li>Verifica que aparezcan con código TEST2065</li>
+              <li>Verifica que aparezcan con el mismo código que configuraste en VITE_META_TEST_EVENT_CODE</li>
             </ol>
           </div>
           

@@ -57,6 +57,19 @@ function getCookie(name: string): string | undefined {
 }
 
 /**
+ * Código de prueba de Meta (Events Manager → Probar eventos).
+ * Configura `VITE_META_TEST_EVENT_CODE` en `.env.local` (ej. TEST53498) para que
+ * todos los `trackMetaEvent` envíen CAPI al flujo de prueba sin repetir el código.
+ * En producción déjalo vacío.
+ */
+function getDefaultTestEventCode(): string | undefined {
+  const raw = import.meta.env.VITE_META_TEST_EVENT_CODE;
+  if (typeof raw !== 'string') return undefined;
+  const t = raw.trim();
+  return t.length > 0 ? t : undefined;
+}
+
+/**
  * Generate a unique event ID for deduplication between Pixel and CAPI
  */
 function generateEventId(): string {
@@ -146,6 +159,7 @@ function ensureValueAndCurrency(
  */
 export async function trackMetaEvent(options: MetaEventOptions): Promise<void> {
   const { event_name, user_data, custom_data, event_source_url, test_event_code } = options;
+  const resolvedTestCode = test_event_code ?? getDefaultTestEventCode();
 
   // Garantiza value + currency en eventos estándar (CLP por defecto).
   // Esto es lo que resuelve la advertencia "Falta completar el campo
@@ -198,7 +212,7 @@ export async function trackMetaEvent(options: MetaEventOptions): Promise<void> {
         user_data: enrichedUserData,
         custom_data: serverCustomData, // Use sanitized version (value + currency garantizados)
         event_source_url: event_source_url || (typeof window !== 'undefined' ? window.location.href : 'https://puntolegal.online'),
-        ...(test_event_code ? { test_event_code } : {}),
+        ...(resolvedTestCode ? { test_event_code: resolvedTestCode } : {}),
       },
     });
 

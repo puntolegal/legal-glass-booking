@@ -121,8 +121,21 @@ Para verificar que los eventos se están enviando correctamente:
 
 ## Prueba de Eventos
 
-### Código de Prueba
-- **test_event_code:** `TEST2065`
+### Código de prueba (Test Events)
+
+En **Events Manager** → **Probar eventos**, Meta muestra un código que cambia (ej. `TEST53498`). Para que el front y la Edge Function envíen eventos a ese flujo de prueba:
+
+1. En la raíz del proyecto, en `.env.local` (no commitear):
+
+```bash
+VITE_META_TEST_EVENT_CODE=TEST53498
+```
+
+2. Reinicia el servidor de Vite. `trackMetaEvent` adjunta automáticamente `test_event_code` a la petición CAPI (la función `meta-conversions` ya lo reenvía a Graph API).
+
+En **producción** no definas esta variable: los eventos deben registrarse como tráfico real, no en el panel de prueba.
+
+- **Parámetro Graph API:** `test_event_code` (mismo valor que muestra Meta).
 
 ### Página de Prueba Local
 Visita: `http://localhost:8080/test-meta-pixel`
@@ -141,15 +154,15 @@ Esta página incluye botones para probar todos los eventos configurados:
 1. Ve a **Meta Events Manager** → **Probar eventos**
 2. Mantén la página "Probar eventos" abierta
 3. Usa la página de prueba local (`/test-meta-pixel`) o realiza acciones en el sitio
-4. Los eventos aparecerán en tiempo real en Meta Events Manager con el código `TEST2065`
+4. Los eventos aparecerán en tiempo real en Meta Events Manager con el mismo código que configuraste (ej. `TEST53498`)
 
 ### Probar con Graph API Explorer
 
-1. Copia el código de prueba: `TEST2065`
+1. Copia el código de prueba que muestra Meta en **Probar eventos** (ej. `TEST53498`)
 2. Ve a Graph API Explorer
 3. Realiza una solicitud POST a:
    ```
-   https://graph.facebook.com/v21.0/1101807351995991/events?access_token={TOKEN}&test_event_code=TEST2065
+   https://graph.facebook.com/v21.0/1101807351995991/events?access_token={TOKEN}&test_event_code=TEST53498
    ```
 4. Con el payload de ejemplo proporcionado en Meta Events Manager
 5. Vuelve a la página "Probar eventos" para verificar
