@@ -49,6 +49,8 @@ export interface BookingData {
   descripcion?: string;
   motivoConsulta?: string;
   notas?: string;
+  /** Lead del paso 1 (tabla agendamiento_intakes), si existe */
+  agendamiento_intake_id?: string | null;
 }
 
 export interface Reserva {
@@ -182,7 +184,10 @@ export const crearReserva = async (bookingData: BookingData): Promise<{
         bookingData.descripcion ||
         bookingData.servicio.descripcion ||
         'Consulta legal',
-      estado: 'pendiente' as const
+      estado: 'pendiente' as const,
+      ...(bookingData.agendamiento_intake_id
+        ? { agendamiento_intake_id: bookingData.agendamiento_intake_id }
+        : {}),
     };
 
     const { data: reserva, error } = await supabase

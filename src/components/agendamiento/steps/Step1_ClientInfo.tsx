@@ -8,6 +8,7 @@ import { useAgendamiento } from '@/contexts/AgendamientoContext';
 import { validationRules } from '@/hooks/useFormValidation';
 import { getServiceTheme } from '@/config/serviceThemes';
 import { buildWhatsAppUrl } from '@/lib/whatsapp';
+import { saveAgendamientoIntake } from '@/services/agendamientoIntakeService';
 import type { FormData } from '@/types/agendamiento';
 
 const Step1_ClientInfo: React.FC = () => {
@@ -18,6 +19,7 @@ const Step1_ClientInfo: React.FC = () => {
     setStep,
     formatRUT,
     priceCalculation,
+    setAgendamientoIntakeId,
   } = useAgendamiento();
 
   const [searchParams] = useSearchParams();
@@ -177,6 +179,17 @@ const Step1_ClientInfo: React.FC = () => {
     }
     
     if (allValid) {
+      const vals = form.getValues();
+      const saved = await saveAgendamientoIntake({
+        form: vals,
+        planSlug: plan || 'general',
+        serviceName: service.name,
+        category: service.category,
+        precioIndicativo: priceCalculation.precioFinal,
+      });
+      if (saved.success && saved.id) {
+        setAgendamientoIntakeId(saved.id);
+      }
       setStep(2);
     }
   };

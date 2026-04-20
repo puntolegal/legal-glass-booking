@@ -1,6 +1,6 @@
 // RUTA: src/contexts/AgendamientoContext.tsx
 
-import React, { createContext, useState, useContext, ReactNode, useCallback } from 'react';
+import React, { createContext, useState, useContext, ReactNode, useCallback, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useForm, UseFormReturn } from 'react-hook-form';
 import { createBookingWithRealEmail, type BookingData } from '@/services/supabaseBooking';
@@ -20,6 +20,9 @@ interface AgendamientoContextType extends BookingState {
   serviceColor: string;
   priceCalculation: ReturnType<typeof calculatePrice>;
   form: UseFormReturn<FormData>;
+  /** ID del registro en agendamiento_intakes tras guardar el paso 1 */
+  agendamientoIntakeId: string | null;
+  setAgendamientoIntakeId: (id: string | null) => void;
   setStep: (step: number) => void;
   setFormData: (data: FormData | ((prev: FormData) => FormData)) => void;
   updateFormField: (field: keyof FormData, value: string) => void;
@@ -55,7 +58,12 @@ const AgendamientoProviderInner: React.FC<{ children: ReactNode; initialService?
   const [selectedMeetingType, setSelectedMeetingType] = useState<'videollamada' | 'telefonica' | 'presencial'>('videollamada');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
+  const [agendamientoIntakeId, setAgendamientoIntakeId] = useState<string | null>(null);
+
+  useEffect(() => {
+    setAgendamientoIntakeId(null);
+  }, [plan]);
+
   // React Hook Form para manejo optimizado del formulario
   const form = useForm<FormData>({
     mode: 'onChange', // Validación en tiempo real
@@ -178,7 +186,8 @@ const AgendamientoProviderInner: React.FC<{ children: ReactNode; initialService?
             estado: 'approved'
           },
           motivoConsulta: formData.descripcion,
-          notas: `Tipo de reunión: ${selectedMeetingType}${isAdminValido ? ` | Código admin aplicado: ${formData.codigoConvenio} (Precio especial $1.000)` : isConvenioValido ? ` | Código de convenio aplicado: ${formData.codigoConvenio} (80% descuento)` : ''}`
+          notas: `Tipo de reunión: ${selectedMeetingType}${isAdminValido ? ` | Código admin aplicado: ${formData.codigoConvenio} (Precio especial $1.000)` : isConvenioValido ? ` | Código de convenio aplicado: ${formData.codigoConvenio} (80% descuento)` : ''}`,
+          agendamiento_intake_id: agendamientoIntakeId || undefined,
         };
         
         const isSupabaseAvailable = await checkSupabaseConnection();
@@ -276,7 +285,8 @@ const AgendamientoProviderInner: React.FC<{ children: ReactNode; initialService?
             fecha: selectedDate,
             hora: selectedTime,
             descripcion: formData.descripcion
-          }
+          },
+          agendamiento_intake_id: agendamientoIntakeId || undefined,
         };
         
         const result = await createBookingWithRealEmail(bookingData);
@@ -389,7 +399,7 @@ const AgendamientoProviderInner: React.FC<{ children: ReactNode; initialService?
     } finally {
       setIsLoading(false);
     }
-  }, [selectedDate, selectedTime, selectedMeetingType, formData, service, priceCalculation]);
+  }, [selectedDate, selectedTime, selectedMeetingType, formData, service, priceCalculation, agendamientoIntakeId]);
   
   // Función para ir al paso de pago (acepta valores frescos para evitar stale closures)
   const goToPayment = useCallback((freshTime?: string) => {
@@ -432,6 +442,8 @@ const AgendamientoProviderInner: React.FC<{ children: ReactNode; initialService?
     serviceColor: serviceColors.color,
     priceCalculation,
     form,
+    agendamientoIntakeId,
+    setAgendamientoIntakeId,
     setStep,
     setFormData,
     updateFormField,

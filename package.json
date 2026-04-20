@@ -31,7 +31,8 @@
     "env:check": "node scripts/validate-mercadopago-env.mjs",
     "mp:sanity": "node scripts/mp-sanity-check.mjs",
     "mp:test": "npm run env:check && npm run mp:sanity",
-    "supabase:security-fix": "node scripts/apply-security-fixes.js"
+    "supabase:security-fix": "node scripts/apply-security-fixes.js",
+    "test:booking-emails": "node scripts/send-test-booking-emails.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",

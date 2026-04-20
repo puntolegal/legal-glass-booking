@@ -179,8 +179,63 @@ export type Database = {
         }
         Relationships: []
       }
+      agendamiento_intakes: {
+        Row: {
+          id: string
+          nombre: string
+          email: string
+          telefono: string
+          rut: string | null
+          empresa: string | null
+          codigo_convenio: string | null
+          descripcion: string | null
+          servicio_slug: string | null
+          servicio_nombre: string
+          categoria: string | null
+          precio_indicativo: string | null
+          source_url: string | null
+          user_agent: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          nombre: string
+          email: string
+          telefono: string
+          rut?: string | null
+          empresa?: string | null
+          codigo_convenio?: string | null
+          descripcion?: string | null
+          servicio_slug?: string | null
+          servicio_nombre: string
+          categoria?: string | null
+          precio_indicativo?: string | null
+          source_url?: string | null
+          user_agent?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          nombre?: string
+          email?: string
+          telefono?: string
+          rut?: string | null
+          empresa?: string | null
+          codigo_convenio?: string | null
+          descripcion?: string | null
+          servicio_slug?: string | null
+          servicio_nombre?: string
+          categoria?: string | null
+          precio_indicativo?: string | null
+          source_url?: string | null
+          user_agent?: string | null
+          created_at?: string
+        }
+        Relationships: []
+      }
       reservas: {
         Row: {
+          agendamiento_intake_id: string | null
           created_at: string | null
           descripcion: string | null
           email: string
@@ -204,6 +259,7 @@ export type Database = {
           webhook_sent: boolean | null
         }
         Insert: {
+          agendamiento_intake_id?: string | null
           created_at?: string | null
           descripcion?: string | null
           email: string
@@ -227,6 +283,7 @@ export type Database = {
           webhook_sent?: boolean | null
         }
         Update: {
+          agendamiento_intake_id?: string | null
           created_at?: string | null
           descripcion?: string | null
           email?: string
