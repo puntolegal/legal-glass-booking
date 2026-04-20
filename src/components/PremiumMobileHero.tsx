@@ -18,17 +18,34 @@ const InstitutionalStat: React.FC<{
 );
 
 /**
- * Scroll robusto a una sección por id. Maneja tanto el caso ideal
- * (sección montada) como el fallback (id no presente en el DOM).
- * Retorna true si encontró el target, false si no.
+ * Scroll robusto a una sección por id.
+ *
+ * En mobile, `element.scrollIntoView` puede fallar o comportarse mal cuando
+ * el elemento está dentro de un ancestro con `transform`, `overflow:hidden`,
+ * o cuando hay headers fijos. Calculamos la posición absoluta manualmente
+ * con `getBoundingClientRect` + `window.pageYOffset` y hacemos scroll en
+ * `window`, que es el contenedor real del documento.
+ *
+ * Reintenta hasta 3 veces si el elemento aún no está montado (lazy sections).
  */
-const scrollToAnchor = (id: string): boolean => {
+const scrollToAnchor = (id: string, attempt = 0): boolean => {
   const el = document.getElementById(id);
-  if (!el) return false;
-  // Usamos requestAnimationFrame para garantizar que cualquier transform
-  // pendiente del layout ya se haya aplicado antes de calcular el scroll.
+  if (!el) {
+    if (attempt < 3) {
+      window.setTimeout(() => scrollToAnchor(id, attempt + 1), 120);
+      return true; // optimista: estamos reintentando
+    }
+    return false;
+  }
+  // Offset para compensar posibles headers fijos (~72px) y dar respiro visual.
+  const HEADER_OFFSET = 72;
+  const rect = el.getBoundingClientRect();
+  const targetY = rect.top + window.pageYOffset - HEADER_OFFSET;
+  // Doble rAF garantiza que el layout esté estabilizado tras animaciones.
   requestAnimationFrame(() => {
-    el.scrollIntoView({ behavior: "smooth", block: "start" });
+    requestAnimationFrame(() => {
+      window.scrollTo({ top: targetY, behavior: "smooth" });
+    });
   });
   return true;
 };
