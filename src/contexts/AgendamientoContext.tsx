@@ -399,8 +399,25 @@ const AgendamientoProviderInner: React.FC<{ children: ReactNode; initialService?
       return;
     }
     setError(null);
+
+    // Meta AddToCart — user ya eligió fecha+hora+modalidad, su intención
+    // de compra es alta. Este evento es clave para las audiencias de
+    // remarketing "dejó el carrito" en Meta Ads.
+    void trackMetaEvent({
+      event_name: 'AddToCart',
+      custom_data: {
+        content_type: 'service_plan',
+        content_name: service.name,
+        content_category: service.category,
+        content_ids: [service.category?.toLowerCase() || 'general'],
+        value: priceCalculation?.precioFinal ?? service.price,
+        currency: 'CLP',
+        source: 'agendamiento_step2',
+      },
+    });
+
     setStep(3);
-  }, [selectedDate, selectedTime, selectedMeetingType]);
+  }, [selectedDate, selectedTime, selectedMeetingType, service, priceCalculation]);
   
   const value: AgendamientoContextType = {
     step,

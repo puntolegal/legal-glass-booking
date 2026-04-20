@@ -344,16 +344,65 @@ export default function ServicioFamiliaPage() {
     const [selectedPlan, setSelectedPlan] = useState<any>(null);
     const [isHelperModalOpen, setIsHelperModalOpen] = useState(false);
 
-    // Track ViewContent event when page loads
+    // Meta ViewContent — impression de la landing de Familia (top of funnel).
     useEffect(() => {
       trackMetaEvent({
         event_name: 'ViewContent',
         custom_data: {
+          content_type: 'service_category',
+          content_ids: ['familia'],
           content_name: 'Punto Legal Familia',
           content_category: 'Servicios Legales',
+          value: 89000, // precio base de la consulta Familia (CLP)
+          currency: 'CLP',
+          source: 'servicios_familia',
         },
       });
     }, []);
+
+    /**
+     * Handler tracked — clic al CTA "Calcular mi Pensión Gratis".
+     * Dispara InitiateCheckout con value 0 (es un lead magnet gratuito)
+     * y luego navega. Meta usa este evento como señal de intent fuerte.
+     */
+    const handleCalculadoraClick = () => {
+      void trackMetaEvent({
+        event_name: 'InitiateCheckout',
+        custom_data: {
+          content_type: 'tool',
+          content_ids: ['calculadora-pension-2026'],
+          content_name: 'Calculadora Pensión de Alimentos',
+          content_category: 'Lead Magnet Familia',
+          value: 0,
+          currency: 'CLP',
+          source: 'servicios_familia_calculadora_cta',
+        },
+      });
+      navigate('/servicios/familia/calculadora');
+    };
+
+    /**
+     * Handler tracked — clic al CTA "Agendar Pack con Garantía".
+     * Dispara InitiateCheckout con el precio real y deja que el <Link />
+     * interno de PremiumHeroCard haga la navegación (evita romper el
+     * comportamiento nativo de react-router).
+     * El AgendamientoPage también dispara ViewContent al aterrizar,
+     * así tenemos el funnel completo trackeado en Meta Ads.
+     */
+    const handleAgendarPack = () => {
+      void trackMetaEvent({
+        event_name: 'InitiateCheckout',
+        custom_data: {
+          content_type: 'service_plan',
+          content_ids: ['consulta-estrategica-familia'],
+          content_name: 'Consulta Estratégica Familia',
+          content_category: 'Derecho de Familia',
+          value: 35000,
+          currency: 'CLP',
+          source: 'servicios_familia_pack_cta',
+        },
+      });
+    };
 
     const openHelperModal = (plan: any) => {
         setSelectedPlan(plan);
@@ -467,7 +516,7 @@ export default function ServicioFamiliaPage() {
                       context="Diagnóstico legal real: monto sugerido, deuda acumulada y medidas de apremio aplicables a tu caso."
                       price="$0"
                       ctaText="Calcular mi Pensión Gratis"
-                      onClick={() => navigate('/servicios/familia/calculadora')}
+                      onClick={handleCalculadoraClick}
                       badge="Empieza aquí si tienes dudas"
                     />
                   </div>
@@ -485,6 +534,7 @@ export default function ServicioFamiliaPage() {
                       priceDetails="Se descuenta íntegramente del plan final y asegura prioridad en agenda."
                       ctaText="Agendar Pack con Garantía"
                       href="/agendamiento?plan=consulta-estrategica-familia"
+                      onCtaClick={handleAgendarPack}
                       testimonial={{
                         quote: 'En 30 minutos me dio más claridad que meses de incertidumbre. Valió cada peso.',
                         author: 'Conztanza M., Las Condes',

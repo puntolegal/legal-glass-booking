@@ -1,10 +1,11 @@
 // RUTA: src/components/agendamiento/steps/Step3_Payment.tsx
 
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { CreditCard, Shield, Lock, CheckCircle, Loader2, ArrowLeft } from 'lucide-react';
 import { useAgendamiento } from '@/contexts/AgendamientoContext';
 import { serviceThemes } from '@/config/serviceThemes';
+import { trackMetaEvent } from '@/services/metaConversionsService';
 
 const Step3_Payment: React.FC = () => {
   const {
@@ -20,6 +21,31 @@ const Step3_Payment: React.FC = () => {
     isLoading,
     error,
   } = useAgendamiento();
+
+  // Meta AddPaymentInfo — se dispara una vez al montar el Step3.
+  // Indica que el usuario ha llegado al paso de confirmación/pago:
+  // datos completos + agenda elegida + revisando monto final.
+  // Es uno de los eventos con mayor correlación con Purchase en Meta Ads.
+  useEffect(() => {
+    void trackMetaEvent({
+      event_name: 'AddPaymentInfo',
+      user_data: {
+        em: formData.email,
+        ph: formData.telefono,
+        fn: formData.nombre,
+      },
+      custom_data: {
+        content_type: 'service_plan',
+        content_name: service.name,
+        content_category: service.category,
+        value: priceCalculation?.precioFinal ?? service.price,
+        currency: 'CLP',
+        source: 'agendamiento_step3',
+      },
+    });
+    // Se dispara sólo al montar el paso de pago, no en cada re-render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   
   const { precioFinal, precioConConvenio } = priceCalculation;
   

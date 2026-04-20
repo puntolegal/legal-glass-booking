@@ -11,6 +11,12 @@ interface PremiumHeroCardProps {
   priceDetails?: string;
   ctaText: string;
   href: string;
+  /**
+   * Callback opcional invocado al hacer click en el CTA.
+   * Útil para disparar eventos de tracking (Meta Pixel, GTM) antes
+   * de la navegación. NO cancela la navegación por defecto.
+   */
+  onCtaClick?: (e: React.MouseEvent<HTMLAnchorElement>) => void;
   testimonial: {
     quote: string;
     author: string;
@@ -48,6 +54,7 @@ export const PremiumHeroCard: React.FC<PremiumHeroCardProps> = ({
   priceDetails,
   ctaText,
   href,
+  onCtaClick,
   testimonial,
   doorLabel,
   highlightLabel,
@@ -159,6 +166,7 @@ export const PremiumHeroCard: React.FC<PremiumHeroCardProps> = ({
 
           <Link
             to={href}
+            onClick={onCtaClick}
             className="group/cta relative mt-5 inline-flex w-full items-center justify-center gap-2 overflow-hidden rounded-2xl border border-pink-400/40 bg-gradient-to-r from-pink-500 via-rose-500 to-sky-500 px-6 py-3.5 text-base font-semibold uppercase tracking-wide text-white shadow-[0_28px_60px_rgba(236,72,153,0.5)] backdrop-blur-md transition-all hover:-translate-y-0.5"
           >
             {ctaText}
