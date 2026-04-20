@@ -9,7 +9,7 @@ import {
   XCircle,
 } from 'lucide-react';
 import SEO from '../components/SEO';
-import BrandMark from '@/components/BrandMark';
+import BrandWordmark from '@/components/BrandWordmark';
 import { supabase } from '@/integrations/supabase/client';
 
 export default function PaymentFailurePage() {
@@ -76,7 +76,7 @@ export default function PaymentFailurePage() {
         {/* Header consistente con el resto de la app */}
         <header className="sticky top-0 z-50 bg-slate-950/70 backdrop-blur-xl border-b border-white/[0.06]">
           <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
-            <BrandMark size="sm" />
+            <BrandWordmark size="sm" orientation="inline" />
             <div className="flex items-center gap-2 text-xs text-rose-300/90">
               <span className="w-1.5 h-1.5 rounded-full bg-rose-400 animate-pulse" />
               Pago no procesado

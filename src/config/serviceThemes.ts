@@ -247,6 +247,58 @@ export const serviceThemes: Record<string, ServiceTheme> = {
     'cae-tesoreria',
   ),
 
+  // ===== Empresariales de alto ticket =====
+  'constitucion-empresarial': makeTheme(
+    '#7C3AED', // violet-600
+    '#8B5CF6', // violet-500
+    '#6D28D9', // violet-700
+    Building2,
+    'Constitución Empresarial',
+    'constitucion-empresarial',
+  ),
+  'reestructuracion': makeTheme(
+    '#4F46E5', // indigo-600
+    '#6366F1', // indigo-500
+    '#4338CA', // indigo-700
+    Landmark,
+    'Reestructuración Societaria',
+    'reestructuracion',
+  ),
+  'holding-patrimonial': makeTheme(
+    '#1E3A8A', // blue-900 — institucional patrimonial
+    '#1D4ED8', // blue-700
+    '#172554', // blue-950
+    Landmark,
+    'Holding Patrimonial',
+    'holding-patrimonial',
+  ),
+  'gestion-patrimonial': makeTheme(
+    '#4338CA', // indigo-700
+    '#6366F1', // indigo-500
+    '#3730A3', // indigo-800
+    Briefcase,
+    'Gestión Patrimonial',
+    'gestion-patrimonial',
+  ),
+  'despido-empresa': makeTheme(
+    '#9333EA', // purple-600
+    '#A855F7', // purple-500
+    '#7E22CE', // purple-700
+    Briefcase,
+    'Despido Empresarial',
+    'despido-empresa',
+  ),
+
+  // ===== Penal económico (Ley 21.595) =====
+  'delitos-economicos': makeTheme(
+    '#991B1B', // red-800 — gravedad corporativa
+    '#B91C1C', // red-700
+    '#7F1D1D', // red-900
+    Briefcase,
+    'Delitos Económicos',
+    'delitos-economicos',
+  ),
+
   // ===== Otros / legacy =====
   civil: makeTheme(
     '#0EA5E9', // sky-500

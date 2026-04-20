@@ -144,7 +144,47 @@ export const serviceCatalog: Record<string, Service> = {
     name: 'Punto Legal Defensa CAE',
     price: '109.000',
     category: 'Patrimonio',
+    originalPrice: '169.000',
+    discount: '35% OFF',
     note: 'Defensa frente a Tesorería General de la República',
+  },
+
+  // ===== Nuevos servicios alto ticket =====
+  'constitucion-empresarial': {
+    name: 'Punto Legal Constitución Empresarial',
+    price: '229.000',
+    category: 'Empresarial',
+    note: 'Sociedad Anónima, estructuras complejas',
+  },
+  'reestructuracion': {
+    name: 'Punto Legal Reestructuración',
+    price: '290.000',
+    category: 'Empresarial',
+    note: 'Fusión, escisión, transformación societaria',
+  },
+  'holding-patrimonial': {
+    name: 'Punto Legal Holding Patrimonial',
+    price: '350.000',
+    category: 'Patrimonio',
+    note: 'Holding familiar o empresarial a medida',
+  },
+  'gestion-patrimonial': {
+    name: 'Punto Legal Gestión Patrimonial',
+    price: '390.000',
+    category: 'Empresarial',
+    note: 'Asesoría mensual · 5 horas incluidas',
+  },
+  'despido-empresa': {
+    name: 'Punto Legal Despido Empresas',
+    price: '149.000',
+    category: 'Laboral Empresarial',
+    note: 'Asesoría preventiva al empleador',
+  },
+  'delitos-economicos': {
+    name: 'Punto Legal Delitos Económicos',
+    price: '290.000',
+    category: 'Penal',
+    note: 'Defensa Ley 21.595 — alta complejidad',
   },
 
   // ===== General (fallback / consulta inicial) =====

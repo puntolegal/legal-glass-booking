@@ -5,7 +5,7 @@ import {
   Video,
   type LucideIcon,
 } from "lucide-react";
-import BrandMark from "@/components/BrandMark";
+import BrandWordmark from "@/components/BrandWordmark";
 
 interface Step {
   number: string;
@@ -58,16 +58,15 @@ const HowItWorksSection = () => {
       <span className="section-flow__top" aria-hidden />
       <span className="section-flow__bottom" aria-hidden />
       <div className="container relative z-10 mx-auto max-w-7xl">
-        {/* BrandMark — alto impacto: la "P." con el punto cyan glow es la firma
-            visual de la marca, reusable en todas las pantallas. */}
+        {/* Wordmark sobrio — solo tipografía, tono institucional de estudio jurídico */}
         <motion.div
-          initial={prefersReducedMotion ? false : { opacity: 0, y: 10, scale: 0.97 }}
-          whileInView={{ opacity: 1, y: 0, scale: 1 }}
+          initial={prefersReducedMotion ? false : { opacity: 0, y: 10 }}
+          whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-40px" }}
           transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
           className="mb-8 flex justify-center"
         >
-          <BrandMark />
+          <BrandWordmark orientation="inline" />
         </motion.div>
 
         <div className="mx-auto mb-16 max-w-2xl text-center lg:mb-20">

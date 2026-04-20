@@ -254,7 +254,7 @@ export const serviceInfoMap: Record<string, ServiceInfo> = {
   'penal': {
     title: 'Punto Legal Penal',
     subtitle: 'Defensa penal con litigantes',
-    description: 'Asumimos defensas en delitos económicos, contra las personas y la propiedad. Negociamos suspensión condicional, acuerdos reparatorios y vamos a juicio oral cuando corresponde.',
+    description: 'Asumimos defensas en delitos contra las personas y la propiedad. Negociamos suspensión condicional, acuerdos reparatorios y vamos a juicio oral cuando corresponde.',
     benefits: [
       'Defensa en juicio oral.',
       'Querellas y representación de víctimas.',
@@ -270,6 +270,138 @@ export const serviceInfoMap: Record<string, ServiceInfo> = {
     icon: Gavel,
     duration: '45 minutos',
     deliverable: 'Estrategia + defensa'
+  },
+
+  // ===== Delitos Económicos (Ley 21.595) =====
+  'delitos-economicos': {
+    title: 'Punto Legal Delitos Económicos',
+    subtitle: 'Defensa penal especializada',
+    description: 'Defensa penal especializada en la Ley 21.595 de Delitos Económicos y Medioambientales: administración desleal, fraude al Fisco, lavado de activos, delitos tributarios y corrupción entre particulares. Dirigida a ejecutivos, directores y socios.',
+    benefits: [
+      'Defensa en causas por Ley 21.595.',
+      'Representación ante Fiscalía, UAF y SII.',
+      'Coordinación con peritos contables y forenses.',
+      'Procedimiento abreviado, suspensión condicional o juicio oral según estrategia.'
+    ],
+    testimonial: {
+      quote: 'Un proceso delicado que manejaron con total rigor técnico y confidencialidad.',
+      author: 'Juan Carlos O.',
+      location: 'Las Condes, Santiago',
+      initials: 'JO'
+    },
+    icon: Briefcase,
+    duration: '45 minutos',
+    deliverable: 'Estrategia + defensa'
+  },
+
+  // ===== Constitución Empresarial avanzada =====
+  'constitucion-empresarial': {
+    title: 'Punto Legal Constitución Empresarial',
+    subtitle: 'Sociedades complejas',
+    description: 'Constitución de estructuras societarias que exceden la SpA estándar: Sociedad Anónima Cerrada o Abierta, estructuras con matriz extranjera, fondos de inversión y sociedades con múltiples series de acciones. Due diligence, redacción de estatutos e inscripción en CMF si corresponde.',
+    benefits: [
+      'Sociedad Anónima Cerrada o Abierta.',
+      'Estructuras con matriz extranjera.',
+      'Series de acciones y preferencias.',
+      'Inscripción ante CMF si corresponde.'
+    ],
+    testimonial: {
+      quote: 'Levantaron la sociedad y los pactos en tiempo récord, con estatutos que resistieron todas las revisiones.',
+      author: 'Andrés M.',
+      location: 'Providencia, Santiago',
+      initials: 'AM'
+    },
+    icon: Building2,
+    duration: '45 minutos',
+    deliverable: 'Estatutos + tramitación'
+  },
+
+  // ===== Reestructuración societaria =====
+  'reestructuracion': {
+    title: 'Punto Legal Reestructuración',
+    subtitle: 'Fusión, escisión, transformación',
+    description: 'Reestructuración societaria completa: fusión por absorción, escisión, transformación de tipo social, aumento o disminución de capital y adecuación estatutaria. Dictamen jurídico-tributario, tramitación notarial y publicación en Diario Oficial.',
+    benefits: [
+      'Fusión por absorción o por creación.',
+      'Escisión y transformación societaria.',
+      'Aumento o disminución de capital.',
+      'Tramitación Registro de Comercio y Diario Oficial.'
+    ],
+    testimonial: {
+      quote: 'Nos fusionamos con una subsidiaria y el proceso fue impecable. Ni un solo contratiempo ante el Registro.',
+      author: 'Patricia G.',
+      location: 'Vitacura, Santiago',
+      initials: 'PG'
+    },
+    icon: Landmark,
+    duration: '45 minutos',
+    deliverable: 'Plan + tramitación'
+  },
+
+  // ===== Holding patrimonial =====
+  'holding-patrimonial': {
+    title: 'Punto Legal Holding Patrimonial',
+    subtitle: 'Holding familiar o empresarial',
+    description: 'Diseño e implementación de sociedades holding patrimoniales y familiares: sociedad matriz, traspaso de activos, pactos de accionistas, protocolos familiares y planificación de sucesión. Enfoque integrado civil-tributario.',
+    benefits: [
+      'Diseño de sociedad matriz y filiales.',
+      'Pactos de accionistas y protocolo familiar.',
+      'Planificación sucesoria patrimonial.',
+      'Análisis civil-tributario integrado.'
+    ],
+    testimonial: {
+      quote: 'Ordenaron la propiedad de un grupo familiar complejo con cero roces entre herederos. Un alivio.',
+      author: 'Ricardo H.',
+      location: 'Las Condes, Santiago',
+      initials: 'RH'
+    },
+    icon: Landmark,
+    duration: '45 minutos',
+    deliverable: 'Diseño + implementación'
+  },
+
+  // ===== Gestión Patrimonial Empresarial =====
+  'gestion-patrimonial': {
+    title: 'Punto Legal Gestión Patrimonial',
+    subtitle: 'Asesoría mensual permanente',
+    description: 'Asesoría patrimonial-empresarial continua con un abogado senior dedicado. Revisión mensual de contratos, gobierno corporativo, dividendos y retiros, planificación tributaria y due diligence de inversiones. Tarifa mensual cerrada.',
+    benefits: [
+      'Abogado senior dedicado a tu grupo.',
+      'Revisión ilimitada de contratos estándar.',
+      'Gobierno corporativo, dividendos y retiros.',
+      'Planificación tributaria mensual.'
+    ],
+    testimonial: {
+      quote: 'Tener un abogado en retainer nos ahorró más de 10 MM en ajustes preventivos este año.',
+      author: 'Sebastián V.',
+      location: 'Vitacura, Santiago',
+      initials: 'SV'
+    },
+    icon: Briefcase,
+    duration: '45 minutos',
+    deliverable: 'Asesoría mensual continua'
+  },
+
+  // ===== Despido trabajadores (asesoría a empresas) =====
+  'despido-empresa': {
+    title: 'Punto Legal Despido Empresas',
+    subtitle: 'Asesoría preventiva al empleador',
+    description: 'Asesoría preventiva en la desvinculación de trabajadores: análisis de la causal aplicable (necesidades de la empresa, incumplimiento grave, Artículo 160), cálculo del costo real del despido y redacción de la carta para minimizar riesgo de demanda.',
+    benefits: [
+      'Análisis de la causal de despido aplicable.',
+      'Cálculo real de finiquito e indemnizaciones.',
+      'Redacción de carta de despido blindada.',
+      'Evaluación de riesgo de litigio y tutela.'
+    ],
+    testimonial: {
+      quote: 'Un despido que parecía seguro lo reestructuramos antes y evitamos una demanda millonaria.',
+      author: 'Isabel R.',
+      location: 'Providencia, Santiago',
+      initials: 'IR'
+    },
+    icon: Briefcase,
+    duration: '45 minutos',
+    deliverable: 'Estrategia + carta'
   },
   'familia': {
     title: 'Consulta Estratégica Familia',

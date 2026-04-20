@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { Clock, Home, RefreshCw } from 'lucide-react';
 import SEO from '../components/SEO';
-import BrandMark from '@/components/BrandMark';
+import BrandWordmark from '@/components/BrandWordmark';
 
 export default function PaymentPendingPage() {
   return (
@@ -17,7 +17,7 @@ export default function PaymentPendingPage() {
         {/* Header consistente */}
         <header className="sticky top-0 z-50 bg-slate-950/70 backdrop-blur-xl border-b border-white/[0.06]">
           <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
-            <BrandMark size="sm" />
+            <BrandWordmark size="sm" orientation="inline" />
             <div className="flex items-center gap-2 text-xs text-amber-300/90">
               <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
               Verificando pago

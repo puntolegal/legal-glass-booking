@@ -2,17 +2,17 @@ import React from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { ArrowDown, Compass } from "lucide-react";
 
-const TrustChip: React.FC<{ value: string; label: string }> = ({
-  value,
-  label,
-}) => (
-  <div className="glass-ios-card-dark flex flex-col items-center justify-center px-2 py-2.5 text-center">
-    <span className="font-display text-base font-bold text-white tracking-tight">
-      {value}
-    </span>
-    <span className="mt-0.5 text-[10px] uppercase tracking-[0.12em] text-slate-400">
-      {label}
-    </span>
+/** Stat institucional estilo papel — mobile.
+ *  Versión compacta del PaperStat del desktop, con tipografía ajustada. */
+const PaperStat: React.FC<{
+  value: string;
+  label: string;
+  note?: string;
+}> = ({ value, label, note }) => (
+  <div className="paper-stat paper-stat--compact">
+    <span className="paper-stat__value">{value}</span>
+    <span className="paper-stat__label">{label}</span>
+    {note && <span className="paper-stat__note">{note}</span>}
   </div>
 );
 
@@ -88,9 +88,21 @@ export const PremiumMobileHero: React.FC = () => {
         </div>
 
         <div className="mt-6 grid grid-cols-3 gap-2.5">
-          <TrustChip value="+1.200" label="casos" />
-          <TrustChip value="4.9 / 5" label="rating" />
-          <TrustChip value="100%" label="confidencial" />
+          <PaperStat
+            value="+1.200"
+            label="Consultas"
+            note="desde 2023"
+          />
+          <PaperStat
+            value="4,9"
+            label="Satisfacción"
+            note="de 5,0"
+          />
+          <PaperStat
+            value="Secreto"
+            label="Profesional"
+            note="Art. 231 COT"
+          />
         </div>
 
         <p className="mt-5 text-center text-[10.5px] uppercase tracking-[0.18em] text-slate-500">

@@ -73,6 +73,36 @@ interface InternalService {
 }
 
 const internalServices: InternalService[] = [
+  // ========== PRODUCTO ESTRELLA ==========
+  // Defensa CAE — máxima urgencia financiera + alta intención de búsqueda.
+  // Colocado como PRIMERO + FEATURED para máxima visibilidad.
+  {
+    title: "Punto Legal Defensa CAE",
+    shortName: "Defensa CAE",
+    hook: "¿La Tesorería te está reteniendo tu sueldo o tu devolución de impuestos por tu CAE moroso? Frenamos el embargo, repactamos la deuda y, cuando corresponde, solicitamos rebaja o condonación.",
+    descriptionHtml:
+      "Defensa integral de deudores morosos del <strong>Crédito con Aval del Estado (CAE) frente a la Tesorería General de la República</strong>. Presentamos recurso para suspender la retención judicial, evaluamos tu capacidad de pago y negociamos un convenio que se ajuste a tu realidad. Si calificas por insolvencia o error administrativo, impulsamos rebaja o condonación parcial.",
+    ctaLabel: "Frenar mi embargo TGR",
+    price: "$109.000",
+    priceBefore: "$169.000",
+    plan: "cae-tesoreria",
+    icon: Receipt,
+    features: [
+      "Suspensión de retención de sueldo o devolución de impuestos",
+      "Convenio de pago contributivo (% según renta)",
+      "Solicitud de rebaja o condonación parcial",
+      "Defensa administrativa y judicial ante la TGR",
+    ],
+    audience: "patrimonio",
+    accent: "239 68 68", // red-500 — urgencia financiera
+    badge: "Producto estrella",
+    featured: true,
+    testimonial: {
+      quote:
+        "“Me estaban reteniendo el sueldo hacía 8 meses. En 3 semanas frenaron el embargo y cerramos un plan mensual razonable. Recomendadísimos.”",
+      author: "Camilo V.",
+    },
+  },
   // ========== PERSONAS ==========
   {
     title: "Punto Legal Tutela Laboral",
@@ -94,32 +124,6 @@ const internalServices: InternalService[] = [
     audience: "personas",
     accent: "16 185 129", // emerald-500 — éxito + recuperación
     badge: "Diagnóstico gratis",
-    featured: true,
-    testimonial: {
-      quote:
-        "“Gracias a Punto Legal conseguí una indemnización de 18 millones. Chao jefe.”",
-      author: "Felipe R.",
-    },
-  },
-  // CAE en posición destacada — alta urgencia, conversión inmediata
-  {
-    title: "Punto Legal Defensa CAE",
-    shortName: "Defensa CAE",
-    hook: "¿Te embargó la Tesorería por tu CAE moroso? Frenamos el embargo y repactamos la deuda contigo.",
-    descriptionHtml:
-      "Defensa de deudores morosos del <strong>Crédito con Aval del Estado (CAE) frente a la Tesorería General de la República</strong>. Frenamos embargos, repactamos saldos y solicitamos rebajas o condonaciones.",
-    ctaLabel: "Frenar mi embargo",
-    price: "$109.000",
-    plan: "cae-tesoreria",
-    icon: Receipt,
-    features: [
-      "Frenar embargo de la TGR",
-      "Repactación y plan de pago",
-      "Solicitud de rebajas y condonaciones",
-    ],
-    audience: "patrimonio",
-    accent: "239 68 68", // red-500 — urgencia financiera
-    badge: "Urgente",
   },
   {
     title: "Punto Legal Familia",
@@ -181,7 +185,7 @@ const internalServices: InternalService[] = [
     shortName: "Penal",
     hook: "Defensa penal con un abogado litigante en juicio oral, querellas y salidas alternativas.",
     descriptionHtml:
-      "Asumimos <strong>defensas en delitos económicos, contra las personas y la propiedad</strong>. Negociamos suspensión condicional y acuerdos reparatorios, y vamos a juicio oral cuando corresponde.",
+      "Asumimos <strong>defensas en delitos contra las personas y la propiedad</strong>. Negociamos suspensión condicional y acuerdos reparatorios, y vamos a juicio oral cuando corresponde.",
     ctaLabel: "Defender mi caso",
     price: "$169.000",
     plan: "penal",
@@ -194,6 +198,26 @@ const internalServices: InternalService[] = [
     audience: "personas",
     accent: "190 18 60", // rose-700 — gravedad
     badge: "Atención inmediata",
+  },
+  {
+    title: "Punto Legal Delitos Económicos",
+    shortName: "Delitos Económicos",
+    hook: "Defensa especializada en la Ley de Delitos Económicos (Ley 21.595): fraude, lavado de activos, administración desleal y corrupción entre particulares.",
+    descriptionHtml:
+      "Defensa penal de ejecutivos, directores y socios frente a investigaciones de la Fiscalía, UAF o SII. Cubrimos <strong>Ley 21.595 de Delitos Económicos</strong>: administración desleal, fraude al Fisco, lavado de activos, delitos tributarios y ambientales. Estrategia desde la primera audiencia y coordinación con peritos contables.",
+    ctaLabel: "Pedir defensa especializada",
+    price: "$290.000",
+    plan: "delitos-economicos",
+    icon: BriefcaseBusiness,
+    features: [
+      "Ley 21.595 — delitos económicos y tributarios",
+      "Defensa en investigación y juicio oral",
+      "Coordinación con peritos contables y compliance",
+      "Procedimiento abreviado y suspensión condicional",
+    ],
+    audience: "personas",
+    accent: "153 27 27", // red-800 — gravedad corporativa
+    badge: "Alta complejidad",
   },
 
   // ========== EMPRESAS ==========
@@ -214,6 +238,104 @@ const internalServices: InternalService[] = [
     ],
     audience: "empresas",
     accent: "139 92 246", // violet-500
+  },
+  {
+    title: "Punto Legal Constitución Empresarial",
+    shortName: "Constitución Empresarial",
+    hook: "Estructuras societarias complejas: Sociedades Anónimas, estructuras internacionales y constitución con múltiples series de acciones.",
+    descriptionHtml:
+      "Para proyectos que exigen más que una SpA estándar: <strong>Sociedad Anónima Cerrada o Abierta, estructuras con matriz extranjera, fondos de inversión y sociedades con múltiples series de acciones</strong>. Due diligence, redacción de estatutos, inscripción en CMF si corresponde y coordinación notarial.",
+    ctaLabel: "Constituir mi empresa",
+    price: "$229.000",
+    plan: "constitucion-empresarial",
+    icon: Building2,
+    features: [
+      "Sociedad Anónima Cerrada o Abierta",
+      "Estructuras con matriz extranjera",
+      "Series de acciones y preferencias",
+      "Inscripción ante CMF si corresponde",
+    ],
+    audience: "empresas",
+    accent: "124 58 237", // violet-600
+  },
+  {
+    title: "Punto Legal Reestructuración",
+    shortName: "Reestructuración",
+    hook: "Fusiones, escisiones, transformaciones de tipo social y adecuación estatutaria con todo el respaldo jurídico del cambio.",
+    descriptionHtml:
+      "Reestructuración societaria completa: <strong>fusión por absorción, escisión, transformación de tipo social, aumento o disminución de capital y adecuación estatutaria</strong>. Dictamen jurídico-tributario, tramitación notarial, inscripción en Registro de Comercio y publicación en el Diario Oficial.",
+    ctaLabel: "Reestructurar mi empresa",
+    price: "$290.000",
+    plan: "reestructuracion",
+    icon: Landmark,
+    features: [
+      "Fusión por absorción o por creación",
+      "Escisión y transformación societaria",
+      "Aumento o disminución de capital",
+      "Tramitación Registro de Comercio y DO",
+    ],
+    audience: "empresas",
+    accent: "79 70 229", // indigo-600
+  },
+  {
+    title: "Punto Legal Holding Patrimonial",
+    shortName: "Holding Patrimonial",
+    hook: "Protege y ordena tu patrimonio con una estructura de holding familiar o empresarial diseñada a medida.",
+    descriptionHtml:
+      "Diseño e implementación de <strong>sociedades holding patrimoniales y familiares</strong>: sociedad matriz, traspaso de activos, pactos de accionistas, protocolos familiares y planificación de sucesión. Enfoque integrado civil-tributario que minimiza carga impositiva y protege el patrimonio intergeneracional.",
+    ctaLabel: "Estructurar mi holding",
+    price: "$350.000",
+    plan: "holding-patrimonial",
+    icon: Landmark,
+    features: [
+      "Diseño de sociedad matriz y filiales",
+      "Pactos de accionistas y protocolo familiar",
+      "Planificación sucesoria patrimonial",
+      "Análisis civil-tributario integrado",
+    ],
+    audience: "empresas",
+    accent: "30 58 138", // blue-900 — institucional
+    badge: "Alto patrimonio",
+  },
+  {
+    title: "Punto Legal Gestión Patrimonial",
+    shortName: "Gestión Patrimonial",
+    hook: "Asesoría legal continua para tu grupo empresarial: contratos, gobierno corporativo y planificación tributaria mensual.",
+    descriptionHtml:
+      "Asesoría patrimonial-empresarial permanente con un abogado senior dedicado: <strong>revisión mensual de contratos, gobierno corporativo, dividendos y retiros, planificación tributaria y due diligence de inversiones</strong>. Tarifa mensual cerrada que incluye hasta 5 horas de consulta y revisión ilimitada de documentos estándar.",
+    ctaLabel: "Iniciar asesoría mensual",
+    price: "$390.000",
+    plan: "gestion-patrimonial",
+    icon: BriefcaseBusiness,
+    priceFootnote: "Tarifa mensual · 5 horas incluidas",
+    features: [
+      "Abogado senior dedicado",
+      "Revisión ilimitada de contratos estándar",
+      "Gobierno corporativo y retiros",
+      "Planificación tributaria mensual",
+    ],
+    audience: "empresas",
+    accent: "67 56 202", // indigo-700
+    badge: "Asesoría mensual",
+  },
+  {
+    title: "Punto Legal Despido Empresas",
+    shortName: "Despido Empresas",
+    hook: "Antes de desvincular a un trabajador, calculamos el costo real, la causal correcta y blindamos la carta de despido para evitar juicios.",
+    descriptionHtml:
+      "Asesoría preventiva en <strong>desvinculación de trabajadores</strong>: análisis de la causal aplicable (necesidades de la empresa, incumplimiento grave, Artículo 160), cálculo del costo real del despido y redacción de la carta para minimizar riesgo de demanda por despido injustificado, nulidad o tutela.",
+    ctaLabel: "Asesorar despido",
+    price: "$149.000",
+    plan: "despido-empresa",
+    icon: BriefcaseBusiness,
+    features: [
+      "Análisis de causal de despido",
+      "Cálculo real de finiquito",
+      "Redacción de carta de despido",
+      "Evaluación de riesgo de litigio",
+    ],
+    audience: "empresas",
+    accent: "147 51 234", // purple-600
   },
   {
     title: "Punto Legal Tributario",

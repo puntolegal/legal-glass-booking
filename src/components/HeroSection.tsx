@@ -164,27 +164,29 @@ const HeroSection = ({
             {/* Imagen 3D flotando con animación suave (loop infinito) */}
             <FloatingPhone />
 
-            {/* Trust chips bajo la imagen */}
+            {/* Stats institucionales — estilo papel, texto legalmente preciso.
+                Construye confianza (firma legal seria) dando al usuario
+                "respiro visual" del fondo dark navy. */}
             <motion.div
               {...reveal("trust")}
-              className="mt-6 grid grid-cols-3 gap-3 lg:gap-4"
+              className="mt-6 grid grid-cols-3 gap-3 lg:gap-3"
             >
-              <TrustChip
-                icon={Users}
+              <PaperStat
                 value="+1.200"
-                label="casos resueltos"
+                label="Consultas atendidas"
+                note="desde 2023"
                 delay={0}
               />
-              <TrustChip
-                icon={Award}
-                value="4.9 / 5"
-                label="satisfacción"
+              <PaperStat
+                value="4,9"
+                label="Satisfacción clientes"
+                note="de 5,0 según encuesta post-consulta"
                 delay={0.08}
               />
-              <TrustChip
-                icon={ShieldCheck}
-                value="100%"
-                label="confidencial"
+              <PaperStat
+                value="Secreto"
+                label="Profesional"
+                note="Art. 231 Código Orgánico de Tribunales"
                 delay={0.16}
               />
             </motion.div>
@@ -255,7 +257,55 @@ const FloatingPhone = () => {
   );
 };
 
-/** Chip de confianza con micro-spring al hover (Apple-style). */
+/** Stat institucional estilo papel — ivory sobre dark navy.
+ *  Crea "respiro visual" y evoca la solidez de un estudio jurídico tradicional.
+ *  Incluye una nota discreta con la fuente o citación legal (Art. 231 COT, etc.)
+ *  para reforzar rigor y credibilidad. */
+const PaperStat = ({
+  value,
+  label,
+  note,
+  delay = 0,
+}: {
+  value: string;
+  label: string;
+  note: string;
+  delay?: number;
+}) => {
+  const prefersReducedMotion = useReducedMotion();
+  return (
+    <motion.div
+      initial={prefersReducedMotion ? false : { opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{
+        duration: 0.4,
+        delay: STAGGER.trust + delay,
+        ease: [0.16, 1, 0.3, 1],
+      }}
+      whileHover={
+        prefersReducedMotion
+          ? undefined
+          : {
+              y: -3,
+              transition: {
+                type: "spring",
+                stiffness: 320,
+                damping: 22,
+              },
+            }
+      }
+      className="paper-stat"
+    >
+      <span className="paper-stat__value">{value}</span>
+      <span className="paper-stat__label">{label}</span>
+      <span className="paper-stat__note">{note}</span>
+    </motion.div>
+  );
+};
+
+/** (Legacy) Chip de confianza con micro-spring al hover.
+ *  Conservado por si otras páginas lo reutilizan. */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const TrustChip = ({
   icon: Icon,
   value,

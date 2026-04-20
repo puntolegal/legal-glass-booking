@@ -51,6 +51,14 @@ const Index = () => {
         "Punto Legal Compliance": "cumplimiento",
         "Punto Legal Marcas": "marcas",
         "Punto Legal Propiedad Intelectual": "marcas",
+        // Alto ticket empresarial
+        "Punto Legal Constitución Empresarial": "constitucion-empresarial",
+        "Punto Legal Reestructuración": "reestructuracion",
+        "Punto Legal Holding Patrimonial": "holding-patrimonial",
+        "Punto Legal Gestión Patrimonial": "gestion-patrimonial",
+        "Punto Legal Despido Empresas": "despido-empresa",
+        // Penal económico
+        "Punto Legal Delitos Económicos": "delitos-economicos",
 
         // ===== Patrimonio =====
         "Punto Legal Inmobiliario": "inmobiliario",
@@ -124,13 +132,20 @@ const Index = () => {
         </p>
         <h2>Precios de consultas legales (CLP, sesión 45 min)</h2>
         <ul>
+          <li>Defensa CAE frente a Tesorería: $109.000 (antes $169.000 — producto estrella).</li>
           <li>Tutela Laboral: GRATIS (despido injustificado, Ley Karin, nulidad — honorarios sólo si recuperamos).</li>
           <li>Familia: $89.000 (divorcio, pensión de alimentos, cuidado personal).</li>
           <li>Sucesorio: $89.000 (posesión efectiva, herencias, testamentos).</li>
           <li>Migratorio: $129.000 (visa, residencia definitiva, nacionalización).</li>
-          <li>Penal: $169.000 (defensa penal, querellas, juicio oral).</li>
+          <li>Penal: $169.000 (defensa penal general, querellas, juicio oral).</li>
+          <li>Delitos Económicos (Ley 21.595): $290.000 (fraude, lavado, administración desleal).</li>
           <li>Inmobiliario: $119.000 (estudio de títulos, compraventa, arriendos).</li>
           <li>Empresarial: $149.000 (constituir SpA o EIRL, pactos de socios).</li>
+          <li>Constitución Empresarial avanzada: $229.000 (Sociedad Anónima, estructuras complejas).</li>
+          <li>Reestructuración societaria: $290.000 (fusión, escisión, transformación).</li>
+          <li>Holding Patrimonial familiar o empresarial: $350.000.</li>
+          <li>Gestión Patrimonial mensual: $390.000/mes (abogado dedicado, 5 horas incluidas).</li>
+          <li>Despido Empresas — asesoría preventiva: $149.000.</li>
           <li>Tributario: $99.000 (representación SII, planificación fiscal).</li>
           <li>Contratos: $59.000 (redacción y revisión en 24 horas).</li>
           <li>Comparendos Dirección del Trabajo: $130.000.</li>
@@ -140,7 +155,6 @@ const Index = () => {
           <li>Cumplimiento (Ley 20.393): $179.000.</li>
           <li>Marcas (registro INAPI): $89.000.</li>
           <li>Cobranza judicial: $109.000 (juicio ejecutivo, embargos).</li>
-          <li>Defensa CAE frente a Tesorería: $109.000.</li>
         </ul>
       </div>
 

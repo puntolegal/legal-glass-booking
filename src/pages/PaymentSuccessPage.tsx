@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { CheckCircle, Calendar, Clock, User, Mail, Phone, ArrowRight, Home, CreditCard, MessageCircle } from 'lucide-react';
 import SEO from '../components/SEO';
-import BrandMark from '@/components/BrandMark';
+import BrandWordmark from '@/components/BrandWordmark';
 import { sendRealBookingEmails, type BookingEmailData, type EmailResult } from '@/services/realEmailService';
 import { findReservaByCriteria, updatePaymentStatus, type Reserva } from '../services/supabaseBooking';
 import { supabase } from '@/integrations/supabase/client';
@@ -407,7 +407,7 @@ export default function PaymentSuccessPage() {
         <div className="min-h-screen bg-black text-white font-sans antialiased">
           <header className="sticky top-0 z-50 bg-black/95 backdrop-blur border-b border-white/10">
             <div className="max-w-lg mx-auto px-4 py-4 flex justify-center">
-              <BrandMark size="sm" />
+              <BrandWordmark size="sm" orientation="inline" />
             </div>
           </header>
           <main className="max-w-lg mx-auto px-4 py-8">
@@ -485,7 +485,7 @@ export default function PaymentSuccessPage() {
       <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
         <header className="sticky top-0 z-50 bg-slate-950/70 backdrop-blur-xl border-b border-white/[0.06]">
           <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
-            <BrandMark size="sm" />
+            <BrandWordmark size="sm" orientation="inline" />
             <div className="flex items-center gap-2 text-xs text-emerald-300/90">
               <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></div>
               Pago confirmado
