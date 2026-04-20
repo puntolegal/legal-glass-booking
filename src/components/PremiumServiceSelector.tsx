@@ -126,6 +126,9 @@ export const PremiumServiceSelector: React.FC = () => {
         content_ids: [selectedService.plan],
         content_name: selectedService.name,
         source: "mobile_service_selector",
+        // value + currency: el helper coerce el string "$35.000" → 35000 automáticamente
+        value: selectedService.price,
+        currency: "CLP",
       },
     });
     navigate(`/agendamiento?plan=${selectedService.plan}`);

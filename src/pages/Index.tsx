@@ -77,6 +77,11 @@ const Index = () => {
 
       const plan = service.plan || serviceMap[service.title] || "general";
 
+      // Enviar el precio real del servicio para que Meta calcule ROAS correcto.
+      // El helper (ensureValueAndCurrency) normaliza el string "$89.000" → 89000
+      // y añade currency "CLP" automáticamente si no se provee.
+      const rawPrice = service.promoPrice || service.price;
+
       void trackMetaEvent({
         event_name: "InitiateCheckout",
         custom_data: {
@@ -85,6 +90,8 @@ const Index = () => {
           content_ids: [plan],
           content_name: service.title,
           source: "services_section",
+          value: rawPrice, // coerced a number por el helper
+          currency: "CLP",
         },
       });
 
