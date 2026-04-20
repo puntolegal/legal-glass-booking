@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { ArrowDown, Compass } from "lucide-react";
+import { trackMetaEvent } from "@/services/metaConversionsService";
 
 /** Stat institucional — dark glass mobile (coherente con el resto del landing).
  *  Atributos de marca (Abogados · Ética · Secreto) sin cifras ni citas falsas. */
@@ -16,21 +17,58 @@ const InstitutionalStat: React.FC<{
   </div>
 );
 
+/**
+ * Scroll robusto a una sección por id. Maneja tanto el caso ideal
+ * (sección montada) como el fallback (id no presente en el DOM).
+ * Retorna true si encontró el target, false si no.
+ */
+const scrollToAnchor = (id: string): boolean => {
+  const el = document.getElementById(id);
+  if (!el) return false;
+  // Usamos requestAnimationFrame para garantizar que cualquier transform
+  // pendiente del layout ya se haya aplicado antes de calcular el scroll.
+  requestAnimationFrame(() => {
+    el.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+  return true;
+};
+
 export const PremiumMobileHero: React.FC = () => {
   const prefersReducedMotion = useReducedMotion();
   const skipEnter = prefersReducedMotion === true;
 
-  const scrollToServices = () => {
-    document
-      .getElementById("servicios")
-      ?.scrollIntoView({ behavior: "smooth", block: "start" });
-  };
+  /** CTA primaria — lleva al catálogo de servicios */
+  const handleVerConsultas = useCallback(
+    (e: React.MouseEvent<HTMLButtonElement>) => {
+      e.preventDefault();
+      e.stopPropagation();
+      void trackMetaEvent({
+        event_name: "InitiateCheckout",
+        custom_data: {
+          content_type: "service_plan",
+          content_category: "Landing Page",
+          content_ids: ["picker"],
+          content_name: "Hero Mobile — Ver consultas",
+          source: "hero_mobile",
+        },
+      });
+      const found = scrollToAnchor("servicios");
+      // Fallback: si el id no existe por alguna razón, ir directo al
+      // agendamiento general para no dejar al usuario atascado.
+      if (!found) window.location.href = "/agendamiento?plan=general";
+    },
+    [],
+  );
 
-  const scrollToHowItWorks = () => {
-    document
-      .getElementById("como-funciona")
-      ?.scrollIntoView({ behavior: "smooth", block: "start" });
-  };
+  /** CTA secundaria — scroll a HowItWorks (3 pasos) */
+  const handleComoFunciona = useCallback(
+    (e: React.MouseEvent<HTMLButtonElement>) => {
+      e.preventDefault();
+      e.stopPropagation();
+      scrollToAnchor("como-funciona");
+    },
+    [],
+  );
 
   return (
     <section className="relative px-4 pt-10 pb-8 text-slate-100">
@@ -64,27 +102,32 @@ export const PremiumMobileHero: React.FC = () => {
           <strong className="text-white">plan de acción claro</strong>.
         </p>
 
+        {/* CTAs mobile — robustos contra problemas de scroll en iOS/Android.
+            whileTap da feedback visual inmediato al dedo del usuario. */}
         <div className="mt-6 flex flex-col gap-3">
-          <button
+          <motion.button
             type="button"
-            onClick={scrollToServices}
-            className="cta-hero cta-hero--primary w-full justify-center py-3.5 text-[15px]"
+            onClick={handleVerConsultas}
+            whileTap={prefersReducedMotion ? undefined : { scale: 0.98 }}
+            className="cta-hero cta-hero--primary w-full justify-center py-3.5 text-[15px] active:opacity-90"
+            aria-label="Ver catálogo de consultas legales y agendar"
           >
             <span>Ver consultas y agendar</span>
             <ArrowDown
               className="cta-hero__arrow h-4 w-4 opacity-80"
               aria-hidden
             />
-          </button>
-          <button
+          </motion.button>
+          <motion.button
             type="button"
-            onClick={scrollToHowItWorks}
-            className="cta-hero cta-hero--ghost w-full justify-center py-3 text-[14px]"
+            onClick={handleComoFunciona}
+            whileTap={prefersReducedMotion ? undefined : { scale: 0.98 }}
+            className="cta-hero cta-hero--ghost w-full justify-center py-3 text-[14px] active:opacity-90"
             aria-label="Ver cómo funciona el proceso en 3 pasos"
           >
             <Compass className="h-4 w-4" aria-hidden />
             <span>Cómo funciona</span>
-          </button>
+          </motion.button>
         </div>
 
         <div className="mt-6 grid grid-cols-3 gap-2.5">
