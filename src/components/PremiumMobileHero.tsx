@@ -11,7 +11,7 @@ const InstitutionalStat: React.FC<{
   label: string;
   note?: string;
 }> = ({ value, label, note }) => (
-  <div className="institutional-stat institutional-stat--compact">
+  <div className="institutional-stat institutional-stat--compact min-w-0">
     <span className="institutional-stat__value">{value}</span>
     <span className="institutional-stat__label">{label}</span>
     {note && <span className="institutional-stat__note">{note}</span>}
@@ -119,21 +119,21 @@ export const PremiumMobileHero: React.FC = () => {
           </motion.button>
         </div>
 
-        <div className="mt-6 grid grid-cols-3 gap-2.5">
+        <div className="mt-6 grid min-w-0 grid-cols-1 gap-2.5 min-[380px]:grid-cols-3">
           <InstitutionalStat
             value="Abogados"
             label="De Chile"
-            note="Colegiados"
+            note="Titulados y colegiados"
           />
           <InstitutionalStat
             value="Ética"
             label="Profesional"
-            note="Código del Colegio"
+            note="Código del Colegio de Abogados"
           />
           <InstitutionalStat
             value="Secreto"
             label="Profesional"
-            note="Confidencialidad"
+            note="Confidencialidad garantizada"
           />
         </div>
 

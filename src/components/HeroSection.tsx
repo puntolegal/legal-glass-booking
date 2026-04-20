@@ -160,38 +160,34 @@ const HeroSection = ({
             </motion.p>
           </div>
 
-          {/* Columna derecha: Phone 3D flotando + trust chips */}
+          {/* Columna derecha: solo teléfono. Las stats van en fila ancha debajo (PC: textos legales largos). */}
           <div className="relative lg:col-span-4">
-            {/* Imagen 3D flotando con animación suave (loop infinito) */}
             <FloatingPhone />
-
-            {/* Stats institucionales — declaraciones de marca + norma profesional.
-                Paleta dark-glass coherente con el resto del landing. Evitan
-                cifras inventadas y citas legales imprecisas. */}
-            <motion.div
-              {...reveal("trust")}
-              className="mt-6 grid grid-cols-3 gap-3 lg:gap-3"
-            >
-              <InstitutionalStat
-                value="Abogados"
-                label="De Chile"
-                note="Titulados y colegiados"
-                delay={0}
-              />
-              <InstitutionalStat
-                value="Ética"
-                label="Profesional"
-                note="Código del Colegio de Abogados"
-                delay={0.08}
-              />
-              <InstitutionalStat
-                value="Secreto"
-                label="Profesional"
-                note="Confidencialidad garantizada"
-                delay={0.16}
-              />
-            </motion.div>
           </div>
+
+          <motion.div
+            {...reveal("trust")}
+            className="institutional-stat-row mt-8 grid min-w-0 grid-cols-1 gap-3 min-[480px]:grid-cols-3 sm:gap-4 lg:col-span-12 lg:mt-4"
+          >
+            <InstitutionalStat
+              value="Abogados"
+              label="De Chile"
+              note="Titulados y colegiados"
+              delay={0}
+            />
+            <InstitutionalStat
+              value="Ética"
+              label="Profesional"
+              note="Código del Colegio de Abogados"
+              delay={0.08}
+            />
+            <InstitutionalStat
+              value="Secreto"
+              label="Profesional"
+              note="Confidencialidad garantizada"
+              delay={0.16}
+            />
+          </motion.div>
         </div>
       </div>
     </section>
@@ -294,7 +290,7 @@ const InstitutionalStat = ({
               },
             }
       }
-      className="institutional-stat"
+      className="institutional-stat institutional-stat--hero min-w-0 h-full"
     >
       <span className="institutional-stat__value">{value}</span>
       <span className="institutional-stat__label">{label}</span>
