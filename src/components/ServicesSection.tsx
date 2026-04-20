@@ -302,14 +302,14 @@ const internalServices: InternalService[] = [
     shortName: "Gestión Patrimonial",
     hook: "Asesoría legal continua para tu grupo empresarial: contratos, gobierno corporativo y planificación tributaria mensual.",
     descriptionHtml:
-      "Asesoría patrimonial-empresarial permanente con un abogado senior dedicado: <strong>revisión mensual de contratos, gobierno corporativo, dividendos y retiros, planificación tributaria y due diligence de inversiones</strong>. Tarifa mensual cerrada que incluye hasta 5 horas de consulta y revisión ilimitada de documentos estándar.",
+      "Asesoría patrimonial-empresarial permanente con un abogado dedicado: <strong>revisión mensual de contratos, gobierno corporativo, dividendos y retiros, planificación tributaria y due diligence de inversiones</strong>. Tarifa mensual cerrada que incluye hasta 5 horas de consulta y revisión ilimitada de documentos estándar.",
     ctaLabel: "Iniciar asesoría mensual",
     price: "$390.000",
     plan: "gestion-patrimonial",
     icon: BriefcaseBusiness,
     priceFootnote: "Tarifa mensual · 5 horas incluidas",
     features: [
-      "Abogado senior dedicado",
+      "Abogado dedicado",
       "Revisión ilimitada de contratos estándar",
       "Gobierno corporativo y retiros",
       "Planificación tributaria mensual",

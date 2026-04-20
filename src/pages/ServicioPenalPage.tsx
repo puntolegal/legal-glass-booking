@@ -291,7 +291,7 @@ export default function ServicioPenalPage() {
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-                    <span className="text-sm">Equipo de abogados senior</span>
+                    <span className="text-sm">Equipo de abogados litigantes</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />

@@ -114,7 +114,7 @@ const QuizModal: React.FC<QuizModalProps> = ({ isOpen, onClose }) => {
         reason: 'Tu situación requiere atención especializada y recursos premium para proteger tus intereses de manera integral.',
         discount: '15%',
         features: [
-          'Abogado senior dedicado 24/7',
+          'Abogado dedicado 24/7',
           'Manejo de casos internacionales',
           'Protección patrimonial completa',
           'Resolución en tiempo récord'

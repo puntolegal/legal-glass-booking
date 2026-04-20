@@ -364,9 +364,9 @@ export const serviceInfoMap: Record<string, ServiceInfo> = {
   'gestion-patrimonial': {
     title: 'Punto Legal Gestión Patrimonial',
     subtitle: 'Asesoría mensual permanente',
-    description: 'Asesoría patrimonial-empresarial continua con un abogado senior dedicado. Revisión mensual de contratos, gobierno corporativo, dividendos y retiros, planificación tributaria y due diligence de inversiones. Tarifa mensual cerrada.',
+    description: 'Asesoría patrimonial-empresarial continua con un abogado dedicado. Revisión mensual de contratos, gobierno corporativo, dividendos y retiros, planificación tributaria y due diligence de inversiones. Tarifa mensual cerrada.',
     benefits: [
-      'Abogado senior dedicado a tu grupo.',
+      'Abogado dedicado a tu grupo.',
       'Revisión ilimitada de contratos estándar.',
       'Gobierno corporativo, dividendos y retiros.',
       'Planificación tributaria mensual.'

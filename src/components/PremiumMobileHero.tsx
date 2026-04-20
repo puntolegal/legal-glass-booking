@@ -2,17 +2,17 @@ import React from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { ArrowDown, Compass } from "lucide-react";
 
-/** Stat institucional estilo papel — mobile.
- *  Versión compacta del PaperStat del desktop, con tipografía ajustada. */
-const PaperStat: React.FC<{
+/** Stat institucional — dark glass mobile (coherente con el resto del landing).
+ *  Atributos de marca (Abogados · Ética · Secreto) sin cifras ni citas falsas. */
+const InstitutionalStat: React.FC<{
   value: string;
   label: string;
   note?: string;
 }> = ({ value, label, note }) => (
-  <div className="paper-stat paper-stat--compact">
-    <span className="paper-stat__value">{value}</span>
-    <span className="paper-stat__label">{label}</span>
-    {note && <span className="paper-stat__note">{note}</span>}
+  <div className="institutional-stat institutional-stat--compact">
+    <span className="institutional-stat__value">{value}</span>
+    <span className="institutional-stat__label">{label}</span>
+    {note && <span className="institutional-stat__note">{note}</span>}
   </div>
 );
 
@@ -88,20 +88,20 @@ export const PremiumMobileHero: React.FC = () => {
         </div>
 
         <div className="mt-6 grid grid-cols-3 gap-2.5">
-          <PaperStat
-            value="+1.200"
-            label="Consultas"
-            note="desde 2023"
+          <InstitutionalStat
+            value="Abogados"
+            label="De Chile"
+            note="Colegiados"
           />
-          <PaperStat
-            value="4,9"
-            label="Satisfacción"
-            note="de 5,0"
+          <InstitutionalStat
+            value="Ética"
+            label="Profesional"
+            note="Código del Colegio"
           />
-          <PaperStat
+          <InstitutionalStat
             value="Secreto"
             label="Profesional"
-            note="Art. 231 COT"
+            note="Confidencialidad"
           />
         </div>
 

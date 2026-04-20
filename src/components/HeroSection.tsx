@@ -164,29 +164,29 @@ const HeroSection = ({
             {/* Imagen 3D flotando con animación suave (loop infinito) */}
             <FloatingPhone />
 
-            {/* Stats institucionales — estilo papel, texto legalmente preciso.
-                Construye confianza (firma legal seria) dando al usuario
-                "respiro visual" del fondo dark navy. */}
+            {/* Stats institucionales — declaraciones de marca + norma profesional.
+                Paleta dark-glass coherente con el resto del landing. Evitan
+                cifras inventadas y citas legales imprecisas. */}
             <motion.div
               {...reveal("trust")}
               className="mt-6 grid grid-cols-3 gap-3 lg:gap-3"
             >
-              <PaperStat
-                value="+1.200"
-                label="Consultas atendidas"
-                note="desde 2023"
+              <InstitutionalStat
+                value="Abogados"
+                label="De Chile"
+                note="Titulados y colegiados"
                 delay={0}
               />
-              <PaperStat
-                value="4,9"
-                label="Satisfacción clientes"
-                note="de 5,0 según encuesta post-consulta"
+              <InstitutionalStat
+                value="Ética"
+                label="Profesional"
+                note="Código del Colegio de Abogados"
                 delay={0.08}
               />
-              <PaperStat
+              <InstitutionalStat
                 value="Secreto"
                 label="Profesional"
-                note="Art. 231 Código Orgánico de Tribunales"
+                note="Confidencialidad garantizada"
                 delay={0.16}
               />
             </motion.div>
@@ -257,11 +257,10 @@ const FloatingPhone = () => {
   );
 };
 
-/** Stat institucional estilo papel — ivory sobre dark navy.
- *  Crea "respiro visual" y evoca la solidez de un estudio jurídico tradicional.
- *  Incluye una nota discreta con la fuente o citación legal (Art. 231 COT, etc.)
- *  para reforzar rigor y credibilidad. */
-const PaperStat = ({
+/** Stat institucional — dark glass coherente con la paleta del landing.
+ *  Comunica atributos de marca (Abogados · Ética · Secreto) sin recurrir
+ *  a cifras ni a citas legales imprecisas. */
+const InstitutionalStat = ({
   value,
   label,
   note,
@@ -294,11 +293,11 @@ const PaperStat = ({
               },
             }
       }
-      className="paper-stat"
+      className="institutional-stat"
     >
-      <span className="paper-stat__value">{value}</span>
-      <span className="paper-stat__label">{label}</span>
-      <span className="paper-stat__note">{note}</span>
+      <span className="institutional-stat__value">{value}</span>
+      <span className="institutional-stat__label">{label}</span>
+      <span className="institutional-stat__note">{note}</span>
     </motion.div>
   );
 };
