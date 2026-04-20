@@ -2,6 +2,7 @@ import React, { useCallback } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { ArrowDown, Compass } from "lucide-react";
 import { trackMetaEvent } from "@/services/metaConversionsService";
+import { scrollToVisibleAnchor } from "@/lib/scroll";
 
 /** Stat institucional — dark glass mobile (coherente con el resto del landing).
  *  Atributos de marca (Abogados · Ética · Secreto) sin cifras ni citas falsas. */
@@ -16,39 +17,6 @@ const InstitutionalStat: React.FC<{
     {note && <span className="institutional-stat__note">{note}</span>}
   </div>
 );
-
-/**
- * Scroll robusto a una sección por id.
- *
- * En mobile, `element.scrollIntoView` puede fallar o comportarse mal cuando
- * el elemento está dentro de un ancestro con `transform`, `overflow:hidden`,
- * o cuando hay headers fijos. Calculamos la posición absoluta manualmente
- * con `getBoundingClientRect` + `window.pageYOffset` y hacemos scroll en
- * `window`, que es el contenedor real del documento.
- *
- * Reintenta hasta 3 veces si el elemento aún no está montado (lazy sections).
- */
-const scrollToAnchor = (id: string, attempt = 0): boolean => {
-  const el = document.getElementById(id);
-  if (!el) {
-    if (attempt < 3) {
-      window.setTimeout(() => scrollToAnchor(id, attempt + 1), 120);
-      return true; // optimista: estamos reintentando
-    }
-    return false;
-  }
-  // Offset para compensar posibles headers fijos (~72px) y dar respiro visual.
-  const HEADER_OFFSET = 72;
-  const rect = el.getBoundingClientRect();
-  const targetY = rect.top + window.pageYOffset - HEADER_OFFSET;
-  // Doble rAF garantiza que el layout esté estabilizado tras animaciones.
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => {
-      window.scrollTo({ top: targetY, behavior: "smooth" });
-    });
-  });
-  return true;
-};
 
 export const PremiumMobileHero: React.FC = () => {
   const prefersReducedMotion = useReducedMotion();
@@ -69,9 +37,13 @@ export const PremiumMobileHero: React.FC = () => {
           source: "hero_mobile",
         },
       });
-      const found = scrollToAnchor("servicios");
-      // Fallback: si el id no existe por alguna razón, ir directo al
-      // agendamiento general para no dejar al usuario atascado.
+      // scrollToVisibleAnchor resuelve el problema de IDs duplicados:
+      // el landing renderiza {landingSections} dos veces (desktop + mobile)
+      // así que hay dos #servicios en el DOM. El helper elige el que está
+      // realmente renderizado (no display:none) basándose en getBoundingClientRect.
+      const found = scrollToVisibleAnchor("servicios");
+      // Fallback: si por algún motivo no hay ningún candidato, llevamos
+      // al usuario al agendamiento genérico para que no quede atascado.
       if (!found) window.location.href = "/agendamiento?plan=general";
     },
     [],
@@ -82,7 +54,7 @@ export const PremiumMobileHero: React.FC = () => {
     (e: React.MouseEvent<HTMLButtonElement>) => {
       e.preventDefault();
       e.stopPropagation();
-      scrollToAnchor("como-funciona");
+      scrollToVisibleAnchor("como-funciona");
     },
     [],
   );

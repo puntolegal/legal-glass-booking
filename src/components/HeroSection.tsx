@@ -9,6 +9,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { trackMetaEvent } from "@/services/metaConversionsService";
+import { scrollToVisibleAnchor } from "@/lib/scroll";
 
 interface HeroSectionProps {
   title?: string;
@@ -51,13 +52,13 @@ const HeroSection = ({
         source: "hero_desktop",
       },
     });
-    document.getElementById("servicios")?.scrollIntoView({ behavior: "smooth" });
+    // Helper resiliente ante IDs duplicados (el landing renderiza las
+    // secciones en dos contenedores: hidden lg:block + lg:hidden).
+    scrollToVisibleAnchor("servicios");
   };
 
   const goToHowItWorks = () => {
-    document
-      .getElementById("como-funciona")
-      ?.scrollIntoView({ behavior: "smooth" });
+    scrollToVisibleAnchor("como-funciona");
   };
 
   /** Helper: motion props con stagger según la key */
