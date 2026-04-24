@@ -15,10 +15,15 @@ import {
   Sun,
   Moon,
   ChevronDown,
+  MessageCircle,
   LucideIcon
 } from 'lucide-react';
 import { useSidebar } from '@/contexts/SidebarContext';
 import { useTheme } from '@/hooks/useTheme';
+import {
+  buildWhatsAppUrlWithMessage,
+  WHATSAPP_URGENCIA_LABORAL,
+} from '@/lib/whatsapp';
 
 export interface ServiceTheme {
   primary: string;
@@ -29,6 +34,8 @@ export interface ServiceTheme {
   icon: LucideIcon;
   serviceName: string;
   serviceSlug: string;
+  /** Si existe, el CTA global "Agendar" del header/dock usa este plan (p. ej. laboral → tutela-laboral). */
+  agendarPlanSlug?: string;
 }
 
 interface HeaderServiceProps {
@@ -37,6 +44,7 @@ interface HeaderServiceProps {
 }
 
 const HeaderService: React.FC<HeaderServiceProps> = ({ theme, transparentOnTop = true }) => {
+  const agendarPlanSlug = theme.agendarPlanSlug ?? theme.serviceSlug;
   const { isOpen, toggleSidebar } = useSidebar();
   const [isScrolled, setIsScrolled] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
@@ -49,6 +57,8 @@ const HeaderService: React.FC<HeaderServiceProps> = ({ theme, transparentOnTop =
   const navigate = useNavigate();
   const location = useLocation();
   const isLanding = location.pathname === '/';
+  const isLaboralServicioPage = location.pathname.includes('/servicios/laboral');
+  const whatsappLaboralHref = buildWhatsAppUrlWithMessage(WHATSAPP_URGENCIA_LABORAL);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -131,7 +141,7 @@ const HeaderService: React.FC<HeaderServiceProps> = ({ theme, transparentOnTop =
       title: '50% OFF Cyber',
       message: `Promoción especial en ${theme.serviceName}`,
       time: 'Hace 2h',
-      href: `/agendamiento?plan=${theme.serviceSlug}`,
+      href: `/agendamiento?plan=${agendarPlanSlug}`,
     },
     {
       id: 2,
@@ -371,8 +381,12 @@ const HeaderService: React.FC<HeaderServiceProps> = ({ theme, transparentOnTop =
                   <Search className="w-4 h-4 text-slate-300 transition-colors hover:text-white" />
                 </motion.button>
 
-                {/* Notificaciones */}
-                <div className="relative">
+                {/* Notificaciones — ocultas en móvil en /servicios/laboral (menos ruido; WhatsApp + menú) */}
+                <div
+                  className={
+                    isLaboralServicioPage ? 'relative hidden lg:block' : 'relative'
+                  }
+                >
                   <motion.button
                     onClick={() => setShowNotifications(!showNotifications)}
                     className="relative p-2.5 rounded-xl bg-slate-800/50 hover:bg-slate-700/50 border border-slate-700/50 hover:border-slate-600/50 transition-all duration-300 group"
@@ -457,12 +471,33 @@ const HeaderService: React.FC<HeaderServiceProps> = ({ theme, transparentOnTop =
                   </AnimatePresence>
                 </div>
 
-                {/* Dark mode toggle */}
+                {/* Móvil en página laboral: WhatsApp urgencia (reemplaza tema, más útil que sol/tema) */}
+                {isLaboralServicioPage && (
+                  <a
+                    href={whatsappLaboralHref}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="lg:hidden flex items-start gap-2 max-w-[min(100%,13.5rem)] shrink-0 rounded-xl border border-emerald-500/40 bg-emerald-500/10 px-2.5 py-2 text-[10px] sm:text-[11px] font-medium leading-snug text-emerald-50 shadow-sm shadow-emerald-900/20 transition hover:border-emerald-400/60 hover:bg-emerald-500/15"
+                    aria-label={`Abrir WhatsApp: ${WHATSAPP_URGENCIA_LABORAL}`}
+                  >
+                    <MessageCircle
+                      className="h-4 w-4 shrink-0 text-emerald-300 mt-0.5"
+                      aria-hidden
+                    />
+                    <span className="min-w-0 text-left">{WHATSAPP_URGENCIA_LABORAL}</span>
+                  </a>
+                )}
+
+                {/* Dark mode toggle (en laboral móvil se oculta; en desktop siempre) */}
                 <motion.button
+                  type="button"
                   onClick={toggleTheme}
-                  className="p-2.5 rounded-xl bg-slate-800/50 hover:bg-slate-700/50 border border-slate-700/50 hover:border-slate-600/50 transition-all duration-300 group"
+                  className={`p-2.5 rounded-xl bg-slate-800/50 hover:bg-slate-700/50 border border-slate-700/50 hover:border-slate-600/50 transition-all duration-300 group ${
+                    isLaboralServicioPage ? 'hidden lg:flex' : 'flex'
+                  }`}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
+                  aria-label="Cambiar tema claro u oscuro"
                 >
                   {colorTheme === 'dark' ? (
                     <Sun className="w-4 h-4 text-slate-300 group-hover:text-amber-400 transition-colors" />
@@ -478,7 +513,7 @@ const HeaderService: React.FC<HeaderServiceProps> = ({ theme, transparentOnTop =
                   className="hidden sm:block"
                 >
                   <Link
-                    to={`/agendamiento?plan=${theme.serviceSlug}`}
+                    to={`/agendamiento?plan=${agendarPlanSlug}`}
                     className="flex items-center gap-2 px-4 py-2 text-white rounded-xl font-medium text-sm shadow-lg transition-all border"
                     style={{
                       background: theme.gradient,
@@ -555,48 +590,51 @@ const HeaderService: React.FC<HeaderServiceProps> = ({ theme, transparentOnTop =
         />
       )}
 
-      {/* Mobile Floating Dock */}
-      <motion.div
-        initial={{ y: 100, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.5, type: 'spring', stiffness: 300 }}
-        className="lg:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50"
-      >
-        <div className="relative">
-          <div 
-            className="absolute inset-0 rounded-full blur-xl"
-            style={{ backgroundColor: `${theme.primary}20` }}
-          />
-          
-          <div 
-            className="relative bg-slate-900/90 backdrop-blur-xl border rounded-full px-6 py-3 shadow-2xl shadow-black/50 flex items-center gap-4"
-            style={{ borderColor: `${theme.primary}30` }}
-          >
-            <Link to="/" className="p-2 hover:bg-slate-800/50 rounded-xl transition-colors">
-              <Home className="w-5 h-5 text-slate-300" />
-            </Link>
-            
-            <Link to="/blog" className="p-2 hover:bg-slate-800/50 rounded-xl transition-colors">
-              <FileText className="w-5 h-5 text-slate-300" />
-            </Link>
-            
-            <button
-              onClick={() => navigate('/agendamiento?plan=emergencia')}
-              className="p-2 bg-red-500/20 hover:bg-red-500/30 rounded-xl transition-colors"
+      {/* Mobile Floating Dock — no en laboral: la página tiene barra sticky + CTA propios */}
+      {!isLaboralServicioPage && (
+        <motion.div
+          initial={{ y: 100, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.5, type: 'spring', stiffness: 300 }}
+          className="lg:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50"
+        >
+          <div className="relative">
+            <div
+              className="absolute inset-0 rounded-full blur-xl"
+              style={{ backgroundColor: `${theme.primary}20` }}
+            />
+
+            <div
+              className="relative bg-slate-900/90 backdrop-blur-xl border rounded-full px-6 py-3 shadow-2xl shadow-black/50 flex items-center gap-4"
+              style={{ borderColor: `${theme.primary}30` }}
             >
-              <Phone className="w-5 h-5 text-red-400" />
-            </button>
-            
-            <Link
-              to={`/agendamiento?plan=${theme.serviceSlug}`}
-              className="px-4 py-2 text-white rounded-xl font-medium text-sm shadow-lg"
-              style={{ background: theme.gradient }}
-            >
-              Agendar
-            </Link>
+              <Link to="/" className="p-2 hover:bg-slate-800/50 rounded-xl transition-colors">
+                <Home className="w-5 h-5 text-slate-300" />
+              </Link>
+
+              <Link to="/blog" className="p-2 hover:bg-slate-800/50 rounded-xl transition-colors">
+                <FileText className="w-5 h-5 text-slate-300" />
+              </Link>
+
+              <button
+                type="button"
+                onClick={() => navigate('/agendamiento?plan=emergencia')}
+                className="p-2 bg-red-500/20 hover:bg-red-500/30 rounded-xl transition-colors"
+              >
+                <Phone className="w-5 h-5 text-red-400" />
+              </button>
+
+              <Link
+                to={`/agendamiento?plan=${agendarPlanSlug}`}
+                className="px-4 py-2 text-white rounded-xl font-medium text-sm shadow-lg"
+                style={{ background: theme.gradient }}
+              >
+                Agendar
+              </Link>
+            </div>
           </div>
-        </div>
-      </motion.div>
+        </motion.div>
+      )}
     </>
   );
 };

@@ -17,10 +17,13 @@ import {
   Briefcase,
   Award,
   Clock,
+  ListOrdered,
+  Sparkles,
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useState } from 'react'
 import SEO from '../components/SEO'
+import { PUNTO_LEGAL_FOUNDER_NAME } from '@/constants/brandIdentity'
 import ServicioPageShell from '@/components/servicios/ServicioPageShell'
 import { useServicioTheme } from '@/components/servicios/servicioThemeContext'
 import TestimonialBubble from '@/components/servicios/TestimonialBubble'
@@ -31,7 +34,7 @@ const services = [
     icon: Scale,
     title: 'Despidos y término de contrato',
     description:
-      'Defensa completa en despidos justificados e injustificados, con protección total de tus derechos laborales.',
+      'Asesoría en despidos y términos de contrato: revisión de causal, finiquito y vías de impugnación según tu caso.',
     features: [
       'Despidos injustificados',
       'Indemnizaciones',
@@ -43,8 +46,8 @@ const services = [
     icon: AlertTriangle,
     title: 'Ley Karin y acoso laboral',
     description:
-      'Defensa especializada en acoso, hostigamiento y vulneración de derechos fundamentales.',
-    features: ['Ley Karin completa', 'Acoso laboral', 'Discriminación', 'Tutela de derechos'],
+      'Asesoría en acoso, hostigamiento y procedimiento bajo la Ley 21.643: orientación sobre tutela y medidas según tu caso.',
+    features: ['Ley 21.643 — ámbitos laboral y sexual', 'Acoso y discriminación', 'Canales y plazos', 'Tutela de derechos'],
   },
   {
     icon: FileText,
@@ -66,13 +69,13 @@ const services = [
   {
     icon: Shield,
     title: 'Seguridad social y previsión',
-    description: 'Gestión completa de derechos previsionales y seguridad social.',
+    description: 'Asesoría en derechos previsionales, cotizaciones y seguridad social según tus antecedentes.',
     features: ['AFP y pensiones', 'Fonasa e Isapre', 'Seguro de desempleo', 'Indemnizaciones'],
   },
   {
     icon: Globe,
     title: 'Fiscalizaciones DT',
-    description: 'Defensa ante la Dirección del Trabajo y comparendos laborales.',
+    description: 'Orientación en fiscalizaciones y comparendos ante la Dirección del Trabajo.',
     features: ['Fiscalizaciones DT', 'Comparendos', 'Multas laborales', 'Defensa administrativa'],
   },
 ]
@@ -82,75 +85,159 @@ const testimonials = [
     name: 'Ana Rodríguez',
     role: 'Trabajadora — Retail',
     content:
-      'Recuperé más de $2.000.000 en horas extra que no me habían pagado durante años. El proceso fue rápido, transparente y muy humano.',
+      'Me orientaron sobre un reclamo por horas extraordinarias y los plazos. El abogado explicó la viabilidad sin prometerme un monto: claridad y rigor.',
   },
   {
     name: 'Carlos Mendoza',
     role: 'Empleado — Servicios',
     content:
-      'Mi despido fue claramente injustificado y Punto Legal lo demostró. La indemnización superó mis expectativas. Profesionalismo total.',
+      'Tenía dudas por un despido y me explicaron las alternativas (negociación, mediación, demanda). Sentí que la decisión seguía siendo mía, con información completa.',
   },
   {
     name: 'María González',
     role: 'Trabajadora — Industrial',
     content:
-      'Sufrí acoso laboral durante meses. Aplicaron la Ley Karin con rigor y logramos indemnización + traslado. Su apoyo fue fundamental.',
+      'Me asesoraron en un tema de acoso laboral bajo la Ley 21.643: pasos ante la empresa y la DT. Muy ordenado y respetuoso.',
   },
-]
-
-const stats = [
-  { number: '1.000+', label: 'Casos resueltos' },
-  { number: '100%', label: 'Confidencialidad' },
-  { number: '48h', label: 'Respuesta garantizada' },
-  { number: '98%', label: 'Clientes satisfechos' },
 ]
 
 const successCases = [
   {
     icon: Briefcase,
-    amount: '$2.4M',
-    case: 'Horas extra recuperadas',
-    client: 'Trabajadora retail',
-    plan: 'Defensa Laboral',
+    amount: 'Horas extra',
+    case: 'Revisión de liquidaciones y estrategia de reclamo',
+    client: 'Ejemplo retail',
+    plan: 'Consulta / tutela',
   },
   {
     icon: Award,
-    amount: '100%',
-    case: 'Indemnización por despido injustificado',
-    client: 'Ejecutivo de ventas',
-    plan: 'Defensa Laboral',
+    amount: 'Despido',
+    case: 'Análisis de causal y plazos para demandar',
+    client: 'Ejemplo servicios',
+    plan: 'Consulta laboral',
   },
   {
     icon: Shield,
-    amount: '11 meses',
-    case: 'Tope máximo de indemnización + Ley Karin',
-    client: 'Profesional administrativa',
-    plan: 'Protección Integral',
+    amount: 'Ley 21.643',
+    case: 'Procedimiento interno y posición ante la DT',
+    client: 'Ejemplo administración',
+    plan: 'Defensa Ley Karin',
   },
 ]
 
+const procesoMicroPasos = [
+  {
+    paso: 1,
+    title: 'Reserva en el agendador',
+    body: 'Elige el plan y un horario que te calce. Primer paso de baja fricción.',
+  },
+  {
+    paso: 2,
+    title: 'Antecedentes y contexto',
+    body: 'Contrato, cartas, liquidaciones: lo que tengas ayuda a afinar la evaluación.',
+  },
+  {
+    paso: 3,
+    title: 'Sesión con abogado',
+    body: 'Revisión de causal, plazos y alternativas (negociación, mediación, demanda).',
+  },
+  {
+    paso: 4,
+    title: 'Plan por escrito',
+    body: 'Si corresponde, recibes pasos siguientes y alcance del servicio contratado.',
+  },
+] as const
+
 const differentiators = [
   {
+    icon: Sparkles,
+    title: 'Información que equilibra la mesa',
+    description:
+      'Traducimos la jerga a decisiones concretas: plazos, riesgos y opciones. El objetivo es que negocies o litigues con el panorama claro, no a ciegas.',
+  },
+  {
     icon: Clock,
-    title: 'Respondemos en 48 horas',
-    description: 'Sabemos que cada día cuenta. Cero burocracia, cero esperas eternas.',
+    title: 'Contacto en horario hábil',
+    description:
+      'Gestionamos agendamientos y consultas según disponibilidad. Los plazos judiciales y administrativos los explica tu abogado según tu caso.',
   },
   {
     icon: Award,
-    title: 'Precio cerrado, sin sorpresas',
-    description: 'Conoces el valor total antes de empezar. No hay cobros por audiencia.',
+    title: 'Honorarios informados',
+    description:
+      'Antes de contratar, conoces la tarifa publicada del servicio (o el acuerdo escrito si aplica patrocinio a porcentaje).',
   },
   {
     icon: Shield,
-    title: 'Confidencialidad absoluta',
-    description: 'Tu caso es tratado por abogados con secreto profesional, nunca asistentes.',
+    title: 'Secreto profesional',
+    description:
+      'La información se maneja conforme al deber de secreto del abogado (Código Orgánico de Tribunales).',
   },
   {
     icon: Users,
-    title: 'Especialistas, no generalistas',
-    description: 'Solo derecho laboral chileno: Ley Karin, despidos, remuneraciones, DT.',
+    title: 'Enfoque laboral',
+    description:
+      'Orientación en derecho del trabajo chileno: despidos, tutela, Ley 21.643 y procedimientos ante la Dirección del Trabajo.',
   },
 ]
+
+/** Planes mostrados en la página (sincronizar slugs con `constants/services.ts`). */
+const laboralPlanes = [
+  {
+    emoji: '✨',
+    name: 'Diagnóstico laboral gratis',
+    sub: 'Tutela de derechos fundamentales · despido · nulidad del despido',
+    priceLabel: 'Gratis',
+    priceExtra: 'Primera sesión sin costo cuando corresponde',
+    popular: true,
+    badge: 'Empieza aquí',
+    features: [
+      'Evaluación inicial de tutela de derechos fundamentales',
+      'Despido injustificado y nulidad del despido (orientación)',
+      'Sin patrocinio automático: el abogado te indica la vía',
+      'Honorarios a porcentaje solo si hay acuerdo escrito de representación',
+    ],
+    plan: 'tutela-laboral',
+    cta: 'Agendar diagnóstico gratis',
+    isFree: true,
+  },
+  {
+    emoji: '🛡️',
+    name: 'Defensa frente a Ley Karin',
+    sub: 'Ley 21.643 · procedimiento como trabajador/a',
+    priceLabel: '$79.000',
+    priceExtra: 'Misma tarifa base que consulta laboral · sin IVA',
+    popular: false,
+    badge: '',
+    features: [
+      'Análisis de tu situación bajo la Ley Karin',
+      'Estrategia ante empleador, investigación interna o DT',
+      'Sesión con abogado y plan por escrito',
+      'Sin promesa de resultado: depende de hechos y prueba',
+    ],
+    plan: 'defensa-karin-trabajador',
+    cta: 'Agendar defensa Ley Karin',
+    isFree: false,
+  },
+  {
+    emoji: '📍',
+    name: 'Comparendo DT · Región Metropolitana',
+    sub: 'Comparendo + proyección de demanda en tribunales',
+    priceLabel: '$35.000',
+    priceExtra: '+ honorarios de juicio según complejidad (cotización aparte)',
+    popular: false,
+    badge: '',
+    features: [
+      'Comparendo de conciliación ante la DT (RM)',
+      'Preparación de descargos y posición',
+      'Indicación de pasos hacia demanda laboral',
+      'Litigio pleno presupuestado en fase siguiente',
+    ],
+    plan: 'comparendo-rm',
+    cta: 'Agendar comparendo RM',
+    isFree: false,
+  },
+] as const
 
 const laboralFaq = [
   {
@@ -166,7 +253,17 @@ const laboralFaq = [
   {
     question: '¿Qué incluye la indemnización por años de servicio?',
     answer:
-      'Corresponde a 30 días de la última remuneración mensual por cada año de servicio (y fracción superior a 6 meses), con tope de 11 meses. Si el despido fue injustificado, procede el recargo del 30% al 100% adicional según la causal usada.',
+      'En líneas generales, corresponde una suma equivalente a 30 días de remuneración por cada año de servicio (con reglas de fracción y topes legales). Para contratos posteriores al 14 de agosto de 1981 suele computarse un tope de 11 años de servicio en la indemnización por años de servicio. Los montos finales dependen de hechos, contrato y prueba; en la consulta se revisa una estimación orientativa.',
+  },
+  {
+    question: '¿Qué es la “última remuneración” para fines de indemnización (Art. 172)?',
+    answer:
+      'Es un concepto técnico: suele incluir el sueldo y otras sumas permanentes que percibías por el trabajo al término del contrato, con exclusiones legales (por ejemplo, la asignación familiar no forma parte de esa base). El cálculo exacto lo aplica tu abogado según tus liquidaciones y la normativa vigente.',
+  },
+  {
+    question: '¿El empleador puede descontar el AFC de la indemnización si gano la demanda?',
+    answer:
+      'Hay criterios jurisprudenciales recientes en torno al descuento del aporte del empleador al seguro de cesantía en ciertos escenarios de despido injustificado. Es un tema casuístico: en la sesión se evalúa si aplica a tus hechos y documentos, sin promesa de resultado.',
   },
   {
     question: '¿Puedo reclamar horas extra no pagadas con prescripción?',
@@ -176,7 +273,7 @@ const laboralFaq = [
   {
     question: '¿Cómo funciona la consulta inicial?',
     answer:
-      'Agendas una consulta online o presencial donde revisamos tu caso, contrato, liquidaciones y documentación relevante. Recibes una evaluación de viabilidad y estrategia recomendada. Si contratas el plan, el valor de la consulta se descuenta.',
+      'Agendas una consulta online o presencial donde revisamos tu caso, contrato, liquidaciones y documentación relevante. Recibes una evaluación de viabilidad y estrategia recomendada. Los descuentos entre servicios, si corresponden, se indican al contratar.',
   },
 ]
 
@@ -184,8 +281,10 @@ export default function ServicioLaboralPage() {
   return (
     <>
       <SEO
-        title="Abogado laboral en Chile: despidos, Ley Karin, horas extra | Punto Legal"
-        description="Especialistas en derecho laboral en Chile. Despidos injustificados, Ley Karin, horas extraordinarias, fiscalizaciones DT. Respuesta en 48h, precio cerrado."
+        title="Derecho laboral Chile: despido, tutela laboral, Ley 21.643 (Ley Karin) | Punto Legal"
+        description={`Asesoría laboral en Chile con lenguaje claro: despido, plazos, tutela, Ley 21.643 (Ley Karin) y DT. Estudio fundado por ${PUNTO_LEGAL_FOUNDER_NAME}. Diagnóstico inicial sin costo cuando corresponde y tarifas publicadas antes de pagar.`}
+        keywords={`abogado laboral chile, despido injustificado, tutela laboral, Ley 21.643, Ley Karin, Punto Legal, ${PUNTO_LEGAL_FOUNDER_NAME}`}
+        author={PUNTO_LEGAL_FOUNDER_NAME}
       />
       <ServicioPageShell
         theme="laboral"
@@ -204,11 +303,12 @@ function ServicioLaboralInner() {
 
   return (
     <>
+      <div className="pb-[calc(5.75rem+env(safe-area-inset-bottom))] md:pb-0">
       {/* HERO sobrio fintech-legal */}
       <section className="relative pt-10 md:pt-16 pb-12 md:pb-20 overflow-hidden">
         {/* blobs ultra sutiles */}
-        <div className="pointer-events-none absolute -top-32 -right-32 h-96 w-96 rounded-full bg-amber-500/5 blur-3xl" />
-        <div className="pointer-events-none absolute -bottom-32 -left-32 h-96 w-96 rounded-full bg-sky-500/5 blur-3xl" />
+        <div className="pointer-events-none absolute -top-32 -right-32 h-96 w-96 rounded-full bg-teal-600/5 blur-3xl" />
+        <div className="pointer-events-none absolute -bottom-32 -left-32 h-96 w-96 rounded-full bg-sky-600/4 blur-3xl" />
 
         <div className="container mx-auto px-4 relative z-10">
           <motion.div
@@ -217,85 +317,158 @@ function ServicioLaboralInner() {
             transition={{ duration: 0.6 }}
             className="text-center max-w-4xl mx-auto"
           >
-            <div className="inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 mb-6 backdrop-blur-xl bg-slate-900/70 border border-slate-800">
-              <span aria-hidden="true">🛡️</span>
-              <span className="text-xs font-medium text-slate-300 tracking-wide">
-                Especialistas en derecho laboral · Chile
+            <div className="inline-flex items-center gap-2 rounded-full px-3.5 py-2 mb-6 glass-ios-card-dark">
+              <Shield className="h-4 w-4 text-teal-300 shrink-0" aria-hidden />
+              <span className="text-xs font-medium tracking-wide text-slate-200">
+                Derecho laboral Chile · <span className="text-teal-200">Diagnóstico gratis</span> cuando aplica
               </span>
             </div>
 
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white mb-6 leading-[1.05] tracking-tight">
-              Defendemos tus derechos
+            <p className="text-sm md:text-base font-semibold text-teal-200/95 mb-3 max-w-2xl mx-auto tracking-tight">
+              Nivelamos la cancha con información clara: plazos, causales y siguientes pasos.
+            </p>
+
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white mb-6 leading-[1.05] tracking-tight font-[family-name:Manrope]">
+              Asesoría laboral
               <br />
-              <span className={t.accent}>laborales con resultados.</span>
+              <span className={t.accent}>para personas y trabajadores</span>
             </h1>
 
             <p className="text-lg md:text-xl text-slate-400 mb-10 leading-relaxed max-w-2xl mx-auto">
-              Despidos, Ley Karin, horas extra y fiscalizaciones DT. Respuesta en{' '}
-              <span className="text-slate-200 font-medium">48 horas</span>, precio cerrado y
-              confidencialidad absoluta.
+              Si te despidieron, te cambiaron condiciones o enfrentas un conflicto con la empresa, aquí no estás solo
+              frente a un manual: traducimos la norma a decisiones posibles —despidos, tutela, Ley 21.643 (Ley Karin),
+              horas extra y fiscalizaciones DT. Puedes partir por un{' '}
+              <span className="text-slate-200 font-medium">diagnóstico inicial sin costo cuando corresponde</span>
+              , o por una consulta pagada con plan por escrito. Primera respuesta en horario hábil, según carga de
+              agenda.
+            </p>
+            <p className="text-xs text-slate-500 max-w-xl mx-auto -mt-6 mb-10 leading-relaxed">
+              Punto Legal — visión fundacional de {PUNTO_LEGAL_FOUNDER_NAME}, abogado (Instituto Nacional): acercar
+              defensa y orientación jurídica con claridad.
             </p>
 
-            <div className="flex flex-wrap gap-3 justify-center">
+            <div className="flex flex-col sm:flex-row flex-wrap gap-3 justify-center items-stretch sm:items-center">
               <Link
-                to="/agendamiento?plan=laboral"
-                className={`group px-7 py-3.5 rounded-2xl font-semibold inline-flex items-center gap-2 transition-all duration-300 ${t.btnPrimary} ${t.btnPrimaryHover} hover:-translate-y-0.5`}
+                to="/agendamiento?plan=tutela-laboral"
+                className={`group min-h-[44px] px-7 py-3.5 rounded-2xl font-semibold inline-flex items-center justify-center gap-2 transition-all duration-300 touch-manipulation active:scale-[0.98] ${t.btnPrimary} ${t.btnPrimaryHover} hover:-translate-y-0.5 shadow-black/35`}
               >
-                <span aria-hidden="true">⚡</span>
-                Consulta laboral hoy
+                <Calendar className="w-4 h-4 shrink-0" aria-hidden />
+                Agendar diagnóstico gratis
                 <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
               </Link>
+              <Link
+                to="/agendamiento?plan=laboral"
+                className={`group min-h-[44px] px-7 py-3.5 rounded-2xl font-semibold inline-flex items-center justify-center gap-2 transition-all duration-300 touch-manipulation active:scale-[0.98] ${t.btnOutline} ${t.btnOutlineHover}`}
+              >
+                <span aria-hidden="true">⚡</span>
+                Consulta pagada · desde $79.000
+              </Link>
               <button
+                type="button"
                 onClick={() => setShowLogin(true)}
-                className={`px-7 py-3.5 rounded-2xl font-semibold inline-flex items-center gap-2 transition-all duration-300 ${t.btnOutline} ${t.btnOutlineHover}`}
+                className={`min-h-[44px] px-7 py-3.5 rounded-2xl font-semibold inline-flex items-center justify-center gap-2 transition-all duration-300 touch-manipulation active:scale-[0.98] border border-white/10 bg-white/[0.03] text-slate-300 hover:bg-white/[0.06]`}
               >
                 <LogIn className="w-4 h-4" />
                 Portal trabajador
               </button>
             </div>
 
-            {/* Trust micro-bar */}
-            <div className="mt-8 inline-flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-[12px] text-slate-500">
-              <span className="inline-flex items-center gap-1.5">
-                <span aria-hidden="true">✅</span> Sin compromiso
-              </span>
-              <span className="inline-flex items-center gap-1.5">
-                <span aria-hidden="true">⏱️</span> Respuesta 48h
-              </span>
-              <span className="inline-flex items-center gap-1.5">
-                <span aria-hidden="true">🔒</span> 100% confidencial
-              </span>
-            </div>
           </motion.div>
         </div>
       </section>
 
-      {/* STATS minimalistas */}
-      <section className="border-y border-slate-800/80 bg-slate-950/40 py-10">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
-            {stats.map((stat, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 14 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: index * 0.08 }}
-                className="text-center"
+      {/* Tres vías — coherente con cluster Laboral del landing */}
+      <section className="relative border-b border-slate-800/80 py-10 md:py-12">
+        <div className="container mx-auto max-w-4xl px-4">
+          <div className="glass-ios-panel-dark p-6 md:p-8">
+            <h2 className="text-center text-lg font-semibold text-white md:text-xl">
+              Tres formas de empezar
+            </h2>
+            <p className="mx-auto mt-2 max-w-2xl text-center text-sm leading-relaxed text-slate-400">
+              Recomendamos comenzar por el <span className="text-slate-200">diagnóstico sin costo</span> cuando
+              corresponda; si ya necesitas plan escrito pago, usa la consulta laboral.
+            </p>
+            <div className="mt-6 grid gap-3 sm:grid-cols-3">
+              <Link
+                to="/agendamiento?plan=tutela-laboral"
+                className={`relative flex min-h-[44px] flex-col justify-center rounded-2xl px-4 py-4 text-center transition touch-manipulation active:scale-[0.98] ${t.cardPopularRing} bg-teal-600/[0.06] hover:bg-teal-600/10`}
               >
-                <div className={`text-3xl md:text-4xl font-bold mb-1 ${t.stat}`}>
-                  {stat.number}
-                </div>
-                <div className="text-[11px] md:text-xs uppercase tracking-[0.2em] text-slate-500">
-                  {stat.label}
-                </div>
-              </motion.div>
-            ))}
+                <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 rounded-full bg-gradient-to-r from-teal-600 to-teal-700 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white shadow-lg shadow-black/25">
+                  Prioridad
+                </span>
+                <span className={`mt-1 text-sm font-semibold text-white ${t.link}`}>Diagnóstico gratis</span>
+                <span className="mt-1 text-[11px] leading-snug text-slate-400">
+                  Primera evaluación sin costo si aplica
+                </span>
+              </Link>
+              <Link
+                to="/agendamiento?plan=laboral"
+                className={`flex min-h-[44px] flex-col justify-center rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-4 text-center transition touch-manipulation active:scale-[0.98] hover:border-teal-500/30 hover:bg-white/[0.06] ${t.link}`}
+              >
+                <span className="text-sm font-semibold text-white">Despido y finiquito</span>
+                <span className="mt-1 text-[11px] leading-snug text-slate-500">
+                  Consulta pagada · plan por escrito
+                </span>
+              </Link>
+              <Link
+                to="/agendamiento?plan=defensa-karin-trabajador"
+                className={`flex min-h-[44px] flex-col justify-center rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-4 text-center transition touch-manipulation active:scale-[0.98] hover:border-teal-500/30 hover:bg-white/[0.06] ${t.link}`}
+              >
+                <span className="text-sm font-semibold text-white">Ley Karin (trabajador)</span>
+                <span className="mt-1 text-[11px] leading-snug text-slate-500">
+                  Consulta $79.000 · sesión y plan por escrito
+                </span>
+              </Link>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* DIFERENCIADORES (NUEVO — clave para conversión) */}
+      {/* Cuatro pasos */}
+      <section className="relative border-b border-slate-800/80 py-10 md:py-14">
+        <div className="container mx-auto max-w-6xl px-4">
+          <div className="glass-ios-panel-dark p-6 md:p-8">
+            <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4 mb-6">
+              <div>
+                <div className="inline-flex items-center gap-2 text-teal-300/90 mb-2">
+                  <ListOrdered className="h-5 w-5 shrink-0" aria-hidden />
+                  <span className="text-xs font-bold uppercase tracking-[0.25em]">Tu siguiente paso</span>
+                </div>
+                <h2 className="text-xl md:text-2xl font-bold text-white leading-tight">
+                  Cuatro pasos, sin formularios interminables
+                </h2>
+                <p className="mt-2 text-sm text-slate-400 max-w-2xl leading-relaxed">
+                  Diseño pensado para el efecto de tareas abiertas: avanzas por etapas claras hasta tener plan y
+                  próximos hitos.
+                </p>
+              </div>
+              <Link
+                to="/agendamiento?plan=tutela-laboral"
+                className={`shrink-0 inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold touch-manipulation active:scale-[0.98] ${t.btnPrimary} ${t.btnPrimaryHover}`}
+              >
+                <Calendar className="h-4 w-4" aria-hidden />
+                Empezar por agendar
+              </Link>
+            </div>
+            <ol className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              {procesoMicroPasos.map((s) => (
+                <li
+                  key={s.paso}
+                  className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 text-left"
+                >
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-teal-400/85">
+                    Paso {s.paso}
+                  </span>
+                  <p className="mt-1.5 text-sm font-semibold text-white">{s.title}</p>
+                  <p className="mt-1.5 text-xs text-slate-400 leading-relaxed">{s.body}</p>
+                </li>
+              ))}
+            </ol>
+          </div>
+        </div>
+      </section>
+
+      {/* DIFERENCIADORES */}
       <section className="py-14 md:py-20">
         <div className="container mx-auto px-4 max-w-6xl">
           <motion.div
@@ -309,12 +482,12 @@ function ServicioLaboralInner() {
               ¿Por qué elegir <span className={t.accent}>Punto Legal Laboral</span>?
             </h2>
             <p className="text-slate-400 max-w-2xl mx-auto">
-              No somos un call center jurídico. Somos abogados especializados en derecho laboral
-              chileno, con casos ganados y procesos transparentes.
+              Equipo con foco en derecho del trabajo chileno: rigor en plazos y causales, comunicación sin humo y alcance
+              definido en cada servicio.
             </p>
           </motion.div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 md:gap-5">
             {differentiators.map((d, index) => (
               <motion.div
                 key={index}
@@ -322,7 +495,7 @@ function ServicioLaboralInner() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.45, delay: index * 0.07 }}
-                className={`rounded-3xl p-5 md:p-6 transition-colors duration-300 ${t.cardGlass} ${t.cardHover}`}
+                className={`glass-ios-card-dark p-5 md:p-6 transition-colors duration-300 ${t.cardHover}`}
               >
                 <div
                   className={`mb-4 flex h-11 w-11 items-center justify-center rounded-2xl ${t.iconBox}`}
@@ -351,7 +524,7 @@ function ServicioLaboralInner() {
               Servicios de <span className={t.accent}>derecho laboral</span>
             </h2>
             <p className="text-lg text-slate-400 max-w-2xl mx-auto">
-              Cobertura completa con resultados reales, no promesas.
+              Evaluamos viabilidad según tus antecedentes; sin promesas de resultado.
             </p>
           </motion.div>
 
@@ -363,7 +536,7 @@ function ServicioLaboralInner() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: index * 0.06 }}
-                className={`rounded-3xl p-6 transition-all duration-300 group ${t.cardGlass} ${t.cardHover}`}
+                className={`glass-ios-card-dark p-6 transition-all duration-300 group ${t.cardHover}`}
               >
                 <div
                   className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-5 group-hover:scale-105 transition-transform duration-300 ${t.iconBox}`}
@@ -400,16 +573,14 @@ function ServicioLaboralInner() {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="rounded-[28px] border border-slate-800 bg-slate-900/70 backdrop-blur-xl p-6 md:p-10 shadow-2xl shadow-black/40 relative overflow-hidden"
+            className="glass-ios-panel-dark p-6 md:p-10 relative overflow-hidden"
           >
-            <div className="pointer-events-none absolute -top-24 -right-24 h-72 w-72 rounded-full bg-amber-500/8 blur-3xl" />
+            <div className="pointer-events-none absolute -top-24 -right-24 h-72 w-72 rounded-full bg-teal-600/6 blur-3xl" />
             <div className="relative z-10 flex flex-col md:flex-row gap-6 md:gap-10 items-start">
               <div
-                className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-amber-500/25 bg-amber-500/10`}
+                className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-teal-500/22 bg-teal-600/10"
               >
-                <span className="text-2xl" aria-hidden="true">
-                  🛡️
-                </span>
+                <Shield className="h-7 w-7 text-teal-300" aria-hidden />
               </div>
               <div className="flex-1">
                 <span
@@ -423,23 +594,29 @@ function ServicioLaboralInner() {
                 <p className="text-slate-400 leading-relaxed mb-6">
                   La <span className="text-slate-200 font-medium">Ley 21.643</span> obliga a las
                   empresas a prevenir y sancionar el acoso laboral y sexual. Si tu empleador no
-                  cumplió o has sufrido hostigamiento, tienes derecho a tutela de derechos
-                  fundamentales e indemnizaciones. Actuamos en{' '}
-                  <span className="text-slate-200 font-medium">48 horas</span>.
+                  cumplió o has sufrido hostigamiento, puedes evaluar tutela de derechos fundamentales y
+                  otras medidas según los hechos. Priorizamos la revisión inicial según urgencia y
+                  disponibilidad.
                 </p>
                 <div className="flex flex-wrap gap-3">
                   <Link
-                    to="/agendamiento?plan=laboral-karin"
-                    className={`inline-flex items-center gap-2 px-6 py-3 rounded-xl font-semibold ${t.btnPrimary} ${t.btnPrimaryHover}`}
+                    to="/agendamiento?plan=tutela-laboral"
+                    className={`inline-flex min-h-[44px] items-center gap-2 px-6 py-3 rounded-xl font-semibold touch-manipulation active:scale-[0.98] ${t.btnPrimary} ${t.btnPrimaryHover}`}
                   >
-                    <span aria-hidden="true">🛡️</span>
-                    Consultar por Ley Karin
+                    <Calendar className="h-4 w-4 shrink-0" aria-hidden />
+                    Agendar diagnóstico gratis
                   </Link>
                   <Link
-                    to="/blog/ley-karin-guia"
-                    className={`inline-flex items-center gap-2 px-6 py-3 rounded-xl font-semibold ${t.btnOutline} ${t.btnOutlineHover}`}
+                    to="/agendamiento?plan=laboral"
+                    className={`inline-flex min-h-[44px] items-center gap-2 px-6 py-3 rounded-xl font-semibold touch-manipulation active:scale-[0.98] ${t.btnOutline} ${t.btnOutlineHover}`}
                   >
-                    Guía Ley Karin
+                    Consulta pagada
+                  </Link>
+                  <Link
+                    to="/blog"
+                    className={`inline-flex min-h-[44px] items-center gap-2 px-6 py-3 rounded-xl font-semibold touch-manipulation active:scale-[0.98] border border-white/10 bg-white/[0.03] text-slate-200 hover:bg-white/[0.06]`}
+                  >
+                    Blog · laboral y derechos
                     <ArrowRight className="w-4 h-4" />
                   </Link>
                 </div>
@@ -460,75 +637,27 @@ function ServicioLaboralInner() {
             className="text-center mb-12"
           >
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-3">
-              Planes claros, <span className={t.accent}>sin sorpresas</span>
+              Elige tu <span className={t.accent}>entrada</span>
             </h2>
-            <p className="text-slate-400 max-w-2xl mx-auto">
-              Precio cerrado por escrito. Sin cobros adicionales por audiencia.
+            <p className="text-slate-400 max-w-2xl mx-auto text-sm md:text-base leading-relaxed">
+              Lo primero es el <strong className="text-slate-200">diagnóstico gratis</strong> cuando aplica.
+              Las otras opciones son consultas pagadas con tarifa publicada en el agendamiento.
             </p>
           </motion.div>
 
           <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
-            {[
-              {
-                emoji: '⚡',
-                name: 'Consulta Express',
-                sub: 'Orientación y estrategia',
-                price: '$30.000',
-                popular: false,
-                features: [
-                  'Revisión de tu caso (1h)',
-                  'Análisis de documentos clave',
-                  'Estrategia recomendada',
-                  'Informe escrito en PDF',
-                  'Descontable del plan si contratas',
-                ],
-                badge: '',
-                plan: 'laboral-consulta',
-              },
-              {
-                emoji: '🛡️',
-                name: 'Defensa Laboral',
-                sub: 'Despidos y remuneraciones',
-                price: '$480.000',
-                popular: true,
-                features: [
-                  'Todo Consulta Express +',
-                  'Demanda ante tribunal laboral',
-                  'Audiencias preparatoria y juicio',
-                  'Negociación extrajudicial previa',
-                  'Apelación incluida',
-                ],
-                badge: 'Más elegido',
-                plan: 'laboral-defensa',
-              },
-              {
-                emoji: '💎',
-                name: 'Protección Integral',
-                sub: 'Ley Karin + DDFF',
-                price: '$850.000',
-                popular: false,
-                features: [
-                  'Todo Defensa Laboral +',
-                  'Tutela de derechos fundamentales',
-                  'Ley Karin completa',
-                  'Acciones preventivas y cautelares',
-                  'Seguimiento por 6 meses',
-                ],
-                badge: '',
-                plan: 'laboral-integral',
-              },
-            ].map((pkg, i) => (
+            {laboralPlanes.map((pkg, i) => (
               <motion.div
-                key={i}
+                key={pkg.plan}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
-                className={`relative rounded-3xl p-7 md:p-8 transition-all duration-300 ${t.cardGlass} ${
+                className={`relative glass-ios-card-dark p-7 md:p-8 transition-all duration-300 ${
                   pkg.popular ? t.cardPopularRing : t.cardHover
                 }`}
               >
-                {pkg.popular && (
+                {pkg.popular && pkg.badge && (
                   <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
                     <div
                       className={`${t.btnPrimary} px-3.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider shadow-lg`}
@@ -543,19 +672,30 @@ function ServicioLaboralInner() {
                     {pkg.emoji}
                   </div>
                   <h3 className="text-xl font-bold text-white mb-1">{pkg.name}</h3>
-                  <p className="text-slate-500 text-xs uppercase tracking-[0.2em] mb-4">
-                    {pkg.sub}
-                  </p>
-                  <div className="flex items-baseline gap-2">
-                    <div className="text-3xl md:text-4xl font-bold text-white">{pkg.price}</div>
-                    <div className="text-xs text-slate-500">CLP · sin IVA</div>
+                  <p className="text-slate-500 text-xs uppercase tracking-[0.2em] mb-4">{pkg.sub}</p>
+                  <div className="flex flex-col gap-1">
+                    <div className="flex items-baseline gap-2 flex-wrap">
+                      {pkg.isFree ? (
+                        <div className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-teal-300 to-cyan-200 bg-clip-text text-transparent">
+                          {pkg.priceLabel}
+                        </div>
+                      ) : (
+                        <div className="text-3xl md:text-4xl font-bold text-white">{pkg.priceLabel}</div>
+                      )}
+                      {!pkg.isFree && (
+                        <div className="text-xs text-slate-500">CLP · sin IVA</div>
+                      )}
+                    </div>
+                    {pkg.priceExtra && (
+                      <p className="text-[11px] leading-snug text-slate-500">{pkg.priceExtra}</p>
+                    )}
                   </div>
                 </div>
 
                 <ul className="space-y-3 mb-7">
                   {pkg.features.map((f) => (
                     <li key={f} className="flex items-start gap-2.5">
-                      <CheckCircle className={`w-4.5 h-4.5 mt-0.5 shrink-0 ${t.accent}`} />
+                      <CheckCircle className={`w-5 h-5 mt-0.5 shrink-0 ${t.accent}`} />
                       <span className="text-sm text-slate-300 leading-relaxed">{f}</span>
                     </li>
                   ))}
@@ -563,13 +703,13 @@ function ServicioLaboralInner() {
 
                 <Link
                   to={`/agendamiento?plan=${pkg.plan}`}
-                  className={`group/cta w-full rounded-2xl py-3 px-6 font-semibold transition-all duration-300 text-center inline-flex items-center justify-center gap-2 ${
+                  className={`group/cta min-h-[44px] w-full rounded-2xl py-3 px-6 font-semibold transition-all duration-300 text-center inline-flex items-center justify-center gap-2 touch-manipulation active:scale-[0.98] ${
                     pkg.popular
                       ? `${t.btnPrimary} ${t.btnPrimaryHover} hover:-translate-y-0.5`
                       : `${t.btnOutline} ${t.btnOutlineHover}`
                   }`}
                 >
-                  Agendar consulta
+                  {pkg.cta}
                   <ArrowRight className="w-4 h-4 transition-transform group-hover/cta:translate-x-1" />
                 </Link>
               </motion.div>
@@ -582,10 +722,10 @@ function ServicioLaboralInner() {
       <section className={`py-12 md:py-16 ${t.sectionWash}`}>
         <div className="container mx-auto px-4 max-w-5xl">
           <h2 className="text-2xl md:text-3xl font-bold text-center mb-3 text-white">
-            Resultados que hablan por sí solos
+            Ejemplos orientativos
           </h2>
-          <p className="text-center text-slate-400 mb-10 max-w-xl mx-auto">
-            Casos reales (cifras anonimizadas) defendidos por nuestro equipo.
+          <p className="text-center text-slate-400 mb-10 max-w-xl mx-auto text-sm leading-relaxed">
+            Ilustraciones anónimas; cada causa es distinta y los resultados no están garantizados.
           </p>
           <div className="grid md:grid-cols-3 gap-4 md:gap-6">
             {successCases.map((c, index) => (
@@ -596,9 +736,9 @@ function ServicioLaboralInner() {
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.08 }}
               >
-                <div className="bg-slate-900/60 border border-slate-800 p-5 rounded-3xl h-full shadow-md shadow-slate-950/40 text-left">
+                <div className="glass-ios-card-dark p-5 h-full text-left">
                   <c.icon className={`w-8 h-8 mb-3 ${t.accent}`} />
-                  <div className={`text-2xl md:text-3xl font-bold mb-1 ${t.accent}`}>
+                  <div className={`text-lg md:text-xl font-bold mb-1 ${t.accent}`}>
                     {c.amount}
                   </div>
                   <div className="font-semibold mb-2 text-slate-100">{c.case}</div>
@@ -621,7 +761,7 @@ function ServicioLaboralInner() {
             viewport={{ once: true }}
             className="text-2xl md:text-3xl font-bold text-center mb-12 text-white"
           >
-            Trabajadores que recuperaron sus derechos 💬
+            Experiencias de personas asesoradas
           </motion.h2>
           <div className="grid md:grid-cols-3 gap-6 md:gap-8 max-w-6xl mx-auto">
             {testimonials.map((testimonial, index) => (
@@ -636,7 +776,7 @@ function ServicioLaboralInner() {
       </section>
 
       {/* FAQ */}
-      <section className={`py-16 md:py-20 ${t.sectionWash}`}>
+      <section id="faq-laboral" className={`py-16 md:py-20 ${t.sectionWash}`}>
         <div className="container mx-auto px-4 max-w-3xl">
           <h2 className="text-2xl md:text-3xl font-bold text-white text-center mb-3">
             Preguntas frecuentes
@@ -659,36 +799,37 @@ function ServicioLaboralInner() {
             initial={{ opacity: 0, scale: 0.98 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
-            className="max-w-4xl mx-auto text-center rounded-[32px] border border-slate-800 bg-slate-900/70 backdrop-blur-xl p-10 md:p-14 relative overflow-hidden"
+            className="max-w-4xl mx-auto text-center glass-ios-panel-dark p-10 md:p-14 relative overflow-hidden"
           >
-            <div className="pointer-events-none absolute -top-32 -right-32 h-72 w-72 rounded-full bg-amber-500/8 blur-3xl" />
-            <div className="pointer-events-none absolute -bottom-32 -left-32 h-72 w-72 rounded-full bg-sky-500/6 blur-3xl" />
+            <div className="pointer-events-none absolute -top-32 -right-32 h-72 w-72 rounded-full bg-teal-600/6 blur-3xl" />
+            <div className="pointer-events-none absolute -bottom-32 -left-32 h-72 w-72 rounded-full bg-sky-600/5 blur-3xl" />
 
             <div className="relative z-10">
-              <div className="inline-flex items-center gap-2 rounded-full px-3 py-1 mb-5 bg-slate-800/80 border border-slate-700">
-                <span aria-hidden="true">⚡</span>
-                <span className="text-[11px] font-medium text-slate-200 uppercase tracking-[0.3em]">
-                  Respuesta en 48h
-                </span>
-              </div>
               <h2 className="text-3xl lg:text-4xl font-bold text-white mb-4 leading-tight">
                 ¿Necesitas asesoría laboral <span className={t.accent}>ahora</span>?
               </h2>
               <p className="text-slate-400 mb-8 max-w-xl mx-auto">
-                Cuéntanos tu caso. Te confirmamos viabilidad, estrategia y precio cerrado en menos
-                de dos días hábiles.
+                Agenda una sesión: en la reunión revisamos hechos, documentos y alternativas. Los honorarios
+                del servicio que contrates se informan antes de pagar; no prometemos resultados en juicio.
               </p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 <Link
-                  to="/agendamiento?plan=laboral"
-                  className={`inline-flex items-center justify-center gap-2 px-8 py-4 rounded-2xl font-semibold ${t.btnPrimary} ${t.btnPrimaryHover} hover:-translate-y-0.5`}
+                  to="/agendamiento?plan=tutela-laboral"
+                  className={`inline-flex min-h-[44px] items-center justify-center gap-2 px-8 py-4 rounded-2xl font-semibold touch-manipulation active:scale-[0.98] ${t.btnPrimary} ${t.btnPrimaryHover} hover:-translate-y-0.5`}
                 >
                   <Calendar className="w-5 h-5" />
-                  Agendar consulta
+                  Diagnóstico gratis
+                </Link>
+                <Link
+                  to="/agendamiento?plan=laboral"
+                  className={`inline-flex min-h-[44px] items-center justify-center gap-2 px-8 py-4 rounded-2xl font-semibold touch-manipulation active:scale-[0.98] ${t.btnOutline} ${t.btnOutlineHover}`}
+                >
+                  Consulta pagada
                 </Link>
                 <button
+                  type="button"
                   onClick={() => setShowLogin(true)}
-                  className={`inline-flex items-center justify-center gap-2 px-8 py-4 rounded-2xl font-semibold ${t.btnOutline} ${t.btnOutlineHover}`}
+                  className={`inline-flex min-h-[44px] items-center justify-center gap-2 px-8 py-4 rounded-2xl font-semibold touch-manipulation active:scale-[0.98] border border-white/10 bg-white/[0.04] text-slate-200 hover:bg-white/[0.08]`}
                 >
                   <LogIn className="w-5 h-5" />
                   Portal trabajador
@@ -698,19 +839,7 @@ function ServicioLaboralInner() {
           </motion.div>
         </div>
       </section>
-
-      <footer className="border-t border-slate-800 py-8">
-        <div className="container mx-auto px-6 text-center text-slate-500 text-sm">
-          <p>&copy; {new Date().getFullYear()} Punto Legal Online. Todos los derechos reservados.</p>
-          <p className="mt-2 text-xs max-w-2xl mx-auto">
-            Información orientativa. Para evaluar tu caso,{' '}
-            <Link to="/agendamiento?plan=laboral" className={`${t.link} underline`}>
-              agenda una consulta
-            </Link>
-            .
-          </p>
-        </div>
-      </footer>
+      </div>
 
       {/* Modal login trabajador */}
       <AnimatePresence>
@@ -744,19 +873,19 @@ function ServicioLaboralInner() {
         )}
       </AnimatePresence>
 
-      {/* Botón mobile flotante */}
+      {/* Barra inferior móvil (estilo iOS: borde + blur) */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.5 }}
-        className="md:hidden fixed bottom-0 left-0 right-0 z-40"
+        className="md:hidden fixed bottom-0 left-0 right-0 z-40 border-t border-white/10 bg-slate-950/85 backdrop-blur-2xl supports-[backdrop-filter]:bg-slate-950/70 shadow-[0_-12px_40px_rgba(0,0,0,0.4)]"
       >
         <Link
-          to="/agendamiento?plan=laboral"
-          className={`block w-full py-4 px-6 text-center font-bold text-base shadow-2xl ${t.btnPrimary} pb-safe`}
-          style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}
+          to="/agendamiento?plan=tutela-laboral"
+          className={`flex min-h-[52px] w-full items-center justify-center px-6 py-3 text-center text-base font-bold touch-manipulation active:brightness-95 ${t.btnPrimary}`}
+          style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}
         >
-          🛡️ Consulta laboral · 48h
+          Diagnóstico gratis · Agendar
         </Link>
       </motion.div>
     </>
@@ -775,10 +904,10 @@ function LaboralFaqItem({
     <div className="border-b border-slate-800/80">
       <button
         type="button"
-        className="w-full flex justify-between items-center text-left py-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/30 rounded-lg"
+        className="w-full flex min-h-[48px] justify-between items-center text-left py-4 touch-manipulation focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500/35 rounded-lg"
         onClick={() => setOpen(!open)}
       >
-        <h3 className="text-base md:text-lg font-medium text-slate-200 pr-4 hover:text-amber-300 transition-colors">
+        <h3 className="text-base md:text-lg font-medium text-slate-200 pr-4 hover:text-teal-300/90 transition-colors">
           {item.question}
         </h3>
         <motion.div animate={{ rotate: open ? 45 : 0 }} transition={{ duration: 0.2 }}>

@@ -26,6 +26,10 @@ type MobileService = {
   highlights: string[];
   gradient: string;
     accent: string;
+  /** Minutos mostrados bajo el precio (default 45) */
+  sessionMinutes?: number;
+  /** Atajos al cluster Laboral (mismo patrón que ServicesSection) */
+  intentPills?: { label: string; plan: string }[];
 };
 
 const services: MobileService[] = [
@@ -54,13 +58,20 @@ const services: MobileService[] = [
   {
     id: "laboral",
     name: "Consulta Laboral",
-    description: "Despidos, tutela de derechos, Ley Karin y negociación.",
+    description:
+      "Despido, finiquito, tutela laboral y Ley 21.643 (Ley Karin). Elige diagnóstico gratis o consulta paga según tu etapa.",
     plan: "laboral",
-    price: "$30.000",
+    price: "$79.000",
     icon: Shield,
-    highlights: ["Despido injustificado", "Tutela laboral", "Ley Karin"],
+    highlights: ["Despido y finiquito", "Tutela laboral", "Ley Karin (trabajador)"],
     gradient: serviceThemes.laboral.gradient,
     accent: serviceThemes.laboral.accent,
+    sessionMinutes: 60,
+    intentPills: [
+      { label: "Diagnóstico gratis", plan: "tutela-laboral" },
+      { label: "Consulta pagada", plan: "laboral" },
+      { label: "Ley Karin", plan: "defensa-karin-trabajador" },
+    ],
   },
   {
     id: "inmobiliario",
@@ -219,10 +230,41 @@ export const PremiumServiceSelector: React.FC = () => {
                 ))}
               </div>
 
+              {selectedService.intentPills && selectedService.intentPills.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {selectedService.intentPills.map((pill) => (
+                    <button
+                      key={`${pill.label}-${pill.plan}`}
+                      type="button"
+                      onClick={() => {
+                        void trackMetaEvent({
+                          event_name: "InitiateCheckout",
+                          custom_data: {
+                            content_type: "service_plan",
+                            content_category: "Landing Page",
+                            content_ids: [pill.plan],
+                            content_name: `Mobile selector — ${pill.label}`,
+                            source: "mobile_service_selector_cluster_pill",
+                            value: pill.plan === "tutela-laboral" ? 0 : 79000,
+                            currency: "CLP",
+                          },
+                        });
+                        navigate(`/agendamiento?plan=${pill.plan}`);
+                      }}
+                      className="rounded-full border border-white/15 bg-white/[0.06] px-3 py-1.5 text-[11px] font-medium text-slate-200 backdrop-blur-sm transition hover:border-white/25 hover:bg-white/10"
+                    >
+                      {pill.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+
               <div className="glass-ios-card-dark p-4">
                 <p className="text-xs uppercase tracking-[0.25em] text-slate-400">Valor de la consulta</p>
                 <p className="mt-1 text-3xl font-bold text-slate-100">{selectedService.price}</p>
-                <p className="mt-1 text-xs text-slate-400">Sesión de 45 minutos por Google Meet</p>
+                <p className="mt-1 text-xs text-slate-400">
+                  Sesión de {selectedService.sessionMinutes ?? 45} minutos por Google Meet
+                </p>
                   </div>
                   
               <button

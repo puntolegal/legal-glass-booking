@@ -257,6 +257,12 @@ export type Database = {
           tipo_reunion: string | null
           updated_at: string | null
           webhook_sent: boolean | null
+          calendar_sync_completed_at: string | null
+          calendar_sync_requested_at: string | null
+          confirmation_email_status: string | null
+          google_calendar_event_id: string | null
+          google_calendar_html_link: string | null
+          google_meet_link: string | null
         }
         Insert: {
           agendamiento_intake_id?: string | null
@@ -281,6 +287,12 @@ export type Database = {
           tipo_reunion?: string | null
           updated_at?: string | null
           webhook_sent?: boolean | null
+          calendar_sync_completed_at?: string | null
+          calendar_sync_requested_at?: string | null
+          confirmation_email_status?: string | null
+          google_calendar_event_id?: string | null
+          google_calendar_html_link?: string | null
+          google_meet_link?: string | null
         }
         Update: {
           agendamiento_intake_id?: string | null
@@ -305,6 +317,12 @@ export type Database = {
           tipo_reunion?: string | null
           updated_at?: string | null
           webhook_sent?: boolean | null
+          calendar_sync_completed_at?: string | null
+          calendar_sync_requested_at?: string | null
+          confirmation_email_status?: string | null
+          google_calendar_event_id?: string | null
+          google_calendar_html_link?: string | null
+          google_meet_link?: string | null
         }
         Relationships: []
       }

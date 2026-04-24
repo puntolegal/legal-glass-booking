@@ -11,3 +11,9 @@ verify_jwt = false
 
 [functions.meta-conversions]
 verify_jwt = false
+
+[functions.booking-calendar-callback]
+verify_jwt = false
+
+[functions.clever-action]
+verify_jwt = false

@@ -1,16 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { CheckCircle, Calendar, Clock, User, Mail, Phone, ArrowRight, Home, CreditCard, MessageCircle } from 'lucide-react';
+import { CheckCircle, Calendar, Clock, User, Mail, Phone, ArrowRight, Home, CreditCard, MessageCircle, Download, AlertCircle, XCircle } from 'lucide-react';
 import SEO from '../components/SEO';
-import BrandWordmark from '@/components/BrandWordmark';
+import BrandMark from '@/components/BrandMark';
 import { sendRealBookingEmails, type BookingEmailData, type EmailResult } from '@/services/realEmailService';
-import { findReservaByCriteria, updatePaymentStatus, type Reserva } from '../services/supabaseBooking';
+import { findReservaByCriteria, getReservaById, updatePaymentStatus, type Reserva } from '../services/supabaseBooking';
 import { supabase } from '@/integrations/supabase/client';
-import type { PendingPaymentData } from '@/types/payments';
-import { ensurePriceFormatted, parsePendingPaymentData } from '@/utils/paymentData';
-import { getMercadoPagoPaymentInfo } from '@/services/mercadopagoPaymentInfo';
 import { trackMetaEvent } from '@/services/metaConversionsService';
+import { buildBookingIcs, downloadBookingIcsFile, hasConcreteBookingSlot } from '@/utils/bookingIcs';
 
 interface PaymentSuccessState {
   reservation: Reserva | null;
@@ -30,8 +28,56 @@ interface PaymentSuccessState {
   hora: string;
   tipo_reunion?: string | null;
   price: number | string | null | undefined;
+  /** Texto listo para UI (número formateado o "Gratis") */
   priceFormatted: string;
+  /** true si monto CLP es 0 o precio marcado como gratuito */
+  isFreeConsult: boolean;
   source?: string;
+  /** Correo ya enviado antes (p. ej. webhook); no hubo nuevo `emailResult` */
+  emailPreviouslySent?: boolean;
+  /** Webhook encoló Zapier; esperando Meet + clever-action */
+  calendarEmailPending?: boolean;
+}
+
+/** Monto en pesos; 0 es válido (consulta gratuita). No usar `||` tras parsear. */
+function parseClpAmount(value: unknown): number | undefined {
+  if (value === null || value === undefined) return undefined;
+  if (typeof value === 'number' && !Number.isNaN(value)) return value;
+  if (typeof value === 'string') {
+    const t = value.trim().toLowerCase();
+    if (t === 'gratis' || t === 'gratuito' || t === 'free') return 0;
+    const digits = value.replace(/[^0-9]/g, '');
+    if (!digits) return undefined;
+    const parsed = parseInt(digits, 10);
+    return Number.isNaN(parsed) ? undefined : parsed;
+  }
+  return undefined;
+}
+
+function resolvePriceForSuccess(
+  precioRaw: unknown,
+  storedPrice?: unknown,
+): { amount: number; isFree: boolean; formatted: string } {
+  const a = parseClpAmount(precioRaw);
+  const b = parseClpAmount(storedPrice);
+  const amount = a !== undefined ? a : b !== undefined ? b : 0;
+  const isFree = amount === 0;
+  const formatted = isFree
+    ? 'Gratis'
+    : new Intl.NumberFormat('es-CL').format(amount);
+  return { amount, isFree, formatted };
+}
+
+/** Ya eligió fecha y hora en el agendamiento (no mostrar CTA de reagendar). */
+function slotAlreadyScheduled(pd: PaymentSuccessState | null): boolean {
+  if (!pd) return false;
+  const fecha = pd.reservation?.fecha ?? pd.fecha;
+  const hora = String(pd.reservation?.hora ?? pd.hora ?? '').trim();
+  if (!fecha || !hora) return false;
+  const h = hora.toLowerCase();
+  if (h.includes('coordinar') || h.includes('agendar') || h === 'por agendar') return false;
+  if (h.includes('urgencia')) return false;
+  return true;
 }
 
 const extractStringFromEmailResult = (result: EmailResult | null, keys: string[]): string | undefined => {
@@ -53,6 +99,7 @@ export default function PaymentSuccessPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isProcessing, setIsProcessing] = useState(false);
   const [processingStatus, setProcessingStatus] = useState<string>('');
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   useEffect(() => {
     processPaymentSuccess();
@@ -60,6 +107,7 @@ export default function PaymentSuccessPage() {
 
   const processPaymentSuccess = async () => {
     try {
+      setLoadError(null);
       console.log('🚀 INICIANDO PaymentSuccessPage - processPaymentSuccess');
       setIsProcessing(true);
       setProcessingStatus('Procesando pago...');
@@ -133,22 +181,8 @@ export default function PaymentSuccessPage() {
           const emailResult = await sendRealBookingEmails(emailData);
           console.log('📧 Resultado envío emails desde localStorage:', emailResult);
 
-          // Mostrar datos desde localStorage
-          const parseAmount = (value: unknown): number | undefined => {
-            if (value === null || value === undefined) return undefined;
-            if (typeof value === 'number' && !Number.isNaN(value)) return value;
-            if (typeof value === 'string') {
-              const cleaned = value.replace(/[^0-9]/g, '');
-              if (!cleaned) return undefined;
-              const parsed = Number(cleaned);
-              return Number.isNaN(parsed) ? undefined : parsed;
-            }
-            return undefined;
-          };
-
-          const paymentAmount = parseAmount(parsedStoredData.price) || 35000;
-          const currencyFormatter = new Intl.NumberFormat('es-CL');
-          const formattedAmount = currencyFormatter.format(paymentAmount);
+          const { amount: paymentAmount, isFree: isFreeLs, formatted: formattedAmount } =
+            resolvePriceForSuccess(parsedStoredData.price);
 
           setPaymentData({
             reservation: null,
@@ -170,10 +204,11 @@ export default function PaymentSuccessPage() {
               categoria: parsedStoredData.category || 'General'
             },
             fecha: parsedStoredData.fecha || parsedStoredData.date || new Date().toISOString().split('T')[0],
-            hora: parsedStoredData.hora || parsedStoredData.time || '10:00',
+            hora: parsedStoredData.hora || parsedStoredData.time || 'Por agendar',
             tipo_reunion: parsedStoredData.tipo_reunion,
             price: paymentAmount,
             priceFormatted: formattedAmount,
+            isFreeConsult: isFreeLs,
             source: parsedStoredData.source
           });
 
@@ -187,6 +222,8 @@ export default function PaymentSuccessPage() {
 
       const reserva = result.reserva;
       console.log('✅ Reserva encontrada:', reserva.id);
+
+      const priceResolved = resolvePriceForSuccess(reserva.precio, parsedStoredData?.price);
 
       // 3. Actualizar estado del pago
       setProcessingStatus('Actualizando estado del pago...');
@@ -204,10 +241,15 @@ export default function PaymentSuccessPage() {
         console.error('❌ Error actualizando estado:', updateResult.error);
       }
 
-      // 4. Enviar emails SOLO si el pago es aprobado Y no se han enviado ya (evitar duplicados con webhook)
+      // 4. Enviar emails SOLO si el pago es aprobado Y no se han enviado ya (evitar duplicados con webhook / Zapier)
       let emailResult: EmailResult | null = null;
+      const emailPreviouslySent = Boolean(isApproved && reserva.email_enviado);
+      const calendarQueuePending =
+        isApproved &&
+        reserva.confirmation_email_status === 'pending_calendar' &&
+        !reserva.email_enviado;
 
-      if (isApproved && !reserva.email_enviado) {
+      if (isApproved && !reserva.email_enviado && !calendarQueuePending) {
         console.log('📧 Pago aprobado - enviando emails de confirmación...');
         setProcessingStatus('Enviando emails de confirmación...');
         
@@ -236,19 +278,23 @@ export default function PaymentSuccessPage() {
             user_data: { em: reserva.email, ph: reserva.telefono, fn: reserva.nombre },
             custom_data: {
               content_name: reserva.servicio,
-              value: Number(String(reserva.precio).replace(/[^0-9]/g, '')) || 0,
+              value: priceResolved.amount,
               currency: 'CLP',
             },
           });
           await supabase
             .from('reservas')
-            .update({ email_enviado: true } as any)
+            .update({ email_enviado: true, email_enviado_at: new Date().toISOString() } as any)
             .eq('id', reserva.id);
         } else {
           console.error('❌ Error enviando emails:', emailResult.error);
         }
         
         setProcessingStatus('¡Pago confirmado y emails enviados!');
+      } else if (isApproved && calendarQueuePending) {
+        console.log('📅 Cola Zapier activa: no enviamos correo desde el cliente');
+        setProcessingStatus('Preparando tu videollamada y el correo de confirmación…');
+        emailResult = null;
       } else if (isApproved && reserva.email_enviado) {
         console.log('📧 Emails ya enviados previamente (webhook), no se duplican');
         setProcessingStatus('¡Pago confirmado!');
@@ -256,24 +302,10 @@ export default function PaymentSuccessPage() {
         setProcessingStatus('Pago registrado');
       }
 
-      // 5. Formatear precio para mostrar
-      const parseAmount = (value: unknown): number | undefined => {
-        if (value === null || value === undefined) return undefined;
-        if (typeof value === 'number' && !Number.isNaN(value)) return value;
-        if (typeof value === 'string') {
-          const cleaned = value.replace(/[^0-9]/g, '');
-          if (!cleaned) return undefined;
-          const parsed = Number(cleaned);
-          return Number.isNaN(parsed) ? undefined : parsed;
-        }
-        return undefined;
-      };
+      const storedSource =
+        typeof parsedStoredData?.source === 'string' ? parsedStoredData.source : undefined;
 
-      const paymentAmount = parseAmount(reserva.precio) || 35000;
-      const currencyFormatter = new Intl.NumberFormat('es-CL');
-      const formattedAmount = currencyFormatter.format(paymentAmount);
-
-      // 6. Preparar datos para mostrar en la UI
+      // 5–6. Precio para UI (0 = consulta gratuita; no usar `|| 35000` tras parsear)
       setPaymentData({
         reservation: reserva,
         mercadopagoData: {
@@ -283,6 +315,8 @@ export default function PaymentSuccessPage() {
           collection_status: status
         },
         emailResult,
+        emailPreviouslySent,
+        calendarEmailPending: calendarQueuePending,
         cliente: {
           nombre: reserva.nombre,
           email: reserva.email,
@@ -290,14 +324,16 @@ export default function PaymentSuccessPage() {
         },
         servicio: {
           tipo: reserva.servicio,
-          precio: paymentAmount,
+          precio: priceResolved.amount,
           categoria: 'General'
         },
         fecha: reserva.fecha,
         hora: reserva.hora,
         tipo_reunion: reserva.tipo_reunion,
-        price: paymentAmount,
-        priceFormatted: formattedAmount
+        price: priceResolved.amount,
+        priceFormatted: priceResolved.formatted,
+        isFreeConsult: priceResolved.isFree,
+        source: storedSource
       });
 
       // 7. Limpiar localStorage
@@ -311,7 +347,10 @@ export default function PaymentSuccessPage() {
       console.error('❌ Stack trace:', error instanceof Error ? error.stack : 'No stack trace');
       console.error('❌ Tipo de error:', typeof error);
       console.error('❌ Mensaje:', error instanceof Error ? error.message : String(error));
-      setProcessingStatus(`Error: ${error instanceof Error ? error.message : 'Error desconocido'}`);
+      const msg = error instanceof Error ? error.message : 'Error desconocido';
+      setProcessingStatus(`Error: ${msg}`);
+      setLoadError(msg);
+      setPaymentData(null);
     } finally {
       console.log('🏁 Finalizando processPaymentSuccess');
       setIsProcessing(false);
@@ -319,13 +358,95 @@ export default function PaymentSuccessPage() {
     }
   };
 
+  /** Reconsultar reserva mientras Zapier + clever-action completan el correo con Meet. */
+  useEffect(() => {
+    const rid = paymentData?.reservation?.id;
+    const pending = paymentData?.calendarEmailPending;
+    if (!rid || !pending) return;
+
+    let cancelled = false;
+    let attempts = 0;
+    const maxAttempts = 36;
+
+    const tick = async () => {
+      if (cancelled) return;
+      attempts += 1;
+      const r = await getReservaById(rid);
+      if (cancelled || !r.success || !r.reserva) return;
+
+      const nr = r.reserva;
+      if (nr.email_enviado) {
+        setPaymentData((prev) => {
+          if (!prev?.reservation || prev.reservation.id !== rid) return prev;
+          return {
+            ...prev,
+            reservation: { ...prev.reservation, ...nr },
+            calendarEmailPending: false,
+            emailPreviouslySent: true,
+          };
+        });
+        return;
+      }
+      if (nr.confirmation_email_status === 'failed') {
+        setPaymentData((prev) => {
+          if (!prev?.reservation || prev.reservation.id !== rid) return prev;
+          return {
+            ...prev,
+            reservation: { ...prev.reservation, ...nr },
+            calendarEmailPending: false,
+          };
+        });
+        return;
+      }
+      if (nr.google_meet_link) {
+        setPaymentData((prev) => {
+          if (!prev?.reservation || prev.reservation.id !== rid) return prev;
+          return {
+            ...prev,
+            reservation: { ...prev.reservation, ...nr },
+          };
+        });
+      }
+      if (attempts >= maxAttempts) {
+        setPaymentData((prev) => {
+          if (!prev?.calendarEmailPending || prev.reservation?.id !== rid) return prev;
+          return { ...prev, calendarEmailPending: false };
+        });
+      }
+    };
+
+    const id = setInterval(() => {
+      void tick();
+    }, 2500);
+    void tick();
+    return () => {
+      cancelled = true;
+      clearInterval(id);
+    };
+  }, [paymentData?.calendarEmailPending, paymentData?.reservation?.id]);
+
   const trackingCode = extractStringFromEmailResult(paymentData?.emailResult ?? null, ['trackingCode', 'tracking_code']);
-  const googleMeetLink = extractStringFromEmailResult(paymentData?.emailResult ?? null, ['googleMeetLink', 'google_meet_link']);
+  const googleMeetLink =
+    extractStringFromEmailResult(paymentData?.emailResult ?? null, ['googleMeetLink', 'google_meet_link']) ||
+    (typeof paymentData?.reservation?.google_meet_link === 'string'
+      ? paymentData.reservation.google_meet_link
+      : undefined);
 
   const isPaymentApproved = paymentData?.mercadopagoData?.status === 'approved';
-  const headerTitle = isPaymentApproved ? '¡Pago confirmado!' : 'Pago registrado';
+  const isFreeConsult =
+    Boolean(paymentData) &&
+    Boolean(paymentData!.isFreeConsult || resolvePriceForSuccess(paymentData!.price).isFree);
+  const scheduledSlot = slotAlreadyScheduled(paymentData);
+
+  const headerTitle = isPaymentApproved
+    ? isFreeConsult
+      ? '¡Consulta confirmada!'
+      : '¡Pago confirmado!'
+    : 'Pago registrado';
   const headerDescription = isPaymentApproved
-    ? 'Tu consulta legal ha sido confirmada y el pago procesado correctamente.'
+    ? isFreeConsult
+      ? 'Tu consulta legal gratuita ha sido confirmada. Revisa los detalles a continuación.'
+      : 'Tu consulta legal ha sido confirmada y el pago procesado correctamente.'
     : 'Hemos registrado tu pago y lo estamos verificando con Mercado Pago. Te avisaremos por email en cuanto se acredite.';
   const visiblePaymentStatus = paymentData?.mercadopagoData?.status || paymentData?.mercadopagoData?.collection_status || 'pendiente';
   const statusDictionary: Record<string, string> = {
@@ -346,11 +467,188 @@ export default function PaymentSuccessPage() {
     ? new Date(paymentData.reservation.fecha).toLocaleDateString('es-CL')
     : paymentData?.fecha
     ? new Date(paymentData.fecha).toLocaleDateString('es-CL')
-    : 'No especificada';
-  const serviceTime = `${paymentData?.reservation?.hora || paymentData?.hora || '10:00'} hrs`;
-  const totalFormatted = paymentData?.priceFormatted ? `$${paymentData.priceFormatted}` : 'Confirmado';
+    : 'A coordinar';
+  const rawHora = String(paymentData?.reservation?.hora || paymentData?.hora || 'A coordinar');
+  const serviceTime = /agendar|coordinar/i.test(rawHora) ? rawHora : `${rawHora} hrs`;
   const agendarUrl = `/agendamiento?postpago=1&email=${encodeURIComponent(clientEmail)}&nombre=${encodeURIComponent(clientName)}&telefono=${encodeURIComponent(clientPhone)}&servicio=${encodeURIComponent(serviceName)}`;
-  const whatsappPostPago = `https://wa.me/56962321883?text=${encodeURIComponent(`Hola, acabo de pagar mi consulta (${serviceName}). Necesito agendar mi sesión. Soy ${clientName}.`)}`;
+  const waTextPostPago = isFreeConsult
+    ? `Hola, acabo de confirmar mi consulta gratuita (${serviceName}). Quiero dejar coordinada mi sesión. Soy ${clientName}.`
+    : `Hola, acabo de pagar mi consulta (${serviceName}). Necesito coordinar o tengo una duda. Soy ${clientName}.`;
+  const whatsappPostPago = `https://wa.me/56962321883?text=${encodeURIComponent(waTextPostPago)}`;
+
+  const emailConfirmationStatus = (() => {
+    const er = paymentData?.emailResult;
+    if (!isPaymentApproved) {
+      return {
+        Icon: Clock,
+        iconClass: 'text-amber-400',
+        text: 'El correo con los detalles se enviará cuando el pago quede acreditado.',
+        detail: undefined as string | undefined,
+      };
+    }
+    if (paymentData?.calendarEmailPending) {
+      return {
+        Icon: Clock,
+        iconClass: 'text-cyan-400',
+        text: 'Estamos generando el enlace de videollamada y enviando tu correo de confirmación.',
+        detail: 'Suele tardar menos de un minuto. También revisa tu bandeja de entrada.',
+      };
+    }
+    if (
+      paymentData?.reservation?.confirmation_email_status === 'failed' &&
+      !paymentData?.emailPreviouslySent &&
+      !er?.success
+    ) {
+      return {
+        Icon: XCircle,
+        iconClass: 'text-rose-400',
+        text: 'No pudimos completar el envío automático con videollamada.',
+        detail: 'Si no recibes el correo en unos minutos, escríbenos por WhatsApp.',
+      };
+    }
+    if (er?.success) {
+      return {
+        Icon: CheckCircle,
+        iconClass: 'text-emerald-400',
+        text: 'Correo de confirmación enviado (revisa spam y promociones).',
+        detail: undefined as string | undefined,
+      };
+    }
+    if (paymentData?.emailPreviouslySent) {
+      return {
+        Icon: CheckCircle,
+        iconClass: 'text-emerald-400',
+        text: 'El correo de confirmación ya fue enviado antes de abrir esta página.',
+        detail: undefined as string | undefined,
+      };
+    }
+    if (er && !er.success) {
+      return {
+        Icon: XCircle,
+        iconClass: 'text-rose-400',
+        text: 'No pudimos completar el envío automático del correo.',
+        detail: er.error || er.message,
+      };
+    }
+    return {
+      Icon: AlertCircle,
+      iconClass: 'text-amber-400',
+      text: 'No pudimos verificar el envío del correo. Si no lo recibes en unos minutos, escríbenos por WhatsApp.',
+      detail: undefined as string | undefined,
+    };
+  })();
+  const { Icon: EmailStatusIcon, iconClass: emailStatusIconClass, text: emailStatusText, detail: emailStatusDetail } =
+    emailConfirmationStatus;
+
+  const seoTitle =
+    isPaymentApproved && isFreeConsult
+      ? 'Consulta confirmada | Punto Legal'
+      : isPaymentApproved
+        ? 'Pago exitoso — consulta confirmada | Punto Legal'
+        : 'Pago registrado | Punto Legal';
+  const seoDescription =
+    isPaymentApproved && isFreeConsult
+      ? 'Tu consulta legal gratuita quedó confirmada. Revisa tu correo o coordina por WhatsApp.'
+      : isPaymentApproved
+        ? 'Tu pago fue procesado y tu consulta quedó confirmada. Próximos pasos por correo y WhatsApp.'
+        : 'Registramos tu pago y lo estamos verificando. Te avisaremos por correo cuando se acredite.';
+
+  const handleDownloadCalendarIcs = () => {
+    if (!paymentData) return;
+    const fecha = paymentData.reservation?.fecha ?? paymentData.fecha;
+    const hora = paymentData.reservation?.hora ?? paymentData.hora;
+    if (!hasConcreteBookingSlot(fecha, hora)) return;
+    const svc = paymentData.reservation?.servicio || paymentData.servicio?.tipo || 'Consulta Legal';
+    const meet =
+      (typeof paymentData.reservation?.google_meet_link === 'string' &&
+        paymentData.reservation.google_meet_link.trim()) ||
+      undefined;
+    const ics = buildBookingIcs({
+      title: `Consulta — ${svc} · Punto Legal`,
+      description: 'Punto Legal Chile — consulta online (enlace Meet por correo).',
+      fechaYmd: String(fecha).trim(),
+      horaHm: String(hora).trim(),
+      durationMinutes: 45,
+      ...(meet ? { meetUrl: meet } : {}),
+    });
+    downloadBookingIcsFile('cita-punto-legal.ics', ics);
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center">
+        <div className="text-center max-w-md mx-auto px-4">
+          <div className="animate-spin rounded-full h-12 w-12 border-2 border-cyan-500/30 border-t-cyan-400 mx-auto mb-4"></div>
+          <h2 className="text-xl font-semibold text-white mb-2">
+            {isProcessing ? 'Procesando pago...' : 'Cargando confirmación...'}
+          </h2>
+          {processingStatus && (
+            <p className="text-sm text-slate-400 mb-4">{processingStatus}</p>
+          )}
+          <div className="rounded-2xl p-5 bg-white/[0.04] border border-white/[0.08]">
+            <div className="space-y-2 text-sm text-slate-300">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-emerald-400 rounded-full"></div>
+                <span>Verificando datos de MercadoPago</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-emerald-400 rounded-full"></div>
+                <span>Guardando reserva en la base de datos</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-emerald-400 rounded-full"></div>
+                <span>Enviando emails de confirmación</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!paymentData) {
+    return (
+      <>
+        <SEO
+          title="No pudimos mostrar tu confirmación | Punto Legal"
+          description="Hubo un problema al cargar los datos de tu pago o reserva. Vuelve a intentar o contacta a soporte."
+        />
+        <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center px-4 pb-[max(2rem,env(safe-area-inset-bottom,0px))]">
+          <div className="max-w-md w-full rounded-2xl border border-white/[0.08] bg-white/[0.04] p-8 text-center">
+            <AlertCircle className="w-12 h-12 text-amber-400 mx-auto mb-4" aria-hidden />
+            <h1 className="text-xl font-semibold text-white mb-2">No pudimos cargar tu confirmación</h1>
+            <p className="text-sm text-slate-400 mb-6">
+              {loadError ||
+                'Faltan datos de la reserva o el enlace expiró. Si ya pagaste, conserva tu comprobante y escríbenos por WhatsApp.'}
+            </p>
+            <div className="flex flex-col gap-3">
+              <Link
+                to="/agendamiento"
+                className="inline-flex min-h-[48px] items-center justify-center rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-semibold px-4"
+              >
+                Ir a agendamiento
+              </Link>
+              <Link
+                to="/"
+                className="inline-flex min-h-[48px] items-center justify-center rounded-xl border border-white/[0.12] text-slate-200 font-medium px-4 hover:bg-white/[0.06]"
+              >
+                Volver al inicio
+              </Link>
+              <a
+                href="https://wa.me/56962321883?text=%23Ayuda%20Pago%20Success"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-4"
+              >
+                <MessageCircle className="w-5 h-5" />
+                WhatsApp soporte
+              </a>
+            </div>
+          </div>
+        </div>
+      </>
+    );
+  }
 
   // Vista específica para Express QR (post-pago)
   if (paymentData?.source === 'express_qr') {
@@ -407,7 +705,7 @@ export default function PaymentSuccessPage() {
         <div className="min-h-screen bg-black text-white font-sans antialiased">
           <header className="sticky top-0 z-50 bg-black/95 backdrop-blur border-b border-white/10">
             <div className="max-w-lg mx-auto px-4 py-4 flex justify-center">
-              <BrandWordmark size="sm" orientation="inline" />
+              <BrandMark size="sm" />
             </div>
           </header>
           <main className="max-w-lg mx-auto px-4 py-8">
@@ -443,57 +741,22 @@ export default function PaymentSuccessPage() {
     );
   }
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center">
-        <div className="text-center max-w-md mx-auto px-4">
-          <div className="animate-spin rounded-full h-12 w-12 border-2 border-cyan-500/30 border-t-cyan-400 mx-auto mb-4"></div>
-          <h2 className="text-xl font-semibold text-white mb-2">
-            {isProcessing ? 'Procesando pago...' : 'Cargando confirmación...'}
-          </h2>
-          {processingStatus && (
-            <p className="text-sm text-slate-400 mb-4">{processingStatus}</p>
-          )}
-          <div className="rounded-2xl p-5 bg-white/[0.04] border border-white/[0.08]">
-            <div className="space-y-2 text-sm text-slate-300">
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-emerald-400 rounded-full"></div>
-                <span>Verificando datos de MercadoPago</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-emerald-400 rounded-full"></div>
-                <span>Guardando reserva en la base de datos</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-emerald-400 rounded-full"></div>
-                <span>Enviando emails de confirmación</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <>
-      <SEO 
-        title="Pago Exitoso - Punto Legal"
-        description="Tu pago ha sido procesado exitosamente. Tu consulta legal está confirmada."
-      />
+      <SEO title={seoTitle} description={seoDescription} />
       
       <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
         <header className="sticky top-0 z-50 bg-slate-950/70 backdrop-blur-xl border-b border-white/[0.06]">
           <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
-            <BrandWordmark size="sm" orientation="inline" />
+            <BrandMark size="sm" />
             <div className="flex items-center gap-2 text-xs text-emerald-300/90">
               <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></div>
-              Pago confirmado
+              {isPaymentApproved && isFreeConsult ? 'Consulta gratuita' : 'Pago confirmado'}
             </div>
           </div>
         </header>
 
-        <div className="max-w-4xl mx-auto px-4 py-8 md:py-12">
+        <div className="max-w-4xl mx-auto px-4 py-8 md:py-12 pb-[max(6rem,env(safe-area-inset-bottom,0px))]">
           {/* Header de éxito */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -526,37 +789,37 @@ export default function PaymentSuccessPage() {
             
             <div className="grid md:grid-cols-2 gap-6">
                 <div className="space-y-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center border border-emerald-500/30">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center border border-emerald-500/30 shrink-0">
                     <User className="w-5 h-5 text-emerald-400" />
                     </div>
-                  <div>
+                  <div className="min-w-0">
                     <p className="text-xs text-slate-500 uppercase tracking-wider">Cliente</p>
-                    <p className="font-semibold text-white">
+                    <p className="font-semibold text-white break-words">
                       {paymentData?.reservation?.nombre || paymentData?.cliente?.nombre || 'Cliente'}
                     </p>
                   </div>
                 </div>
                 
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center border border-emerald-500/30">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center border border-emerald-500/30 shrink-0">
                     <Mail className="w-5 h-5 text-emerald-400" />
                     </div>
-                    <div>
+                    <div className="min-w-0">
                     <p className="text-xs text-slate-500 uppercase tracking-wider">Email</p>
-                    <p className="font-semibold text-white">
+                    <p className="font-semibold text-white break-all sm:break-words">
                       {paymentData?.reservation?.email || paymentData?.cliente?.email || 'No especificado'}
                       </p>
                     </div>
                   </div>
                   
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center border border-emerald-500/30">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center border border-emerald-500/30 shrink-0">
                     <Phone className="w-5 h-5 text-emerald-400" />
                     </div>
-                    <div>
+                    <div className="min-w-0">
                     <p className="text-xs text-slate-500 uppercase tracking-wider">Teléfono</p>
-                    <p className="font-semibold text-white">
+                    <p className="font-semibold text-white break-words">
                       {paymentData?.reservation?.telefono || paymentData?.cliente?.telefono || 'No especificado'}
                     </p>
                   </div>
@@ -564,38 +827,33 @@ export default function PaymentSuccessPage() {
               </div>
               
               <div className="space-y-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center border border-emerald-500/30">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center border border-emerald-500/30 shrink-0">
                     <Calendar className="w-5 h-5 text-emerald-400" />
                   </div>
-                  <div>
+                  <div className="min-w-0">
                     <p className="text-xs text-slate-500 uppercase tracking-wider">Fecha</p>
-                    <p className="font-semibold text-white">
-                      {paymentData?.reservation?.fecha ? new Date(paymentData.reservation.fecha).toLocaleDateString('es-CL') : 
-                       paymentData?.fecha ? new Date(paymentData.fecha).toLocaleDateString('es-CL') : 'A coordinar'}
-                      </p>
+                    <p className="font-semibold text-white break-words">{serviceDate}</p>
                     </div>
                   </div>
                   
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center border border-emerald-500/30">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center border border-emerald-500/30 shrink-0">
                     <Clock className="w-5 h-5 text-emerald-400" />
                     </div>
-                    <div>
+                    <div className="min-w-0">
                     <p className="text-xs text-slate-500 uppercase tracking-wider">Hora</p>
-                    <p className="font-semibold text-white">
-                      {paymentData?.reservation?.hora || paymentData?.hora || 'A coordinar'}
-                      </p>
+                    <p className="font-semibold text-white break-words">{serviceTime}</p>
                     </div>
                 </div>
                 
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center border border-emerald-500/30">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center border border-emerald-500/30 shrink-0">
                     <CreditCard className="w-5 h-5 text-emerald-400" />
                   </div>
-                  <div>
+                  <div className="min-w-0">
                     <p className="text-xs text-slate-500 uppercase tracking-wider">Servicio</p>
-                    <p className="font-semibold text-white">
+                    <p className="font-semibold text-white break-words">
                       {paymentData?.reservation?.servicio || paymentData?.servicio?.tipo || 'Consulta Legal'}
                     </p>
                   </div>
@@ -605,12 +863,32 @@ export default function PaymentSuccessPage() {
             
             <div className="border-t border-white/[0.06] pt-6 mt-6">
               <div className="flex items-center justify-between">
-                <span className="text-lg font-semibold text-white">Total pagado</span>
+                <span className="text-lg font-semibold text-white">
+                  {isFreeConsult ? 'Precio de la consulta' : 'Total pagado'}
+                </span>
                 <span className="text-2xl font-bold text-emerald-400">
-                  ${paymentData?.priceFormatted ? paymentData.priceFormatted.replace('$', '') : 'Confirmado'} CLP
+                  {isFreeConsult
+                    ? 'Gratis'
+                    : `${paymentData?.priceFormatted ?? ''} CLP`.trim()}
                 </span>
               </div>
             </div>
+
+            {scheduledSlot && isPaymentApproved && (
+              <div className="mt-6 pt-6 border-t border-white/[0.06] flex flex-col sm:flex-row sm:items-center gap-4">
+                <button
+                  type="button"
+                  onClick={handleDownloadCalendarIcs}
+                  className="inline-flex items-center justify-center gap-2 rounded-xl border border-cyan-500/40 bg-cyan-500/10 px-5 py-3 text-sm font-semibold text-cyan-200 hover:bg-cyan-500/20 transition-colors"
+                >
+                  <Download className="w-4 h-4" />
+                  Descargar .ics (añadir al calendario)
+                </button>
+                <p className="text-xs text-slate-500 max-w-md leading-relaxed">
+                  Abre el archivo en iPhone, Google Calendar o Outlook para guardar automáticamente la misma fecha y hora que figura arriba (referencia hora Chile).
+                </p>
+              </div>
+            )}
           </motion.div>
 
           {/* Estado del procesamiento */}
@@ -630,11 +908,20 @@ export default function PaymentSuccessPage() {
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle className="w-5 h-5 text-emerald-400" />
-                <span className="text-slate-300">Pago confirmado vía MercadoPago</span>
+                <span className="text-slate-300">
+                  {isFreeConsult
+                    ? 'Consulta gratuita confirmada (sin cargo)'
+                    : 'Pago confirmado vía MercadoPago'}
+                </span>
               </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle className="w-5 h-5 text-emerald-400" />
-                <span className="text-slate-300">Emails de confirmación enviados</span>
+              <div className="flex items-start gap-2">
+                <EmailStatusIcon className={`w-5 h-5 flex-shrink-0 mt-0.5 ${emailStatusIconClass}`} aria-hidden />
+                <span className="text-slate-300 text-left">
+                  {emailStatusText}
+                  {emailStatusDetail ? (
+                    <span className="block text-xs text-slate-500 mt-1 break-words">{emailStatusDetail}</span>
+                  ) : null}
+                </span>
               </div>
               {paymentData?.reservation && (
                 <div className="mt-4 p-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
@@ -650,15 +937,15 @@ export default function PaymentSuccessPage() {
                     </p>
                   )}
                   {googleMeetLink && (
-                    <p className="text-[11px] text-slate-500">
-                      <strong className="text-slate-400">Link de Google Meet:</strong>
+                    <p className="text-[11px] text-slate-500 flex flex-wrap items-center gap-x-2 gap-y-2">
+                      <strong className="text-slate-400 shrink-0">Link de Google Meet:</strong>
                       <a
                         href={googleMeetLink}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-cyan-300 hover:text-cyan-200 underline ml-1"
+                        className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg px-3 text-sm font-semibold text-cyan-950 bg-cyan-400/90 hover:bg-cyan-300 transition-colors"
                       >
-                        Unirse
+                        Unirse a la reunión
                       </a>
                     </p>
                   )}
@@ -667,8 +954,8 @@ export default function PaymentSuccessPage() {
             </div>
           </motion.div>
 
-          {/* Información del pago */}
-          {paymentData?.mercadopagoData && (
+          {/* Información del pago (omitir en consulta gratuita sin pasarela) */}
+          {paymentData?.mercadopagoData && !isFreeConsult && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -769,7 +1056,11 @@ export default function PaymentSuccessPage() {
                 <div className="w-6 h-6 rounded-full bg-emerald-500/20 flex items-center justify-center flex-shrink-0 mt-0.5 border border-emerald-500/30">
                   <span className="text-[10px] font-bold text-emerald-400">3</span>
                 </div>
-                <p className="text-slate-300 text-sm">Coordinarás fecha y hora de tu sesión de 45 min</p>
+                <p className="text-slate-300 text-sm">
+                  {scheduledSlot
+                    ? 'Tu sesión quedó agendada en la fecha y hora indicadas arriba.'
+                    : 'Coordinarás fecha y hora de tu sesión de 45 min'}
+                </p>
               </div>
             </div>
           </motion.div>
@@ -789,28 +1080,49 @@ export default function PaymentSuccessPage() {
             <p className="text-[10px] text-slate-500 uppercase tracking-widest font-bold mb-3 text-center">
               Siguiente paso
             </p>
-            <p className="text-white font-semibold text-center mb-4">
-              Elige fecha y hora para tu sesión de 45 min
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Link
-                to={agendarUrl}
-                className="inline-flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-4 px-6 rounded-xl transition-all duration-200"
-                style={{ boxShadow: '0 4px 20px rgba(79,70,229,0.4)' }}
-              >
-                <Calendar className="w-5 h-5" />
-                Agendar mi sesión
-              </Link>
-              <a
-                href={whatsappPostPago}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-4 px-6 rounded-xl transition-all duration-200"
-              >
-                <MessageCircle className="w-5 h-5" />
-                Hablar por WhatsApp
-              </a>
-            </div>
+            {!scheduledSlot ? (
+              <>
+                <p className="text-white font-semibold text-center mb-4">
+                  Elige fecha y hora para tu sesión de 45 min
+                </p>
+                <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                  <Link
+                    to={agendarUrl}
+                    className="inline-flex min-h-[48px] items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-4 px-6 rounded-xl transition-all duration-200"
+                    style={{ boxShadow: '0 4px 20px rgba(79,70,229,0.4)' }}
+                  >
+                    <Calendar className="w-5 h-5" />
+                    Agendar mi sesión
+                  </Link>
+                  <a
+                    href={whatsappPostPago}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex min-h-[48px] items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-4 px-6 rounded-xl transition-all duration-200"
+                  >
+                    <MessageCircle className="w-5 h-5" />
+                    Hablar por WhatsApp
+                  </a>
+                </div>
+              </>
+            ) : (
+              <>
+                <p className="text-white font-semibold text-center mb-4">
+                  ¿Necesitas cambiar la hora o tienes dudas? Escríbenos por WhatsApp.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                  <a
+                    href={whatsappPostPago}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex min-h-[48px] items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-4 px-6 rounded-xl transition-all duration-200"
+                  >
+                    <MessageCircle className="w-5 h-5" />
+                    Hablar por WhatsApp
+                  </a>
+                </div>
+              </>
+            )}
           </motion.div>
 
           {/* Botones secundarios */}
@@ -838,12 +1150,12 @@ export default function PaymentSuccessPage() {
         </div>
       </div>
 
-      {/* WhatsApp flotante */}
+      {/* WhatsApp flotante (safe-area en notch / home indicator) */}
       <a
         href={whatsappPostPago}
         target="_blank"
         rel="noopener noreferrer"
-        className="fixed bottom-6 right-6 z-[100] flex items-center gap-3 group"
+        className="fixed z-[100] flex items-center gap-3 group bottom-[max(1.25rem,env(safe-area-inset-bottom,0px))] right-[max(1.25rem,env(safe-area-inset-right,0px))]"
       >
         <div className="bg-slate-900/90 backdrop-blur-xl border border-slate-700 px-3 py-2 rounded-2xl text-white text-xs font-bold shadow-2xl flex items-center gap-2 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
           <span className="relative flex h-2 w-2 flex-none">

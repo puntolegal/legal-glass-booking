@@ -53,7 +53,7 @@ function customerTemplate(b: any) {
         <p style="font-size: 16px; margin-bottom: 15px;"><strong>¿Qué sigue?</strong></p>
         <ul style="font-size: 14px; line-height: 1.6;">
           <li>Recibirás un recordatorio 24 horas antes de tu cita</li>
-          <li>Si necesitas reagendar, contáctanos con al menos 24 horas de anticipación</li>
+          <li>Tu información se maneja con confidencialidad y secreto profesional</li>
           <li>Prepara cualquier documentación relevante para tu consulta</li>
         </ul>
         

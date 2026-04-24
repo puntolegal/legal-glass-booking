@@ -516,7 +516,7 @@ const CalculadoraPensionPage: React.FC = () => {
     const isProtectionReady = protectionType !== null;
     const isAssetsReady = hasComplexAssets !== null;
     const isReadyToCalculate = legalMatter !== null && isContactReady && isBaseReady && isDebtReady && isProtectionReady && isAssetsReady;
-    
+
     if (isReadyToCalculate && !isRevealed && !isAnalyzing) {
       const range = calculatePensionRange(selectedIncome, selectedChildren);
       if (range) {
@@ -547,7 +547,9 @@ const CalculadoraPensionPage: React.FC = () => {
           }, 5000);
         }, 100);
       }
-    } else if (!isReadyToCalculate) {
+    } else if (!isReadyToCalculate && !isRevealed && !isAnalyzing) {
+      // No borrar el rango si el usuario ya vio resultados (isRevealed) o durante el análisis
+      // (isAnalyzing); evita UI rota: resultados visibles con calculatedRange === null.
       setCalculatedRange(null);
     }
   }, [legalMatter, selectedIncome, selectedChildren, currentPension, hidesIncome, hasDebt, monthsOwed, protectionType, hasComplexAssets, name, emailValid, whatsappValid, isRevealed, isAnalyzing]);

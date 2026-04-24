@@ -66,8 +66,8 @@ export const serviceInfoMap: Record<string, ServiceInfo> = {
 
   // ===== Tutela Laboral GRATIS (lead magnet) =====
   'tutela-laboral': {
-    title: 'Punto Legal Tutela Laboral',
-    subtitle: 'Diagnóstico gratuito',
+    title: 'Punto Legal Laboral — Diagnóstico gratis',
+    subtitle: 'Trabajadores · primera sesión sin costo',
     description: 'Si te despidieron sin justificación, sufriste acoso laboral o creemos que te calcularon mal el finiquito, evaluamos tu caso gratis. Si tiene mérito, lo tomamos a porcentaje: pagas sólo si recuperamos.',
     benefits: [
       'Diagnóstico gratuito de tu caso por Google Meet.',
@@ -166,6 +166,36 @@ export const serviceInfoMap: Record<string, ServiceInfo> = {
     icon: ShieldCheck,
     duration: '45 minutos',
     deliverable: 'Protocolo + capacitación'
+  },
+  'defensa-karin-trabajador': {
+    title: 'Defensa Ley Karin (trabajador)',
+    subtitle: 'Ley 21.643 · orientación y estrategia',
+    description:
+      'Si estás involucrado/a en un procedimiento por acoso u hostigamiento bajo la Ley 21.643 (Ley Karin), revisamos tus antecedentes y definimos estrategia ante empleador, investigación interna o Dirección del Trabajo, según corresponda.',
+    benefits: [
+      'Sesión con abogado especialista (45 min).',
+      'Análisis de hechos y documentación disponible.',
+      'Plan de acción por escrito.',
+      'Sin promesa de resultado: cada causa es distinta.'
+    ],
+    icon: ShieldCheck,
+    duration: '45 minutos',
+    deliverable: 'PDF + estrategia'
+  },
+  'comparendo-rm': {
+    title: 'Comparendo DT · Región Metropolitana',
+    subtitle: 'Conciliación + proyección de demanda',
+    description:
+      'Te preparamos para el comparendo de conciliación ante la Dirección del Trabajo en la Región Metropolitana y proyectamos, si corresponde, la vía de demanda en tribunales laborales. Los honorarios de litigio pleno se cotizan aparte según complejidad.',
+    benefits: [
+      'Revisión de citación y hechos.',
+      'Estrategia de descargo y negociación.',
+      'Indicación de pasos hacia demanda en tribunales.',
+      'Tarifa indicada por esta etapa de comparendo RM.'
+    ],
+    icon: Gavel,
+    duration: '45 minutos',
+    deliverable: 'Estrategia + comparendo'
   },
   'cumplimiento': {
     title: 'Punto Legal Cumplimiento',
@@ -462,9 +492,9 @@ export const serviceInfoMap: Record<string, ServiceInfo> = {
     deliverable: 'PDF + asesoría'
   },
   'laboral': {
-    title: 'Punto Legal Laboral',
+    title: 'Punto Legal Laboral — Consulta',
     subtitle: 'Protección de derechos laborales',
-    description: 'Asesoría en derecho laboral: despido injustificado, tutela laboral, Ley Karin, finiquitos y nulidad del despido. Si tu caso califica, lo derivamos al diagnóstico gratuito de Tutela Laboral.',
+    description: 'Asesoría en derecho laboral: despido injustificado, tutela laboral, Ley 21.643 (Ley Karin), finiquitos y nulidad del despido. Si tu caso califica para primera sesión sin costo, te indicamos cómo agendar el diagnóstico gratuito.',
     benefits: [
       'Sesión con abogado especialista en derecho laboral.',
       'Cálculo real de tu indemnización.',

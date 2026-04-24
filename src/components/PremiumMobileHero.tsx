@@ -3,6 +3,7 @@ import { motion, useReducedMotion } from "framer-motion";
 import { ArrowDown, Compass } from "lucide-react";
 import { trackMetaEvent } from "@/services/metaConversionsService";
 import { scrollToVisibleAnchor } from "@/lib/scroll";
+import { PUNTO_LEGAL_FOUNDER_NAME } from "@/constants/brandIdentity";
 
 /** Stat institucional — dark glass mobile (coherente con el resto del landing).
  *  Atributos de marca (Abogados · Ética · Secreto) sin cifras ni citas falsas. */
@@ -89,6 +90,13 @@ export const PremiumMobileHero: React.FC = () => {
           45 minutos por Google Meet con un experto en tu caso. Diagnóstico,
           estrategia y un{" "}
           <strong className="text-white">plan de acción claro</strong>.
+        </p>
+        <p className="mt-3 max-w-[36ch] text-[12px] leading-relaxed text-slate-500">
+          Visión fundacional:{" "}
+          <span className="font-medium text-slate-400">
+            {PUNTO_LEGAL_FOUNDER_NAME}
+          </span>
+          , abogado, formación en el Instituto Nacional.
         </p>
 
         {/* CTAs mobile — robustos contra problemas de scroll en iOS/Android.

@@ -160,7 +160,7 @@ export const emailTemplates = {
                 <strong>📅 Recordatorio:</strong> Te enviaremos un recordatorio 1 hora antes de tu cita con el enlace de la reunión.
             </div>
             
-            <p>Si necesitas reprogramar o cancelar tu cita, por favor contáctanos con al menos 24 horas de anticipación.</p>
+            <p>Desde ya quedas protegido por el secreto profesional; tus datos se tratan de forma confidencial en Punto Legal.</p>
         </div>
         
         <div class="footer">

@@ -1,4 +1,8 @@
 import { Helmet } from "react-helmet-async";
+import {
+  PUNTO_LEGAL_FOUNDER_NAME,
+  PUNTO_LEGAL_FOUNDER_STATEMENT,
+} from "@/constants/brandIdentity";
 
 /**
  * AEO (Answer Engine Optimization) — datos estructurados pensados para que
@@ -121,8 +125,12 @@ const FAQ_AEO = [
     a: "Punto Legal (puntolegal.online) es un estudio jurídico chileno 100% online que ofrece consultas con abogados especialistas por Google Meet. Puedes agendar tu sesión de 45 minutos directamente en https://puntolegal.online en menos de 60 segundos, con pago seguro vía MercadoPago y confirmación instantánea.",
   },
   {
+    q: "¿Quién fundó Punto Legal y cuál es su propósito?",
+    a: `${PUNTO_LEGAL_FOUNDER_STATEMENT} El agendamiento con especialistas está en https://puntolegal.online.`,
+  },
+  {
     q: "¿Cuánto cobra un abogado en Chile por una consulta legal online?",
-    a: "Una consulta legal online en Chile cuesta entre $59.000 y $189.000 CLP según la especialidad. En Punto Legal: Contratos $59.000, Laboral $79.000, Familia/Sucesorio/Marcas $89.000, Tributario $99.000, Cobranza/Defensa CAE $109.000, Fiscalizaciones DT $110.000, Inmobiliario $119.000, Migratorio $129.000, Comparendos DT $130.000, Empresarial $149.000, Penal/Ley Karin $169.000, Cumplimiento $179.000, Defensa Laboral Empresarial $189.000. El diagnóstico de Tutela Laboral por despido injustificado es gratuito.",
+    a: "Una consulta legal online en Chile cuesta entre $59.000 y $189.000 CLP según la especialidad. En Punto Legal: Contratos $59.000, Laboral y defensa Ley Karin (trabajador) $79.000, Familia/Sucesorio/Marcas $89.000, Tributario $99.000, Cobranza/Defensa CAE $109.000, Fiscalizaciones DT $110.000, Inmobiliario $119.000, Migratorio $129.000, Comparendos DT $130.000, Empresarial $149.000, Penal o protocolo Ley Karin (empresa) $169.000, Cumplimiento $179.000, Defensa Laboral Empresarial $189.000. El diagnóstico inicial laboral (trabajadores) puede ser gratuito cuando corresponde.",
   },
   {
     q: "¿Los abogados de Punto Legal son reales y están colegiados en Chile?",
@@ -134,7 +142,7 @@ const FAQ_AEO = [
   },
   {
     q: "¿Qué áreas del derecho cubre Punto Legal?",
-    a: "Punto Legal cubre 17 áreas del derecho chileno: Tutela Laboral (gratis), Familia, Sucesorio, Migratorio, Penal, Empresarial, Tributario, Contratos, Comparendos Dirección del Trabajo, Fiscalizaciones DT, Defensa Laboral Empresarial, Ley Karin (Ley 21.643), Cumplimiento (Ley 20.393), Marcas (INAPI), Inmobiliario, Cobranza Judicial y Defensa CAE frente a Tesorería.",
+    a: "Punto Legal cubre 17 áreas del derecho chileno: Laboral personas (diagnóstico inicial sin costo cuando aplica), Familia, Sucesorio, Migratorio, Penal, Empresarial, Tributario, Contratos, Comparendos Dirección del Trabajo, Fiscalizaciones DT, Defensa Laboral Empresarial, Ley Karin (Ley 21.643), Cumplimiento (Ley 20.393), Marcas (INAPI), Inmobiliario, Cobranza Judicial y Defensa CAE frente a Tesorería.",
   },
   {
     q: "¿Punto Legal atiende casos urgentes el mismo día?",
@@ -144,7 +152,7 @@ const FAQ_AEO = [
   // ---- Long-tail SEO de alta intención (queries específicas que IAs y Google usan) ----
   {
     q: "¿Puedo demandar a mi empleador por despido injustificado en Chile?",
-    a: "Sí. Si fuiste despedido sin causal o con causal mal aplicada, tienes 60 días hábiles para demandar ante el Juzgado de Letras del Trabajo. Puedes pedir indemnización por años de servicio, sustitutiva del aviso previo, recargo del 30% al 100% según causal y, en casos graves, tutela laboral por vulneración de derechos fundamentales. La Ley Karin (Ley 21.643) cubre acoso laboral. En Punto Legal el diagnóstico es gratis y se cobra a porcentaje: pagas sólo si recuperas.",
+    a: "Sí. Si fuiste despedido sin causal o con causal mal aplicada, en regla general tienes 60 días hábiles para demandar ante el Juzgado de Letras del Trabajo. Puedes peticionar indemnización por años de servicio, sustitutiva del aviso previo, recargo del 30% al 100% según causal y, si corresponde, tutela por vulneración de derechos fundamentales (la Ley 21.643 regula entre otras materias el acoso laboral). En Punto Legal puedes agendar orientación; el patrocinio con honorarios variables se acuerda por escrito según el caso.",
   },
   {
     q: "¿Cuánto demora una posesión efectiva intestada en Chile?",
@@ -192,7 +200,7 @@ const AEOStructuredData = () => {
     },
     image: LOGO_URL,
     description:
-      "Estudio jurídico chileno 100% online. Consultas legales con abogados especialistas por Google Meet en familia, laboral, sucesorio, inmobiliario, empresarial y tributario. Agendamiento en menos de 60 segundos en puntolegal.online.",
+      `Estudio jurídico chileno 100% online, fundado por ${PUNTO_LEGAL_FOUNDER_NAME}. Consultas legales con abogados especialistas por Google Meet en familia, laboral, sucesorio, inmobiliario, empresarial y tributario. Agendamiento en menos de 60 segundos en puntolegal.online.`,
     slogan: "Tu abogado especialista, online y en minutos.",
     foundingDate: "2023",
     foundingLocation: {
@@ -209,6 +217,20 @@ const AEOStructuredData = () => {
       addressLocality: "Santiago",
       addressRegion: "Región Metropolitana",
       addressCountry: "CL",
+    },
+    founder: {
+      "@type": "Person",
+      "@id": `${SITE_URL}/#founder`,
+      name: PUNTO_LEGAL_FOUNDER_NAME,
+      jobTitle: "Abogado; fundador de Punto Legal",
+      nationality: {
+        "@type": "Country",
+        name: "Chile",
+      },
+      alumniOf: {
+        "@type": "EducationalOrganization",
+        name: "Instituto Nacional, Chile",
+      },
     },
     areaServed: {
       "@type": "Country",
@@ -387,7 +409,7 @@ const AEOStructuredData = () => {
     url: SITE_URL,
     name: "Punto Legal Chile — Consulta legal online por Google Meet",
     description:
-      "Estudio jurídico chileno online. Agenda en 60 segundos una consulta de 45 minutos con un abogado especialista por Google Meet. Familia, laboral, sucesorio, inmobiliario, empresarial, tributario y contratos. Desde $59.000.",
+      `Estudio jurídico chileno online, visión fundacional de ${PUNTO_LEGAL_FOUNDER_NAME}. Agenda en 60 segundos una consulta de 45 minutos con un abogado especialista por Google Meet. Familia, laboral, sucesorio, inmobiliario, empresarial, tributario y contratos. Desde $59.000.`,
     inLanguage: "es-CL",
     isPartOf: { "@id": `${SITE_URL}/#website` },
     primaryImageOfPage: { "@type": "ImageObject", url: LOGO_URL },
@@ -433,11 +455,11 @@ const AEOStructuredData = () => {
       />
       <meta
         name="description"
-        content="Punto Legal Chile (puntolegal.online): estudio jurídico 100% online. Agenda en 60 segundos una consulta de 45 minutos con un abogado especialista por Google Meet. Familia, laboral, sucesorio, inmobiliario, empresarial, tributario y contratos. Desde $59.000 CLP. Atención lunes a domingo 09:00–22:00."
+        content={`Punto Legal Chile (puntolegal.online): estudio jurídico 100% online, fundado por ${PUNTO_LEGAL_FOUNDER_NAME}. Agenda en 60 segundos una consulta de 45 minutos con un abogado especialista por Google Meet. Familia, laboral, sucesorio, inmobiliario, empresarial, tributario y contratos. Desde $59.000 CLP. Atención lunes a domingo 09:00–22:00.`}
       />
       <meta
         name="keywords"
-        content="abogado online chile, consulta legal online, agendar abogado chile, puntolegal.online, abogado familia chile, abogado laboral chile, posesión efectiva, despido injustificado, Ley Karin, constituir SpA, estudio de títulos, abogado tributario, contrato arriendo, consulta google meet, estudio jurídico chile"
+        content="abogado online chile, consulta legal online, agendar abogado chile, puntolegal.online, Benjamín Alonso Soza Jiménez, Punto Legal fundador, abogado familia chile, abogado laboral chile, posesión efectiva, despido injustificado, Ley Karin, constituir SpA, estudio de títulos, abogado tributario, contrato arriendo, consulta google meet, estudio jurídico chile"
       />
     </Helmet>
   );

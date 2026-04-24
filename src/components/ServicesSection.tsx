@@ -26,6 +26,7 @@ import {
   Video,
   type LucideIcon,
 } from "lucide-react";
+import { trackMetaEvent } from "@/services/metaConversionsService";
 
 interface ExternalService {
   title: string;
@@ -70,8 +71,13 @@ interface InternalService {
   testimonial?: { quote: string; author: string };
   /** Plan gratuito (cambia el render del precio) */
   free?: boolean;
+  /** Atajos a otros planes (cluster Laboral personas) */
+  clusterPills?: { label: string; plan: string }[];
+  /** Minutos de sesión mostrados en trust pills (default 45) */
+  sessionDurationMin?: number;
 }
 
+/** Catálogo web/móvil: al cambiar títulos, sincronizar `supabase/functions/_shared/landingServiceTitles.ts` (correos / WhatsApp). */
 const internalServices: InternalService[] = [
   // ========== PRODUCTO ESTRELLA ==========
   // Defensa CAE — máxima urgencia financiera + alta intención de búsqueda.
@@ -105,25 +111,31 @@ const internalServices: InternalService[] = [
   },
   // ========== PERSONAS ==========
   {
-    title: "Punto Legal Tutela Laboral",
-    shortName: "Tutela Laboral",
-    hook: "Si te despidieron sin justificación o sufriste acoso laboral, te decimos cuánto te corresponde. El diagnóstico es gratis.",
+    title: "Punto Legal Laboral",
+    shortName: "Laboral",
+    hook: "Despido, tutela laboral o Ley 21.643 (Ley Karin): priorizamos tu caso y te decimos la vía. El diagnóstico inicial puede ser gratis.",
     descriptionHtml:
-      "Calculamos tu <strong>indemnización por despido injustificado</strong>, evaluamos casos de tutela laboral, Ley Karin y nulidad del despido. Si tu caso tiene mérito, lo tomamos a porcentaje: pagas sólo cuando recuperas.",
+      "Evaluamos <strong>despido injustificado, finiquito, nulidad y acoso laboral</strong> (incl. Ley Karin). Si corresponde, primera sesión de diagnóstico sin costo; si el patrocinio es a porcentaje, pagas honorarios sólo cuando recuperas, según acuerdo escrito.",
     ctaLabel: "Pedir mi diagnóstico gratis",
     price: "Gratis",
     plan: "tutela-laboral",
     icon: Scale,
     free: true,
     features: [
-      "Diagnóstico gratuito de tu caso",
-      "Cálculo real de indemnización",
-      "Tutela laboral, Ley Karin y nulidad del despido",
-      "Honorarios sólo si recuperamos",
+      "Diagnóstico inicial sin costo cuando aplica",
+      "Despido, finiquito, tutela y nulidad",
+      "Ley 21.643 (Ley Karin) y hostigamiento",
+      "Honorarios a porcentaje si asumimos el caso",
     ],
     audience: "personas",
-    accent: "16 185 129", // emerald-500 — éxito + recuperación
-    badge: "Diagnóstico gratis",
+    accent: "13 148 136", // teal-600 — vertical laboral (alineado a serviceThemes)
+    badge: "Diagnóstico gratis disponible",
+    clusterPills: [
+      { label: "Diagnóstico gratis", plan: "tutela-laboral" },
+      { label: "Despido y finiquito", plan: "laboral" },
+      { label: "Ley Karin (trabajador)", plan: "defensa-karin-trabajador" },
+    ],
+    sessionDurationMin: 45,
   },
   {
     title: "Punto Legal Familia",
@@ -543,7 +555,7 @@ const categories: CategoryDef[] = [
   {
     id: "personas",
     label: "Personas",
-    sublabel: "Tutela laboral, familia, sucesorio, migratorio y penal",
+    sublabel: "Laboral, familia, sucesorio, migratorio y penal",
     icon: Heart,
     accent: "96 165 250", // blue-400
   },
@@ -813,7 +825,7 @@ const ServicesSection = ({
         {/* Trust strip al final */}
         <div className="relative z-10 mt-10 flex flex-col items-center gap-3 text-[12px] text-slate-500 md:flex-row md:justify-center md:gap-6">
           <span className="inline-flex items-center gap-2">
-            <span className="h-1 w-1 rounded-full bg-emerald-400" />
+            <span className="h-1 w-1 rounded-full bg-teal-400/90" />
             +1.200 consultas resueltas
           </span>
           <span className="hidden md:inline-flex h-1 w-1 rounded-full bg-slate-700" aria-hidden />
@@ -996,6 +1008,36 @@ const MobileServiceCard = ({
         </div>
       )}
 
+      {service.clusterPills && service.clusterPills.length > 0 && (
+        <div className="flex flex-wrap gap-1.5 px-3 pb-2 pt-1">
+          {service.clusterPills.map((pill) => (
+            <button
+              key={`${pill.label}-${pill.plan}`}
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                void trackMetaEvent({
+                  event_name: "InitiateCheckout",
+                  custom_data: {
+                    content_type: "service_plan",
+                    content_category: "Landing Page",
+                    content_ids: [pill.plan],
+                    content_name: `${service.shortName} — ${pill.label}`,
+                    source: "services_section_cluster_pill_mobile",
+                    value: pill.plan === "tutela-laboral" ? 0 : 79000,
+                    currency: "CLP",
+                  },
+                });
+                window.location.href = `/agendamiento?plan=${pill.plan}`;
+              }}
+              className="rounded-full border border-white/15 bg-white/[0.06] px-2.5 py-1 text-[10px] font-medium text-slate-200 backdrop-blur-sm"
+            >
+              {pill.label}
+            </button>
+          ))}
+        </div>
+      )}
+
       {/* Fila principal — tap para expandir features */}
       <button
         type="button"
@@ -1023,7 +1065,7 @@ const MobileServiceCard = ({
           <p
             className={`mobile-service-card__price ${
               service.free
-                ? "bg-gradient-to-r from-emerald-300 to-teal-200 bg-clip-text text-transparent"
+                ? "bg-gradient-to-r from-teal-300 to-cyan-200 bg-clip-text text-transparent"
                 : ""
             }`}
           >
@@ -1092,7 +1134,7 @@ const MobileServiceCard = ({
 
               <div className="mt-3 flex items-center gap-1.5 text-[10.5px] text-slate-500">
                 <Clock className="h-3 w-3" strokeWidth={2.2} aria-hidden />
-                45 min
+                {service.sessionDurationMin ?? 45} min
                 <span className="mx-1">·</span>
                 <Video className="h-3 w-3" strokeWidth={2.2} aria-hidden />
                 Google Meet
@@ -1271,6 +1313,36 @@ const ServiceCard = ({
           />
         </div>
 
+        {service.clusterPills && service.clusterPills.length > 0 && (
+          <div className="relative z-10 mt-4 flex flex-wrap gap-2">
+            {service.clusterPills.map((pill) => (
+              <button
+                key={`${pill.label}-${pill.plan}`}
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  void trackMetaEvent({
+                    event_name: "InitiateCheckout",
+                    custom_data: {
+                      content_type: "service_plan",
+                      content_category: "Landing Page",
+                      content_ids: [pill.plan],
+                      content_name: `${service.shortName} — ${pill.label}`,
+                      source: "services_section_cluster_pill",
+                      value: pill.plan === "tutela-laboral" ? 0 : 79000,
+                      currency: "CLP",
+                    },
+                  });
+                  window.location.href = `/agendamiento?plan=${pill.plan}`;
+                }}
+                className="rounded-full border border-white/15 bg-white/[0.06] px-3 py-1.5 text-[11px] font-medium text-slate-200 backdrop-blur-sm transition hover:border-white/25 hover:bg-white/10"
+              >
+                {pill.label}
+              </button>
+            ))}
+          </div>
+        )}
+
         {/* === Features como pills === */}
         <ul className="relative z-10 mt-5 flex flex-wrap gap-2">
           {service.features.map((f) => (
@@ -1315,7 +1387,7 @@ const ServiceCard = ({
         <div className="relative z-10 mt-5 flex flex-wrap items-center gap-2">
           <span className="trust-pill" aria-label="Duración">
             <Clock className="trust-pill__icon" strokeWidth={2.2} aria-hidden />
-            45 min
+            {service.sessionDurationMin ?? 45} min
           </span>
           <span className="trust-pill" aria-label="Modalidad">
             <Video className="trust-pill__icon" strokeWidth={2.2} aria-hidden />
@@ -1350,7 +1422,7 @@ const ServiceCard = ({
                 <p
                   className={`price-ticker font-display font-bold leading-none ${
                     service.free
-                      ? "bg-gradient-to-r from-emerald-300 to-teal-200 bg-clip-text text-transparent"
+                      ? "bg-gradient-to-r from-teal-300 to-cyan-200 bg-clip-text text-transparent"
                       : "text-white"
                   } ${
                     featured

@@ -36,7 +36,7 @@ export default function TestimonialBubble({
       viewport={{ once: true }}
       transition={{ delay: index * 0.1 }}
     >
-      <div className="bg-slate-900/60 border border-slate-800 p-6 rounded-3xl h-full shadow-md shadow-slate-950/40">
+      <div className="glass-ios-card-dark p-6 h-full">
         <div className="flex items-center justify-between mb-3">
           <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-slate-800/90 border border-slate-700">
             <span className="text-xs" aria-hidden="true">

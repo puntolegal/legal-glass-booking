@@ -23,7 +23,7 @@ export const WHATSAPP_NUMBER = "56962321883";
 export const WHATSAPP_MESSAGES = {
   /** CTA principal del Hero — orientado al despido (alta intención). */
   despido:
-    "Hola Punto Legal 👋, vi su sitio y necesito ayuda con un despido injustificado ⚖️. Me gustaría acceder al diagnóstico gratuito de Tutela Laboral. ¡Gracias! 🙏",
+    "Hola Punto Legal 👋, vi su sitio y necesito ayuda con un despido injustificado ⚖️. Me gustaría agendar el diagnóstico inicial Laboral (gratis cuando aplica). ¡Gracias! 🙏",
 
   /** CTA general — para usuarios que no tienen un caso específico aún. */
   general:
@@ -53,4 +53,11 @@ export type WhatsAppContext = keyof typeof WHATSAPP_MESSAGES;
 export function buildWhatsAppUrl(context: WhatsAppContext = "despido"): string {
   const text = encodeURIComponent(WHATSAPP_MESSAGES[context]);
   return `https://wa.me/${WHATSAPP_NUMBER}?text=${text}`;
+}
+
+/** Mensaje fijo para urgencias laborales desde header móvil (`/servicios/laboral`). */
+export const WHATSAPP_URGENCIA_LABORAL = "Hola, tengo una urgencia laboral.";
+
+export function buildWhatsAppUrlWithMessage(message: string): string {
+  return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
 }

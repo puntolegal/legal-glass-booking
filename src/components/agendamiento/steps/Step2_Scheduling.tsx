@@ -105,7 +105,13 @@ const Step2_Scheduling: React.FC = () => {
     []
   );
 
-  const toISODate = (date: Date) => date.toISOString().split('T')[0];
+  /** Fecha civil local (evita desfase UTC de `toISOString()` al cambiar de día). */
+  const toLocalYmd = (date: Date) => {
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const d = String(date.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+  };
 
   // Mostrar próximos 14 días disponibles
   const displayedDates = useMemo(() => availableDates.slice(0, 14), [availableDates]);
@@ -128,7 +134,7 @@ const Step2_Scheduling: React.FC = () => {
   const afternoonTimes = remainingTimes.filter((time) => Number(time.split(':')[0]) >= 13);
 
   const handleSelectDate = (date: Date) => {
-    const iso = toISODate(date);
+    const iso = toLocalYmd(date);
     setSelectedDate(iso);
     setSelectedTime('');
     setSchedulingStep('time');
@@ -175,7 +181,7 @@ const Step2_Scheduling: React.FC = () => {
       <motion.button
         onClick={() => handleSelectTime(time)}
         whileTap={{ scale: 0.97 }}
-        className={`px-4 py-2.5 rounded-xl text-sm font-medium border transition ${
+        className={`min-h-[44px] px-4 py-2.5 rounded-xl text-sm font-medium border transition flex items-center justify-center ${
           isSelected 
             ? 'text-white shadow-lg' 
             : variant === 'recommended'
@@ -207,7 +213,7 @@ const Step2_Scheduling: React.FC = () => {
 
         <section className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-2 md:gap-3 pb-1">
           {displayedDates.map((date) => {
-            const iso = toISODate(date);
+            const iso = toLocalYmd(date);
             const isSelected = selectedDate === iso;
               
             return (
@@ -255,8 +261,9 @@ const Step2_Scheduling: React.FC = () => {
         <div className="rounded-3xl border border-slate-800/70 bg-slate-900/60 px-4 py-6 text-center space-y-3">
           <p className="text-sm text-slate-300">No quedan cupos para este día.</p>
           <button
+            type="button"
             onClick={() => setSchedulingStep('day')}
-            className="inline-flex items-center gap-2 rounded-full border border-slate-700 bg-slate-800/50 px-4 py-2 text-xs font-semibold text-slate-200 hover:bg-slate-800 transition-colors"
+            className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-full border border-slate-700 bg-slate-800/50 px-4 py-2 text-sm font-semibold text-slate-200 hover:bg-slate-800 transition-colors"
           >
             Elegir otra fecha
           </button>
@@ -278,11 +285,12 @@ const Step2_Scheduling: React.FC = () => {
             <div className="col-span-full text-center py-8">
               <p className="text-sm text-slate-400 mb-4">No quedan cupos para este día</p>
               <button
+                type="button"
                 onClick={() => {
                   setSelectedDate('');
                   setSchedulingStep('day');
                 }}
-                className="inline-flex items-center gap-2 rounded-full border border-slate-700 bg-slate-800/50 px-4 py-2 text-xs font-semibold text-slate-200 hover:bg-slate-800 transition-colors"
+                className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-full border border-slate-700 bg-slate-800/50 px-4 py-2 text-sm font-semibold text-slate-200 hover:bg-slate-800 transition-colors"
               >
                 Elegir otra fecha
               </button>
@@ -368,11 +376,12 @@ const Step2_Scheduling: React.FC = () => {
       
       <div className="flex items-center justify-between pt-2">
         <button
+          type="button"
           onClick={() => {
             setSelectedDate('');
             setSchedulingStep('day');
           }}
-          className="text-xs uppercase tracking-wide font-semibold text-slate-400 border border-slate-700/50 rounded-full px-3 py-1 hover:bg-slate-800/50 transition"
+          className="min-h-[44px] inline-flex items-center justify-center text-xs uppercase tracking-wide font-semibold text-slate-400 border border-slate-700/50 rounded-full px-4 py-2 hover:bg-slate-800/50 transition"
         >
           Cambiar fecha
         </button>
@@ -430,8 +439,9 @@ const Step2_Scheduling: React.FC = () => {
         </a>
         
         <button
+          type="button"
           onClick={() => setStep(1)}
-          className="w-full md:w-auto px-5 py-3 rounded-full text-sm font-semibold text-white/65 border border-white/10 hover:bg-white/10 transition"
+          className="w-full md:w-auto min-h-[44px] px-5 py-3 rounded-full text-sm font-semibold text-white/65 border border-white/10 hover:bg-white/10 transition inline-flex items-center justify-center"
         >
           Volver al paso anterior
         </button>

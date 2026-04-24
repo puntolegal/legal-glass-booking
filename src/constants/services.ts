@@ -15,7 +15,7 @@ export const serviceCatalog: Record<string, Service> = {
 
   // ===== Tutela Laboral GRATIS (lead magnet a porcentaje) =====
   'tutela-laboral': {
-    name: 'Punto Legal Tutela Laboral',
+    name: 'Punto Legal Laboral — Diagnóstico gratis',
     price: '0',
     category: 'Laboral',
     note: 'Diagnóstico gratuito · Honorarios sólo si recuperamos',
@@ -38,9 +38,10 @@ export const serviceCatalog: Record<string, Service> = {
     note: 'Primera consulta con abogado especialista',
   },
   'laboral': {
-    name: 'Punto Legal Laboral',
+    name: 'Punto Legal Laboral — Consulta',
     price: '79.000',
     category: 'Laboral',
+    note: 'Consulta paga · 60 min',
   },
   'sucesorio': {
     name: 'Punto Legal Sucesorio',
@@ -104,6 +105,20 @@ export const serviceCatalog: Record<string, Service> = {
     price: '169.000',
     category: 'Laboral Empresarial',
     note: 'Implementación protocolo + capacitación',
+  },
+  /** Trabajador/a — defensa y estrategia Ley 21.643 (tarifa alineada a consulta laboral). */
+  'defensa-karin-trabajador': {
+    name: 'Defensa Ley Karin (trabajador)',
+    price: '79.000',
+    category: 'Laboral',
+    note: 'Ley 21.643 — sesión y plan por escrito',
+  },
+  /** Comparendo DT en RM + proyección de demanda (tarifa indicada). */
+  'comparendo-rm': {
+    name: 'Comparendo DT · Región Metropolitana',
+    price: '35.000',
+    category: 'Laboral',
+    note: 'Comparendo RM; demanda en tribunales según presupuesto',
   },
   'cumplimiento': {
     name: 'Punto Legal Cumplimiento',

@@ -45,6 +45,7 @@ const makeTheme = (
   icon: ServiceTheme['icon'],
   serviceName: string,
   serviceSlug: string,
+  agendarPlanSlug?: string,
 ): ServiceTheme => ({
   primary,
   secondary,
@@ -54,25 +55,28 @@ const makeTheme = (
   icon,
   serviceName,
   serviceSlug,
+  ...(agendarPlanSlug !== undefined ? { agendarPlanSlug } : {}),
 });
 
 export const serviceThemes: Record<string, ServiceTheme> = {
   // ===== Personas =====
   'tutela-laboral': makeTheme(
-    '#10B981', // emerald-500 — éxito + recuperación
-    '#34D399', // emerald-400
-    '#059669', // emerald-600
+    '#0d9488', // teal-600 — acento apagado (vertical laboral)
+    '#2dd4bf', // teal-400
+    '#0f766e', // teal-700
     Scale,
-    'Tutela Laboral',
+    'Laboral — Diagnóstico gratis',
     'tutela-laboral',
   ),
+  /** En página laboral, el CTA global del header apunta al diagnóstico gratis. */
   laboral: makeTheme(
-    '#10B981',
-    '#34D399',
-    '#059669',
+    '#0d9488',
+    '#2dd4bf',
+    '#0f766e',
     Briefcase,
-    'Derecho Laboral',
+    'Laboral — Consulta',
     'laboral',
+    'tutela-laboral',
   ),
   familia: makeTheme(
     '#818CF8', // indigo-400 — confianza, sin rosado
@@ -187,6 +191,22 @@ export const serviceThemes: Record<string, ServiceTheme> = {
     ShieldCheck,
     'Ley Karin',
     'ley-karin',
+  ),
+  'defensa-karin-trabajador': makeTheme(
+    '#7C3AED',
+    '#8B5CF6',
+    '#6D28D9',
+    ShieldCheck,
+    'Defensa Ley Karin (trabajador)',
+    'defensa-karin-trabajador',
+  ),
+  'comparendo-rm': makeTheme(
+    '#A855F7',
+    '#C084FC',
+    '#9333EA',
+    Gavel,
+    'Comparendo DT RM',
+    'comparendo-rm',
   ),
   cumplimiento: makeTheme(
     '#9333EA', // purple-600

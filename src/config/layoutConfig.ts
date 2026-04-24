@@ -166,6 +166,24 @@ export const layoutConfigs: RouteLayoutRule[] = [
     }
   },
   
+  // 5. Derecho Laboral — header/footer integrados en la página (tema esmeralda; sin header global duplicado)
+  {
+    path: '/servicios/laboral',
+    config: {
+      type: 'default',
+      showHeader: false,
+      showFooter: true,
+      headerVariant: 'none',
+      footerVariant: 'default',
+      useMobileLayout: false,
+      seoConfig: {
+        titleSuffix: 'Derecho Laboral',
+        defaultDescription:
+          'Asesoría en derecho laboral chile: despido, tutela, Ley 21.643 y procedimientos ante la DT.',
+      },
+    },
+  },
+
   // 5. ServicioFamiliaPage (sin footer, tiene el propio)
   {
     path: '/servicios/familia',

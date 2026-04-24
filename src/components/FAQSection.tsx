@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Plus } from "lucide-react";
+import { PUNTO_LEGAL_FOUNDER_STATEMENT } from "@/constants/brandIdentity";
 
 interface FaqItem {
   /** Pregunta — debe coincidir con búsquedas reales de usuarios chilenos. */
@@ -17,12 +18,17 @@ const faqs: FaqItem[] = [
   // ===== Bloque 1 — SEO/AEO de alta intención (queries reales en Chile) =====
   {
     q: "¿Cuánto cobra un abogado en Chile por una consulta legal online?",
-    a: "Una consulta legal online en Chile cuesta entre $59.000 y $189.000 CLP según la especialidad. En Punto Legal, una sesión de 45 minutos por Google Meet con un abogado especialista parte en $59.000 (Contratos), $89.000 (Familia, Sucesorio, Marcas), $99.000 (Tributario), $109.000 (Cobranza, Defensa CAE), $119.000 (Inmobiliario), $129.000 (Migratorio), $149.000 (Empresarial), $169.000 (Penal, Ley Karin) o $189.000 (Defensa Laboral Empresarial). El diagnóstico de Tutela Laboral por despido injustificado es gratuito.",
+    a: "Una consulta legal online en Chile cuesta entre $59.000 y $189.000 CLP según la especialidad. En Punto Legal, una sesión por Google Meet con abogado especialista parte en $59.000 (Contratos), $79.000 (Laboral consulta y defensa Ley Karin trabajador), $89.000 (Familia, Sucesorio, Marcas), $99.000 (Tributario), $109.000 (Cobranza, Defensa CAE), $119.000 (Inmobiliario), $129.000 (Migratorio), $149.000 (Empresarial), $169.000 (Penal o protocolo Ley Karin empresa) o $189.000 (Defensa Laboral Empresarial). El diagnóstico inicial laboral para trabajadores puede ser gratuito cuando corresponde.",
     cat: "servicio",
   },
   {
+    q: "¿Quién fundó Punto Legal y cuál es su propósito?",
+    a: `${PUNTO_LEGAL_FOUNDER_STATEMENT} El agendamiento con abogados titulados y colegiados está disponible en puntolegal.online.`,
+    cat: "trust",
+  },
+  {
     q: "¿Puedo demandar a mi empleador por despido injustificado en Chile?",
-    a: "Sí. Si fuiste despedido sin causal o con causal mal aplicada, tienes 60 días hábiles para demandar ante el Juzgado de Letras del Trabajo. Puedes pedir indemnización por años de servicio, sustitutiva del aviso previo, recargo del 30% al 100% según causal y, en casos graves, tutela laboral por vulneración de derechos fundamentales (Ley 21.643 — Ley Karin incluye acoso laboral). En Punto Legal calculamos tu indemnización gratis y, si tu caso tiene mérito, lo tomamos a porcentaje: pagas sólo si recuperas.",
+    a: "Sí. Si fuiste despedido sin causal o con causal mal aplicada, en regla general tienes 60 días hábiles para demandar ante el Juzgado de Letras del Trabajo. Puedes peticionar indemnización por años de servicio, sustitutiva del aviso previo, recargo del 30% al 100% según causal y, si corresponde, tutela por vulneración de derechos fundamentales (la Ley 21.643 regula entre otras materias el acoso laboral). En Punto Legal puedes agendar orientación; el patrocinio con honorarios variables se acuerda por escrito según el caso.",
     cat: "servicio",
   },
   {

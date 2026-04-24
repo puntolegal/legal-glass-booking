@@ -130,8 +130,8 @@ const Step3_Payment: React.FC = () => {
       {/* Información de Pago - Simplificada */}
       {!isFree && (
         <div className="bg-slate-900/50 rounded-xl p-4 border border-white/5">
-          <div className="flex items-center gap-2 text-xs text-slate-400">
-            <Lock className="w-3 h-3 text-emerald-400" />
+          <div className="flex items-center gap-2 text-sm text-slate-400">
+            <Lock className="w-4 h-4 shrink-0 text-emerald-400" aria-hidden />
             <span>Pago seguro procesado por Mercado Pago</span>
           </div>
         </div>
@@ -153,13 +153,13 @@ const Step3_Payment: React.FC = () => {
         </motion.div>
       )}
       
-      {/* Botones de navegación */}
-      <div className="flex gap-4">
+      {/* Botones: en móvil el pago queda arriba (flex-col-reverse) */}
+      <div className="flex flex-col-reverse sm:flex-row gap-3 sm:gap-4">
         <button
           type="button"
           onClick={() => setStep(2)}
           disabled={isLoading}
-          className="flex-1 py-4 px-6 rounded-xl font-semibold bg-slate-800 border border-slate-700 text-slate-300 hover:bg-slate-700 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+          className="w-full sm:flex-1 min-h-[48px] py-4 px-6 rounded-xl font-semibold bg-slate-800 border border-slate-700 text-slate-300 hover:bg-slate-700 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
         >
           <ArrowLeft className="w-4 h-4" />
           Anterior
@@ -169,7 +169,7 @@ const Step3_Payment: React.FC = () => {
           type="button"
           onClick={handleBookingAndPayment}
           disabled={isLoading}
-          className="flex-[2] py-5 px-8 rounded-xl font-semibold text-white shadow-2xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 text-lg transform hover:scale-105 active:scale-100 bg-[#009EE3] hover:bg-[#0084C7]"
+          className="w-full sm:flex-[2] min-h-[48px] py-5 px-8 rounded-xl font-semibold text-white shadow-2xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 text-lg active:scale-[0.99] md:transform md:hover:scale-[1.02] bg-[#009EE3] hover:bg-[#0084C7]"
           style={{
             boxShadow: '0 26px 52px rgba(0, 158, 227, 0.35)',
           }}

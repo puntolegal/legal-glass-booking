@@ -1,6 +1,7 @@
 # Configuración Meta Conversions API
 
 ## Token de Acceso
+
 ```
 EABAXeUpkjJIBQ2fV4rm07Dj9K3aWV30YmpT6yPBTzSZCrZBSmxJDaYnc8vdM8r5dOM2l1gte9rLA6yXAQ039x09vwCipOxyMflnSZAFQZAmhWqLnz1IF0i6JbzCzT4ZCQmNwmgdV70wiXtbZCC06RGR4RttYWtVC6ZBQpnVauLTeznJVGntNrWHgDxxAKLOQv4fbwZDZD
 ```
@@ -21,6 +22,7 @@ META_CONVERSIONS_API_TOKEN=EABAXeUpkjJIBQ2fV4rm07Dj9K3aWV30YmpT6yPBTzSZCrZBSmxJD
 ```
 
 ### 2. Pixel ID
+
 - **Pixel ID:** `1101807351995991`
 - **API Version:** `v21.0`
 - **Endpoint:** `https://graph.facebook.com/v21.0/1101807351995991/events`
@@ -28,9 +30,11 @@ META_CONVERSIONS_API_TOKEN=EABAXeUpkjJIBQ2fV4rm07Dj9K3aWV30YmpT6yPBTzSZCrZBSmxJD
 ## Eventos Configurados
 
 ### 1. CompleteRegistration
+
 **Descripción:** Envío de información por parte de un cliente a cambio de un servicio proporcionado.
 
 **Parámetros:**
+
 - `event_name`: "CompleteRegistration"
 - `event_time`: Timestamp Unix
 - `action_source`: "website"
@@ -40,9 +44,11 @@ META_CONVERSIONS_API_TOKEN=EABAXeUpkjJIBQ2fV4rm07Dj9K3aWV30YmpT6yPBTzSZCrZBSmxJD
 **Dónde se dispara:** Cuando un usuario completa el formulario de agendamiento
 
 ### 2. Purchase
+
 **Descripción:** Finalización de una compra.
 
 **Parámetros:**
+
 - `event_name`: "Purchase"
 - `event_time`: Timestamp Unix
 - `action_source`: "website"
@@ -52,9 +58,11 @@ META_CONVERSIONS_API_TOKEN=EABAXeUpkjJIBQ2fV4rm07Dj9K3aWV30YmpT6yPBTzSZCrZBSmxJD
 **Dónde se dispara:** En `PaymentSuccessPage.tsx` cuando se confirma el pago
 
 ### 3. ViewContent
+
 **Descripción:** Visita a una página de contenido importante.
 
 **Parámetros:**
+
 - `event_name`: "ViewContent"
 - `event_time`: Timestamp Unix
 - `action_source`: "website"
@@ -63,9 +71,11 @@ META_CONVERSIONS_API_TOKEN=EABAXeUpkjJIBQ2fV4rm07Dj9K3aWV30YmpT6yPBTzSZCrZBSmxJD
 **Dónde se dispara:** En páginas de servicios y landing page
 
 ### 4. Schedule
+
 **Descripción:** Reserva de una cita.
 
 **Parámetros:**
+
 - `event_name`: "Schedule"
 - `event_time`: Timestamp Unix
 - `action_source`: "website"
@@ -76,9 +86,11 @@ META_CONVERSIONS_API_TOKEN=EABAXeUpkjJIBQ2fV4rm07Dj9K3aWV30YmpT6yPBTzSZCrZBSmxJD
 ## Eventos Adicionales Implementados
 
 ### Lead
+
 **Dónde se dispara:** Cuando un usuario inicia el proceso de agendamiento con pago
 
 ### InitiateCheckout
+
 **Dónde se dispara:** Cuando un usuario es redirigido a MercadoPago para pagar
 
 ## Estructura de la Carga
@@ -131,16 +143,18 @@ En **Events Manager** → **Probar eventos**, Meta muestra un código que cambia
 VITE_META_TEST_EVENT_CODE=TEST53498
 ```
 
-2. Reinicia el servidor de Vite. `trackMetaEvent` adjunta automáticamente `test_event_code` a la petición CAPI (la función `meta-conversions` ya lo reenvía a Graph API).
+1. Reinicia el servidor de Vite. `trackMetaEvent` adjunta automáticamente `test_event_code` a la petición CAPI (la función `meta-conversions` ya lo reenvía a Graph API).
 
 En **producción** no definas esta variable: los eventos deben registrarse como tráfico real, no en el panel de prueba.
 
 - **Parámetro Graph API:** `test_event_code` (mismo valor que muestra Meta).
 
 ### Página de Prueba Local
+
 Visita: `http://localhost:8080/test-meta-pixel`
 
 Esta página incluye botones para probar todos los eventos configurados:
+
 - PageView
 - ViewContent
 - CompleteRegistration
@@ -154,23 +168,25 @@ Esta página incluye botones para probar todos los eventos configurados:
 1. Ve a **Meta Events Manager** → **Probar eventos**
 2. Mantén la página "Probar eventos" abierta
 3. Usa la página de prueba local (`/test-meta-pixel`) o realiza acciones en el sitio
-4. Los eventos aparecerán en tiempo real en Meta Events Manager con el mismo código que configuraste (ej. `TEST53498`)
+4. Los eventos aparecerán en tiempo real en Meta Events Manager con el código `TEST2065`
 
 ### Probar con Graph API Explorer
 
-1. Copia el código de prueba que muestra Meta en **Probar eventos** (ej. `TEST53498`)
+1. Copia el código de prueba: `TEST2065`
 2. Ve a Graph API Explorer
 3. Realiza una solicitud POST a:
-   ```
-   https://graph.facebook.com/v21.0/1101807351995991/events?access_token={TOKEN}&test_event_code=TEST53498
-   ```
+  ```
+   https://graph.facebook.com/v21.0/1101807351995991/events?access_token={TOKEN}&test_event_code=TEST2065
+  ```
 4. Con el payload de ejemplo proporcionado en Meta Events Manager
 5. Vuelve a la página "Probar eventos" para verificar
 
 ## Troubleshooting
 
 Si los eventos no aparecen:
+
 1. Verifica que el token esté configurado correctamente en Supabase
 2. Revisa los logs de la función Edge en Supabase
 3. Verifica que el Pixel ID sea correcto
 4. Asegúrate de que los datos estén hasheados correctamente
+

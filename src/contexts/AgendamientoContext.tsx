@@ -4,6 +4,7 @@ import React, { createContext, useState, useContext, ReactNode, useCallback, use
 import { useSearchParams } from 'react-router-dom';
 import { useForm, UseFormReturn } from 'react-hook-form';
 import { createBookingWithRealEmail, type BookingData } from '@/services/supabaseBooking';
+import { sendRealBookingEmails } from '@/services/realEmailService';
 import { supabase } from '@/integrations/supabase/client';
 import { createOfflineBookingWithEmail, type OfflineBookingData } from '@/services/offlineBooking';
 import { checkSupabaseConnection } from '@/integrations/supabase/client';
@@ -178,6 +179,7 @@ const AgendamientoProviderInner: React.FC<{ children: ReactNode; initialService?
             tipo: service.name,
             precio: precioFinal,
             descripcion: `${service.category}${isAdminValido ? ' - ADMIN $1.000' : isConvenioValido ? ' - CONVENIO 80% OFF' : ''}`,
+            tipoReunion: selectedMeetingType,
             fecha: selectedDate,
             hora: selectedTime
           },
@@ -199,6 +201,28 @@ const AgendamientoProviderInner: React.FC<{ children: ReactNode; initialService?
               .from('reservas')
               .update({ external_reference: externalReference })
               .eq('id', result.reserva.id);
+
+            const r = result.reserva;
+            try {
+              const emailRes = await sendRealBookingEmails({
+                id: r.id,
+                nombre: r.nombre,
+                email: r.email,
+                telefono: r.telefono,
+                servicio: r.servicio,
+                precio: String(r.precio ?? '0'),
+                fecha: r.fecha,
+                hora: r.hora,
+                tipo_reunion: r.tipo_reunion || selectedMeetingType,
+                descripcion: r.descripcion || undefined,
+                created_at: r.created_at || new Date().toISOString(),
+              });
+              if (!emailRes.success) {
+                console.error('❌ No se pudo enviar correo de consulta gratuita:', emailRes.error);
+              }
+            } catch (emailErr) {
+              console.error('❌ Error enviando correo tras reserva gratuita:', emailErr);
+            }
 
             // Track Schedule event for free bookings
             trackMetaEvent({

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1080" viewBox="0 0 1080 1080">
+  <defs>
+    <linearGradient id="bgLab" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#030d1a"/>
+      <stop offset="45%" stop-color="#041329"/>
+      <stop offset="100%" stop-color="#071426"/>
+    </linearGradient>
+    <radialGradient id="glowLab" cx="18%" cy="22%" r="55%">
+      <stop offset="0%" stop-color="rgba(59,130,246,0.12)"/>
+      <stop offset="100%" stop-color="rgba(59,130,246,0)"/>
+    </radialGradient>
+    <radialGradient id="glowLab2" cx="82%" cy="28%" r="50%">
+      <stop offset="0%" stop-color="rgba(34,211,238,0.08)"/>
+      <stop offset="100%" stop-color="rgba(34,211,238,0)"/>
+    </radialGradient>
+    <style type="text/css"><![CDATA[
+      @import url("https://fonts.googleapis.com/css2?family=Manrope:wght@600;800&family=Inter:wght@400;500;600&display=swap");
+      .eyebrow { font-family: Manrope, Inter, system-ui, sans-serif; font-weight: 600; font-size: 26px; fill: rgb(13,148,136); letter-spacing: 0.04em; }
+      .h1 { font-family: Manrope, Inter, system-ui, sans-serif; font-weight: 800; font-size: 52px; fill: #e8eef7; letter-spacing: -0.02em; }
+      .sub { font-family: Inter, system-ui, sans-serif; font-weight: 500; font-size: 30px; fill: #b8c5d9; }
+      .cta { font-family: Manrope, Inter, system-ui, sans-serif; font-weight: 700; font-size: 28px; fill: #041329; }
+      .url { font-family: Inter, monospace; font-size: 22px; fill: rgba(232,238,247,0.55); }
+    ]]></style>
+  </defs>
+  <rect width="1080" height="1080" fill="url(#bgLab)"/>
+  <rect width="1080" height="1080" fill="url(#glowLab)"/>
+  <rect width="1080" height="1080" fill="url(#glowLab2)"/>
+  <!-- glass panel -->
+  <rect x="72" y="120" width="936" height="840" rx="36" ry="36"
+        fill="rgba(28,31,42,0.58)" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/>
+  <rect x="72" y="120" width="936" height="840" rx="36" ry="36"
+        fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+  <text x="120" y="240" class="eyebrow">Punto Legal ? Laboral</text>
+  <text x="120" y="340" class="h1">?Despido o conflicto</text>
+  <text x="120" y="410" class="h1">en el trabajo?</text>
+  <text x="120" y="510" class="sub">Primera evaluación puede ser</text>
+  <text x="120" y="555" class="sub">sin costo cuando aplica.</text>
+  <!-- CTA pill -->
+  <rect x="120" y="620" width="420" height="72" rx="36" fill="rgb(13,148,136)"/>
+  <text x="330" y="668" text-anchor="middle" class="cta">Pedir mi diagnóstico</text>
+  <text x="120" y="780" class="url">puntolegal.online/agendamiento?plan=tutela-laboral</text>
+  <text x="120" y="820" class="url">Videollamada ? Chile</text>
+</svg>

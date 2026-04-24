@@ -486,6 +486,18 @@ All colors MUST be HSL.
     border-radius: 1.25rem;
   }
 
+  @media (prefers-reduced-transparency: reduce) {
+    .glass-ios-panel-dark,
+    .glass-ios-card-dark {
+      -webkit-backdrop-filter: blur(8px) saturate(100%);
+      backdrop-filter: blur(8px) saturate(100%);
+      background: hsla(var(--la-surface-mid) / 0.92);
+    }
+    .glass-ios-card-dark {
+      background: hsla(var(--la-surface-low) / 0.92);
+    }
+  }
+
   /* === Service card — glassmorphism iOS limpio (sin "metálico") ===
      Antes: triple radial-gradient con tintes accent al 18%/10% — esto creaba
      una "lámina metálica" tintada. Ahora: glass casi puro con un solo radial

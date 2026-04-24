@@ -45,7 +45,7 @@ const AgendamientoLayout: React.FC<AgendamientoLayoutProps> = ({ children }) => 
     <>
       <SEO 
         title={`Agendar ${service.name} - Punto Legal`}
-        description={`Agenda tu consulta estratégica de ${service.name} con nuestros expertos. Precio: $${service.price}. Garantía de satisfacción total y respuesta rápida.`}
+        description={`Agenda tu consulta de ${service.name} con abogados especialistas. Precio indicativo: $${service.price}. Respuesta ágil y condiciones según el servicio contratado.`}
       />
       
       {/* Layout de Foco Premium — dark navy + glassmorphism iOS, alineado con landing */}
@@ -65,11 +65,14 @@ const AgendamientoLayout: React.FC<AgendamientoLayoutProps> = ({ children }) => 
         />
 
         {/* Header sticky — wordmark "Punto Legal Chile" sobrio (sin tile P.) */}
-        <header className="sticky top-0 z-40 bg-slate-950/70 backdrop-blur-xl border-b border-white/[0.06]">
+        <header
+          className="sticky top-0 z-40 bg-slate-950/80 backdrop-blur-xl border-b border-white/[0.06]"
+          style={{ paddingTop: 'max(0.875rem, env(safe-area-inset-top, 0px))' }}
+        >
           <div className="max-w-5xl mx-auto px-4 py-3.5 flex items-center justify-between gap-4">
             <Link
               to="/"
-              className="agendamiento-wordmark"
+              className="agendamiento-wordmark inline-flex min-h-[44px] items-center -mx-1 px-1 py-1 rounded-lg hover:bg-white/[0.04] transition-colors"
               aria-label="Punto Legal Chile — volver al inicio"
             >
               <span className="agendamiento-wordmark__name">Punto Legal</span>
@@ -87,7 +90,10 @@ const AgendamientoLayout: React.FC<AgendamientoLayoutProps> = ({ children }) => 
         </header>
 
         {/* Main Content */}
-        <div className="relative px-4 pb-12 pt-5 md:pt-8">
+        <div
+          className="relative px-4 pt-5 md:pt-8"
+          style={{ paddingBottom: 'max(3rem, env(safe-area-inset-bottom, 0px))' }}
+        >
           <div className="max-w-5xl mx-auto">
             {isMobile ? (
               // ===== Versión móvil — flujo limpio sin info duplicada =====

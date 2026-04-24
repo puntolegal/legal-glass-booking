@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { trackMetaEvent } from "@/services/metaConversionsService";
 import { scrollToVisibleAnchor } from "@/lib/scroll";
+import { PUNTO_LEGAL_FOUNDER_NAME } from "@/constants/brandIdentity";
 
 interface HeroSectionProps {
   title?: string;
@@ -32,6 +33,7 @@ const STAGGER: Record<string, number> = {
   desc: 0.20,
   ctas: 0.28,
   microcopy: 0.38,
+  founder: 0.42,
   trust: 0.32,
 };
 
@@ -157,6 +159,16 @@ const HeroSection = ({
               className="mt-5 text-[11.5px] uppercase tracking-[0.18em] text-slate-500"
             >
               Pago seguro · Cancelación gratis · Especialistas certificados
+            </motion.p>
+            <motion.p
+              {...reveal("founder")}
+              className="mt-3 max-w-[52ch] text-xs leading-relaxed text-slate-500"
+            >
+              Visión fundacional:{" "}
+              <span className="font-medium text-slate-400">
+                {PUNTO_LEGAL_FOUNDER_NAME}
+              </span>
+              , abogado, formación en el Instituto Nacional.
             </motion.p>
           </div>
 

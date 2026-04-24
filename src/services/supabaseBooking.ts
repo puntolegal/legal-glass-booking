@@ -20,6 +20,8 @@ const mapDatabaseToReserva = (data: any): Reserva => ({
   estado: data.estado,
   recordatorio_enviado: data.recordatorio_enviado || false,
   email_enviado: data.email_enviado || false, // Campo real en la base de datos
+  google_meet_link: data.google_meet_link ?? undefined,
+  confirmation_email_status: data.confirmation_email_status ?? undefined,
   created_at: data.created_at || new Date().toISOString(),
   updated_at: data.updated_at || new Date().toISOString()
 });
@@ -71,6 +73,9 @@ export interface Reserva {
   estado: 'pendiente' | 'confirmada' | 'completada' | 'cancelada';
   recordatorio_enviado?: boolean;
   email_enviado?: boolean;
+  google_meet_link?: string | null;
+  /** pending_calendar: esperando Zapier; sent: correo listo; failed: error previo al envío */
+  confirmation_email_status?: string | null;
   created_at?: string;
   updated_at?: string;
 }
@@ -167,6 +172,12 @@ export const crearReserva = async (bookingData: BookingData): Promise<{
       console.warn('⚠️ Teléfono demasiado largo, truncando a 50 caracteres');
     }
     
+    const pagoEstado = bookingData.pago?.estado?.trim();
+    const estadoInicial =
+      pagoEstado && ['approved', 'completed', 'success', 'pagado'].includes(pagoEstado.toLowerCase())
+        ? ('confirmada' as const)
+        : ('pendiente' as const);
+
     const reservaData = {
       nombre: bookingData.cliente.nombre,
       email: bookingData.cliente.email,
@@ -184,7 +195,8 @@ export const crearReserva = async (bookingData: BookingData): Promise<{
         bookingData.descripcion ||
         bookingData.servicio.descripcion ||
         'Consulta legal',
-      estado: 'pendiente' as const,
+      estado: estadoInicial,
+      ...(pagoEstado ? { pago_estado: pagoEstado } : {}),
       ...(bookingData.agendamiento_intake_id
         ? { agendamiento_intake_id: bookingData.agendamiento_intake_id }
         : {}),

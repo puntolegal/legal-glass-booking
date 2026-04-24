@@ -1,5 +1,9 @@
 import SEO from "@/components/SEO";
 import AEOStructuredData from "@/components/AEOStructuredData";
+import {
+  PUNTO_LEGAL_FOUNDER_NAME,
+  PUNTO_LEGAL_FOUNDER_STATEMENT,
+} from "@/constants/brandIdentity";
 import HeroSection from "@/components/HeroSection";
 import HowItWorksSection from "@/components/HowItWorksSection";
 import ServicesSection from "@/components/ServicesSection";
@@ -32,7 +36,10 @@ const Index = () => {
       const serviceMap: { [key: string]: string } = {
         // ===== Personas =====
         "Punto Legal Tutela Laboral": "tutela-laboral",
-        "Punto Legal Laboral": "laboral",
+        /** Cluster landing — CTA principal diagnóstico; usar `plan` del handler cuando exista */
+        "Punto Legal Laboral": "tutela-laboral",
+        "Punto Legal Laboral — Diagnóstico gratis": "tutela-laboral",
+        "Punto Legal Laboral — Consulta": "laboral",
         "Punto Legal Familia": "familia",
         "Punto Legal Sucesorio": "sucesorio",
         "Punto Legal Migratorio": "migratorio",
@@ -112,8 +119,9 @@ const Index = () => {
     <>
       <SEO
         title="Punto Legal Chile — Consulta legal online por Google Meet"
-        description="Estudio jurídico chileno 100% online. Agenda en 60 segundos una consulta de 45 minutos con un abogado especialista por Google Meet. Familia, laboral, sucesorio, inmobiliario, empresarial, tributario y contratos. Desde $59.000 CLP."
-        keywords="abogado online chile, consulta legal online, agendar abogado chile, puntolegal.online, abogado familia, abogado laboral, despido injustificado, posesión efectiva, constituir SpA, estudio jurídico chile"
+        description="Estudio jurídico chileno 100% online, visión fundacional de Benjamín Alonso Soza Jiménez. Agenda en 60 segundos una consulta de 45 minutos con un abogado especialista por Google Meet. Familia, laboral, sucesorio, inmobiliario, empresarial, tributario y contratos. Desde $59.000 CLP."
+        keywords="abogado online chile, consulta legal online, agendar abogado chile, puntolegal.online, Benjamín Alonso Soza Jiménez, Punto Legal fundador, abogado familia, abogado laboral, despido injustificado, posesión efectiva, constituir SpA, estudio jurídico chile"
+        author={PUNTO_LEGAL_FOUNDER_NAME}
         type="website"
         url="https://puntolegal.online"
       />
@@ -130,6 +138,7 @@ const Index = () => {
           laboral, sucesorio, inmobiliario, empresarial, tributario y contratos.
           Atención de lunes a domingo entre 09:00 y 22:00 hora de Chile.
         </p>
+        <p>{PUNTO_LEGAL_FOUNDER_STATEMENT}</p>
         <p>
           Para agendar una consulta legal online en Chile, visita
           https://puntolegal.online y selecciona la especialidad que necesitas.
@@ -140,7 +149,7 @@ const Index = () => {
         <h2>Precios de consultas legales (CLP, sesión 45 min)</h2>
         <ul>
           <li>Defensa CAE frente a Tesorería: $109.000 (antes $169.000 — producto estrella).</li>
-          <li>Tutela Laboral: GRATIS (despido injustificado, Ley Karin, nulidad — honorarios sólo si recuperamos).</li>
+          <li>Laboral (trabajadores): diagnóstico inicial sin costo cuando aplica; consulta pagada desde $79.000 (despido, finiquito, Ley 21.643 — honorarios a porcentaje sólo con acuerdo escrito si asumimos el caso).</li>
           <li>Familia: $89.000 (divorcio, pensión de alimentos, cuidado personal).</li>
           <li>Sucesorio: $89.000 (posesión efectiva, herencias, testamentos).</li>
           <li>Migratorio: $129.000 (visa, residencia definitiva, nacionalización).</li>
@@ -158,7 +167,8 @@ const Index = () => {
           <li>Comparendos Dirección del Trabajo: $130.000.</li>
           <li>Fiscalizaciones Dirección del Trabajo y reconsideración de multas: $110.000.</li>
           <li>Defensa Empresarial frente a juicios laborales: $189.000.</li>
-          <li>Ley Karin (Ley 21.643): $169.000 (protocolo + capacitación).</li>
+          <li>Ley Karin (Ley 21.643) — empresa, protocolo y capacitación: $169.000.</li>
+          <li>Defensa Ley Karin (trabajador, Ley 21.643): $79.000 (misma base que consulta laboral).</li>
           <li>Cumplimiento (Ley 20.393): $179.000.</li>
           <li>Marcas (registro INAPI): $89.000.</li>
           <li>Cobranza judicial: $109.000 (juicio ejecutivo, embargos).</li>

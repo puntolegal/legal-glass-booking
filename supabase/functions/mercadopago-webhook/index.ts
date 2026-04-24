@@ -7,6 +7,8 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 // Configuración desde variables de entorno
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL') || 'https://qrgelocijmwnxcckxbdg.supabase.co'
 const SUPABASE_ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY') || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFyZ2Vsb2Npam13bnhjY2t4YmRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc4MDI0MjksImV4cCI6MjA3MzM3ODQyOX0.0q_3bb8bKR8VVZZAK_hYvhvLSTaU1ioQzmO5fKALjbI'
+/** Preferir service role para columnas de cola Zapier / RLS. */
+const SUPABASE_DB_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || Deno.env.get('SUPABASE_ANON_KEY') || SUPABASE_ANON_KEY
 const MERCADOPAGO_ACCESS_TOKEN = Deno.env.get('MERCADOPAGO_ACCESS_TOKEN')
 const MERCADOPAGO_WEBHOOK_SECRET = Deno.env.get('MERCADOPAGO_WEBHOOK_SECRET') || 'd5818a98ec20e01124607d033512760d8fa7b3b539d28ccdc8000a34eb6734ac'
 
@@ -148,7 +150,7 @@ serve(async (req) => {
       });
 
       // PASO 2: Buscar la reserva por external_reference
-      const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      const supabase = createClient(SUPABASE_URL, SUPABASE_DB_KEY);
       
       const { data: reservation, error: reservationError } = await supabase
         .from('reservas')
@@ -191,38 +193,92 @@ serve(async (req) => {
 
       console.log('✅ Reserva actualizada:', updatedReservation.id);
 
-      // PASO 4: Enviar emails si el pago fue aprobado
+      // PASO 4: Cola Zapier (Calendar/Meet) o envío directo clever-action
+      let emailsSent = false;
+      let zapierDispatched = false;
       if (paymentInfo.status === 'approved') {
-        console.log('📧 Enviando emails de confirmación...');
-        
-        try {
-          const EDGE_ADMIN_TOKEN = Deno.env.get('EDGE_ADMIN_TOKEN') || 'puntolegal-admin-token-2025';
-          
-          const emailResponse = await supabase.functions.invoke('clever-action', {
-            body: {
-              booking_id: updatedReservation.id
-            },
-            headers: {
-              'x-admin-token': EDGE_ADMIN_TOKEN
-            }
-          });
+        const EDGE_ADMIN_TOKEN = Deno.env.get('EDGE_ADMIN_TOKEN') || 'puntolegal-admin-token-2025';
+        const ZAPIER_BOOKING_HOOK_URL = (Deno.env.get('ZAPIER_BOOKING_HOOK_URL') || '').trim();
 
-          if (emailResponse.error) {
-            console.error('❌ Error enviando emails:', emailResponse.error);
-          } else {
-            console.log('✅ Emails enviados exitosamente:', emailResponse.data);
-            
-            // Actualizar estado de email enviado
-            await supabase
-              .from('reservas')
-              .update({
-                email_enviado: true,
-                email_enviado_at: new Date().toISOString()
-              })
-              .eq('id', updatedReservation.id);
+        const invokeCleverActionAndMarkEmail = async (): Promise<boolean> => {
+          try {
+            const emailResponse = await supabase.functions.invoke('clever-action', {
+              body: { booking_id: updatedReservation.id },
+              headers: { 'x-admin-token': EDGE_ADMIN_TOKEN },
+            });
+            if (emailResponse.error) {
+              console.error('❌ Error enviando emails (clever-action):', emailResponse.error);
+              return false;
+            }
+            console.log('✅ Emails enviados (clever-action):', emailResponse.data);
+            return true;
+          } catch (e) {
+            console.error('❌ Error en clever-action:', e);
+            return false;
           }
-        } catch (emailError) {
-          console.error('❌ Error en envío de emails:', emailError);
+        };
+
+        if (ZAPIER_BOOKING_HOOK_URL) {
+          console.log('📅 Cola Zapier: marcando pending_calendar y notificando Catch Hook');
+          const nowIso = new Date().toISOString();
+          const { error: pendErr } = await supabase
+            .from('reservas')
+            .update({
+              confirmation_email_status: 'pending_calendar',
+              calendar_sync_requested_at: nowIso,
+            })
+            .eq('id', updatedReservation.id);
+
+          if (pendErr) {
+            console.error('❌ No se pudo marcar pending_calendar:', pendErr);
+            emailsSent = await invokeCleverActionAndMarkEmail();
+          } else {
+            const tipo = String(updatedReservation.tipo_reunion ?? 'online');
+            const zapPayload = {
+              booking_id: updatedReservation.id,
+              id: updatedReservation.id,
+              nombre: updatedReservation.nombre,
+              email: updatedReservation.email,
+              telefono: updatedReservation.telefono,
+              servicio: updatedReservation.servicio,
+              fecha: updatedReservation.fecha,
+              hora: updatedReservation.hora,
+              tipo_reunion: tipo,
+              external_reference: updatedReservation.external_reference,
+              precio: updatedReservation.precio,
+              descripcion: updatedReservation.descripcion,
+            };
+
+            try {
+              const zr = await fetch(ZAPIER_BOOKING_HOOK_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(zapPayload),
+              });
+              if (!zr.ok) {
+                const zt = await zr.text();
+                console.error('❌ Zapier Catch Hook HTTP', zr.status, zt);
+                await supabase
+                  .from('reservas')
+                  .update({ confirmation_email_status: 'failed' })
+                  .eq('id', updatedReservation.id);
+                emailsSent = await invokeCleverActionAndMarkEmail();
+              } else {
+                zapierDispatched = true;
+                console.log('✅ Zapier Catch Hook aceptado');
+              }
+            } catch (zapErr) {
+              console.error('❌ Error de red hacia Zapier:', zapErr);
+              await supabase
+                .from('reservas')
+                .update({ confirmation_email_status: 'failed' })
+                .eq('id', updatedReservation.id);
+              emailsSent = await invokeCleverActionAndMarkEmail();
+            }
+          }
+        } else {
+          console.log('📧 ZAPIER_BOOKING_HOOK_URL no configurada — clever-action directo');
+          emailsSent = await invokeCleverActionAndMarkEmail();
         }
       }
       
@@ -232,7 +288,8 @@ serve(async (req) => {
           message: 'Webhook procesado correctamente',
           paymentId,
           reservationId: updatedReservation.id,
-          emailsSent: paymentInfo.status === 'approved'
+          emailsSent: paymentInfo.status === 'approved' && emailsSent,
+          zapierDispatched: paymentInfo.status === 'approved' ? zapierDispatched : false,
         }),
         { 
           status: 200, 

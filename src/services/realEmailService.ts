@@ -69,11 +69,13 @@ const sendEmailWithSupabase = async (emailData: {
 
     console.log('🔍 DEBUG: Datos enviados a Supabase Function:', realBookingData);
     
+    const key = SUPABASE_CREDENTIALS.PUBLISHABLE_KEY;
     const response = await fetch(`${SUPABASE_CREDENTIALS.URL}/functions/v1/clever-action`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFyZ2Vsb2Npam13bnhjY2t4YmRnIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NzgwMjQyOSwiZXhwIjoyMDczMzc4NDI5fQ.eKvVrXiuz39_JP9lydQI6gxyrYX2tLQWIJzlI4lqnYg',
+        'Authorization': `Bearer ${key}`,
+        'apikey': key,
         'X-Admin-Token': 'puntolegal-admin-token-2025'
       },
       body: JSON.stringify({ 
@@ -81,12 +83,17 @@ const sendEmailWithSupabase = async (emailData: {
       })
     });
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(`Supabase Function Error: ${errorData.error || 'Error desconocido'}`);
+    const result = await response.json().catch(() => ({}));
+    if (!response.ok || result?.success === false) {
+      const msg =
+        typeof result?.error === 'string'
+          ? result.error
+          : typeof result?.detail === 'string'
+            ? result.detail
+            : `HTTP ${response.status}`;
+      throw new Error(`clever-action: ${msg}`);
     }
 
-    const result = await response.json();
     console.log('✅ Email enviado exitosamente con Supabase Function:', result);
     
     // Delay para evitar rate limit de Resend (2 requests per second)
@@ -179,45 +186,16 @@ const sendEmailWithResend = async (emailData: {
     
     console.log('✅ Resend configurado correctamente, enviando email real');
 
-    // Determinar si usar Supabase Function o envío directo
-    // En producción siempre usar Supabase Function para evitar CORS
-    const isProduction = import.meta.env.PROD || window.location.hostname === 'puntolegal.online';
-    
-    console.log('🔍 DEBUG Producción:', {
-      'import.meta.env.PROD': import.meta.env.PROD,
-      'window.location.hostname': window.location.hostname,
-      'isProduction': isProduction
-    });
-    
-    if (isProduction) {
-      console.log('🌐 Usando función de Supabase para envío de emails');
-      try {
-        return await sendEmailWithSupabase(emailData, bookingData);
-      } catch (error) {
-        console.warn('⚠️ Error con Supabase Function, usando fallback:', error);
-        // Fallback: simular envío exitoso en producción
-        return {
-          id: `email_prod_fallback_${Date.now()}`,
-          from: emailData.from,
-          to: emailData.to[0],
-          created_at: new Date().toISOString()
-        };
-      }
-    } else {
-      console.log('🏠 Usando envío directo para desarrollo');
-      return await sendEmailDirect(emailData);
+    // Confirmaciones de reserva: siempre vía Edge Function (clever-action + Resend en servidor).
+    // Evita sendEmailDirect en dev (no hay API key en el browser) y evita falsos positivos.
+    if (!bookingData?.id) {
+      throw new Error('sendEmailWithResend: falta bookingData.id para confirmación');
     }
+    console.log('🌐 Enviando confirmación vía Supabase clever-action');
+    return await sendEmailWithSupabase(emailData, bookingData);
   } catch (error) {
     console.error('❌ Error enviando email con Resend:', error);
-    
-    // Fallback: simular envío exitoso
-    return {
-      id: `email_fallback_${Date.now()}`,
-      from: emailData.from,
-      to: emailData.to[0],
-      created_at: new Date().toISOString(),
-      error: error instanceof Error ? error.message : 'Error desconocido'
-    };
+    throw error;
   }
 };
 

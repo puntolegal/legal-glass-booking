@@ -99,7 +99,7 @@ Nos complace confirmar que tu cita ha sido agendada correctamente.
 
 ¿Qué sigue?
 • Recibirás un recordatorio 24 horas antes de tu cita
-• Si necesitas reagendar, contáctanos con al menos 24 horas de anticipación
+• Tu información se maneja con confidencialidad y secreto profesional
 • Prepara cualquier documentación relevante para tu consulta
 
 Gracias por confiar en Punto Legal.
