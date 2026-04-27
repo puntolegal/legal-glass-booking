@@ -166,15 +166,15 @@ export const layoutConfigs: RouteLayoutRule[] = [
     }
   },
   
-  // 5. Derecho Laboral — header/footer integrados en la página (tema esmeralda; sin header global duplicado)
+  // 5. Derecho Laboral — sin chrome global: foco en conversión orgánica (shell propia)
   {
     path: '/servicios/laboral',
     config: {
       type: 'default',
       showHeader: false,
-      showFooter: true,
+      showFooter: false,
       headerVariant: 'none',
-      footerVariant: 'default',
+      footerVariant: 'none',
       useMobileLayout: false,
       seoConfig: {
         titleSuffix: 'Derecho Laboral',

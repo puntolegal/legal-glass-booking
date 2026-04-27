@@ -1,4 +1,4 @@
-export type ServicioThemeId = 'civil' | 'laboral' | 'corporativo';
+export type ServicioThemeId = 'civil' | 'laboral' | 'laboralLight' | 'corporativo';
 
 export interface ServicioThemeTokens {
   id: ServicioThemeId;
@@ -105,6 +105,42 @@ export const SERVICIO_THEMES: Record<ServicioThemeId, ServicioThemeTokens> = {
     accentSecondaryBorder: 'border-sky-500/25',
     cardGlass: 'bg-slate-900/60 backdrop-blur-xl border border-slate-800',
     cardHover: 'hover:border-teal-400/22',
+  },
+  /** Laboral — superficie clara, glass iOS blanco/gris (menos fatiga visual). */
+  laboralLight: {
+    id: 'laboralLight',
+    radialTL: 'from-teal-500/12',
+    radialBR: 'from-sky-500/10',
+    chip: 'border border-teal-200/80 bg-teal-50/90 text-teal-900',
+    accent: 'text-teal-700',
+    accentStrong: 'text-teal-800',
+    accentBg: 'bg-teal-600',
+    accentBgHover: 'hover:bg-teal-700',
+    accentBorder: 'border-teal-300/60',
+    accentBorderStrong: 'border-teal-500/45',
+    accentGlow: 'from-teal-400/15 to-sky-400/10',
+    stat: 'text-teal-700',
+    dot: 'bg-teal-500',
+    pillSuccess: 'bg-teal-100 border-teal-200/90',
+    pillSuccessText: 'text-teal-900',
+    cardPopularRing: 'border-2 border-teal-500/50 shadow-md shadow-teal-900/10',
+    link: 'text-teal-700',
+    linkHover: 'hover:text-teal-800',
+    btnPrimary:
+      'bg-gradient-to-r from-teal-600 to-teal-700 text-white shadow-lg shadow-teal-900/15',
+    btnPrimaryHover: 'hover:from-teal-500 hover:to-teal-600',
+    btnOutline:
+      'border border-slate-300/90 bg-white/75 backdrop-blur-xl text-slate-800 shadow-sm shadow-slate-900/5',
+    btnOutlineHover: 'hover:bg-white hover:border-slate-400/90',
+    sectionWash: 'bg-slate-100/70 border-y border-slate-200/80',
+    iconBox: 'bg-gradient-to-br from-teal-100/90 to-sky-100/80 border border-teal-200/40',
+    progressBg: 'bg-teal-200/80',
+    stripeCta: 'from-slate-100 via-white to-slate-100',
+    accentSecondary: 'text-sky-700',
+    accentSecondaryBg: 'bg-sky-100/80',
+    accentSecondaryBorder: 'border-sky-200/90',
+    cardGlass: 'bg-white/70 backdrop-blur-xl border border-slate-200/80',
+    cardHover: 'hover:border-teal-300/70 hover:shadow-md hover:shadow-slate-900/5',
   },
   corporativo: {
     id: 'corporativo',
