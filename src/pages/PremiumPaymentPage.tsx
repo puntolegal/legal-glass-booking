@@ -44,6 +44,7 @@ export default function PremiumPaymentPage() {
           if (result.success && result.reserva) {
             finalData = {
               ...finalData,
+              id: result.reserva.id,
               reservaId: result.reserva.id,
               reservationId: result.reserva.id,
               external_reference: result.reserva.id

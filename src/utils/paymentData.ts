@@ -43,14 +43,24 @@ export const parsePendingPaymentData = (rawData: string): PendingPaymentData => 
 
   const priceValue = toNumber(parsed.price);
   const originalPrice = toNumber(parsed.originalPrice);
+
+  /** Calculadora y otros flujos guardan reservaId / reservationId sin `id` — hay que conservarlo para MercadoPago. */
+  const reservaIdFromStore =
+    toStringValue(parsed.reservaId) ??
+    toStringValue(parsed.reservationId) ??
+    (typeof parsed.external_reference === 'string' && parsed.external_reference.trim()
+      ? parsed.external_reference.trim()
+      : undefined);
+  const stableId = toStringValue(parsed.id) ?? reservaIdFromStore ?? 'fallback';
   
   // Validación más flexible para localStorage (solo fallback)
   if (!parsed.id || priceValue === null) {
     console.warn('⚠️ localStorage data incomplete - using fallback values');
     // Usar valores por defecto en lugar de fallar
     return {
-      id: String(parsed.id || 'fallback'),
-      reservationId: String(parsed.reservationId || parsed.id || 'fallback'),
+      id: stableId,
+      reservaId: reservaIdFromStore,
+      reservationId: toStringValue(parsed.reservationId) ?? reservaIdFromStore,
       external_reference: parsed.external_reference ? String(parsed.external_reference) : undefined,
       nombre: nombre,
       email: email,
@@ -58,9 +68,9 @@ export const parsePendingPaymentData = (rawData: string): PendingPaymentData => 
       service: toStringValue(parsed.service) ?? 'Consulta Legal',
       category: toStringValue(parsed.category) ?? 'General',
       description: toStringValue(parsed.description),
-      price: priceValue || 35000, // Valor por defecto
-      priceFormatted: currencyFormatter.format(priceValue || 35000),
-      originalPrice: originalPrice || 35000,
+      price: priceValue ?? 35000, // Valor por defecto si amount inválido
+      priceFormatted: currencyFormatter.format(priceValue ?? 35000),
+      originalPrice: originalPrice ?? 35000,
       fecha: toStringValue(parsed.fecha) ?? new Date().toISOString().split('T')[0],
       hora: toStringValue(parsed.hora) ?? '10:00',
       date: toStringValue(parsed.fecha) ?? new Date().toISOString().split('T')[0],
@@ -72,7 +82,9 @@ export const parsePendingPaymentData = (rawData: string): PendingPaymentData => 
       method: toStringValue(parsed.method) ?? null,
       preferenceId: parsed.preferenceId ? String(parsed.preferenceId) : null,
       timestamp: typeof parsed.timestamp === 'number' ? parsed.timestamp : Date.now(),
-      source: parsed.source ? String(parsed.source) : undefined
+      source: parsed.source ? String(parsed.source) : undefined,
+      isVip: typeof parsed.isVip === 'boolean' ? parsed.isVip : undefined,
+      isVulnerable: typeof parsed.isVulnerable === 'boolean' ? parsed.isVulnerable : undefined
     };
   }
 
@@ -81,7 +93,8 @@ export const parsePendingPaymentData = (rawData: string): PendingPaymentData => 
 
   return {
     id: String(parsed.id),
-    reservationId: parsed.reservationId ? String(parsed.reservationId) : undefined,
+    reservaId: reservaIdFromStore,
+    reservationId: parsed.reservationId ? String(parsed.reservationId) : reservaIdFromStore,
     external_reference: parsed.external_reference ? String(parsed.external_reference) : undefined,
     nombre,
     email,
@@ -102,6 +115,8 @@ export const parsePendingPaymentData = (rawData: string): PendingPaymentData => 
     porcentajeDescuento: toStringValue(parsed.porcentajeDescuento) ?? null,
     method: toStringValue(parsed.method) ?? null,
     preferenceId: parsed.preferenceId ? String(parsed.preferenceId) : null,
-    timestamp: typeof parsed.timestamp === 'number' ? parsed.timestamp : Date.now()
+    timestamp: typeof parsed.timestamp === 'number' ? parsed.timestamp : Date.now(),
+    isVip: typeof parsed.isVip === 'boolean' ? parsed.isVip : undefined,
+    isVulnerable: typeof parsed.isVulnerable === 'boolean' ? parsed.isVulnerable : undefined
   };
 };

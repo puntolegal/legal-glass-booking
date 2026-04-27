@@ -1,6 +1,8 @@
 // Servicio temporal que usa MercadoPago SDK directamente
 // NOTA: En producción, esto debería hacerse en el backend por seguridad
 
+import { SITE_ORIGIN } from "@/config/siteUrl";
+
 export interface PaymentData {
   service: string;
   price: string;
@@ -46,9 +48,9 @@ export const createDirectPreference = async (paymentData: PaymentData): Promise<
         }
       },
       back_urls: {
-        success: `https://www.puntolegal.online/payment-success?source=mercadopago`,
-        failure: `https://www.puntolegal.online/payment-failure?source=mercadopago`,
-        pending: `https://www.puntolegal.online/payment-pending?source=mercadopago`
+        success: `${SITE_ORIGIN}/payment-success?source=mercadopago`,
+        failure: `${SITE_ORIGIN}/payment-failure?source=mercadopago`,
+        pending: `${SITE_ORIGIN}/payment-pending?source=mercadopago`,
       },
       auto_return: 'approved',
       external_reference: `PL-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,

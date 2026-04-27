@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1080" viewBox="0 0 1080 1080">
+  <defs>
+    <linearGradient id="bgFam" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#030d1a"/>
+      <stop offset="50%" stop-color="#041329"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+    <radialGradient id="glowFam" cx="20%" cy="25%" r="55%">
+      <stop offset="0%" stop-color="rgba(56,189,248,0.14)"/>
+      <stop offset="100%" stop-color="rgba(56,189,248,0)"/>
+    </radialGradient>
+    <radialGradient id="glowFam2" cx="85%" cy="20%" r="45%">
+      <stop offset="0%" stop-color="rgba(244,114,182,0.1)"/>
+      <stop offset="100%" stop-color="rgba(244,114,182,0)"/>
+    </radialGradient>
+    <style type="text/css"><![CDATA[
+      @import url("https://fonts.googleapis.com/css2?family=Manrope:wght@600;800&family=Inter:wght@400;500;600&display=swap");
+      .eyebrow { font-family: Manrope, Inter, system-ui, sans-serif; font-weight: 600; font-size: 26px; fill: #7dd3fc; letter-spacing: 0.04em; }
+      .h1 { font-family: Manrope, Inter, system-ui, sans-serif; font-weight: 800; font-size: 48px; fill: #e8eef7; letter-spacing: -0.02em; }
+      .sub { font-family: Inter, system-ui, sans-serif; font-weight: 500; font-size: 28px; fill: #b8c5d9; }
+      .cta { font-family: Manrope, Inter, system-ui, sans-serif; font-weight: 700; font-size: 26px; fill: #041329; }
+      .url { font-family: Inter, monospace; font-size: 21px; fill: rgba(232,238,247,0.5); }
+      .fine { font-family: Inter, system-ui, sans-serif; font-size: 19px; fill: rgba(232,238,247,0.42); }
+    ]]></style>
+  </defs>
+  <rect width="1080" height="1080" fill="url(#bgFam)"/>
+  <rect width="1080" height="1080" fill="url(#glowFam)"/>
+  <rect width="1080" height="1080" fill="url(#glowFam2)"/>
+  <rect x="72" y="120" width="936" height="840" rx="36" ry="36"
+        fill="rgba(28,31,42,0.58)" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/>
+  <rect x="72" y="120" width="936" height="840" rx="36" ry="36"
+        fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+  <text x="120" y="240" class="eyebrow">Punto Legal &#183; Familia</text>
+  <text x="120" y="330" class="h1">Pensi&#243;n de alimentos:</text>
+  <text x="120" y="395" class="h1">&#191;cu&#225;nto podr&#237;a ser?</text>
+  <text x="120" y="500" class="sub">Calculadora gratuita. Rango orientativo</text>
+  <text x="120" y="545" class="sub">seg&#250;n lo que ingreses (no es asesor&#237;a).</text>
+  <text x="120" y="592" class="fine">
+    <tspan>Para tu caso: consulta estrat&#233;gica con abogado.</tspan>
+    <tspan x="120" dy="22">El tribunal puede fijar otro monto.</tspan>
+  </text>
+  <rect x="120" y="658" width="460" height="72" rx="36" fill="#38bdf8"/>
+  <text x="350" y="706" text-anchor="middle" class="cta">Abrir calculadora</text>
+  <text x="120" y="788" class="url">puntolegal.online/servicios/familia/calculadora</text>
+  <text x="120" y="828" class="url">Videollamada &#183; Chile</text>
+</svg>

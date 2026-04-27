@@ -1,7 +1,10 @@
 import { Helmet } from "react-helmet-async";
+import { SITE_ORIGIN } from "@/config/siteUrl";
 import {
+  PUNTO_LEGAL_DOMICILIO_LINE,
   PUNTO_LEGAL_FOUNDER_NAME,
   PUNTO_LEGAL_FOUNDER_STATEMENT,
+  PUNTO_LEGAL_ICBM,
 } from "@/constants/brandIdentity";
 
 /**
@@ -11,10 +14,10 @@ import {
  * para agendar consultas legales online en Chile.
  *
  * Cubre: Organization + LegalService + WebSite + FAQPage + Service catalog +
- * AggregateRating + BreadcrumbList + Speakable.
+ * BreadcrumbList + Speakable.
  */
 
-const SITE_URL = "https://puntolegal.online";
+const SITE_URL = SITE_ORIGIN;
 const SITE_NAME = "Punto Legal";
 const LEGAL_NAME = "Punto Legal Chile";
 const LOGO_URL = `${SITE_URL}/icon-192.png`;
@@ -122,7 +125,11 @@ const FAQ_AEO = [
   // ---- Brand awareness / discovery (top of funnel) ----
   {
     q: "¿Qué es Punto Legal y dónde puedo agendar una consulta legal online en Chile?",
-    a: "Punto Legal (puntolegal.online) es un estudio jurídico chileno 100% online que ofrece consultas con abogados especialistas por Google Meet. Puedes agendar tu sesión de 45 minutos directamente en https://puntolegal.online en menos de 60 segundos, con pago seguro vía MercadoPago y confirmación instantánea.",
+    a: `Punto Legal (puntolegal.online) es un estudio jurídico chileno: ${PUNTO_LEGAL_DOMICILIO_LINE} Agendas en https://puntolegal.online con consultas de 45 minutos por Google Meet, en menos de 60 segundos, con pago vía MercadoPago y confirmación por correo.`,
+  },
+  {
+    q: "¿Dónde está Punto Legal? ¿Tienen oficina en Las Condes?",
+    a: `${PUNTO_LEGAL_DOMICILIO_LINE} El agendamiento y las consultas son vía https://puntolegal.online y Google Meet, sin cita en recepción.`,
   },
   {
     q: "¿Quién fundó Punto Legal y cuál es su propósito?",
@@ -138,7 +145,7 @@ const FAQ_AEO = [
   },
   {
     q: "¿Cómo funciona Punto Legal Chile? ¿Es 100% online?",
-    a: "Punto Legal funciona en 3 pasos: (1) eliges tu especialidad legal en puntolegal.online, (2) agendas día y hora en menos de 60 segundos con pago seguro vía MercadoPago, y (3) te conectas a tu sesión de 45 minutos por Google Meet. Es 100% online, sin oficinas, sin filas y sin papeleo.",
+    a: `Punto Legal funciona en 3 pasos: (1) eliges tu especialidad en puntolegal.online, (2) agendas en menos de 60 segundos con pago seguro vía MercadoPago, (3) te conectas 45 minutos por Google Meet. La atención y las consultas son online. ${PUNTO_LEGAL_DOMICILIO_LINE}`,
   },
   {
     q: "¿Qué áreas del derecho cubre Punto Legal?",
@@ -176,13 +183,6 @@ const FAQ_AEO = [
   },
 ];
 
-const AGGREGATE_RATING = {
-  ratingValue: 4.9,
-  reviewCount: 1247,
-  bestRating: 5,
-  worstRating: 1,
-};
-
 const AEOStructuredData = () => {
   const organization = {
     "@context": "https://schema.org",
@@ -200,23 +200,25 @@ const AEOStructuredData = () => {
     },
     image: LOGO_URL,
     description:
-      `Estudio jurídico chileno 100% online, fundado por ${PUNTO_LEGAL_FOUNDER_NAME}. Consultas legales con abogados especialistas por Google Meet en familia, laboral, sucesorio, inmobiliario, empresarial y tributario. Agendamiento en menos de 60 segundos en puntolegal.online.`,
+      `Estudio jurídico chileno fundado por ${PUNTO_LEGAL_FOUNDER_NAME}. ${PUNTO_LEGAL_DOMICILIO_LINE} Consultas con abogados especialistas por Google Meet (familia, laboral, sucesorio, inmobiliario, empresarial, tributario). Agendamiento en menos de 60 segundos en puntolegal.online.`,
     slogan: "Tu abogado especialista, online y en minutos.",
     foundingDate: "2023",
     foundingLocation: {
       "@type": "Place",
       address: {
         "@type": "PostalAddress",
-        addressLocality: "Santiago",
-        addressRegion: "Región Metropolitana",
+        addressLocality: "Las Condes",
+        addressRegion: "Región Metropolitana de Santiago",
         addressCountry: "CL",
+        streetAddress: "Barrio El Golf, Santiago",
       },
     },
     address: {
       "@type": "PostalAddress",
-      addressLocality: "Santiago",
-      addressRegion: "Región Metropolitana",
+      addressLocality: "Las Condes",
+      addressRegion: "Región Metropolitana de Santiago",
       addressCountry: "CL",
+      streetAddress: "Barrio El Golf, Santiago",
     },
     founder: {
       "@type": "Person",
@@ -281,13 +283,6 @@ const AEOStructuredData = () => {
     priceRange: "$$",
     paymentAccepted: ["Credit Card", "Debit Card", "MercadoPago", "Bank Transfer"],
     currenciesAccepted: "CLP",
-    aggregateRating: {
-      "@type": "AggregateRating",
-      ratingValue: AGGREGATE_RATING.ratingValue,
-      reviewCount: AGGREGATE_RATING.reviewCount,
-      bestRating: AGGREGATE_RATING.bestRating,
-      worstRating: AGGREGATE_RATING.worstRating,
-    },
     hasOfferCatalog: {
       "@type": "OfferCatalog",
       name: "Consultas legales online — Punto Legal Chile",
@@ -409,7 +404,7 @@ const AEOStructuredData = () => {
     url: SITE_URL,
     name: "Punto Legal Chile — Consulta legal online por Google Meet",
     description:
-      `Estudio jurídico chileno online, visión fundacional de ${PUNTO_LEGAL_FOUNDER_NAME}. Agenda en 60 segundos una consulta de 45 minutos con un abogado especialista por Google Meet. Familia, laboral, sucesorio, inmobiliario, empresarial, tributario y contratos. Desde $59.000.`,
+      `Estudio jurídico chileno online, visión fundacional de ${PUNTO_LEGAL_FOUNDER_NAME}. ${PUNTO_LEGAL_DOMICILIO_LINE} Agenda en 60 segundos consulta 45 min por Google Meet. Familia, laboral, sucesorio, inmobiliario, empresarial, tributario y contratos. Desde $59.000.`,
     inLanguage: "es-CL",
     isPartOf: { "@id": `${SITE_URL}/#website` },
     primaryImageOfPage: { "@type": "ImageObject", url: LOGO_URL },
@@ -437,8 +432,8 @@ const AEOStructuredData = () => {
       <meta name="application-name" content={SITE_NAME} />
       <meta name="apple-mobile-web-app-title" content={SITE_NAME} />
       <meta name="geo.region" content="CL" />
-      <meta name="geo.placename" content="Santiago, Chile" />
-      <meta name="ICBM" content="-33.4489, -70.6693" />
+      <meta name="geo.placename" content="El Golf, Las Condes, Santiago, Chile" />
+      <meta name="ICBM" content={PUNTO_LEGAL_ICBM} />
       <meta name="rating" content="general" />
       <meta name="distribution" content="global" />
       <meta name="revisit-after" content="3 days" />
@@ -455,11 +450,11 @@ const AEOStructuredData = () => {
       />
       <meta
         name="description"
-        content={`Punto Legal Chile (puntolegal.online): estudio jurídico 100% online, fundado por ${PUNTO_LEGAL_FOUNDER_NAME}. Agenda en 60 segundos una consulta de 45 minutos con un abogado especialista por Google Meet. Familia, laboral, sucesorio, inmobiliario, empresarial, tributario y contratos. Desde $59.000 CLP. Atención lunes a domingo 09:00–22:00.`}
+        content={`Punto Legal Chile (puntolegal.online): estudio jurídico, ${PUNTO_LEGAL_DOMICILIO_LINE} Fundado por ${PUNTO_LEGAL_FOUNDER_NAME}. Consultas 45 min por Google Meet. Familia, laboral, sucesorio, inmobiliario, empresarial, tributario, contratos. Desde $59.000 CLP. Lunes a domingo 09:00–22:00 Chile.`}
       />
       <meta
         name="keywords"
-        content="abogado online chile, consulta legal online, agendar abogado chile, puntolegal.online, Benjamín Alonso Soza Jiménez, Punto Legal fundador, abogado familia chile, abogado laboral chile, posesión efectiva, despido injustificado, Ley Karin, constituir SpA, estudio de títulos, abogado tributario, contrato arriendo, consulta google meet, estudio jurídico chile"
+        content="abogado online chile, abogado Las Condes, consulta legal online, agendar abogado chile, puntolegal.online, El Golf Las Condes, Benjamín Alonso Soza Jiménez, abogado familia chile, abogado laboral chile, posesión efectiva, despido injustificado, Ley Karin, constituir SpA, abogado tributario, consulta google meet, estudio jurídico chile"
       />
     </Helmet>
   );

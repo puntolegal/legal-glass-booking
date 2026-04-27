@@ -1,28 +1,33 @@
 User-agent: *
 Allow: /
 
-# Sitemap
-Sitemap: https://puntolegal.cl/sitemap.xml
+# Sitemap (host canónico: https://puntolegal.online)
+Sitemap: https://puntolegal.online/sitemap.xml
 
-# Crawl-delay
+# Crawl-delay (no todos los bots lo respetan)
 Crawl-delay: 1
 
-# Disallow admin pages
+# Páginas de administración y flujos de pago
 Disallow: /admin
 Disallow: /admin/*
-Disallow: /payment/*
-Disallow: /payment-success/*
+Disallow: /payment
+Disallow: /pago
+Disallow: /mercadopago
+Disallow: /payment-success
+Disallow: /payment-failure
+Disallow: /payment-pending
+Disallow: /auth
+Disallow: /amanda
+Disallow: /test
+Disallow: /test-meta-pixel
+Disallow: /pago/diagnostico-ia
+Disallow: /diagnostico/iniciar
+Disallow: /portal-reconstruccion
+Disallow: /rugby
 
-# Allow important pages
 Allow: /servicios
-Allow: /laboral
-Allow: /familia
-Allow: /herencias
-Allow: /corporativo
-Allow: /contratos-express
-Allow: /marcas-patentes
-Allow: /sociedades-express
-Allow: /proteccion-datos
-Allow: /ecommerce-compliance
-Allow: /reclamos-sernac
-Allow: /blog/*
+Allow: /blog
+Allow: /agendamiento
+Allow: /express
+Allow: /centro
+Allow: /urgencia

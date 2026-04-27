@@ -1,6 +1,8 @@
 // Proxy para MercadoPago que funciona sin backend
 // Usa un servicio proxy público para evitar problemas de CORS
 
+import { SITE_ORIGIN } from "@/config/siteUrl";
+
 export interface PaymentData {
   service: string;
   price: string;
@@ -37,9 +39,9 @@ export const createPreferenceViaProxy = async (paymentData: PaymentData): Promis
         }
       },
       back_urls: {
-        success: `https://www.puntolegal.online/payment-success?source=mercadopago`,
-        failure: `https://www.puntolegal.online/payment-failure?source=mercadopago`,
-        pending: `https://www.puntolegal.online/payment-pending?source=mercadopago`
+        success: `${SITE_ORIGIN}/payment-success?source=mercadopago`,
+        failure: `${SITE_ORIGIN}/payment-failure?source=mercadopago`,
+        pending: `${SITE_ORIGIN}/payment-pending?source=mercadopago`,
       },
       auto_return: 'approved',
       external_reference: `PL-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
@@ -114,9 +116,9 @@ const createFallbackPreference = async (paymentData: PaymentData): Promise<{ pre
       `&currency_id=CLP` +
       `&payer_name=${encodeURIComponent(paymentData.name)}` +
       `&payer_email=${encodeURIComponent(paymentData.email)}` +
-      `&back_urls[success]=${encodeURIComponent(`https://www.puntolegal.online/payment-success?source=mercadopago`)}` +
-      `&back_urls[failure]=${encodeURIComponent(`https://www.puntolegal.online/payment-failure?source=mercadopago`)}` +
-      `&back_urls[pending]=${encodeURIComponent(`https://www.puntolegal.online/payment-pending?source=mercadopago`)}` +
+      `&back_urls[success]=${encodeURIComponent(`${SITE_ORIGIN}/payment-success?source=mercadopago`)}` +
+      `&back_urls[failure]=${encodeURIComponent(`${SITE_ORIGIN}/payment-failure?source=mercadopago`)}` +
+      `&back_urls[pending]=${encodeURIComponent(`${SITE_ORIGIN}/payment-pending?source=mercadopago`)}` +
       `&auto_return=approved` +
       `&external_reference=PL-${Date.now()}`;
     

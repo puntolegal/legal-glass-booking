@@ -1,6 +1,8 @@
 // Servicio real de MercadoPago usando su API oficial
 // Este reemplaza el backend simulado
 
+import { SITE_ORIGIN } from "@/config/siteUrl";
+
 export interface PaymentData {
   service: string;
   price: string;
@@ -42,9 +44,9 @@ export const createRealPreference = async (paymentData: PaymentData): Promise<{ 
         }
       },
       back_urls: {
-        success: `https://www.puntolegal.online/payment-success?source=mercadopago`,
-        failure: `https://www.puntolegal.online/payment-failure?source=mercadopago`,
-        pending: `https://www.puntolegal.online/payment-pending?source=mercadopago`
+        success: `${SITE_ORIGIN}/payment-success?source=mercadopago`,
+        failure: `${SITE_ORIGIN}/payment-failure?source=mercadopago`,
+        pending: `${SITE_ORIGIN}/payment-pending?source=mercadopago`,
       },
       auto_return: 'approved',
       external_reference: preferenceId,

@@ -1,0 +1,6 @@
+# Punto Legal — puntolegal.online
+# Resumen para crawlers e asistentes: datos orientativos; no constituye asesoría legal.
+
+Sitemap: https://puntolegal.online/sitemap.xml
+Contenido principal: agendamiento de consultas legales online en Chile; domicilio comercial barrio El Golf, Las Condes, Santiago. Las sesiones se realizan por Google Meet.
+Política: respete robots.txt. Para uso comercial o reproducción masiva, contacte al titular del sitio.

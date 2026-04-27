@@ -1,6 +1,8 @@
 // Implementación oficial de MercadoPago siguiendo la documentación exacta
 // https://www.mercadopago.com/developers/es/docs/checkout-pro/landing
 
+import { SITE_ORIGIN } from "@/config/siteUrl";
+
 export interface MercadoPagoPreferenceData {
   service: string;
   price: number;
@@ -44,9 +46,9 @@ export const createOfficialPreference = async (paymentData: MercadoPagoPreferenc
         }
       },
       back_urls: {
-        success: `https://www.puntolegal.online/payment-success?source=mercadopago`,
-        failure: `https://www.puntolegal.online/payment-failure?source=mercadopago`,
-        pending: `https://www.puntolegal.online/payment-pending?source=mercadopago`
+        success: `${SITE_ORIGIN}/payment-success?source=mercadopago`,
+        failure: `${SITE_ORIGIN}/payment-failure?source=mercadopago`,
+        pending: `${SITE_ORIGIN}/payment-pending?source=mercadopago`,
       },
       auto_return: 'approved',
       external_reference: `PL-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,

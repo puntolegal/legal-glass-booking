@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1080" viewBox="0 0 1080 1080">
+  <defs>
+    <linearGradient id="bgPen" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#030d1a"/>
+      <stop offset="50%" stop-color="#041329"/>
+      <stop offset="100%" stop-color="#0a0610"/>
+    </linearGradient>
+    <radialGradient id="rosePen" cx="88%" cy="15%" r="45%">
+      <stop offset="0%" stop-color="rgba(190,18,60,0.18)"/>
+      <stop offset="100%" stop-color="rgba(190,18,60,0)"/>
+    </radialGradient>
+    <style type="text/css"><![CDATA[
+      @import url("https://fonts.googleapis.com/css2?family=Manrope:wght@600;800&family=Inter:wght@400;500;600&display=swap");
+      .eyebrow { font-family: Manrope, Inter, system-ui, sans-serif; font-weight: 600; font-size: 26px; fill: #fb7185; letter-spacing: 0.04em; }
+      .h1 { font-family: Manrope, Inter, system-ui, sans-serif; font-weight: 800; font-size: 50px; fill: #e8eef7; letter-spacing: -0.02em; }
+      .sub { font-family: Inter, system-ui, sans-serif; font-weight: 500; font-size: 28px; fill: #b8c5d9; }
+      .cta { font-family: Manrope, Inter, system-ui, sans-serif; font-weight: 700; font-size: 26px; fill: #f8fafc; }
+      .url { font-family: Inter, monospace; font-size: 21px; fill: rgba(232,238,247,0.5); }
+      .fine { font-family: Inter, system-ui, sans-serif; font-size: 20px; fill: rgba(232,238,247,0.4); }
+    ]]></style>
+  </defs>
+  <rect width="1080" height="1080" fill="url(#bgPen)"/>
+  <rect width="1080" height="1080" fill="url(#rosePen)"/>
+  <rect x="72" y="120" width="936" height="840" rx="36" ry="36"
+        fill="rgba(28,31,42,0.58)" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/>
+  <rect x="72" y="120" width="936" height="840" rx="36" ry="36"
+        fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+  <text x="120" y="240" class="eyebrow">Punto Legal · Penal</text>
+  <text x="120" y="340" class="h1">Defensa penal:</text>
+  <text x="120" y="410" class="h1">primer paso claro</text>
+  <text x="120" y="510" class="sub">Consulta reservada con abogado.</text>
+  <text x="120" y="575" class="fine">Resultados dependen de Fiscalía y tribunal.</text>
+  <rect x="120" y="630" width="400" height="72" rx="36" fill="rgba(190,18,60,0.85)"/>
+  <text x="320" y="678" text-anchor="middle" class="cta">Agendar consulta</text>
+  <text x="120" y="780" class="url">puntolegal.online/agendamiento?plan=penal</text>
+  <text x="120" y="820" class="url">Videollamada · Chile</text>
+</svg>

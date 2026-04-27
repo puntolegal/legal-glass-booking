@@ -1,7 +1,10 @@
 import { useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Plus } from "lucide-react";
-import { PUNTO_LEGAL_FOUNDER_STATEMENT } from "@/constants/brandIdentity";
+import {
+  PUNTO_LEGAL_DOMICILIO_LINE,
+  PUNTO_LEGAL_FOUNDER_STATEMENT,
+} from "@/constants/brandIdentity";
 
 interface FaqItem {
   /** Pregunta — debe coincidir con búsquedas reales de usuarios chilenos. */
@@ -20,6 +23,11 @@ const faqs: FaqItem[] = [
     q: "¿Cuánto cobra un abogado en Chile por una consulta legal online?",
     a: "Una consulta legal online en Chile cuesta entre $59.000 y $189.000 CLP según la especialidad. En Punto Legal, una sesión por Google Meet con abogado especialista parte en $59.000 (Contratos), $79.000 (Laboral consulta y defensa Ley Karin trabajador), $89.000 (Familia, Sucesorio, Marcas), $99.000 (Tributario), $109.000 (Cobranza, Defensa CAE), $119.000 (Inmobiliario), $129.000 (Migratorio), $149.000 (Empresarial), $169.000 (Penal o protocolo Ley Karin empresa) o $189.000 (Defensa Laboral Empresarial). El diagnóstico inicial laboral para trabajadores puede ser gratuito cuando corresponde.",
     cat: "servicio",
+  },
+  {
+    q: "¿Dónde está Punto Legal? ¿Tienen oficina en Las Condes?",
+    a: `${PUNTO_LEGAL_DOMICILIO_LINE} El agendamiento y las consultas son en puntolegal.online y por Google Meet; no requieres concurrir a recepción.`,
+    cat: "trust",
   },
   {
     q: "¿Quién fundó Punto Legal y cuál es su propósito?",

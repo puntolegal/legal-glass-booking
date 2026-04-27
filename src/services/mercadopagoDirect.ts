@@ -1,6 +1,8 @@
 // Servicio directo de MercadoPago - Sin Edge Function
 // Usa la API de MercadoPago directamente desde el frontend
 
+import { SITE_ORIGIN } from "@/config/siteUrl";
+
 export interface MercadoPagoPreferenceData {
   items: Array<{
     id?: string;
@@ -285,9 +287,9 @@ export function createStandardPreferenceData(
       }
     },
     back_urls: {
-      success: `https://www.puntolegal.online/payment-success?source=mercadopago`,
-      failure: `https://www.puntolegal.online/payment-failure?source=mercadopago`,
-      pending: `https://www.puntolegal.online/payment-pending?source=mercadopago`
+      success: `${SITE_ORIGIN}/payment-success?source=mercadopago`,
+      failure: `${SITE_ORIGIN}/payment-failure?source=mercadopago`,
+      pending: `${SITE_ORIGIN}/payment-pending?source=mercadopago`,
     },
     auto_return: 'approved',
     external_reference: externalReference,

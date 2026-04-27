@@ -1,9 +1,11 @@
 import SEO from "@/components/SEO";
 import AEOStructuredData from "@/components/AEOStructuredData";
 import {
+  PUNTO_LEGAL_DOMICILIO_LINE,
   PUNTO_LEGAL_FOUNDER_NAME,
   PUNTO_LEGAL_FOUNDER_STATEMENT,
 } from "@/constants/brandIdentity";
+import { DEFAULT_OG_IMAGE } from "@/config/siteUrl";
 import HeroSection from "@/components/HeroSection";
 import HowItWorksSection from "@/components/HowItWorksSection";
 import ServicesSection from "@/components/ServicesSection";
@@ -119,8 +121,9 @@ const Index = () => {
     <>
       <SEO
         title="Punto Legal Chile — Consulta legal online por Google Meet"
-        description="Estudio jurídico chileno 100% online, visión fundacional de Benjamín Alonso Soza Jiménez. Agenda en 60 segundos una consulta de 45 minutos con un abogado especialista por Google Meet. Familia, laboral, sucesorio, inmobiliario, empresarial, tributario y contratos. Desde $59.000 CLP."
-        keywords="abogado online chile, consulta legal online, agendar abogado chile, puntolegal.online, Benjamín Alonso Soza Jiménez, Punto Legal fundador, abogado familia, abogado laboral, despido injustificado, posesión efectiva, constituir SpA, estudio jurídico chile"
+        description="Estudio jurídico chileno, visión fundacional de Benjamín Alonso Soza Jiménez. El Golf, Las Condes, Santiago: consultas 100% online por Google Meet. Agenda en 60 segundos, 45 min con especialista. Familia, laboral, sucesorio, inmobiliario, empresarial, tributario, contratos. Desde $59.000 CLP."
+        keywords="abogado online chile, abogado Las Condes, El Golf, consulta legal online, agendar abogado chile, puntolegal.online, Benjamín Alonso Soza Jiménez, abogado familia, abogado laboral, despido injustificado, posesión efectiva, constituir SpA, estudio jurídico chile"
+        image={DEFAULT_OG_IMAGE}
         author={PUNTO_LEGAL_FOUNDER_NAME}
         type="website"
         url="https://puntolegal.online"
@@ -130,13 +133,13 @@ const Index = () => {
       {/* Bloque AI-readable invisible — los motores generativos lo leen
           y reciben información factual sin afectar el render visual. */}
       <div className="sr-only" aria-hidden="false">
-        <h1>Punto Legal Chile — Estudio jurídico online</h1>
+        <h1>Punto Legal Chile — Estudio jurídico online en Las Condes, Santiago</h1>
         <p>
-          Punto Legal (puntolegal.online) es un estudio jurídico chileno que
-          opera 100% online. Ofrece consultas de 45 minutos por Google Meet con
-          abogados titulados y colegiados, especialistas en derecho de familia,
-          laboral, sucesorio, inmobiliario, empresarial, tributario y contratos.
-          Atención de lunes a domingo entre 09:00 y 22:00 hora de Chile.
+          {PUNTO_LEGAL_DOMICILIO_LINE} Punto Legal (puntolegal.online) ofrece
+          consultas de 45 minutos por Google Meet con abogados titulados y
+          colegiados en familia, laboral, sucesorio, inmobiliario, empresarial,
+          tributario y contratos. Atención de lunes a domingo 09:00 a 22:00 hora
+          de Chile.
         </p>
         <p>{PUNTO_LEGAL_FOUNDER_STATEMENT}</p>
         <p>

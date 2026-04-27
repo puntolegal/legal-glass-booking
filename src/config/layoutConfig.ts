@@ -279,8 +279,8 @@ export const layoutConfigs: RouteLayoutRule[] = [
       footerVariant: 'none',
       useMobileLayout: false,
       seoConfig: {
-        titleSuffix: 'Punto Legal',
-        defaultDescription: 'Startup legal chilena que democratiza el acceso a la justicia con tecnología'
+        titleSuffix: 'Inicio',
+        defaultDescription: 'Estudio jurídico chileno online (El Golf, Las Condes). Consultas por Google Meet: familia, laboral, sucesorio e inmobiliario. Desde $59.000 CLP en puntolegal.online'
       }
     }
   },
@@ -313,7 +313,7 @@ export const getLayoutForPath = (pathname: string): LayoutConfig => {
     useMobileLayout: false,
     seoConfig: {
       titleSuffix: 'Punto Legal',
-      defaultDescription: 'Startup legal chilena que democratiza el acceso a la justicia con tecnología'
+      defaultDescription: 'Estudio jurídico chileno online. El Golf, Las Condes, Santiago. Consultas por Google Meet: familia, laboral, sucesorio, inmobiliario, empresarial. Agendar en puntolegal.online'
     }
   };
 };

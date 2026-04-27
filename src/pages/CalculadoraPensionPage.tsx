@@ -239,8 +239,10 @@ const CalculadoraPensionPage: React.FC = () => {
       aumento:   'Demanda de Aumento de Pensión de Alimentos',
     };
 
+    const calcReservaId = `CALC-${Date.now()}`;
     const paymentData = {
       plan:          'consulta-estrategica-familia',
+      id:            calcReservaId,
       service:       isVulnerableProfile
         ? 'Consulta Urgente de Protección VIF — Tarifa Social'
         : isVipProfile
@@ -260,7 +262,7 @@ const CalculadoraPensionPage: React.FC = () => {
       category:      'Derecho de Familia',
       fecha:         new Date().toLocaleDateString('es-CL'),
       hora:          'A coordinar con el equipo',
-      reservaId:     `CALC-${Date.now()}`
+      reservaId:     calcReservaId
     };
 
     localStorage.setItem('pendingPayment', JSON.stringify(paymentData));
@@ -516,7 +518,7 @@ const CalculadoraPensionPage: React.FC = () => {
     const isProtectionReady = protectionType !== null;
     const isAssetsReady = hasComplexAssets !== null;
     const isReadyToCalculate = legalMatter !== null && isContactReady && isBaseReady && isDebtReady && isProtectionReady && isAssetsReady;
-
+    
     if (isReadyToCalculate && !isRevealed && !isAnalyzing) {
       const range = calculatePensionRange(selectedIncome, selectedChildren);
       if (range) {
@@ -547,9 +549,7 @@ const CalculadoraPensionPage: React.FC = () => {
           }, 5000);
         }, 100);
       }
-    } else if (!isReadyToCalculate && !isRevealed && !isAnalyzing) {
-      // No borrar el rango si el usuario ya vio resultados (isRevealed) o durante el análisis
-      // (isAnalyzing); evita UI rota: resultados visibles con calculatedRange === null.
+    } else if (!isReadyToCalculate) {
       setCalculatedRange(null);
     }
   }, [legalMatter, selectedIncome, selectedChildren, currentPension, hidesIncome, hasDebt, monthsOwed, protectionType, hasComplexAssets, name, emailValid, whatsappValid, isRevealed, isAnalyzing]);
