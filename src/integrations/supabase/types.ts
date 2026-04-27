@@ -196,6 +196,9 @@ export type Database = {
           source_url: string | null
           user_agent: string | null
           created_at: string
+          /** Sincronizado desde reservas (trigger) al confirmar cita */
+          fecha_cita: string | null
+          hora_cita: string | null
         }
         Insert: {
           id?: string
@@ -213,6 +216,8 @@ export type Database = {
           source_url?: string | null
           user_agent?: string | null
           created_at?: string
+          fecha_cita?: string | null
+          hora_cita?: string | null
         }
         Update: {
           id?: string
@@ -230,6 +235,8 @@ export type Database = {
           source_url?: string | null
           user_agent?: string | null
           created_at?: string
+          fecha_cita?: string | null
+          hora_cita?: string | null
         }
         Relationships: []
       }

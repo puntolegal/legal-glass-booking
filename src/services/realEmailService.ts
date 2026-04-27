@@ -18,6 +18,10 @@ export interface BookingEmailData {
   pago_metodo?: string;
   pago_estado?: string;
   created_at: string;
+  /** Búsqueda en clever-action si id no coincide (p. ej. ref PL- o réplica) */
+  external_reference?: string | null;
+  /** Resolución vía reservas.agendamiento_intake_id en el edge */
+  agendamiento_intake_id?: string | null;
 }
 
 export interface EmailResult {
@@ -70,6 +74,12 @@ const sendEmailWithSupabase = async (emailData: {
     console.log('🔍 DEBUG: Datos enviados a Supabase Function:', realBookingData);
     
     const key = SUPABASE_CREDENTIALS.PUBLISHABLE_KEY;
+    const extRef = bookingData?.external_reference?.trim() || undefined;
+    const intakeId = bookingData?.agendamiento_intake_id?.trim() || undefined;
+    const bodyPayload: Record<string, string> = { booking_id: String(realBookingData.id) };
+    if (extRef) bodyPayload.external_reference = extRef;
+    if (intakeId) bodyPayload.intake_id = intakeId;
+
     const response = await fetch(`${SUPABASE_CREDENTIALS.URL}/functions/v1/clever-action`, {
       method: 'POST',
       headers: {
@@ -78,9 +88,7 @@ const sendEmailWithSupabase = async (emailData: {
         'apikey': key,
         'X-Admin-Token': 'puntolegal-admin-token-2025'
       },
-      body: JSON.stringify({ 
-        booking_id: realBookingData.id
-      })
+      body: JSON.stringify(bodyPayload)
     });
 
     const result = await response.json().catch(() => ({}));

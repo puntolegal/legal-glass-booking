@@ -216,6 +216,8 @@ const AgendamientoProviderInner: React.FC<{ children: ReactNode; initialService?
                 tipo_reunion: r.tipo_reunion || selectedMeetingType,
                 descripcion: r.descripcion || undefined,
                 created_at: r.created_at || new Date().toISOString(),
+                external_reference: externalReference,
+                agendamiento_intake_id: agendamientoIntakeId || undefined,
               });
               if (!emailRes.success) {
                 console.error('❌ No se pudo enviar correo de consulta gratuita:', emailRes.error);

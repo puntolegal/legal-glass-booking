@@ -22,6 +22,7 @@ const mapDatabaseToReserva = (data: any): Reserva => ({
   email_enviado: data.email_enviado || false, // Campo real en la base de datos
   google_meet_link: data.google_meet_link ?? undefined,
   confirmation_email_status: data.confirmation_email_status ?? undefined,
+  agendamiento_intake_id: data.agendamiento_intake_id ?? null,
   created_at: data.created_at || new Date().toISOString(),
   updated_at: data.updated_at || new Date().toISOString()
 });
@@ -76,6 +77,7 @@ export interface Reserva {
   google_meet_link?: string | null;
   /** pending_calendar: esperando Zapier; sent: correo listo; failed: error previo al envío */
   confirmation_email_status?: string | null;
+  agendamiento_intake_id?: string | null;
   created_at?: string;
   updated_at?: string;
 }
@@ -99,6 +101,8 @@ export interface BookingEmailData {
   tipo_reunion?: string;
   descripcion?: string;
   created_at: string;
+  external_reference?: string | null;
+  agendamiento_intake_id?: string | null;
 }
 
 // Crear una nueva reserva con sistema de email real
@@ -393,7 +397,9 @@ export const confirmarPagoYEnviarComprobante = async (reserva: Reserva): Promise
       hora: reserva.hora,
       tipo_reunion: reserva.tipo_reunion || undefined,
       descripcion: reserva.descripcion || undefined,
-      created_at: reserva.created_at
+      created_at: reserva.created_at || new Date().toISOString(),
+      external_reference: reserva.external_reference ?? undefined,
+      agendamiento_intake_id: reserva.agendamiento_intake_id ?? undefined,
     };
 
     const emailResult = await sendRealBookingEmails(emailData);

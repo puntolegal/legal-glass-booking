@@ -175,7 +175,9 @@ export default function PaymentSuccessPage() {
             hora: parsedStoredData.hora || parsedStoredData.time || 'Por agendar',
             tipo_reunion: parsedStoredData.tipo_reunion || 'online',
             descripcion: parsedStoredData.description,
-            created_at: new Date().toISOString()
+            created_at: new Date().toISOString(),
+            external_reference: parsedStoredData.external_reference || external_reference || undefined,
+            agendamiento_intake_id: parsedStoredData.agendamiento_intake_id || undefined,
           };
 
           const emailResult = await sendRealBookingEmails(emailData);
@@ -264,7 +266,9 @@ export default function PaymentSuccessPage() {
           hora: reserva.hora,
           tipo_reunion: reserva.tipo_reunion || 'online',
           descripcion: reserva.descripcion,
-          created_at: reserva.created_at || new Date().toISOString()
+          created_at: reserva.created_at || new Date().toISOString(),
+          external_reference: reserva.external_reference ?? external_reference ?? undefined,
+          agendamiento_intake_id: reserva.agendamiento_intake_id ?? undefined,
         };
 
         emailResult = await sendRealBookingEmails(emailData);

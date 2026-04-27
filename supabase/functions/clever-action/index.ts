@@ -105,12 +105,13 @@ serve(async (req) => {
     const body = await req.json();
     const booking_id = body?.booking_id as string | undefined;
     const intake_id = body?.intake_id as string | undefined;
+    const external_reference = body?.external_reference as string | undefined;
 
-    if (!booking_id && !intake_id) {
+    if (!booking_id && !intake_id && !external_reference) {
       return new Response(
         JSON.stringify({
           success: false,
-          error: "Se requiere booking_id (reserva) o intake_id (agendamiento_intakes)",
+          error: "Se requiere booking_id, external_reference o intake_id (agendamiento_intakes)",
         }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
@@ -131,28 +132,79 @@ serve(async (req) => {
     let reserva: Record<string, unknown>;
     /** Si existe fila en `reservas`, actualizamos email_enviado; si sólo intake, no. */
     let persistedReservaId: string | null = null;
-    let resolution: "reserva" | "reserva_por_intake" | "intake_solo" = "reserva";
+    let resolution: "reserva" | "reserva_por_intake" | "intake_solo" | "reserva_por_external_ref" = "reserva";
 
     if (booking_id) {
-      const { data, error: reservaError } = await supabase
+      let data: Record<string, unknown> | null = null;
+      const { data: byId, error: errId } = await supabase
         .from("reservas")
         .select("*")
-        .eq("id", booking_id)
-        .single();
-      if (reservaError || !data) {
+        .eq("id", String(booking_id).trim())
+        .maybeSingle();
+      if (byId) {
+        data = byId;
+        resolution = "reserva";
+      }
+      if (!data && (String(booking_id).startsWith("PL-") || !/^[0-9a-f-]{36}$/i.test(String(booking_id).trim()))) {
+        const { data: byPl } = await supabase
+          .from("reservas")
+          .select("*")
+          .eq("external_reference", String(booking_id).trim())
+          .maybeSingle();
+        if (byPl) {
+          data = byPl;
+          resolution = "reserva_por_external_ref";
+        }
+      }
+      if (!data && external_reference) {
+        const { data: byExt } = await supabase
+          .from("reservas")
+          .select("*")
+          .eq("external_reference", String(external_reference).trim())
+          .maybeSingle();
+        if (byExt) {
+          data = byExt;
+          resolution = "reserva_por_external_ref";
+        }
+      }
+      if (!data) {
+        console.error("clever-action: reserva no encontrada por id/ref", {
+          booking_id,
+          external_reference,
+          errId: errId?.message,
+        });
         return new Response(
           JSON.stringify({
             success: false,
             error: "Reserva no encontrada",
-            detail: reservaError?.message,
+            detail: errId?.message,
           }),
           { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } },
         );
       }
       reserva = data;
-      persistedReservaId = booking_id;
-    } else {
-      const iid = intake_id as string;
+      persistedReservaId = String(data.id);
+    } else if (external_reference) {
+      const { data: byExt, error: extErr } = await supabase
+        .from("reservas")
+        .select("*")
+        .eq("external_reference", String(external_reference).trim())
+        .maybeSingle();
+      if (extErr || !byExt) {
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: "Reserva no encontrada",
+            detail: extErr?.message,
+          }),
+          { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        );
+      }
+      reserva = byExt;
+      persistedReservaId = String(byExt.id);
+      resolution = "reserva_por_external_ref";
+    } else if (intake_id) {
+      const iid = String(intake_id);
       const { data: linked, error: linkErr } = await supabase
         .from("reservas")
         .select("*")
@@ -187,6 +239,14 @@ serve(async (req) => {
         persistedReservaId = null;
         resolution = "intake_solo";
       }
+    } else {
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: "Se requiere booking_id, external_reference o intake_id",
+        }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
     }
 
     const tipoLabel = mapTipoReunion(reserva.tipo_reunion as string | null | undefined);
