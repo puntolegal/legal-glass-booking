@@ -4,16 +4,13 @@ import { useState, useEffect } from "react";
 
 const DarkModeToggle = () => {
   const [isDark, setIsDark] = useState(() => {
-    // Verificar localStorage primero
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('theme');
-      if (saved) {
-        return saved === 'dark';
-      }
-      // Si no hay preferencia guardada, verificar la preferencia del sistema
-      return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      if (saved === 'light') return false;
+      if (saved === 'dark') return true;
+      return true;
     }
-    return false;
+    return true;
   });
 
   // Aplicar tema al inicializar
@@ -35,21 +32,6 @@ const DarkModeToggle = () => {
       localStorage.setItem('theme', newTheme);
     }
   }, [isDark]);
-
-  // Detectar cambios en la preferencia del sistema
-  useEffect(() => {
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    const handleChange = (e: MediaQueryListEvent) => {
-      // Solo aplicar si no hay preferencia guardada
-      const savedTheme = localStorage.getItem('theme');
-      if (!savedTheme) {
-        setIsDark(e.matches);
-      }
-    };
-
-    mediaQuery.addEventListener('change', handleChange);
-    return () => mediaQuery.removeEventListener('change', handleChange);
-  }, []);
 
   const toggleTheme = () => {
     const newDarkMode = !isDark;

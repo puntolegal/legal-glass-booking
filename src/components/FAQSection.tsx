@@ -5,6 +5,7 @@ import {
   PUNTO_LEGAL_DOMICILIO_LINE,
   PUNTO_LEGAL_FOUNDER_STATEMENT,
 } from "@/constants/brandIdentity";
+import { useTheme } from "@/hooks/useTheme";
 
 interface FaqItem {
   /** Pregunta — debe coincidir con búsquedas reales de usuarios chilenos. */
@@ -21,7 +22,7 @@ const faqs: FaqItem[] = [
   // ===== Bloque 1 — SEO/AEO de alta intención (queries reales en Chile) =====
   {
     q: "¿Cuánto cobra un abogado en Chile por una consulta legal online?",
-    a: "Una consulta legal online en Chile cuesta entre $59.000 y $189.000 CLP según la especialidad. En Punto Legal, una sesión por Google Meet con abogado especialista parte en $59.000 (Contratos), $79.000 (Laboral consulta y defensa Ley Karin trabajador), $89.000 (Familia, Sucesorio, Marcas), $99.000 (Tributario), $109.000 (Cobranza, Defensa CAE), $119.000 (Inmobiliario), $129.000 (Migratorio), $149.000 (Empresarial), $169.000 (Penal o protocolo Ley Karin empresa) o $189.000 (Defensa Laboral Empresarial). El diagnóstico inicial laboral para trabajadores puede ser gratuito cuando corresponde.",
+    a: "Una consulta legal online en Chile cuesta entre $59.000 y $189.000 CLP según la especialidad. En Punto Legal, una sesión por Google Meet con abogado especialista parte en $59.000 (Contratos), evaluación inicial laboral despido/finiquito sin costo cuando aplica, $79.000 (defensa Ley Karin trabajador), $89.000 (Familia, Sucesorio, Marcas), $99.000 (Tributario), $109.000 (Cobranza, Defensa CAE), $119.000 (Inmobiliario), $129.000 (Migratorio), $149.000 (Empresarial), $169.000 (Penal o protocolo Ley Karin empresa) o $189.000 (Defensa Laboral Empresarial). El diagnóstico inicial laboral para trabajadores puede ser gratuito cuando corresponde.",
     cat: "servicio",
   },
   {
@@ -96,6 +97,8 @@ const faqs: FaqItem[] = [
 const FAQSection = () => {
   const prefersReducedMotion = useReducedMotion();
   const [openIdx, setOpenIdx] = useState<number | null>(null);
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
 
   return (
     <section
@@ -109,17 +112,23 @@ const FAQSection = () => {
 
       <div className="container relative z-10 mx-auto max-w-5xl">
         <div className="mb-12 text-center">
-          <span className="badge-ios" style={{ color: "rgb(125 211 252)" }}>
+          <span
+            className={`badge-ios ${isDark ? "text-slate-200" : "text-slate-700"}`}
+          >
             Preguntas frecuentes
           </span>
-          <h2 className="font-display mt-6 text-[28px] font-bold leading-[1.06] tracking-tight text-white sm:text-[40px] lg:text-[48px]">
-            <span className="bg-gradient-to-r from-white via-blue-100 to-cyan-100 bg-clip-text text-transparent">
+          <h2
+            className={`font-display mt-6 text-[28px] font-bold leading-[1.06] tracking-tight sm:text-[40px] lg:text-[48px] ${
+              isDark ? "text-white" : "text-slate-900"
+            }`}
+          >
+            <span className={isDark ? "text-white" : "text-slate-950"}>
               Lo que la gente nos{" "}
               <br className="hidden sm:block" />
               suele preguntar antes de agendar.
             </span>
           </h2>
-          <p className="mx-auto mt-4 max-w-md text-[14px] text-slate-400">
+          <p className={`mx-auto mt-4 max-w-md text-[14px] ${isDark ? "text-slate-200" : "text-slate-600"}`}>
             Toca cualquier burbuja para abrir la respuesta.
           </p>
         </div>
@@ -190,7 +199,7 @@ const FAQSection = () => {
         </div>
 
         <div className="mt-12 flex flex-col items-center gap-3 text-center">
-          <p className="text-[13px] text-slate-400">
+          <p className={`text-[13px] ${isDark ? "text-slate-300" : "text-slate-600"}`}>
             ¿Tu pregunta no está aquí?
           </p>
           <a

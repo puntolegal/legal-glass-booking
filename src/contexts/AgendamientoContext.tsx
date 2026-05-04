@@ -14,6 +14,8 @@ import type { Service, FormData, BookingState } from '@/types/agendamiento';
 import { calculatePrice, formatRUT, getServiceColors } from '@/utils/agendamiento';
 import { serviceCatalog } from '@/constants/services';
 import { validationRules } from '@/hooks/useFormValidation';
+import { enqueueBookingCalendarForWaived } from '@/services/enqueueBookingCalendar';
+import { INMOB_QUAL_STORAGE_KEY } from '@/constants/inmobiliarioQualification';
 
 interface AgendamientoContextType extends BookingState {
   service: Service;
@@ -167,6 +169,27 @@ const AgendamientoProviderInner: React.FC<{ children: ReactNode; initialService?
       
       // Si el precio es 0, crear reserva directamente (sin pasar por MercadoPago)
       const isFreeBooking = precioFinal === '0' || normalizedPriceForPayment === 0;
+      const isInmobiliarioEvalPlan = plan === 'inmobiliario-eval';
+
+      let qualificationMeta: Record<string, unknown> | null = null;
+      if (isInmobiliarioEvalPlan && typeof window !== 'undefined') {
+        try {
+          const raw = sessionStorage.getItem(INMOB_QUAL_STORAGE_KEY);
+          if (raw) qualificationMeta = JSON.parse(raw) as Record<string, unknown>;
+        } catch {
+          qualificationMeta = null;
+        }
+      }
+
+      const qualDir =
+        qualificationMeta != null && typeof qualificationMeta.direccion_referencia === 'string'
+          ? String(qualificationMeta.direccion_referencia).slice(0, 120)
+          : '';
+      const qualSummary =
+        qualificationMeta != null
+          ? ` [inmobiliario-eval] tipo=${qualificationMeta.tipo_propiedad} ubicacion=${qualificationMeta.ubicacion}${qualDir ? ` dir=${qualDir}` : ''} momento=${qualificationMeta.momento_venta} m2=${qualificationMeta.metros_cuadrados} uf=${qualificationMeta.precio_esperado}`
+          : '';
+
       if (isFreeBooking) {
         const bookingData: BookingData = {
           cliente: {
@@ -178,18 +201,21 @@ const AgendamientoProviderInner: React.FC<{ children: ReactNode; initialService?
           servicio: {
             tipo: service.name,
             precio: precioFinal,
-            descripcion: `${service.category}${isAdminValido ? ' - ADMIN $1.000' : isConvenioValido ? ' - CONVENIO 80% OFF' : ''}`,
+            descripcion: `${service.category}${isAdminValido ? ' - ADMIN $1.000' : isConvenioValido ? ' - CONVENIO 80% OFF' : ''}${qualSummary}`,
             tipoReunion: selectedMeetingType,
             fecha: selectedDate,
             hora: selectedTime
           },
-          pago: {
-            metodo: 'gratis',
-            estado: 'approved'
-          },
+          pago: isInmobiliarioEvalPlan
+            ? { metodo: 'inmobiliario_eval', estado: 'waived_inmobiliario' }
+            : {
+                metodo: 'gratis',
+                estado: 'approved'
+              },
           motivoConsulta: formData.descripcion,
           notas: `Tipo de reunión: ${selectedMeetingType}${isAdminValido ? ` | Código admin aplicado: ${formData.codigoConvenio} (Precio especial $1.000)` : isConvenioValido ? ` | Código de convenio aplicado: ${formData.codigoConvenio} (80% descuento)` : ''}`,
           agendamiento_intake_id: agendamientoIntakeId || undefined,
+          qualificationData: qualificationMeta,
         };
         
         const isSupabaseAvailable = await checkSupabaseConnection();
@@ -203,27 +229,62 @@ const AgendamientoProviderInner: React.FC<{ children: ReactNode; initialService?
               .eq('id', result.reserva.id);
 
             const r = result.reserva;
-            try {
-              const emailRes = await sendRealBookingEmails({
-                id: r.id,
-                nombre: r.nombre,
-                email: r.email,
-                telefono: r.telefono,
-                servicio: r.servicio,
-                precio: String(r.precio ?? '0'),
-                fecha: r.fecha,
-                hora: r.hora,
-                tipo_reunion: r.tipo_reunion || selectedMeetingType,
-                descripcion: r.descripcion || undefined,
-                created_at: r.created_at || new Date().toISOString(),
-                external_reference: externalReference,
-                agendamiento_intake_id: agendamientoIntakeId || undefined,
-              });
-              if (!emailRes.success) {
-                console.error('❌ No se pudo enviar correo de consulta gratuita:', emailRes.error);
+
+            if (isInmobiliarioEvalPlan) {
+              const enqueueRes = await enqueueBookingCalendarForWaived(r.id);
+              if (!enqueueRes.success) {
+                console.warn('enqueue-booking-calendar falló, correo directo:', enqueueRes.error);
+                try {
+                  const emailRes = await sendRealBookingEmails({
+                    id: r.id,
+                    nombre: r.nombre,
+                    email: r.email,
+                    telefono: r.telefono,
+                    servicio: r.servicio,
+                    precio: String(r.precio ?? '0'),
+                    fecha: r.fecha,
+                    hora: r.hora,
+                    tipo_reunion: r.tipo_reunion || selectedMeetingType,
+                    descripcion: r.descripcion || undefined,
+                    created_at: r.created_at || new Date().toISOString(),
+                    external_reference: externalReference,
+                    agendamiento_intake_id: agendamientoIntakeId || undefined,
+                  });
+                  if (!emailRes.success) {
+                    console.error('❌ No se pudo enviar correo fallback inmobiliario:', emailRes.error);
+                  }
+                } catch (emailErr) {
+                  console.error('❌ Error enviando correo fallback:', emailErr);
+                }
               }
-            } catch (emailErr) {
-              console.error('❌ Error enviando correo tras reserva gratuita:', emailErr);
+              try {
+                sessionStorage.removeItem(INMOB_QUAL_STORAGE_KEY);
+              } catch {
+                /* ignore */
+              }
+            } else {
+              try {
+                const emailRes = await sendRealBookingEmails({
+                  id: r.id,
+                  nombre: r.nombre,
+                  email: r.email,
+                  telefono: r.telefono,
+                  servicio: r.servicio,
+                  precio: String(r.precio ?? '0'),
+                  fecha: r.fecha,
+                  hora: r.hora,
+                  tipo_reunion: r.tipo_reunion || selectedMeetingType,
+                  descripcion: r.descripcion || undefined,
+                  created_at: r.created_at || new Date().toISOString(),
+                  external_reference: externalReference,
+                  agendamiento_intake_id: agendamientoIntakeId || undefined,
+                });
+                if (!emailRes.success) {
+                  console.error('❌ No se pudo enviar correo de consulta gratuita:', emailRes.error);
+                }
+              } catch (emailErr) {
+                console.error('❌ Error enviando correo tras reserva gratuita:', emailErr);
+              }
             }
 
             // Track Schedule event for free bookings
@@ -425,7 +486,7 @@ const AgendamientoProviderInner: React.FC<{ children: ReactNode; initialService?
     } finally {
       setIsLoading(false);
     }
-  }, [selectedDate, selectedTime, selectedMeetingType, formData, service, priceCalculation, agendamientoIntakeId]);
+  }, [selectedDate, selectedTime, selectedMeetingType, formData, service, priceCalculation, agendamientoIntakeId, plan]);
   
   // Función para ir al paso de pago (acepta valores frescos para evitar stale closures)
   const goToPayment = useCallback((freshTime?: string) => {

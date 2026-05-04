@@ -4,10 +4,13 @@ import React, { useMemo } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useAgendamiento } from '@/contexts/AgendamientoContext';
 import { useMobile } from '@/hooks/useMobile';
+import { useTheme } from '@/hooks/useTheme';
+import { LaboralThemeToggle } from '@/components/servicios/LaboralThemeToggle';
 import ProgressBar from './ProgressBar';
 import ConversionSidebar from './ConversionSidebar';
 import SEO from '../SEO';
 import { getServiceTheme } from '@/config/serviceThemes';
+import { isLaborAgendamientoPlan } from '@/constants/laborAgendamientoPlans';
 
 interface AgendamientoLayoutProps {
   children: React.ReactNode;
@@ -16,6 +19,7 @@ interface AgendamientoLayoutProps {
 const AgendamientoLayout: React.FC<AgendamientoLayoutProps> = ({ children }) => {
   const { step, service } = useAgendamiento();
   const isMobile = useMobile();
+  const { theme, toggleTheme } = useTheme();
   const [searchParams] = useSearchParams();
   const plan = searchParams.get('plan');
 
@@ -25,6 +29,20 @@ const AgendamientoLayout: React.FC<AgendamientoLayoutProps> = ({ children }) => 
     () => getServiceTheme(plan, service.category),
     [plan, service.category],
   );
+
+  const laborAgenda = isLaborAgendamientoPlan(plan);
+  const wordmarkHref = laborAgenda ? '/servicios/laboral' : '/';
+  const wordmarkAria = laborAgenda
+    ? 'Punto Legal Chile — volver a servicio laboral'
+    : 'Punto Legal Chile — volver al inicio';
+
+  const seoDescription = useMemo(() => {
+    const priceLine =
+      service.price === '0'
+        ? 'Sin costo de consulta cuando aplica al plan seleccionado.'
+        : `Precio indicativo: $${service.price}.`;
+    return `Agenda ${service.name} con abogados especialistas. ${priceLine} Respuesta ágil y condiciones según el servicio contratado.`;
+  }, [service.name, service.price]);
   
   const hexToRgba = (hex: string, alpha: number) => {
     const r = parseInt(hex.slice(1, 3), 16);
@@ -45,53 +63,63 @@ const AgendamientoLayout: React.FC<AgendamientoLayoutProps> = ({ children }) => 
     <>
       <SEO 
         title={`Agendar ${service.name} - Punto Legal`}
-        description={`Agenda tu consulta de ${service.name} con abogados especialistas. Precio indicativo: $${service.price}. Respuesta ágil y condiciones según el servicio contratado.`}
+        description={seoDescription}
       />
       
-      {/* Layout de Foco Premium — dark navy + glassmorphism iOS, alineado con landing */}
-      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-slate-100">
-        {/* Tints dinámicos del servicio — radial muy sutil (3-4%) que no compite */}
+      {/* Canvas = landing: claro (base blanca + auroras del plan) u oscuro navy */}
+      <div className="landing-canvas relative min-h-screen">
+        {/* Auroras del color del plan — muy suaves; encima del fondo del canvas */}
         <div
-          className="fixed inset-0 pointer-events-none"
-          style={{
-            background: `radial-gradient(ellipse at top right, ${hexToRgba(serviceTheme.primary, 0.04)}, transparent 60%)`,
-          }}
-        />
-        <div
-          className="fixed inset-0 pointer-events-none"
-          style={{
-            background: `radial-gradient(ellipse at bottom left, ${hexToRgba(serviceTheme.accent, 0.03)}, transparent 60%)`,
-          }}
-        />
+          className="pointer-events-none fixed inset-0 z-0"
+          aria-hidden
+        >
+          <div
+            className="absolute inset-0 dark:hidden"
+            style={{
+              background: `radial-gradient(ellipse 85% 55% at 100% 0%, ${hexToRgba(serviceTheme.primary, 0.14)}, transparent 58%),
+                radial-gradient(ellipse 70% 50% at 0% 100%, ${hexToRgba(serviceTheme.accent, 0.1)}, transparent 55%)`,
+            }}
+          />
+          <div
+            className="absolute inset-0 hidden dark:block"
+            style={{
+              background: `radial-gradient(ellipse at top right, ${hexToRgba(serviceTheme.primary, 0.07)}, transparent 60%),
+                radial-gradient(ellipse at bottom left, ${hexToRgba(serviceTheme.accent, 0.05)}, transparent 60%)`,
+            }}
+          />
+        </div>
 
         {/* Header sticky — wordmark "Punto Legal Chile" sobrio (sin tile P.) */}
         <header
-          className="sticky top-0 z-40 bg-slate-950/80 backdrop-blur-xl border-b border-white/[0.06]"
+          className="sticky top-0 z-40 border-b border-slate-200/75 bg-white/72 backdrop-blur-2xl backdrop-saturate-150 dark:border-white/[0.08] dark:bg-slate-950/65"
           style={{ paddingTop: 'max(0.875rem, env(safe-area-inset-top, 0px))' }}
         >
-          <div className="max-w-5xl mx-auto px-4 py-3.5 flex items-center justify-between gap-4">
+          <div className="max-w-5xl mx-auto px-4 py-3.5 flex items-center justify-between gap-3">
             <Link
-              to="/"
-              className="agendamiento-wordmark inline-flex min-h-[44px] items-center -mx-1 px-1 py-1 rounded-lg hover:bg-white/[0.04] transition-colors"
-              aria-label="Punto Legal Chile — volver al inicio"
+              to={wordmarkHref}
+              className="agendamiento-wordmark inline-flex min-h-[44px] items-center -mx-1 px-1 py-1 rounded-lg hover:bg-slate-900/[0.04] dark:hover:bg-white/[0.04] transition-colors"
+              aria-label={wordmarkAria}
             >
               <span className="agendamiento-wordmark__name">Punto Legal</span>
               <span className="agendamiento-wordmark__country">Chile</span>
             </Link>
-            <div className="flex items-center gap-2 text-[11px] uppercase tracking-[0.18em] text-slate-400">
-              <span
-                className="h-1.5 w-1.5 rounded-full animate-pulse"
-                style={{ background: serviceTheme.primary }}
-                aria-hidden
-              />
-              Paso {step} de 3
+            <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+              <LaboralThemeToggle mode={theme} onToggle={toggleTheme} variant="inline" />
+              <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-[0.14em] text-slate-500 dark:text-slate-400 sm:gap-2 sm:text-[11px] sm:tracking-[0.18em]">
+                <span
+                  className="h-1.5 w-1.5 rounded-full animate-pulse shrink-0"
+                  style={{ background: serviceTheme.primary }}
+                  aria-hidden
+                />
+                <span className="whitespace-nowrap">Paso {step} de 3</span>
+              </div>
             </div>
           </div>
         </header>
 
         {/* Main Content */}
         <div
-          className="relative px-4 pt-5 md:pt-8"
+          className="relative z-10 px-4 pt-5 md:pt-8"
           style={{ paddingBottom: 'max(3rem, env(safe-area-inset-bottom, 0px))' }}
         >
           <div className="max-w-5xl mx-auto">
@@ -107,7 +135,9 @@ const AgendamientoLayout: React.FC<AgendamientoLayoutProps> = ({ children }) => 
                 <div className="order-2 space-y-4">
                   <div
                     id="agendamiento-form"
-                    className="rounded-2xl border border-white/[0.06] bg-white/[0.03] backdrop-blur-xl p-3 shadow-2xl"
+                    className={`rounded-[1.75rem] p-3 shadow-lg ${
+                      theme === 'light' ? 'glass-ios-panel-light' : 'glass-ios-panel-dark'
+                    }`}
                   >
                     <ProgressBar currentStep={step} totalSteps={3} />
                   </div>
@@ -123,7 +153,11 @@ const AgendamientoLayout: React.FC<AgendamientoLayoutProps> = ({ children }) => 
               // Versión desktop — dos columnas
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div className="space-y-6">
-                  <div className="rounded-2xl border border-white/[0.06] bg-white/[0.03] backdrop-blur-xl p-6 shadow-2xl">
+                  <div
+                    className={`rounded-[1.75rem] p-6 shadow-lg ${
+                      theme === 'light' ? 'glass-ios-panel-light' : 'glass-ios-panel-dark'
+                    }`}
+                  >
                     <ProgressBar currentStep={step} totalSteps={3} />
                   </div>
                   {children}

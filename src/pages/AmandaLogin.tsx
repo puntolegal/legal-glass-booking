@@ -50,23 +50,26 @@ const AmandaLogin: React.FC = () => {
       return;
     }
 
-    // Validar Benjamin - Comparación exacta en minúsculas
-    if (normalizedName === 'benjamin' && normalizedCode === 'admin') {
-      console.log('✅ Benjamin login successful');
-      login('benjamin');
-      toast.success('Bienvenido, Benjamin.');
+    // Demo interno: curador (alias de login histórico sigue admitiéndose)
+    if (
+      (normalizedName === 'curator' || normalizedName === 'curador' || normalizedName === 'benjamin') &&
+      normalizedCode === 'admin'
+    ) {
+      console.log('✅ Curador login successful');
+      login('curator');
+      toast.success('Sesión iniciada.');
       const redirectPath = (location.state as any)?.from?.pathname || '/apuntes';
       navigate(redirectPath, { replace: true });
       return;
     }
 
     // Si llegamos aquí, las credenciales son inválidas
-    console.error('❌ Invalid credentials:', { 
+    console.error('❌ Invalid credentials:', {
       received: { name: normalizedName, code: normalizedCode },
       expected: {
         amanda: { name: 'amanda', code: 'admin' },
-        benjamin: { name: 'benjamin', code: 'admin' }
-      }
+        curador: { name: 'curator | curador | (legacy)', code: 'admin' },
+      },
     });
     setError(`Credenciales inválidas. Verifica tu nombre y clave.`);
   };

@@ -54,16 +54,24 @@ function formatPrecioForEmail(precio: unknown): string {
   return `$${n.toLocaleString("es-CL")} CLP`;
 }
 
+/** Texto comparación insensible a mayúsculas y tildes (Diagnóstico vs diagnostico). */
+function normalizeForMatch(s: string): string {
+  return s
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+}
+
 /** Diagnóstico / consulta laboral gratuita (plan tutela-laboral), no otros planes gratis. */
 function shouldSendTutelaLaboralGratisFollowUp(reserva: {
   servicio: string | null;
   precio: unknown;
 }): boolean {
   if (parseClpToNumber(reserva.precio) !== 0) return false;
-  const s = String(reserva.servicio ?? "").toLowerCase();
+  const s = normalizeForMatch(String(reserva.servicio ?? ""));
   if (s.includes("tutela")) return true;
-  if (s.includes("diagnóstico") && s.includes("gratis")) return true;
-  if (s.includes("laboral") && s.includes("diagnóstico")) return true;
+  if (s.includes("diagnostico") && s.includes("gratis")) return true;
+  if (s.includes("laboral") && s.includes("diagnostico")) return true;
   return false;
 }
 
@@ -93,6 +101,7 @@ serve(async (req) => {
   try {
     const adminToken = req.headers.get("x-admin-token");
     const expectedToken = Deno.env.get("ADMIN_EDGE_TOKEN") ||
+      Deno.env.get("EDGE_ADMIN_TOKEN") ||
       "puntolegal-admin-token-2025";
 
     if (adminToken !== expectedToken) {
@@ -249,6 +258,23 @@ serve(async (req) => {
       );
     }
 
+    /** Evita doble envío Resend si webhook MP y PaymentSuccessPage invocan casi a la vez */
+    if (persistedReservaId) {
+      const alreadySent = (reserva as { email_enviado?: boolean }).email_enviado === true;
+      if (alreadySent) {
+        return new Response(
+          JSON.stringify({
+            success: true,
+            message: "Correos ya enviados anteriormente",
+            skipped: true,
+            booking_id: persistedReservaId,
+            resolution,
+          }),
+          { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        );
+      }
+    }
+
     const tipoLabel = mapTipoReunion(reserva.tipo_reunion as string | null | undefined);
     const precioDisplay = formatPrecioForEmail(reserva.precio);
     const isFreeConsult = parseClpToNumber(reserva.precio) === 0;
@@ -287,6 +313,22 @@ serve(async (req) => {
       (reserva as { google_meet_link?: string }).google_meet_link ?? "",
     ).trim() || undefined;
 
+    const waivedInmobiliario = String(reserva.pago_estado ?? "").toLowerCase() === "waived_inmobiliario";
+    const qual = (reserva as { qualification_data?: unknown }).qualification_data;
+    let descripcionCliente = (reserva.descripcion as string | undefined) || undefined;
+    if (waivedInmobiliario) {
+      const extra =
+        "\n\nPreparación sugerida: reúna certificados de dominio e hipotecas con vigencia razonable, escrituras recientes y antecedentes de sucesión o matrimonio si aplican. Este correo no reemplaza un estudio de títulos exhaustivo.";
+      descripcionCliente = (descripcionCliente || "") + extra;
+      if (qual && typeof qual === "object") {
+        try {
+          descripcionCliente += `\n\nCualificación recibida: ${JSON.stringify(qual)}`;
+        } catch {
+          /* ignore */
+        }
+      }
+    }
+
     const clientParams = {
       nombre: reserva.nombre as string,
       email: reserva.email as string,
@@ -298,7 +340,7 @@ serve(async (req) => {
       ...(fechaLarga && horaEtiqueta ? { fechaLarga, horaEtiqueta } : {}),
       tipoReunion: tipoLabel,
       pagoEstado: String(reserva.pago_estado || "aprobado"),
-      descripcion: (reserva.descripcion as string | undefined) || undefined,
+      descripcion: descripcionCliente,
       bookingId: bookingIdForEmail,
       adminContactEmail: ADMIN_EMAIL,
       whatsappE164: WHATSAPP_E164,
@@ -316,7 +358,11 @@ serve(async (req) => {
       ...(fechaLarga && horaEtiqueta ? { fechaLarga, horaEtiqueta } : {}),
       tipoReunion: tipoLabel,
       pagoEstado: String(reserva.pago_estado || "aprobado"),
-      pagoMetodo: isFreeConsult ? "Consulta gratuita" : "MercadoPago",
+      pagoMetodo: waivedInmobiliario
+        ? "Evaluación inmobiliaria (sin MP)"
+        : isFreeConsult
+          ? "Consulta gratuita"
+          : "MercadoPago",
       descripcion: (reserva.descripcion as string | undefined) || undefined,
       bookingId: bookingIdForEmail,
       ...(meetFromDb ? { meetLink: meetFromDb } : {}),
@@ -337,10 +383,11 @@ serve(async (req) => {
       })
       : null;
 
+    const subjectPrefix = waivedInmobiliario ? "Evaluación agendada" : "Consulta confirmada";
     const clientePayload: Record<string, unknown> = {
       from: MAIL_FROM,
       to: [reserva.email],
-      subject: `Consulta confirmada${asuntoFecha} — ${reserva.servicio} · Punto Legal`,
+      subject: `${subjectPrefix}${asuntoFecha} — ${reserva.servicio} · Punto Legal`,
       html: clientHtml,
     };
     if (icsContent) {

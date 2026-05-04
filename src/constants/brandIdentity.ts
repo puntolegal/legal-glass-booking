@@ -1,11 +1,24 @@
 /**
- * Identidad fundacional — misma redacción en FAQ, JSON-LD (AEO) y bloque sr-only del landing.
- * Tono: institucional, acceso a justicia como orientación/defensa profesional (sin prometer resultados).
+ * Identidad pública — misma redacción en FAQ, JSON-LD (AEO) y bloque sr-only del landing.
+ * Tono: institucional, acceso a justicia (sin prometer resultados ni nombre personal en UI).
  */
-export const PUNTO_LEGAL_FOUNDER_NAME = "Benjamín Alonso Soza Jiménez";
 
-export const PUNTO_LEGAL_FOUNDER_STATEMENT =
-  "Punto Legal fue fundado por Benjamín Alonso Soza Jiménez, abogado, con formación en el Instituto Nacional, con el propósito de acercar la defensa y la orientación jurídica profesional a quienes aún no acceden a ellas con la rapidez y claridad que merecen.";
+/** Autoría para meta `author`, Open Graph y documentación (marca, no persona). */
+export const PUNTO_LEGAL_PUBLIC_AUTHOR = "Punto Legal Chile";
+
+/**
+ * @deprecated Usar `PUNTO_LEGAL_PUBLIC_AUTHOR`. Se mantiene el export para imports legados.
+ */
+export const PUNTO_LEGAL_FOUNDER_NAME = PUNTO_LEGAL_PUBLIC_AUTHOR;
+
+/** Declaración de propósito — SEO, FAQ, JSON-LD (sin fundador nombrado). */
+export const PUNTO_LEGAL_INSTITUTIONAL_PURPOSE =
+  "Punto Legal es un estudio jurídico chileno en línea con el propósito de acercar la defensa y la orientación jurídica profesional a quienes aún no acceden a ellas con la rapidez y claridad que merecen.";
+
+/**
+ * @deprecated Usar `PUNTO_LEGAL_INSTITUTIONAL_PURPOSE`.
+ */
+export const PUNTO_LEGAL_FOUNDER_STATEMENT = PUNTO_LEGAL_INSTITUTIONAL_PURPOSE;
 
 /** Domicilio comercial (SEO, correos, términos) — consultas 100% online. */
 export const PUNTO_LEGAL_DOMICILIO_LINE =

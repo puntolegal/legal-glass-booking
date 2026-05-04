@@ -9,9 +9,11 @@ import Footer from '../Footer';
 import PageTransition from '../PageTransition';
 import { MobileLayout } from '../MobileLayout';
 import { getLayoutForPath } from '@/config/layoutConfig';
+import { useTheme } from '@/hooks/useTheme';
 
 const MainLayout: React.FC = () => {
   const location = useLocation();
+  const { theme } = useTheme();
   const config = getLayoutForPath(location.pathname);
 
   // Marca la ruta actual en <body> para que index.css pueda atenuar
@@ -31,12 +33,21 @@ const MainLayout: React.FC = () => {
 
   // En el landing (`/`) delegamos el fondo al canvas slate de Index;
   // el resto de rutas conserva el fondo crema/oscuro tradicional.
-  const isLanding = location.pathname === '/';
-  const baseBackgroundClass = isLanding
-    ? 'relative min-h-screen bg-transparent text-slate-100 selection:bg-sky-500/30 selection:text-white overflow-hidden'
-    : 'relative min-h-screen bg-[#FAFAF9] dark:bg-[#0B1121] text-stone-800 dark:text-stone-100 selection:bg-stone-200 selection:text-stone-900 overflow-hidden';
+  const isLanding = location.pathname === '/'
+  const isChromelessGlass =
+    isLanding ||
+    location.pathname === '/servicios/inmobiliario' ||
+    location.pathname === '/inmobiliario'
+  const landingLight = isLanding && theme === 'light'
+  const baseBackgroundClass = isChromelessGlass
+    ? `relative min-h-screen bg-transparent overflow-hidden ${
+        landingLight
+          ? 'text-slate-900 selection:bg-teal-500/20 selection:text-slate-900'
+          : 'text-slate-100 selection:bg-sky-500/30 selection:text-white'
+      }`
+    : 'relative min-h-screen bg-slate-50 dark:bg-[#05060a] text-slate-800 dark:text-slate-100 selection:bg-teal-500/15 selection:text-slate-900 dark:selection:bg-sky-500/25 dark:selection:text-white overflow-hidden'
   const NoiseOverlay = () =>
-    isLanding ? null : (
+    isChromelessGlass ? null : (
       <div
         className="paper-noise"
         aria-hidden="true"

@@ -28,7 +28,8 @@ export const AmandaProfileCard = () => {
   const getInitials = () => {
     if (!user) return 'AG';
     if (user.name === 'Amanda G.') return 'AG';
-    if (user.name === 'Benjamin') return 'BS';
+    if (user.name === 'Curador' || user.id === 'usr_curator_legal' || user.id === 'usr_benjamin_legal')
+      return 'CR';
     return user.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
   };
 

@@ -23,6 +23,9 @@ const mapDatabaseToReserva = (data: any): Reserva => ({
   google_meet_link: data.google_meet_link ?? undefined,
   confirmation_email_status: data.confirmation_email_status ?? undefined,
   agendamiento_intake_id: data.agendamiento_intake_id ?? null,
+  pago_estado: data.pago_estado ?? undefined,
+  qualification_data: data.qualification_data ?? undefined,
+  risk_level: data.risk_level ?? undefined,
   created_at: data.created_at || new Date().toISOString(),
   updated_at: data.updated_at || new Date().toISOString()
 });
@@ -54,6 +57,9 @@ export interface BookingData {
   notas?: string;
   /** Lead del paso 1 (tabla agendamiento_intakes), si existe */
   agendamiento_intake_id?: string | null;
+  /** Micro-cualificación inmobiliaria (JSON en columna qualification_data) */
+  qualificationData?: Record<string, unknown> | null;
+  riskLevel?: string | null;
 }
 
 export interface Reserva {
@@ -78,6 +84,9 @@ export interface Reserva {
   /** pending_calendar: esperando Zapier; sent: correo listo; failed: error previo al envío */
   confirmation_email_status?: string | null;
   agendamiento_intake_id?: string | null;
+  pago_estado?: string | null;
+  qualification_data?: Record<string, unknown> | null;
+  risk_level?: string | null;
   created_at?: string;
   updated_at?: string;
 }
@@ -177,12 +186,15 @@ export const crearReserva = async (bookingData: BookingData): Promise<{
     }
     
     const pagoEstado = bookingData.pago?.estado?.trim();
+    const pLower = pagoEstado?.toLowerCase() ?? '';
     const estadoInicial =
-      pagoEstado && ['approved', 'completed', 'success', 'pagado'].includes(pagoEstado.toLowerCase())
+      pLower &&
+      (['approved', 'completed', 'success', 'pagado'].includes(pLower) ||
+        pLower === 'waived_inmobiliario')
         ? ('confirmada' as const)
         : ('pendiente' as const);
 
-    const reservaData = {
+    const reservaData: Record<string, unknown> = {
       nombre: bookingData.cliente.nombre,
       email: bookingData.cliente.email,
       telefono: telefonoValidado.substring(0, 50), // Limitar a 50 caracteres
@@ -204,6 +216,10 @@ export const crearReserva = async (bookingData: BookingData): Promise<{
       ...(bookingData.agendamiento_intake_id
         ? { agendamiento_intake_id: bookingData.agendamiento_intake_id }
         : {}),
+      ...(bookingData.qualificationData != null
+        ? { qualification_data: bookingData.qualificationData as object }
+        : {}),
+      ...(bookingData.riskLevel ? { risk_level: bookingData.riskLevel } : {}),
     };
 
     const { data: reserva, error } = await supabase

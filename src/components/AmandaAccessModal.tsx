@@ -40,10 +40,12 @@ const AmandaAccessModal: React.FC<AmandaAccessModalProps> = ({ open, onClose }) 
       return;
     }
 
-    // Validar Benjamin
-    if (normalizedName === 'benjamin' && normalizedCode === 'admin') {
-      login('benjamin');
-      toast.success('Bienvenido, Benjamin.');
+    if (
+      (normalizedName === 'curator' || normalizedName === 'curador' || normalizedName === 'benjamin') &&
+      normalizedCode === 'admin'
+    ) {
+      login('curator');
+      toast.success('Sesión iniciada.');
       onClose();
       return;
     }

@@ -17,3 +17,6 @@ verify_jwt = false
 
 [functions.clever-action]
 verify_jwt = false
+
+[functions.enqueue-booking-calendar]
+verify_jwt = false

@@ -21,9 +21,9 @@ import {
   Receipt,
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import SEO from '../components/SEO'
-import { PUNTO_LEGAL_FOUNDER_NAME } from '@/constants/brandIdentity'
+import { PUNTO_LEGAL_PUBLIC_AUTHOR } from '@/constants/brandIdentity'
 import ServicioPageShell from '@/components/servicios/ServicioPageShell'
 import { LaboralThemeToggle } from '@/components/servicios/LaboralThemeToggle'
 import { getLaboralPageSkin } from '@/components/servicios/laboralPageSkin'
@@ -294,9 +294,9 @@ export default function ServicioLaboralPage() {
     <>
       <SEO
         title="Derecho laboral Chile: despido, tutela laboral, Ley 21.643 (Ley Karin) | Punto Legal"
-        description={`Asesoría laboral en Chile con lenguaje claro: despido, plazos, tutela, Ley 21.643 (Ley Karin) y DT. Estudio fundado por ${PUNTO_LEGAL_FOUNDER_NAME}. Diagnóstico inicial sin costo cuando corresponde y tarifas publicadas antes de pagar.`}
-        keywords={`abogado laboral chile, despido injustificado, tutela laboral, Ley 21.643, Ley Karin, Punto Legal, ${PUNTO_LEGAL_FOUNDER_NAME}`}
-        author={PUNTO_LEGAL_FOUNDER_NAME}
+        description="Asesoría laboral en Chile con lenguaje claro: despido, plazos, tutela, Ley 21.643 (Ley Karin) y DT. Diagnóstico inicial sin costo cuando corresponde y tarifas publicadas antes de pagar."
+        keywords="abogado laboral chile, despido injustificado, tutela laboral, Ley 21.643, Ley Karin, Punto Legal Chile, consulta laboral online"
+        author={PUNTO_LEGAL_PUBLIC_AUTHOR}
       />
       <ServicioPageShell
         theme={shellTheme}
@@ -320,18 +320,73 @@ function ServicioLaboralInner({
   const t = useServicioTheme()
   const isDark = colorMode === 'dark'
   const ui = getLaboralPageSkin(isDark)
+  const [deskCtaVisible, setDeskCtaVisible] = useState(false)
+
+  useEffect(() => {
+    const onScroll = () => setDeskCtaVisible(window.scrollY > 120)
+    onScroll()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
 
   return (
     <>
       <LaboralThemeToggle mode={colorMode} onToggle={onToggleColorMode} />
+
+      {/* Sticky desktop: logo + CTA conversión (móvil ya tiene dock inferior) */}
+      <header
+        className={`fixed top-0 left-0 right-0 z-[32] hidden md:block transition-all duration-300 ease-out ${
+          deskCtaVisible
+            ? 'translate-y-0 opacity-100 pointer-events-auto'
+            : '-translate-y-full opacity-0 pointer-events-none'
+        }`}
+        aria-hidden={!deskCtaVisible}
+      >
+        <div
+          className={`border-b backdrop-blur-2xl backdrop-saturate-150 ${
+            isDark
+              ? 'border-white/[0.07] bg-slate-950/72 supports-[backdrop-filter]:bg-slate-950/58 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]'
+              : 'border-white/65 bg-white/70 supports-[backdrop-filter]:bg-white/58 shadow-[0_10px_40px_rgba(15,23,42,0.06),inset_0_1px_0_rgba(255,255,255,0.9)]'
+          }`}
+        >
+          <div className="container mx-auto flex h-14 max-w-6xl items-center justify-between gap-4 px-4 sm:px-5 pr-[max(4.25rem,env(safe-area-inset-right))]">
+            <Link
+              to="/"
+              className={
+                isDark
+                  ? 'agendamiento-wordmark inline-flex min-h-[44px] items-center -mx-1 px-1 py-1 rounded-lg hover:bg-white/[0.04] transition-colors'
+                  : 'text-base font-bold tracking-tight text-slate-900 transition-opacity hover:opacity-90'
+              }
+              aria-label="Punto Legal Chile — volver al inicio"
+            >
+              {isDark ? (
+                <>
+                  <span className="agendamiento-wordmark__name">Punto Legal</span>
+                  <span className="agendamiento-wordmark__country">Chile</span>
+                </>
+              ) : (
+                'Punto Legal'
+              )}
+            </Link>
+            <Link
+              to="/agendamiento?plan=tutela-laboral"
+              className={`inline-flex min-h-[40px] shrink-0 items-center justify-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold touch-manipulation active:scale-[0.98] ${t.btnPrimary} ${t.btnPrimaryHover}`}
+            >
+              <Calendar className="h-4 w-4 shrink-0" aria-hidden />
+              Diagnóstico gratis
+            </Link>
+          </div>
+        </div>
+      </header>
+
       <div className="pb-[calc(5.75rem+env(safe-area-inset-bottom))] md:pb-0">
         {/* HERO — superficie clara, menos contraste fatigante */}
         <section className="relative pt-14 md:pt-16 pb-10 md:pb-16 overflow-hidden">
           <div
-            className={`pointer-events-none absolute -top-28 -right-28 h-[22rem] w-[22rem] rounded-full blur-3xl ${ui.heroBlobTR}`}
+            className={`pointer-events-none absolute -top-28 -right-28 h-[22rem] w-[22rem] rounded-full blur-2xl ${ui.heroBlobTR}`}
           />
           <div
-            className={`pointer-events-none absolute -bottom-24 -left-24 h-[20rem] w-[20rem] rounded-full blur-3xl ${ui.heroBlobBL}`}
+            className={`pointer-events-none absolute -bottom-24 -left-24 h-[20rem] w-[20rem] rounded-full blur-2xl ${ui.heroBlobBL}`}
           />
           {/* línea decorativa suave (ritmo visual, sin competir con el CTA) */}
           <div
@@ -339,14 +394,14 @@ function ServicioLaboralInner({
             aria-hidden
           />
 
-          <div className="container mx-auto px-4 relative z-10">
+          <div className="container mx-auto px-4 sm:px-5 relative z-10">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
               className="text-center max-w-4xl mx-auto"
             >
-              <div className={`inline-flex items-center gap-2 rounded-full px-3.5 py-2 mb-6 ${ui.glassCard}`}>
+              <div className={`inline-flex items-center gap-2 rounded-full px-3.5 py-2 mb-6 ${ui.heroPill}`}>
                 <Shield className={`h-4 w-4 shrink-0 ${ui.heroBadgeIcon}`} aria-hidden />
                 <span className={`text-xs font-medium tracking-wide ${ui.heroBadgeText}`}>
                   Derecho laboral Chile ·{' '}
@@ -365,28 +420,57 @@ function ServicioLaboralInner({
               >
                 Asesoría laboral
                 <br />
-                <span className={t.accent}>para personas y trabajadores</span>
+                <span className={ui.headlineAccent}>para personas y trabajadores</span>
               </h1>
 
-              <p className={`text-lg md:text-xl mb-8 leading-relaxed max-w-2xl mx-auto ${ui.textBody}`}>
-                Si te despidieron, te cambiaron condiciones o enfrentas un conflicto con la empresa, aquí no estás solo
-                frente a un manual: traducimos la norma a decisiones posibles —despidos, tutela, Ley 21.643 (Ley Karin),
-                horas extra y fiscalizaciones DT. Puedes partir por un{' '}
-                <span className={`${ui.textStrong} font-medium`}>
-                  diagnóstico inicial sin costo cuando corresponde
-                </span>
-                , o por una consulta pagada con plan por escrito. Primera respuesta en horario hábil, según carga de
-                agenda.
+              <p className={`text-lg md:text-xl mb-4 leading-relaxed max-w-2xl mx-auto ${ui.textBody}`}>
+                Traducimos la ley a decisiones posibles. Sin jerga incomprensible.
               </p>
-              <p className="text-xs text-slate-500 max-w-xl mx-auto -mt-4 mb-8 leading-relaxed">
-                Punto Legal — visión fundacional de {PUNTO_LEGAL_FOUNDER_NAME}, abogado (Instituto Nacional): acercar
-                defensa y orientación jurídica con claridad.
+              <ul
+                className={`mx-auto mb-6 flex max-w-lg flex-col gap-2.5 text-left text-sm md:text-base ${ui.textBody}`}
+              >
+                <li className="flex items-start gap-2.5">
+                  <CheckCircle
+                    className="mt-0.5 h-5 w-5 shrink-0 text-emerald-500"
+                    strokeWidth={2}
+                    aria-hidden
+                  />
+                  <span>
+                    <strong className={ui.textStrong}>Diagnóstico gratis</strong> para evaluar viabilidad (si
+                    aplica).
+                  </span>
+                </li>
+                <li className="flex items-start gap-2.5">
+                  <CheckCircle
+                    className="mt-0.5 h-5 w-5 shrink-0 text-emerald-500"
+                    strokeWidth={2}
+                    aria-hidden
+                  />
+                  <span>
+                    <strong className={ui.textStrong}>Estrategias claras</strong> frente a despidos, Ley Karin y horas
+                    extra.
+                  </span>
+                </li>
+                <li className="flex items-start gap-2.5">
+                  <CheckCircle
+                    className="mt-0.5 h-5 w-5 shrink-0 text-emerald-500"
+                    strokeWidth={2}
+                    aria-hidden
+                  />
+                  <span>
+                    <strong className={ui.textStrong}>Honorarios transparentes</strong> antes de que pagues un peso.
+                  </span>
+                </li>
+              </ul>
+              <p className={`mx-auto mb-8 max-w-xl text-xs leading-relaxed ${ui.textCaption}`}>
+                Punto Legal Chile — orientación laboral con lenguaje claro, plazos visibles y honorarios informados antes
+                de pagar.
               </p>
 
               <div className="flex flex-col sm:flex-row flex-wrap gap-3 justify-center items-stretch sm:items-center">
                 <Link
                   to="/agendamiento?plan=tutela-laboral"
-                  className={`group min-h-[44px] px-7 py-3.5 rounded-2xl font-semibold inline-flex items-center justify-center gap-2 transition-all duration-300 touch-manipulation active:scale-[0.98] ${t.btnPrimary} ${t.btnPrimaryHover} hover:-translate-y-0.5 ${ui.primaryCtaShadow}`}
+                  className={`group min-h-[44px] px-7 py-3.5 rounded-2xl font-semibold inline-flex items-center justify-center gap-2 transition-all duration-300 touch-manipulation active:scale-[0.98] ${t.btnPrimary} ${t.btnPrimaryHover} hover:-translate-y-0.5`}
                 >
                   <Calendar className="w-4 h-4 shrink-0" aria-hidden />
                   Agendar diagnóstico gratis
@@ -397,16 +481,31 @@ function ServicioLaboralInner({
                   className={`group min-h-[44px] px-7 py-3.5 rounded-2xl font-semibold inline-flex items-center justify-center gap-2 transition-all duration-300 touch-manipulation active:scale-[0.98] ${t.btnOutline} ${t.btnOutlineHover}`}
                 >
                   <span aria-hidden="true">⚡</span>
-                  Consulta pagada · desde $79.000
+                  Despido y finiquito · gratis cuando aplica
                 </Link>
               </div>
 
-              <div className="mt-10 flex flex-wrap justify-center gap-2.5 md:gap-3 max-w-3xl mx-auto">
-                {trustChips.map(({ icon: Icon, label }) => (
-                  <div
-                    key={label}
-                    className={`inline-flex items-center gap-2 rounded-2xl border px-3.5 py-2.5 text-left ${ui.trustOuter}`}
-                  >
+              <div
+                className={`mx-auto mt-3 flex max-w-lg items-center justify-center gap-1.5 text-center text-xs font-medium ${
+                  isDark ? 'text-slate-400' : 'text-slate-500'
+                }`}
+              >
+                <Clock className="h-3.5 w-3.5 shrink-0" aria-hidden />
+                <span>Cupos limitados de diagnóstico semanal según capacidad de agenda.</span>
+              </div>
+
+              <div className="mt-10 -mx-4 px-4 sm:mx-0 sm:px-0 max-w-3xl sm:max-w-3xl mx-auto">
+                <div
+                  className="flex flex-nowrap gap-2.5 overflow-x-auto pb-1.5 md:flex-wrap md:justify-center md:overflow-visible md:pb-0 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+                  role="list"
+                  aria-label="Ventajas del servicio"
+                >
+                  {trustChips.map(({ icon: Icon, label }) => (
+                    <div
+                      key={label}
+                      role="listitem"
+                      className={`inline-flex shrink-0 items-center gap-2 rounded-2xl px-3.5 py-2.5 text-left ${ui.trustOuter}`}
+                    >
                     <span
                       className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-xl ${ui.trustIconBox}`}
                     >
@@ -419,6 +518,7 @@ function ServicioLaboralInner({
                     </span>
                   </div>
                 ))}
+                </div>
               </div>
             </motion.div>
           </div>
@@ -433,33 +533,34 @@ function ServicioLaboralInner({
               </h2>
               <p className={`mx-auto mt-2 max-w-2xl text-center text-sm leading-relaxed ${ui.textBody}`}>
                 Recomendamos comenzar por el <span className={`${ui.textStrong} font-medium`}>diagnóstico sin costo</span>{' '}
-                cuando corresponda; si ya necesitas plan escrito pago, usa la consulta laboral.
+                cuando corresponda; la vía despido y finiquito también puede iniciarse sin costo en esas condiciones. Ley
+                Karin y comparendo RM tienen tarifa publicada al agendar.
               </p>
               <div className="mt-6 grid gap-3 sm:grid-cols-3">
                 <Link
                   to="/agendamiento?plan=tutela-laboral"
                   className={`relative flex min-h-[44px] flex-col justify-center rounded-2xl px-4 py-4 text-center transition touch-manipulation active:scale-[0.98] ${t.cardPopularRing} ${ui.viasPrimaryBg}`}
                 >
-                  <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 rounded-full bg-gradient-to-r from-teal-600 to-teal-700 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white shadow-md shadow-teal-900/20">
+                  <span className={`absolute -top-2.5 left-1/2 -translate-x-1/2 ${ui.prioridadBadge}`}>
                     Prioridad
                   </span>
-                  <span className={`mt-1 text-sm font-semibold ${t.link}`}>Diagnóstico gratis</span>
+                  <span className={`mt-1 text-sm font-semibold ${ui.viasCardTitle}`}>Diagnóstico gratis</span>
                   <span className={`mt-1 text-[11px] leading-snug ${ui.viasCardMuted}`}>
                     Primera evaluación sin costo si aplica
                   </span>
                 </Link>
                 <Link
                   to="/agendamiento?plan=laboral"
-                  className={`flex min-h-[44px] flex-col justify-center rounded-2xl px-4 py-4 text-center transition touch-manipulation active:scale-[0.98] ${ui.viasSecondary} ${t.link}`}
+                  className={`flex min-h-[44px] flex-col justify-center rounded-2xl px-4 py-4 text-center transition touch-manipulation active:scale-[0.98] ${ui.viasSecondary}`}
                 >
                   <span className={`text-sm font-semibold ${ui.viasCardTitle}`}>Despido y finiquito</span>
                   <span className={`mt-1 text-[11px] leading-snug ${ui.viasCardMuted}`}>
-                    Consulta pagada · plan por escrito
+                    Evaluación sin costo cuando aplica
                   </span>
                 </Link>
                 <Link
                   to="/agendamiento?plan=defensa-karin-trabajador"
-                  className={`flex min-h-[44px] flex-col justify-center rounded-2xl px-4 py-4 text-center transition touch-manipulation active:scale-[0.98] ${ui.viasSecondary} ${t.link}`}
+                  className={`flex min-h-[44px] flex-col justify-center rounded-2xl px-4 py-4 text-center transition touch-manipulation active:scale-[0.98] ${ui.viasSecondary}`}
                 >
                   <span className={`text-sm font-semibold ${ui.viasCardTitle}`}>Ley Karin (trabajador)</span>
                   <span className={`mt-1 text-[11px] leading-snug ${ui.viasCardMuted}`}>
@@ -478,7 +579,7 @@ function ServicioLaboralInner({
               <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4 mb-6">
                 <div>
                   <div className={`inline-flex items-center gap-2 mb-2 ${ui.pasosKicker}`}>
-                    <ListOrdered className="h-5 w-5 shrink-0" aria-hidden />
+                    <ListOrdered className={`h-5 w-5 shrink-0 ${ui.serviceIcon}`} aria-hidden />
                     <span className="text-xs font-bold uppercase tracking-[0.25em]">Tu siguiente paso</span>
                   </div>
                   <h2 className={`text-xl md:text-2xl font-bold leading-tight ${ui.textTitle}`}>
@@ -491,7 +592,7 @@ function ServicioLaboralInner({
                 </div>
                 <Link
                   to="/agendamiento?plan=tutela-laboral"
-                  className={`shrink-0 inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold touch-manipulation active:scale-[0.98] ${t.btnPrimary} ${t.btnPrimaryHover}`}
+                  className={`shrink-0 inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold touch-manipulation active:scale-[0.98] ${t.btnOutline} ${t.btnOutlineHover}`}
                 >
                   <Calendar className="h-4 w-4" aria-hidden />
                   Empezar por agendar
@@ -512,100 +613,9 @@ function ServicioLaboralInner({
           </div>
         </section>
 
-        {/* DIFERENCIADORES */}
-        <section className="py-14 md:py-20">
-          <div className="container mx-auto px-4 max-w-6xl">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
-              className="text-center mb-10 md:mb-14"
-            >
-              <h2 className={`text-3xl md:text-4xl font-bold mb-3 ${ui.textTitle}`}>
-                ¿Por qué elegir <span className={t.accent}>Punto Legal Laboral</span>?
-              </h2>
-              <p className={`max-w-2xl mx-auto ${ui.textBody}`}>
-                Equipo con foco en derecho del trabajo chileno: rigor en plazos y causales, comunicación sin humo y
-                alcance definido en cada servicio.
-              </p>
-            </motion.div>
-
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 md:gap-5">
-              {differentiators.map((d, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 16 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.45, delay: index * 0.07 }}
-                  className={`${ui.glassCard} p-5 md:p-6 transition-colors duration-300 ${t.cardHover}`}
-                >
-                  <div className={`mb-4 flex h-11 w-11 items-center justify-center rounded-2xl ${t.iconBox}`}>
-                    <d.icon className={`h-5 w-5 ${t.accent}`} />
-                  </div>
-                  <h3 className={`text-base md:text-lg font-semibold mb-2 ${ui.textTitle}`}>{d.title}</h3>
-                  <p className={`text-sm leading-relaxed ${ui.textBody}`}>{d.description}</p>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* SERVICIOS */}
-        <section className={`py-16 md:py-20 ${t.sectionWash}`}>
-          <div className="container mx-auto px-4">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
-              className="text-center mb-12"
-            >
-              <h2 className={`text-3xl md:text-4xl font-bold mb-4 ${ui.textTitle}`}>
-                Servicios de <span className={t.accent}>derecho laboral</span>
-              </h2>
-              <p className={`text-lg max-w-2xl mx-auto ${ui.textBody}`}>
-                Evaluamos viabilidad según tus antecedentes; sin promesas de resultado.
-              </p>
-            </motion.div>
-
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6">
-              {services.map((service, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: index * 0.06 }}
-                  className={`${ui.glassCard} p-6 transition-all duration-300 group ${t.cardHover}`}
-                >
-                  <div
-                    className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-5 group-hover:scale-105 transition-transform duration-300 ${t.iconBox}`}
-                  >
-                    <service.icon className={`w-6 h-6 ${t.accent}`} />
-                  </div>
-
-                  <h3 className={`text-lg font-bold mb-2.5 ${ui.textTitle}`}>{service.title}</h3>
-                  <p className={`text-sm mb-5 leading-relaxed ${ui.textBody}`}>{service.description}</p>
-
-                  <ul className="space-y-2">
-                    {service.features.map((feature, fi) => (
-                      <li key={fi} className={`flex items-center gap-2 text-sm ${ui.textList}`}>
-                        <CheckCircle className={`w-4 h-4 shrink-0 ${t.accent}`} />
-                        {feature}
-                      </li>
-                    ))}
-                  </ul>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* LEY KARIN */}
+        {/* LEY KARIN — prioridad emocional tras el proceso (leads urgentes) */}
         <section className="py-12 md:py-16">
-          <div className="container mx-auto px-4 max-w-5xl">
+          <div className="container mx-auto max-w-6xl px-4">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -613,7 +623,7 @@ function ServicioLaboralInner({
               className={`${ui.glassPanel} p-6 md:p-10 relative overflow-hidden`}
             >
               <div
-                className={`pointer-events-none absolute -top-24 -right-24 h-72 w-72 rounded-full blur-3xl ${ui.karinBlob}`}
+                className={`pointer-events-none absolute -top-24 -right-24 h-72 w-72 rounded-full blur-2xl ${ui.karinBlob}`}
               />
               <div className="relative z-10 flex flex-col md:flex-row gap-6 md:gap-10 items-start">
                 <div
@@ -622,7 +632,7 @@ function ServicioLaboralInner({
                   <Shield className={`h-7 w-7 ${ui.karinIcon}`} aria-hidden />
                 </div>
                 <div className="flex-1">
-                  <span className={`inline-block text-[11px] font-bold uppercase tracking-[0.35em] mb-2 ${t.accent}`}>
+                  <span className={`inline-block text-[11px] font-bold uppercase tracking-[0.35em] mb-2 ${ui.sectionKicker}`}>
                     Ley Karin · vigente
                   </span>
                   <h2 className={`text-2xl md:text-3xl font-bold mb-3 leading-tight ${ui.textTitle}`}>
@@ -646,19 +656,103 @@ function ServicioLaboralInner({
                       to="/agendamiento?plan=laboral"
                       className={`inline-flex min-h-[44px] items-center gap-2 px-6 py-3 rounded-xl font-semibold touch-manipulation active:scale-[0.98] ${t.btnOutline} ${t.btnOutlineHover}`}
                     >
-                      Consulta pagada
-                    </Link>
-                    <Link
-                      to="/blog"
-                      className={`inline-flex min-h-[44px] items-center gap-2 px-6 py-3 rounded-xl font-semibold touch-manipulation active:scale-[0.98] ${ui.blogLink}`}
-                    >
-                      Blog · laboral y derechos
-                      <ArrowRight className="w-4 h-4" />
+                      Despido y finiquito · gratis
                     </Link>
                   </div>
                 </div>
               </div>
             </motion.div>
+          </div>
+        </section>
+
+        {/* DIFERENCIADORES */}
+        <section className="py-14 md:py-20">
+          <div className="container mx-auto px-4 max-w-6xl">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+              className="text-center mb-10 md:mb-14"
+            >
+              <h2 className={`text-3xl md:text-4xl font-bold mb-3 ${ui.textTitle}`}>
+                ¿Por qué elegir <span className={ui.headlineAccent}>Punto Legal Laboral</span>?
+              </h2>
+              <p className={`max-w-2xl mx-auto ${ui.textBody}`}>
+                Equipo con foco en derecho del trabajo chileno: rigor en plazos y causales, comunicación sin humo y
+                alcance definido en cada servicio.
+              </p>
+            </motion.div>
+
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 md:gap-5">
+              {differentiators.map((d, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 16 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.45, delay: index * 0.07 }}
+                  className={`${ui.glassCard} p-5 md:p-6 transition-colors duration-300 ${t.cardHover}`}
+                >
+                  <div className={`mb-4 flex h-11 w-11 items-center justify-center rounded-2xl ${t.iconBox}`}>
+                    <d.icon className={`h-5 w-5 ${ui.serviceIcon}`} />
+                  </div>
+                  <h3 className={`text-base md:text-lg font-semibold mb-2 ${ui.textTitle}`}>{d.title}</h3>
+                  <p className={`text-sm leading-relaxed ${ui.textBody}`}>{d.description}</p>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* SERVICIOS */}
+        <section className={`py-16 md:py-20 ${t.sectionWash}`}>
+          <div className="container mx-auto px-4">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="text-center mb-12"
+            >
+              <h2 className={`text-3xl md:text-4xl font-bold mb-4 ${ui.textTitle}`}>
+                Servicios de <span className={ui.headlineAccent}>derecho laboral</span>
+              </h2>
+              <p className={`text-lg max-w-2xl mx-auto ${ui.textBody}`}>
+                Evaluamos viabilidad según tus antecedentes; sin promesas de resultado.
+              </p>
+            </motion.div>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6">
+              {services.map((service, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: index * 0.06 }}
+                  className={`${ui.glassCard} p-6 transition-all duration-300 group ${t.cardHover}`}
+                >
+                  <div
+                    className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-5 group-hover:scale-105 transition-transform duration-300 ${t.iconBox}`}
+                  >
+                    <service.icon className={`w-6 h-6 ${ui.serviceIcon}`} />
+                  </div>
+
+                  <h3 className={`text-lg font-bold mb-2.5 ${ui.textTitle}`}>{service.title}</h3>
+                  <p className={`text-sm mb-5 leading-relaxed ${ui.textBody}`}>{service.description}</p>
+
+                  <ul className="space-y-2">
+                    {service.features.map((feature, fi) => (
+                      <li key={fi} className={`flex items-center gap-2 text-sm ${ui.textList}`}>
+                        <CheckCircle className={`w-4 h-4 shrink-0 ${ui.serviceIcon}`} />
+                        {feature}
+                      </li>
+                    ))}
+                  </ul>
+                </motion.div>
+              ))}
+            </div>
           </div>
         </section>
 
@@ -673,7 +767,7 @@ function ServicioLaboralInner({
               className="text-center mb-12"
             >
               <h2 className={`text-3xl md:text-4xl font-bold mb-3 ${ui.textTitle}`}>
-                Elige tu <span className={t.accent}>entrada</span>
+                Elige tu <span className={ui.headlineAccent}>entrada</span>
               </h2>
               <p className={`max-w-2xl mx-auto text-sm md:text-base leading-relaxed ${ui.textBody}`}>
                 Lo primero es el <strong className={ui.textStrong}>diagnóstico gratis</strong> cuando aplica. Las
@@ -695,9 +789,7 @@ function ServicioLaboralInner({
                 >
                   {pkg.popular && pkg.badge && (
                     <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
-                      <div
-                        className={`${t.btnPrimary} px-3.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider shadow-md`}
-                      >
+                      <div className={ui.pkgPopularBadge}>
                         ⭐ {pkg.badge}
                       </div>
                     </div>
@@ -708,7 +800,7 @@ function ServicioLaboralInner({
                       {pkg.emoji}
                     </div>
                     <h3 className={`text-xl font-bold mb-1 ${ui.textTitle}`}>{pkg.name}</h3>
-                    <p className="text-slate-500 text-xs uppercase tracking-[0.2em] mb-4">{pkg.sub}</p>
+                    <p className={`text-xs uppercase tracking-[0.2em] mb-4 ${ui.pkgSubline}`}>{pkg.sub}</p>
                     <div className="flex flex-col gap-1">
                       <div className="flex items-baseline gap-2 flex-wrap">
                         {pkg.isFree ? (
@@ -720,10 +812,10 @@ function ServicioLaboralInner({
                         ) : (
                           <div className={`text-3xl md:text-4xl font-bold ${ui.pkgPricePaid}`}>{pkg.priceLabel}</div>
                         )}
-                        {!pkg.isFree && <div className="text-xs text-slate-500">CLP · sin IVA</div>}
+                        {!pkg.isFree && <div className={`text-xs ${ui.pkgSubline}`}>CLP · sin IVA</div>}
                       </div>
                       {pkg.priceExtra && (
-                        <p className="text-[11px] leading-snug text-slate-500">{pkg.priceExtra}</p>
+                        <p className={`text-[11px] leading-snug ${ui.pkgSubline}`}>{pkg.priceExtra}</p>
                       )}
                     </div>
                   </div>
@@ -731,7 +823,7 @@ function ServicioLaboralInner({
                   <ul className="space-y-3 mb-7">
                     {pkg.features.map((f) => (
                       <li key={f} className="flex items-start gap-2.5">
-                        <CheckCircle className={`w-5 h-5 mt-0.5 shrink-0 ${t.accent}`} />
+                        <CheckCircle className={`w-5 h-5 mt-0.5 shrink-0 ${ui.serviceIcon}`} />
                         <span className={`text-sm leading-relaxed ${ui.pkgFeatures}`}>{f}</span>
                       </li>
                     ))}
@@ -773,10 +865,10 @@ function ServicioLaboralInner({
                   transition={{ delay: index * 0.08 }}
                 >
                   <div className={`${ui.glassCard} p-5 h-full text-left`}>
-                    <c.icon className={`w-8 h-8 mb-3 ${t.accent}`} />
-                    <div className={`text-lg md:text-xl font-bold mb-1 ${t.accent}`}>{c.amount}</div>
+                    <c.icon className={`w-8 h-8 mb-3 ${ui.serviceIcon}`} />
+                    <div className={`text-lg md:text-xl font-bold mb-1 ${ui.caseAmount}`}>{c.amount}</div>
                     <div className={`font-semibold mb-2 ${ui.textTitle}`}>{c.case}</div>
-                    <div className="text-[11px] md:text-xs text-slate-500">
+                    <div className={`text-[11px] md:text-xs ${ui.caseMeta}`}>
                       {c.client} · Plan {c.plan}
                     </div>
                   </div>
@@ -821,7 +913,7 @@ function ServicioLaboralInner({
             </p>
             <div>
               {laboralFaq.map((item, i) => (
-                <LaboralFaqItem key={i} item={item} accentClass={t.accent} isDark={isDark} />
+                <LaboralFaqItem key={i} item={item} accentClass={ui.faqAccent} isDark={isDark} />
               ))}
             </div>
           </div>
@@ -837,15 +929,15 @@ function ServicioLaboralInner({
               className={`max-w-4xl mx-auto text-center ${ui.glassPanel} p-10 md:p-14 relative overflow-hidden`}
             >
               <div
-                className={`pointer-events-none absolute -top-32 -right-32 h-72 w-72 rounded-full blur-3xl ${ui.ctaBlobTR}`}
+                className={`pointer-events-none absolute -top-32 -right-32 h-72 w-72 rounded-full blur-2xl ${ui.ctaBlobTR}`}
               />
               <div
-                className={`pointer-events-none absolute -bottom-32 -left-32 h-72 w-72 rounded-full blur-3xl ${ui.ctaBlobBL}`}
+                className={`pointer-events-none absolute -bottom-32 -left-32 h-72 w-72 rounded-full blur-2xl ${ui.ctaBlobBL}`}
               />
 
               <div className="relative z-10">
                 <h2 className={`text-3xl lg:text-4xl font-bold mb-4 leading-tight ${ui.textTitle}`}>
-                  ¿Necesitas asesoría laboral <span className={t.accent}>ahora</span>?
+                  ¿Necesitas asesoría laboral <span className={ui.headlineAccent}>ahora</span>?
                 </h2>
                 <p className={`mb-8 max-w-xl mx-auto ${ui.textBody}`}>
                   Agenda una sesión: en la reunión revisamos hechos, documentos y alternativas. Los honorarios del
@@ -863,7 +955,7 @@ function ServicioLaboralInner({
                     to="/agendamiento?plan=laboral"
                     className={`inline-flex min-h-[44px] items-center justify-center gap-2 px-8 py-4 rounded-2xl font-semibold touch-manipulation active:scale-[0.98] ${t.btnOutline} ${t.btnOutlineHover}`}
                   >
-                    Consulta pagada
+                    Despido y finiquito · gratis
                   </Link>
                 </div>
               </div>
@@ -902,15 +994,14 @@ function LaboralFaqItem({
 }) {
   const [open, setOpen] = useState(false)
   const border = isDark ? 'border-slate-800/80' : 'border-slate-200/90'
-  const q = isDark ? 'text-slate-200 hover:text-teal-300/90' : 'text-slate-800 hover:text-teal-800'
-  const plus = isDark ? 'text-slate-500' : 'text-slate-400'
+  const q = isDark ? 'text-slate-200 hover:text-slate-100' : 'text-slate-800 hover:text-slate-950'
   const ans = isDark ? 'text-slate-400' : 'text-slate-600'
 
   return (
     <div className={`border-b ${border}`}>
       <button
         type="button"
-        className="w-full flex min-h-[48px] justify-between items-center text-left py-4 touch-manipulation focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-600/30 rounded-lg"
+        className="w-full flex min-h-[48px] justify-between items-center text-left py-4 touch-manipulation focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-400/30 rounded-lg"
         onClick={() => setOpen(!open)}
       >
         <h3 className={`text-base md:text-lg font-medium pr-4 transition-colors ${q}`}>{item.question}</h3>
@@ -918,7 +1009,7 @@ function LaboralFaqItem({
           {open ? (
             <Minus className={`h-5 w-5 shrink-0 ${accentClass}`} />
           ) : (
-            <Plus className={`h-5 w-5 shrink-0 ${plus}`} />
+            <Plus className={`h-5 w-5 shrink-0 ${accentClass}`} />
           )}
         </motion.div>
       </button>

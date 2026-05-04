@@ -2,8 +2,8 @@ import SEO from "@/components/SEO";
 import AEOStructuredData from "@/components/AEOStructuredData";
 import {
   PUNTO_LEGAL_DOMICILIO_LINE,
-  PUNTO_LEGAL_FOUNDER_NAME,
   PUNTO_LEGAL_FOUNDER_STATEMENT,
+  PUNTO_LEGAL_PUBLIC_AUTHOR,
 } from "@/constants/brandIdentity";
 import { DEFAULT_OG_IMAGE } from "@/config/siteUrl";
 import HeroSection from "@/components/HeroSection";
@@ -14,8 +14,11 @@ import { MobileLayout } from "@/components/MobileLayout";
 import PremiumMobileHero from "@/components/PremiumMobileHero";
 import { useEffect, useCallback } from "react";
 import { trackMetaEvent } from "@/services/metaConversionsService";
+import { useTheme } from "@/hooks/useTheme";
+import { LandingThemeToggle } from "@/components/landing/LandingThemeToggle";
 
 const Index = () => {
+  const { theme, toggleTheme } = useTheme();
   useEffect(() => {
     trackMetaEvent({
       event_name: "ViewContent",
@@ -121,10 +124,10 @@ const Index = () => {
     <>
       <SEO
         title="Punto Legal Chile — Consulta legal online por Google Meet"
-        description="Estudio jurídico chileno, visión fundacional de Benjamín Alonso Soza Jiménez. El Golf, Las Condes, Santiago: consultas 100% online por Google Meet. Agenda en 60 segundos, 45 min con especialista. Familia, laboral, sucesorio, inmobiliario, empresarial, tributario, contratos. Desde $59.000 CLP."
-        keywords="abogado online chile, abogado Las Condes, El Golf, consulta legal online, agendar abogado chile, puntolegal.online, Benjamín Alonso Soza Jiménez, abogado familia, abogado laboral, despido injustificado, posesión efectiva, constituir SpA, estudio jurídico chile"
+        description="Estudio jurídico chileno en línea. El Golf, Las Condes, Santiago: consultas 100% online por Google Meet. Agenda en 60 segundos, 45 min con especialista. Familia, laboral, sucesorio, inmobiliario, empresarial, tributario, contratos. Desde $59.000 CLP."
+        keywords="abogado online chile, abogado Las Condes, El Golf, consulta legal online, agendar abogado chile, puntolegal.online, abogado familia, abogado laboral, despido injustificado, posesión efectiva, constituir SpA, estudio jurídico chile"
         image={DEFAULT_OG_IMAGE}
-        author={PUNTO_LEGAL_FOUNDER_NAME}
+        author={PUNTO_LEGAL_PUBLIC_AUTHOR}
         type="website"
         url="https://puntolegal.online"
       />
@@ -152,7 +155,7 @@ const Index = () => {
         <h2>Precios de consultas legales (CLP, sesión 45 min)</h2>
         <ul>
           <li>Defensa CAE frente a Tesorería: $109.000 (antes $169.000 — producto estrella).</li>
-          <li>Laboral (trabajadores): diagnóstico inicial sin costo cuando aplica; consulta pagada desde $79.000 (despido, finiquito, Ley 21.643 — honorarios a porcentaje sólo con acuerdo escrito si asumimos el caso).</li>
+          <li>Laboral (trabajadores): diagnóstico inicial sin costo cuando aplica; evaluación despido y finiquito sin costo cuando aplica; defensa Ley Karin (trabajador) $79.000; comparendo RM desde $35.000 según plan (honorarios a porcentaje sólo con acuerdo escrito si asumimos el caso).</li>
           <li>Familia: $89.000 (divorcio, pensión de alimentos, cuidado personal).</li>
           <li>Sucesorio: $89.000 (posesión efectiva, herencias, testamentos).</li>
           <li>Migratorio: $129.000 (visa, residencia definitiva, nacionalización).</li>
@@ -171,14 +174,14 @@ const Index = () => {
           <li>Fiscalizaciones Dirección del Trabajo y reconsideración de multas: $110.000.</li>
           <li>Defensa Empresarial frente a juicios laborales: $189.000.</li>
           <li>Ley Karin (Ley 21.643) — empresa, protocolo y capacitación: $169.000.</li>
-          <li>Defensa Ley Karin (trabajador, Ley 21.643): $79.000 (misma base que consulta laboral).</li>
+          <li>Defensa Ley Karin (trabajador, Ley 21.643): $79.000 (sesión y plan por escrito).</li>
           <li>Cumplimiento (Ley 20.393): $179.000.</li>
           <li>Marcas (registro INAPI): $89.000.</li>
           <li>Cobranza judicial: $109.000 (juicio ejecutivo, embargos).</li>
         </ul>
       </div>
 
-      <div className="landing-canvas relative min-h-screen overflow-x-hidden">
+      <div className="landing-canvas relative min-h-screen overflow-x-hidden pb-[max(5.25rem,env(safe-area-inset-bottom,0px)+4.5rem)] lg:pb-10">
         <div className="hidden lg:block">
           <HeroSection
             showForm={false}
@@ -195,6 +198,8 @@ const Index = () => {
             {landingSections}
           </MobileLayout>
         </div>
+        {/* Último en el canvas: queda por encima del contenido móvil (z-100) — claro/oscuro en todos los breakpoints */}
+        <LandingThemeToggle mode={theme} onToggle={toggleTheme} />
       </div>
     </>
   );

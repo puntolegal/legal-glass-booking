@@ -6,8 +6,10 @@ import { CreditCard, Shield, Lock, CheckCircle, Loader2, ArrowLeft } from 'lucid
 import { useAgendamiento } from '@/contexts/AgendamientoContext';
 import { serviceThemes } from '@/config/serviceThemes';
 import { trackMetaEvent } from '@/services/metaConversionsService';
+import { useTheme } from '@/hooks/useTheme';
 
 const Step3_Payment: React.FC = () => {
+  const { theme } = useTheme();
   const {
     service,
     serviceColor,
@@ -102,16 +104,18 @@ const Step3_Payment: React.FC = () => {
       className="space-y-6"
     >
       {/* Resumen de la Reserva - Estilo iOS */}
-      <div className="bg-white/[0.03] backdrop-blur-2xl border border-white/10 rounded-3xl p-6 md:p-7">
+      <div className={`rounded-[1.75rem] p-6 shadow-xl md:p-7 ${
+        theme === 'light' ? 'glass-ios-panel-light' : 'glass-ios-panel-dark'
+      }`}>
         <div className="mb-6">
-          <h3 className="text-xl font-semibold text-white">Resumen</h3>
+          <h3 className="text-xl font-semibold text-slate-900 dark:text-white">Resumen</h3>
         </div>
         
         <div className="space-y-4">
           {/* Resumen compacto */}
           <div className="space-y-3">
             <div className="flex justify-between items-center">
-              <span className="text-sm text-slate-400">{service.name}</span>
+              <span className="text-sm text-slate-600 dark:text-slate-400">{service.name}</span>
               <span 
                 className="text-xl font-bold text-transparent bg-clip-text"
                 style={{ backgroundImage: primaryGradient }}
@@ -119,9 +123,9 @@ const Step3_Payment: React.FC = () => {
                 ${precioFinal}
               </span>
             </div>
-            <div className="text-sm text-slate-400">
-              <p className="text-white capitalize">{formatDate(selectedDate)} · {selectedTime} hrs</p>
-              <p className="text-xs mt-1">{getMeetingTypeLabel()}</p>
+            <div className="text-sm text-slate-600 dark:text-slate-400">
+              <p className="text-slate-900 capitalize dark:text-white">{formatDate(selectedDate)} · {selectedTime} hrs</p>
+              <p className="text-xs mt-1 text-slate-600 dark:text-slate-400">{getMeetingTypeLabel()}</p>
             </div>
           </div>
         </div>
@@ -129,8 +133,8 @@ const Step3_Payment: React.FC = () => {
       
       {/* Información de Pago - Simplificada */}
       {!isFree && (
-        <div className="bg-slate-900/50 rounded-xl p-4 border border-white/5">
-          <div className="flex items-center gap-2 text-sm text-slate-400">
+        <div className="rounded-xl border border-slate-200/80 bg-slate-50/90 p-4 dark:border-white/5 dark:bg-slate-900/50">
+          <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
             <Lock className="w-4 h-4 shrink-0 text-emerald-400" aria-hidden />
             <span>Pago seguro procesado por Mercado Pago</span>
           </div>
@@ -159,7 +163,7 @@ const Step3_Payment: React.FC = () => {
           type="button"
           onClick={() => setStep(2)}
           disabled={isLoading}
-          className="w-full sm:flex-1 min-h-[48px] py-4 px-6 rounded-xl font-semibold bg-slate-800 border border-slate-700 text-slate-300 hover:bg-slate-700 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+          className="w-full sm:flex-1 min-h-[48px] py-4 px-6 rounded-xl font-semibold border transition-all flex items-center justify-center gap-2 disabled:opacity-50 bg-white border-slate-200 text-slate-800 hover:bg-slate-50 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-700"
         >
           <ArrowLeft className="w-4 h-4" />
           Anterior

@@ -7,13 +7,15 @@ import { useAgendamiento } from '@/contexts/AgendamientoContext';
 import { useSearchParams } from 'react-router-dom';
 import { getServiceInfo } from '@/config/serviceInfo';
 import { getServiceTheme } from '@/config/serviceThemes';
+import { useTheme } from '@/hooks/useTheme';
 
 interface ConversionSidebarProps {
   compact?: boolean;
 }
 
 const ConversionSidebar: React.FC<ConversionSidebarProps> = ({ compact = false }) => {
-  const { service, priceCalculation, step } = useAgendamiento();
+  const { service, priceCalculation } = useAgendamiento();
+  const { theme } = useTheme();
   const { precioFinal, isConvenioValido, isAdminValido } = priceCalculation;
   const [searchParams] = useSearchParams();
   const plan = searchParams.get('plan') || 'general';
@@ -31,6 +33,9 @@ const ConversionSidebar: React.FC<ConversionSidebarProps> = ({ compact = false }
     const b = parseInt(hex.slice(5, 7), 16);
     return `rgba(${r}, ${g}, ${b}, ${alpha})`;
   };
+
+  const shellGlass = theme === 'light' ? 'glass-ios-panel-light' : 'glass-ios-panel-dark';
+  const insetGlass = theme === 'light' ? 'glass-ios-card-light' : 'glass-ios-card-dark';
 
   const DiscountBadge = ({ label }: { label: string }) => (
     <span 
@@ -53,11 +58,7 @@ const ConversionSidebar: React.FC<ConversionSidebarProps> = ({ compact = false }
       <motion.section
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
-        className={`rounded-3xl border border-white/10 bg-slate-950/90 shadow-xl backdrop-blur-xl ${compact ? 'p-4 space-y-4' : 'p-6 space-y-6'}`}
-        style={{
-          borderColor: 'rgba(255, 255, 255, 0.1)',
-          boxShadow: '0 20px 50px rgba(0, 0, 0, 0.4)',
-        }}
+        className={`rounded-[1.75rem] shadow-xl ${shellGlass} ${compact ? 'p-4 space-y-4' : 'p-6 space-y-6'}`}
       >
         <header className="flex items-center gap-3">
           <div 
@@ -70,15 +71,15 @@ const ConversionSidebar: React.FC<ConversionSidebarProps> = ({ compact = false }
             <ServiceIcon className="w-6 h-6 text-white" />
           </div>
           <div>
-            <p className="text-xs uppercase tracking-[0.35em] text-slate-400 leading-tight">{serviceInfo.subtitle}</p>
-            <h3 className="text-lg font-semibold text-white">{serviceInfo.title}</h3>
+            <p className="text-xs uppercase tracking-[0.35em] text-slate-500 dark:text-slate-400 leading-tight">{serviceInfo.subtitle}</p>
+            <h3 className="text-lg font-semibold text-slate-900 dark:text-white">{serviceInfo.title}</h3>
           </div>
         </header>
         
-        <div className={`rounded-2xl border border-white/10 bg-white/5 ${compact ? 'px-4 py-3' : 'px-5 py-4'}`}>
+        <div className={`rounded-2xl ${insetGlass} ${compact ? 'px-4 py-3' : 'px-5 py-4'}`}>
           <div className="flex flex-wrap items-baseline gap-3">
             <span
-              className={`${compact ? 'text-3xl' : 'text-4xl'} font-bold text-white`}
+              className={`${compact ? 'text-3xl' : 'text-4xl'} font-bold text-slate-900 dark:text-white`}
             >
               {precioFinal === '0' ? 'Gratis' : `$${precioFinal}`}
             </span>
@@ -97,13 +98,13 @@ const ConversionSidebar: React.FC<ConversionSidebarProps> = ({ compact = false }
 
           {/* Footnote del servicio (note) — visible en mobile compact también */}
           {service.note && (
-            <p className="mt-2 text-[11.5px] leading-relaxed text-slate-400">
+            <p className="mt-2 text-[11.5px] leading-relaxed text-slate-600 dark:text-slate-400">
               {service.note}
             </p>
           )}
         </div>
 
-        <ul className="space-y-2.5 text-sm text-slate-300">
+        <ul className="space-y-2.5 text-sm text-slate-700 dark:text-slate-300">
           {(compact ? serviceInfo.benefits.slice(0, 3) : serviceInfo.benefits).map((item, index) => (
             <li key={index} className="flex items-start gap-3">
               <CheckCircle
@@ -121,11 +122,7 @@ const ConversionSidebar: React.FC<ConversionSidebarProps> = ({ compact = false }
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.12 }}
-          className="rounded-[28px] border border-white/10 bg-white/5 p-6 backdrop-blur-2xl space-y-4 shadow-xl"
-          style={{
-            borderColor: 'rgba(255, 255, 255, 0.1)',
-            boxShadow: '0 20px 40px rgba(0, 0, 0, 0.3)',
-          }}
+          className={`rounded-[1.75rem] p-6 space-y-4 shadow-xl ${shellGlass}`}
         >
           <div className="flex items-center gap-3">
             <div 
@@ -137,19 +134,19 @@ const ConversionSidebar: React.FC<ConversionSidebarProps> = ({ compact = false }
               <span className="text-base font-semibold text-white">{serviceInfo.testimonial.initials}</span>
             </div>
             <div className="flex-1">
-              <p className="text-sm font-semibold text-white leading-tight">{serviceInfo.testimonial.author}</p>
-              <p className="text-xs text-slate-400">{serviceInfo.testimonial.location}</p>
+              <p className="text-sm font-semibold text-slate-900 dark:text-white leading-tight">{serviceInfo.testimonial.author}</p>
+              <p className="text-xs text-slate-600 dark:text-slate-400">{serviceInfo.testimonial.location}</p>
             </div>
-            <div className="rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.3em] text-slate-400">
+            <div className="rounded-full border border-slate-200/80 bg-slate-100/80 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.3em] text-slate-500 dark:border-white/20 dark:bg-white/10 dark:text-slate-400">
               Caso real
             </div>
           </div>
-          <blockquote className="text-sm text-slate-300 leading-relaxed">
+          <blockquote className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
             "{serviceInfo.testimonial.quote}"
           </blockquote>
           {/* Footer del testimonial — sólo etiqueta "Gracias" (sin rating de estrellas) */}
           <div className="flex items-center justify-end" aria-hidden="true">
-            <div className="inline-flex items-center gap-1 rounded-full bg-white/10 px-2 py-0.5 text-xs font-semibold text-slate-300">
+            <div className="inline-flex items-center gap-1 rounded-full bg-slate-200/80 px-2 py-0.5 text-xs font-semibold text-slate-600 dark:bg-white/10 dark:text-slate-300">
               ❤️
               <span>Gracias</span>
             </div>

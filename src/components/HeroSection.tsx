@@ -10,8 +10,7 @@ import {
 } from "lucide-react";
 import { trackMetaEvent } from "@/services/metaConversionsService";
 import { scrollToVisibleAnchor } from "@/lib/scroll";
-import { PUNTO_LEGAL_FOUNDER_NAME } from "@/constants/brandIdentity";
-
+import { useTheme } from "@/hooks/useTheme";
 interface HeroSectionProps {
   title?: string;
   subtitle?: string;
@@ -33,7 +32,6 @@ const STAGGER: Record<string, number> = {
   desc: 0.20,
   ctas: 0.28,
   microcopy: 0.38,
-  founder: 0.42,
   trust: 0.32,
 };
 
@@ -42,6 +40,8 @@ const HeroSection = ({
   subtitle = "online y en minutos.",
 }: HeroSectionProps) => {
   const prefersReducedMotion = useReducedMotion();
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
 
   const goToServices = () => {
     void trackMetaEvent({
@@ -90,7 +90,11 @@ const HeroSection = ({
             {/* Status pill — pulso verde "vivo hoy" */}
             <motion.span
               {...reveal("badge")}
-              className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3.5 py-1.5 text-[11px] font-medium uppercase tracking-[0.16em] text-slate-300 backdrop-blur-md"
+              className={`inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-[11px] font-medium uppercase tracking-[0.16em] backdrop-blur-md ${
+                isDark
+                  ? "border border-white/10 bg-white/[0.04] text-slate-300"
+                  : "border border-slate-200/90 bg-white/75 text-slate-600 shadow-[0_8px_24px_rgba(15,23,42,0.06)]"
+              }`}
             >
               <span className="relative flex h-2 w-2">
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
@@ -100,16 +104,28 @@ const HeroSection = ({
             </motion.span>
 
             {/* Headline en dos líneas con gradient distinto por línea (foco visual) */}
-            <h1 className="font-display mt-6 text-[44px] font-bold leading-[0.96] tracking-tight text-white sm:text-[64px] lg:text-[84px]">
+            <h1
+              className={`font-display mt-6 text-[44px] font-bold leading-[0.96] tracking-tight sm:text-[64px] lg:text-[84px] ${
+                isDark ? "text-white" : "text-slate-900"
+              }`}
+            >
               <motion.span
                 {...reveal("title")}
-                className="block bg-gradient-to-r from-white via-blue-100 to-cyan-100 bg-clip-text text-transparent"
+                className={
+                  isDark
+                    ? "block bg-gradient-to-b from-white to-slate-200 bg-clip-text text-transparent"
+                    : "block text-slate-950"
+                }
               >
                 {title}
               </motion.span>
               <motion.span
                 {...reveal("subtitle")}
-                className="mt-1 block bg-gradient-to-r from-blue-300 via-cyan-200 to-sky-100 bg-clip-text text-transparent"
+                className={
+                  isDark
+                    ? "mt-1 block text-slate-300"
+                    : "mt-1 block bg-gradient-to-r from-slate-600 via-slate-700 to-slate-800 bg-clip-text text-transparent"
+                }
               >
                 {subtitle}
               </motion.span>
@@ -117,11 +133,16 @@ const HeroSection = ({
 
             <motion.p
               {...reveal("desc")}
-              className="mt-7 max-w-[58ch] text-base leading-relaxed text-slate-300 sm:text-lg"
+              className={`mt-7 max-w-[58ch] text-base leading-relaxed sm:text-lg ${
+                isDark ? "text-slate-300" : "text-slate-600"
+              }`}
             >
               45 minutos por Google Meet con un abogado especialista en tu caso.
               Diagnóstico, estrategia y un{" "}
-              <strong className="text-white">plan de acción claro</strong>. Sin
+              <strong className={isDark ? "text-white" : "text-slate-900"}>
+                plan de acción claro
+              </strong>
+              . Sin
               filas, sin trámites confusos, sin sorpresas en la cuenta.
             </motion.p>
 
@@ -156,19 +177,11 @@ const HeroSection = ({
 
             <motion.p
               {...reveal("microcopy")}
-              className="mt-5 text-[11.5px] uppercase tracking-[0.18em] text-slate-500"
+              className={`mt-5 text-[11.5px] uppercase tracking-[0.18em] ${
+                isDark ? "text-slate-400" : "text-slate-500"
+              }`}
             >
               Pago seguro · Cancelación gratis · Especialistas certificados
-            </motion.p>
-            <motion.p
-              {...reveal("founder")}
-              className="mt-3 max-w-[52ch] text-xs leading-relaxed text-slate-500"
-            >
-              Visión fundacional:{" "}
-              <span className="font-medium text-slate-400">
-                {PUNTO_LEGAL_FOUNDER_NAME}
-              </span>
-              , abogado, formación en el Instituto Nacional.
             </motion.p>
           </div>
 

@@ -29,8 +29,8 @@ All colors MUST be HSL.
 @layer base {
   :root {
     /* Tema Claro - Estilo App Motion Premium */
-    --background: 30 20% 96%; /* #f7f5f3 - Beige/gris muy claro */
-    --foreground: 0 0% 15%; /* #262626 - Gris oscuro suave */
+    --background: 210 35% 97%; /* slate-warm: alineado con landing-canvas claro */
+    --foreground: 222 25% 12%;
     --card: 0 0% 100%; /* #ffffff - Blanco puro para cards */
     --card-foreground: 0 0% 20%; /* #333333 - Gris oscuro para texto en cards */
     --popover: 0 0% 100%;
@@ -38,10 +38,10 @@ All colors MUST be HSL.
 
     --primary: 20 95% 55%; /* #ff6b35 - Naranja más sofisticado */
     --primary-foreground: 0 0% 100%;
-    --secondary: 30 10% 94%; /* #f3f1ef - Gris/beige secundario */
-    --secondary-foreground: 0 0% 30%;
-    --muted: 30 10% 92%; /* #ebe9e7 - Gris muted */
-    --muted-foreground: 0 0% 45%; /* #737373 - Texto muted */
+    --secondary: 210 25% 94%;
+    --secondary-foreground: 222 20% 28%;
+    --muted: 210 22% 92%;
+    --muted-foreground: 215 16% 40%;
     --accent: 20 90% 60%; /* #ff8052 - Naranja accent más suave */
     --accent-foreground: 0 0% 100%;
 
@@ -66,7 +66,7 @@ All colors MUST be HSL.
     /* Gradientes Premium - Modo Claro */
     --gradient-primary: linear-gradient(135deg, hsl(20 95% 55%), hsl(15 90% 50%));
     --gradient-glass: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.95));
-    --gradient-bg: linear-gradient(180deg, hsl(30 20% 96%), hsl(30 15% 94%));
+    --gradient-bg: linear-gradient(180deg, hsl(210 40% 98%), hsl(200 30% 96%));
     --gradient-neon: linear-gradient(135deg, hsl(20 95% 55%), hsl(15 90% 50%));
     --gradient-warm: linear-gradient(180deg, hsl(20 95% 55%), hsl(15 90% 50%));
     
@@ -97,8 +97,8 @@ All colors MUST be HSL.
 
   .dark {
     /* Tema Oscuro Premium Global */
-    --background: 0 0% 0%; /* #000000 - Fondo completamente negro */
-    --foreground: 0 0% 100%; /* #ffffff títulos */
+    --background: 222 47% 5%; /* navy profundo, coherente con landing dark */
+    --foreground: 210 20% 98%;
     --card: 0 0% 4% / 0.6; /* rgba(10,10,10,0.6) */
     --card-foreground: 0 0% 80%; /* #cccccc párrafos */
     --popover: 0 0% 4% / 0.9;
@@ -135,7 +135,7 @@ All colors MUST be HSL.
     /* Gradientes Neón - Modo Oscuro */
     --gradient-primary: linear-gradient(135deg, hsl(22 100% 50%), hsl(16 100% 50%));
     --gradient-glass: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.08));
-    --gradient-bg: linear-gradient(135deg, hsl(0 0% 0%), hsl(0 0% 2%));
+    --gradient-bg: linear-gradient(180deg, hsl(222 47% 5%), hsl(222 50% 3%));
     --gradient-neon: linear-gradient(135deg, hsl(22 100% 50%), hsl(16 100% 50%));
     --gradient-warm: linear-gradient(180deg, hsl(22 100% 50%), hsl(16 100% 50%));
     
@@ -164,8 +164,8 @@ All colors MUST be HSL.
   
   /* Asegurar fondo negro en modo oscuro */
   .dark body {
-    background: #000000;
-    color: #ffffff;
+    background: hsl(222 47% 5%);
+    color: hsl(210 20% 98%);
   }
   
   /* Orbes ambient — alineados con la paleta brand (cyan/blue, sin orange).
@@ -211,10 +211,13 @@ All colors MUST be HSL.
     animation: float 10s ease-in-out infinite reverse, pulse-glow 6s ease-in-out infinite;
   }
 
-  /* En el landing (data-route="/") los orbes globales se desactivan para
-     no competir con el sistema landing-canvas que ya gestiona su propio fondo. */
+  /* En landing y embudos glass propios: sin orbes globales */
   body[data-route="/"]::before,
-  body[data-route="/"]::after {
+  body[data-route="/"]::after,
+  body[data-route="/servicios/inmobiliario"]::before,
+  body[data-route="/servicios/inmobiliario"]::after,
+  body[data-route="/inmobiliario"]::before,
+  body[data-route="/inmobiliario"]::after {
     opacity: 0;
     animation: none;
   }
@@ -378,34 +381,40 @@ All colors MUST be HSL.
     --landing-accent-to: var(--la-accent-to);
   }
 
-  /* === Landing canvas — deep navy unified, sin spotlights brillantes ===
-     Fondo más oscuro y consistente de arriba a abajo (alineado con el
-     vibe de la sección FAQ). Los acentos cyan/blue ahora son MUY sutiles
-     para no romper la sobriedad del estudio jurídico. */
-  .landing-canvas {
+  /* === Landing canvas — sólo con html.dark (navy refinado, menos brillo duro arriba) === */
+  html.dark .landing-canvas {
     color: hsl(var(--la-fg));
     font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
       'Segoe UI', Roboto, sans-serif;
-    /* Base: navy profundo sin gradiente vertical brillante.
-       Spots ambient muy bajos en opacidad (0.05–0.07) para textura,
-       no para iluminación. Esto evita el "glow" que hacía ver el top más claro. */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
     background:
-      radial-gradient(ellipse 80% 60% at 50% -10%, rgba(15, 23, 42, 0.85), transparent 70%),
-      radial-gradient(ellipse 60% 40% at 15% 20%, rgba(59, 130, 246, 0.06), transparent 60%),
-      radial-gradient(ellipse 60% 40% at 85% 30%, rgba(34, 211, 238, 0.05), transparent 60%),
-      radial-gradient(ellipse 70% 50% at 50% 100%, rgba(30, 41, 59, 0.5), transparent 70%),
-      hsl(var(--la-bg));
+      radial-gradient(ellipse 82% 58% at 50% -8%, rgba(30, 41, 59, 0.55), transparent 70%),
+      radial-gradient(ellipse 58% 38% at 14% 22%, rgba(59, 130, 246, 0.035), transparent 58%),
+      radial-gradient(ellipse 58% 38% at 86% 28%, rgba(45, 212, 191, 0.03), transparent 58%),
+      radial-gradient(ellipse 72% 52% at 50% 100%, rgba(15, 23, 42, 0.4), transparent 72%),
+      hsl(218 52% 9%);
     background-attachment: fixed;
   }
 
-  /* Transición visual entre secciones del landing.
-     Cada <section> dentro del landing-canvas comparte un mismo "hilo" cromático,
-     con bordes superiores/inferiores blends suaves que evitan cortes duros. */
+  /* Modo claro — cristal iOS sobre base fría (alineado a laboralLight) */
+  html:not(.dark) .landing-canvas {
+    color: rgb(30 41 59);
+    font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+      'Segoe UI', Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background:
+      radial-gradient(ellipse 80% 55% at 50% -15%, rgba(255, 255, 255, 0.75), transparent 58%),
+      linear-gradient(180deg, rgb(250 250 252) 0%, rgb(244 246 249) 48%, rgb(235 238 244) 100%);
+    background-attachment: fixed;
+  }
+
   .landing-canvas section {
     position: relative;
   }
-  /* Sutil hairline luminoso entre secciones (estilo iOS group separators) */
-  .landing-canvas section + section::before {
+
+  html.dark .landing-canvas section + section::before {
     content: "";
     position: absolute;
     top: 0;
@@ -415,7 +424,24 @@ All colors MUST be HSL.
     background: linear-gradient(
       90deg,
       transparent,
-      rgba(255, 255, 255, 0.06),
+      rgba(255, 255, 255, 0.07),
+      transparent
+    );
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  html:not(.dark) .landing-canvas section + section::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 10%;
+    right: 10%;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(15, 23, 42, 0.08),
       transparent
     );
     pointer-events: none;
@@ -450,6 +476,17 @@ All colors MUST be HSL.
     background:
       radial-gradient(ellipse 60% 100% at 50% 100%, rgba(59, 130, 246, 0.05), transparent 70%),
       linear-gradient(0deg, rgba(8, 14, 30, 0.55) 0%, transparent 100%);
+  }
+
+  html:not(.dark) .landing-canvas .section-flow__top {
+    background:
+      radial-gradient(ellipse 60% 100% at 50% 0%, rgba(15, 23, 42, 0.04), transparent 72%),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.5) 0%, transparent 100%);
+  }
+  html:not(.dark) .landing-canvas .section-flow__bottom {
+    background:
+      radial-gradient(ellipse 60% 100% at 50% 100%, rgba(15, 23, 42, 0.035), transparent 72%),
+      linear-gradient(0deg, rgba(241, 245, 249, 0.85) 0%, transparent 100%);
   }
 
   /* Display headlines (Manrope, tightly tracked) */
@@ -536,18 +573,18 @@ All colors MUST be HSL.
 
   /* === Service card — glassmorphism iOS limpio (sin "metálico") ===
      Antes: triple radial-gradient con tintes accent al 18%/10% — esto creaba
-     una "lámina metálica" tintada. Ahora: glass casi puro con un solo radial
-     muy sutil (8%) y opacidad de fondo más baja para que se vea el navy del
+     una "lámina metálica" tintada. Ahora: glass casi puro con radial accent
+     muy sutil y opacidad de fondo baja para que se vea el navy del
      landing-canvas a través del cristal. */
   .service-card {
     --card-accent: 139 92 246; /* rgb fallback (violet-500) */
     position: relative;
     isolation: isolate;
     background:
-      radial-gradient(140% 100% at 100% 0%, rgba(var(--card-accent), 0.08), transparent 60%),
+      radial-gradient(140% 100% at 100% 0%, rgba(var(--card-accent), 0.045), transparent 62%),
       rgba(255, 255, 255, 0.035);
-    -webkit-backdrop-filter: blur(40px) saturate(160%);
-    backdrop-filter: blur(40px) saturate(160%);
+    -webkit-backdrop-filter: blur(40px) saturate(150%);
+    backdrop-filter: blur(40px) saturate(150%);
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 1.75rem;
     box-shadow:
@@ -576,11 +613,11 @@ All colors MUST be HSL.
   }
   .service-card:hover {
     transform: translateY(-4px);
-    border-color: rgba(var(--card-accent), 0.30);
+    border-color: rgba(var(--card-accent), 0.22);
     box-shadow:
       0 28px 56px -14px rgba(0, 0, 0, 0.55),
-      0 0 0 1px rgba(var(--card-accent), 0.16),
-      0 0 60px -16px rgba(var(--card-accent), 0.30),
+      0 0 0 1px rgba(var(--card-accent), 0.12),
+      0 0 48px -18px rgba(var(--card-accent), 0.18),
       inset 0 1px 0 rgba(255, 255, 255, 0.10);
   }
   .service-card:hover::before {
@@ -590,20 +627,256 @@ All colors MUST be HSL.
   /* Featured card — más sutil sin glow saturado */
   .service-card[data-featured="true"] {
     background:
-      radial-gradient(140% 100% at 100% 0%, rgba(var(--card-accent), 0.12), transparent 55%),
+      radial-gradient(140% 100% at 100% 0%, rgba(var(--card-accent), 0.07), transparent 58%),
       rgba(255, 255, 255, 0.045);
     box-shadow:
       0 22px 52px -14px rgba(0, 0, 0, 0.55),
-      0 0 0 1px rgba(var(--card-accent), 0.10),
+      0 0 0 1px rgba(var(--card-accent), 0.08),
       inset 0 1px 0 rgba(255, 255, 255, 0.10),
       inset 0 -1px 0 rgba(0, 0, 0, 0.18);
   }
   .service-card[data-featured="true"]:hover {
     box-shadow:
       0 32px 68px -16px rgba(0, 0, 0, 0.60),
-      0 0 0 1px rgba(var(--card-accent), 0.20),
-      0 0 70px -18px rgba(var(--card-accent), 0.35),
+      0 0 0 1px rgba(var(--card-accent), 0.14),
+      0 0 56px -18px rgba(var(--card-accent), 0.22),
       inset 0 1px 0 rgba(255, 255, 255, 0.14);
+  }
+
+  html:not(.dark) .landing-canvas #servicios .service-card {
+    background:
+      radial-gradient(130% 90% at 100% 0%, rgba(15, 23, 42, 0.04), transparent 65%),
+      rgba(255, 255, 255, 0.88);
+    border-color: rgba(15, 23, 42, 0.07);
+    box-shadow:
+      0 14px 36px rgba(15, 23, 42, 0.06),
+      inset 0 1px 0 rgba(255, 255, 255, 0.96),
+      inset 0 -1px 0 rgba(15, 23, 42, 0.03);
+    -webkit-backdrop-filter: blur(32px) saturate(140%);
+    backdrop-filter: blur(32px) saturate(140%);
+  }
+  html:not(.dark) .landing-canvas #servicios .service-card:hover {
+    border-color: rgba(15, 23, 42, 0.1);
+    box-shadow:
+      0 20px 44px rgba(15, 23, 42, 0.08),
+      0 0 0 1px rgba(14, 116, 144, 0.1),
+      inset 0 1px 0 rgba(255, 255, 255, 1),
+      inset 0 -1px 0 rgba(15, 23, 42, 0.03);
+  }
+  html:not(.dark) .landing-canvas #servicios .service-card[data-featured="true"] {
+    background:
+      radial-gradient(130% 90% at 100% 0%, rgba(14, 116, 144, 0.055), transparent 62%),
+      rgba(255, 255, 255, 0.92);
+    border-color: rgba(15, 23, 42, 0.08);
+  }
+  html:not(.dark) .landing-canvas #servicios .service-card h3 {
+    color: rgb(15 23 42);
+  }
+  html:not(.dark) .landing-canvas #servicios .service-card p {
+    color: rgb(51 65 85);
+  }
+  html:not(.dark) .landing-canvas #servicios .service-card .price-ticker.text-white {
+    color: rgb(15 23 42);
+  }
+  html:not(.dark) .landing-canvas #servicios .service-card[data-free="true"] .price-ticker {
+    color: rgb(13 148 136);
+  }
+  .landing-canvas #servicios .service-card[data-free="true"] .price-ticker {
+    color: rgb(45 212 191);
+  }
+
+  /* Cluster laboral / pills — en claro el vidrio oscuro desaparece el texto */
+  html:not(.dark) .landing-canvas #servicios .service-cluster-pill {
+    color: rgb(51 65 85);
+    border-color: rgba(15, 23, 42, 0.12);
+    background: rgba(255, 255, 255, 0.72);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.92);
+  }
+  html:not(.dark) .landing-canvas #servicios .service-cluster-pill:hover {
+    border-color: rgba(15, 23, 42, 0.14);
+    background: rgba(255, 255, 255, 0.94);
+  }
+
+  /* Testimonial featured — quote y autor legibles sobre vidrio claro */
+  html:not(.dark) .landing-canvas #servicios .service-card blockquote {
+    color: rgb(51 65 85) !important;
+    border-color: rgba(15, 23, 42, 0.1) !important;
+    background: rgba(255, 255, 255, 0.92) !important;
+    box-shadow:
+      0 12px 28px rgba(15, 23, 42, 0.06),
+      inset 0 1px 0 rgba(255, 255, 255, 0.95) !important;
+  }
+  html:not(.dark) .landing-canvas #servicios .service-card figure figcaption .text-slate-300 {
+    color: rgb(71 85 105);
+  }
+  html:not(.dark) .landing-canvas #servicios .service-card figure figcaption .text-slate-500 {
+    color: rgb(100 116 139);
+  }
+  html:not(.dark) .landing-canvas #servicios .service-card figure figcaption .text-slate-600 {
+    color: rgb(100 116 139);
+  }
+
+  /* Landing claro — tiles de icono, CTA shimmer y burbujas: contraste iOS */
+  html:not(.dark) .landing-canvas #servicios .service-card-icon-tile svg {
+    filter: drop-shadow(0 0 0.75px rgba(15, 23, 42, 0.9))
+      drop-shadow(0 1.5px 2px rgba(15, 23, 42, 0.35));
+  }
+  html:not(.dark) .landing-canvas #servicios .service-card-icon-tile {
+    box-shadow:
+      0 12px 28px -10px rgba(15, 23, 42, 0.14),
+      inset 0 1.5px 0 rgba(255, 255, 255, 0.65),
+      inset 0 -2px 0 rgba(0, 0, 0, 0.1),
+      0 0 0 1px rgba(15, 23, 42, 0.1) !important;
+  }
+  html:not(.dark) .landing-canvas #servicios .service-card .service-card__hook {
+    color: rgb(51 65 85);
+  }
+  html:not(.dark) .landing-canvas #servicios .service-card p strong {
+    color: rgb(15 23 42);
+    font-weight: 700;
+  }
+  html:not(.dark) .landing-canvas #servicios .service-card-cta.cta-shimmer::after {
+    mix-blend-mode: normal;
+    opacity: 0.12;
+  }
+  html:not(.dark) .landing-canvas #servicios .service-card-cta {
+    color: #fff;
+    text-shadow: 0 1px 2px rgba(15, 23, 42, 0.45);
+    border-color: rgba(15, 23, 42, 0.18);
+    background-color: rgb(var(--card-accent));
+    background-image: linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.26) 0%,
+        rgba(255, 255, 255, 0) 44%
+      ),
+      linear-gradient(135deg, rgb(var(--card-accent)), rgba(var(--card-accent), 0.68));
+    box-shadow:
+      0 10px 26px -8px rgba(15, 23, 42, 0.22),
+      inset 0 1px 0 rgba(255, 255, 255, 0.28);
+  }
+  html:not(.dark) .landing-canvas #servicios .service-card-cta:hover {
+    box-shadow:
+      0 14px 32px -8px rgba(15, 23, 42, 0.28),
+      inset 0 1px 0 rgba(255, 255, 255, 0.32);
+  }
+
+  /* Agendamiento claro — CTA primario (misma lógica que service-card-cta; --agenda-card-accent = "R G B") */
+  html:not(.dark) .landing-canvas .agendamiento-primary-cta.cta-shimmer::after {
+    mix-blend-mode: normal;
+    opacity: 0.12;
+  }
+  html:not(.dark) .landing-canvas .agendamiento-primary-cta {
+    color: #fff;
+    text-shadow: 0 1px 2px rgba(15, 23, 42, 0.45);
+    border-color: rgba(15, 23, 42, 0.18);
+    background-color: rgb(var(--agenda-card-accent));
+    background-image: linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.26) 0%,
+        rgba(255, 255, 255, 0) 44%
+      ),
+      linear-gradient(135deg, rgb(var(--agenda-card-accent)), rgba(var(--agenda-card-accent), 0.68));
+    box-shadow:
+      0 10px 26px -8px rgba(15, 23, 42, 0.22),
+      inset 0 1px 0 rgba(255, 255, 255, 0.28);
+  }
+  html:not(.dark) .landing-canvas .agendamiento-primary-cta:hover {
+    box-shadow:
+      0 14px 32px -8px rgba(15, 23, 42, 0.28),
+      inset 0 1px 0 rgba(255, 255, 255, 0.32);
+  }
+
+  html:not(.dark) .landing-canvas #servicios .trending-spotlight__tile svg {
+    filter: drop-shadow(0 0 0.65px rgba(15, 23, 42, 0.88))
+      drop-shadow(0 1.5px 2px rgba(15, 23, 42, 0.32));
+  }
+  html:not(.dark) .landing-canvas #servicios .trending-spotlight__cta.cta-shimmer::after {
+    mix-blend-mode: normal;
+    opacity: 0.12;
+  }
+  html:not(.dark) .landing-canvas #servicios .trending-spotlight__cta {
+    color: #fff;
+    text-shadow: 0 1px 2px rgba(15, 23, 42, 0.45);
+    border-color: rgba(15, 23, 42, 0.16);
+    background-color: rgb(var(--spotlight-accent));
+    background-image: linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.24) 0%,
+        rgba(255, 255, 255, 0) 44%
+      ),
+      linear-gradient(135deg, rgb(var(--spotlight-accent)), rgba(var(--spotlight-accent), 0.68));
+    box-shadow:
+      0 10px 26px -8px rgba(15, 23, 42, 0.22),
+      inset 0 1px 0 rgba(255, 255, 255, 0.26);
+  }
+  html:not(.dark) .landing-canvas .mobile-service-card__tile svg {
+    filter: drop-shadow(0 0 0.75px rgba(15, 23, 42, 0.9))
+      drop-shadow(0 1.5px 2px rgba(15, 23, 42, 0.35));
+  }
+  html:not(.dark) .landing-canvas .mobile-service-card__tile {
+    box-shadow:
+      0 10px 22px -8px rgba(15, 23, 42, 0.12),
+      inset 0 1.5px 0 rgba(255, 255, 255, 0.5),
+      inset 0 -2px 0 rgba(0, 0, 0, 0.08),
+      0 0 0 1px rgba(15, 23, 42, 0.09);
+  }
+  html:not(.dark) .landing-canvas #servicios .cat-bubble__tile svg {
+    filter: drop-shadow(0 0 0.65px rgba(15, 23, 42, 0.85))
+      drop-shadow(0 1.5px 2px rgba(15, 23, 42, 0.32));
+  }
+  html:not(.dark) .landing-canvas #servicios .mobile-service-card__panel .service-card-cta.cta-shimmer::after {
+    mix-blend-mode: normal;
+    opacity: 0.12;
+  }
+  html:not(.dark) .landing-canvas #servicios .mobile-service-card__panel .service-card-cta {
+    color: #fff;
+    text-shadow: 0 1px 2px rgba(15, 23, 42, 0.35);
+    border-color: rgba(15, 23, 42, 0.14);
+  }
+  html:not(.dark) .landing-canvas #servicios .trust-pill__icon {
+    color: inherit;
+    opacity: 0.92;
+  }
+
+  /* Landing oscuro — #servicios: grises Tailwind más legibles sobre vidrio/navy */
+  html.dark .landing-canvas #servicios .service-card .text-slate-400 {
+    color: rgb(203 213 225);
+  }
+  html.dark .landing-canvas #servicios .service-card .text-slate-500 {
+    color: rgb(186 198 210);
+  }
+  html.dark .landing-canvas #servicios .service-card .text-slate-600 {
+    color: rgb(186 198 210);
+  }
+  html.dark .landing-canvas #servicios .service-card figcaption .text-slate-300 {
+    color: rgb(226 232 240);
+  }
+  html.dark .landing-canvas #servicios .service-card figcaption .text-slate-400 {
+    color: rgb(203 213 225);
+  }
+  html.dark .landing-canvas #servicios .service-card figcaption .text-slate-500,
+  html.dark .landing-canvas #servicios .service-card figcaption .text-slate-600 {
+    color: rgb(186 198 210);
+  }
+  html.dark .landing-canvas #servicios .service-card .price-well .text-slate-400 {
+    color: rgb(203 213 225);
+  }
+  html.dark .landing-canvas #servicios .service-card .price-well .text-slate-500 {
+    color: rgb(186 198 210);
+  }
+  html.dark .landing-canvas #servicios .price-well {
+    border-top-color: rgba(255, 255, 255, 0.12);
+  }
+
+  html.dark .landing-canvas .mobile-service-card__panel ul li {
+    color: rgb(226 232 240);
+  }
+  html.dark .landing-canvas .mobile-service-card__panel .text-slate-500 {
+    color: rgb(186 198 210);
+  }
+
+  html.dark .landing-canvas #faq .faq-bubble__panel {
+    color: rgb(203 213 225);
   }
 
   /* Pill CTA per-card with accent gradient */
@@ -754,7 +1027,7 @@ All colors MUST be HSL.
       0 1px 0 rgba(255, 255, 255, 0.22) inset,
       0 -2px 0 rgba(0, 0, 0, 0.42) inset,
       0 0 0 1px rgba(255, 255, 255, 0.06),
-      0 0 50px -14px rgba(59, 130, 246, 0.30);
+      0 0 40px -18px rgba(59, 130, 246, 0.14);
   }
   .cta-hero--primary:focus-visible {
     box-shadow:
@@ -820,22 +1093,59 @@ All colors MUST be HSL.
     transform: translateY(-2px);
     border-color: hsla(var(--la-outline) / 0.28);
     background:
-      radial-gradient(120% 90% at 30% 20%, rgba(34, 211, 238, 0.10), transparent 55%),
+      radial-gradient(120% 90% at 30% 20%, rgba(255, 255, 255, 0.08), transparent 55%),
       hsla(var(--la-surface-high) / 0.65);
     color: white;
     box-shadow:
       0 22px 44px -10px rgba(0, 0, 0, 0.55),
-      0 0 0 1px rgba(34, 211, 238, 0.18),
+      0 0 0 1px rgba(255, 255, 255, 0.06),
       inset 0 1px 0 hsla(var(--la-outline-warm) / 0.24);
   }
   .cta-hero--ghost:focus-visible {
     box-shadow:
-      0 0 0 3px rgba(34, 211, 238, 0.30),
+      0 0 0 3px rgba(148, 163, 184, 0.35),
       0 14px 32px -10px rgba(0, 0, 0, 0.45);
   }
   .cta-hero--ghost > * {
     position: relative;
     z-index: 1;
+  }
+
+  html:not(.dark) .landing-canvas .cta-hero--ghost {
+    color: rgb(15 23 42);
+    background:
+      radial-gradient(120% 90% at 30% 20%, rgba(255, 255, 255, 0.85), transparent 55%),
+      rgba(255, 255, 255, 0.72);
+    border-color: rgba(15, 23, 42, 0.1);
+    box-shadow:
+      0 12px 32px rgba(15, 23, 42, 0.08),
+      inset 0 1px 0 rgba(255, 255, 255, 0.95);
+  }
+  html:not(.dark) .landing-canvas .cta-hero--ghost:hover {
+    color: rgb(15 23 42);
+    border-color: rgba(15, 23, 42, 0.14);
+    background:
+      radial-gradient(120% 90% at 30% 20%, rgba(255, 255, 255, 0.95), transparent 55%),
+      rgba(248, 250, 252, 0.94);
+    box-shadow:
+      0 16px 36px rgba(15, 23, 42, 0.08),
+      inset 0 1px 0 rgba(255, 255, 255, 1);
+  }
+
+  html:not(.dark) .landing-canvas .cta-hero--primary {
+    color: white;
+    border-color: rgba(15, 23, 42, 0.1);
+    box-shadow:
+      0 18px 40px rgba(15, 23, 42, 0.16),
+      0 1px 0 rgba(255, 255, 255, 0.2) inset,
+      0 -2px 0 rgba(0, 0, 0, 0.12) inset;
+  }
+  html:not(.dark) .landing-canvas .cta-hero--primary:hover {
+    box-shadow:
+      0 22px 48px rgba(15, 23, 42, 0.2),
+      0 1px 0 rgba(255, 255, 255, 0.24) inset,
+      0 -2px 0 rgba(0, 0, 0, 0.12) inset,
+      0 0 36px -16px rgba(37, 99, 235, 0.18);
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -876,10 +1186,57 @@ All colors MUST be HSL.
     border-color: rgba(var(--card-accent), 0.24);
   }
 
+  html:not(.dark) .landing-canvas .mobile-service-card {
+    background: rgba(255, 255, 255, 0.85);
+    border-color: rgba(15, 23, 42, 0.08);
+    box-shadow:
+      0 12px 28px rgba(15, 23, 42, 0.07),
+      inset 0 1px 0 rgba(255, 255, 255, 0.95);
+  }
+  html:not(.dark) .landing-canvas .mobile-service-card[data-featured="true"] {
+    background:
+      radial-gradient(140% 100% at 100% 0%, rgba(var(--card-accent), 0.14), transparent 55%),
+      rgba(255, 255, 255, 0.9);
+  }
+  html:not(.dark) .landing-canvas .mobile-service-card__title {
+    color: rgb(15 23 42);
+  }
+  html:not(.dark) .landing-canvas .mobile-service-card__hook,
+  html:not(.dark) .landing-canvas .mobile-service-card__price-before {
+    color: rgb(51 65 85);
+  }
+  /* Precio sólido (sin gradiente cyan); "Gratis" usa teal alineado a vertical laboral */
+  html:not(.dark) .landing-canvas .mobile-service-card__price:not(.text-transparent) {
+    color: rgb(15 23 42);
+  }
+  html:not(.dark) .landing-canvas .mobile-service-card[data-free="true"] .mobile-service-card__price {
+    color: rgb(13 148 136);
+  }
+  html.dark .landing-canvas .mobile-service-card[data-free="true"] .mobile-service-card__price {
+    color: rgb(45 212 191);
+  }
+
+  html:not(.dark) .landing-canvas .mobile-service-card__pill {
+    color: rgb(51 65 85);
+    border-color: rgba(15, 23, 42, 0.12);
+    background: rgba(255, 255, 255, 0.78);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.95);
+  }
+  html:not(.dark) .landing-canvas .mobile-service-card__pill:active {
+    background: rgba(241, 245, 249, 0.98);
+  }
+
+  html:not(.dark) .landing-canvas .mobile-service-card__panel {
+    border-top-color: rgba(15, 23, 42, 0.08);
+  }
+  html:not(.dark) .landing-canvas .mobile-service-card__panel ul li {
+    color: rgb(51 65 85);
+  }
+
   .mobile-service-card__row {
     width: 100%;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 0.75rem;
     padding: 0.85rem 0.95rem;
     background: transparent;
@@ -894,6 +1251,7 @@ All colors MUST be HSL.
     flex-shrink: 0;
     width: 44px;
     height: 44px;
+    margin-top: 3px;
     border-radius: 12px;
     display: inline-flex;
     align-items: center;
@@ -939,11 +1297,36 @@ All colors MUST be HSL.
     font-size: 9.5px;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.16em;
-    line-height: 1;
-    border-bottom: 1px solid;
+    letter-spacing: 0.12em;
+    line-height: 1.25;
+    white-space: normal;
+    text-wrap: balance;
+    border-bottom-width: 1px;
+    border-bottom-style: solid;
+    border-bottom-color: transparent;
     -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
+  }
+  /* Banda de badge neutra — evita rojo/azul alternado en todo el catálogo */
+  .mobile-service-card__badge-bar--muted {
+    color: rgb(71 85 105);
+    background: rgba(15, 23, 42, 0.045);
+    border-bottom-color: rgba(15, 23, 42, 0.09);
+  }
+  html.dark .landing-canvas .mobile-service-card__badge-bar--muted {
+    color: rgb(148 163 184);
+    background: rgba(255, 255, 255, 0.055);
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+  }
+  /* Sólo producto estrella (p. ej. CAE): acento por --card-accent */
+  .mobile-service-card__badge-bar--accent {
+    color: rgb(var(--card-accent));
+    background: linear-gradient(
+      90deg,
+      rgba(var(--card-accent), 0.14),
+      rgba(var(--card-accent), 0.035)
+    );
+    border-bottom-color: rgba(var(--card-accent), 0.2);
   }
   .mobile-service-card__badge-dot {
     width: 5px;
@@ -951,16 +1334,148 @@ All colors MUST be HSL.
     border-radius: 9999px;
     flex-shrink: 0;
   }
+  .mobile-service-card__badge-dot--muted {
+    background: rgb(100 116 139);
+    box-shadow: none;
+  }
+  .mobile-service-card__badge-bar--accent .mobile-service-card__badge-dot:not(.mobile-service-card__badge-dot--muted) {
+    background: rgb(var(--card-accent));
+    box-shadow: 0 0 6px rgba(var(--card-accent), 0.55);
+  }
+
+  /* Cluster Laboral: badge + pills en un solo bloque (teal sobrio, sin parche gris) */
+  .mobile-service-card__cluster-sheet {
+    border-bottom: 1px solid rgba(13, 148, 136, 0.12);
+    background: linear-gradient(
+      180deg,
+      rgba(13, 148, 136, 0.07) 0%,
+      rgba(13, 148, 136, 0.02) 100%
+    );
+  }
+  html.dark .landing-canvas .mobile-service-card__cluster-sheet {
+    border-bottom-color: rgba(45, 212, 191, 0.14);
+    background: linear-gradient(
+      180deg,
+      rgba(45, 212, 191, 0.09) 0%,
+      rgba(15, 23, 42, 0.2) 100%
+    );
+  }
+  .mobile-service-card__cluster-label {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.5rem 0.95rem 0.35rem;
+    font-family: 'Inter', sans-serif;
+    font-size: 9.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    line-height: 1.2;
+    color: rgb(15 118 110);
+  }
+  html.dark .landing-canvas .mobile-service-card__cluster-label {
+    color: rgb(94 234 212);
+  }
+  .mobile-service-card__cluster-label-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 9999px;
+    flex-shrink: 0;
+    background: rgb(13 148 136);
+    box-shadow: 0 0 8px rgba(13, 148, 136, 0.45);
+  }
+  html.dark .landing-canvas .mobile-service-card__cluster-label-dot {
+    background: rgb(45 212 191);
+    box-shadow: 0 0 8px rgba(45, 212, 191, 0.35);
+  }
+  .mobile-service-card__pills-scroll--in-cluster {
+    padding-top: 0 !important;
+    padding-bottom: 0.65rem;
+    padding-left: 0.65rem;
+    padding-right: 0.65rem;
+  }
+  .mobile-service-card__pill--cluster {
+    border-color: rgba(13, 148, 136, 0.35);
+    background: rgba(255, 255, 255, 0.82);
+    color: rgb(17 94 89);
+    font-weight: 650;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.95),
+      0 1px 2px rgba(13, 148, 136, 0.06);
+  }
+  html.dark .landing-canvas .mobile-service-card__pill--cluster {
+    border-color: rgba(45, 212, 191, 0.35);
+    background: rgba(255, 255, 255, 0.07);
+    color: rgb(204 251 241);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  }
+  .mobile-service-card__pill--cluster:active {
+    background: rgba(13, 148, 136, 0.12);
+  }
+  html.dark .landing-canvas .mobile-service-card__pill--cluster:active {
+    background: rgba(45, 212, 191, 0.14);
+  }
+  html:not(.dark) .landing-canvas .mobile-service-card__pill--cluster {
+    color: rgb(17 94 89);
+    border-color: rgba(13, 148, 136, 0.38);
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.98),
+      0 1px 2px rgba(13, 148, 136, 0.08);
+  }
+  html.dark .landing-canvas .mobile-service-card__pill--cluster {
+    border-color: rgba(45, 212, 191, 0.38);
+    background: rgba(255, 255, 255, 0.08);
+    color: rgb(204 251 241);
+  }
+
+  /* Pastillas de plan (p. ej. cluster laboral): scroll horizontal en lugar de wrap incómodo */
+  .mobile-service-card__pills-scroll {
+    -webkit-overflow-scrolling: touch;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+    mask-image: linear-gradient(90deg, transparent 0, #000 10px, #000 calc(100% - 10px), transparent 100%);
+  }
+  .mobile-service-card__pills-scroll::-webkit-scrollbar {
+    display: none;
+  }
+  .mobile-service-card__pills-track {
+    display: inline-flex;
+    flex-wrap: nowrap;
+    gap: 0.45rem;
+    padding: 0.125rem 0.5rem 0.35rem;
+    min-height: 2rem;
+    align-items: center;
+  }
+  .mobile-service-card__pill {
+    flex-shrink: 0;
+    border-radius: 9999px;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    background: rgba(255, 255, 255, 0.06);
+    padding: 0.32rem 0.65rem;
+    font-family: 'Inter', sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    color: rgb(226 232 240);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    white-space: nowrap;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .mobile-service-card__pill:active {
+    background: rgba(255, 255, 255, 0.1);
+  }
 
   .mobile-service-card__hook {
     font-family: 'Inter', sans-serif;
-    font-size: 12px;
-    line-height: 1.35;
+    font-size: 11.5px;
+    line-height: 1.4;
     color: rgb(148 163 184);
-    /* Truncar a 2 líneas */
+    /* Truncar a 3 líneas — laboral y CAE tienen copy largo en móvil */
     display: -webkit-box;
-    -webkit-line-clamp: 2;
-    line-clamp: 2;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
@@ -970,6 +1485,8 @@ All colors MUST be HSL.
     display: flex;
     flex-direction: column;
     align-items: flex-end;
+    justify-content: center;
+    align-self: center;
     gap: 1px;
     margin-left: 0.25rem;
   }
@@ -980,6 +1497,7 @@ All colors MUST be HSL.
     font-weight: 800;
     line-height: 1;
     color: white;
+    white-space: nowrap;
     font-variant-numeric: tabular-nums;
     letter-spacing: -0.02em;
   }
@@ -999,17 +1517,28 @@ All colors MUST be HSL.
     margin-top: 2px;
     padding: 1px 5px;
     border-radius: 9999px;
-    background: rgba(34, 197, 94, 0.14);
-    color: rgb(74 222 128);
-    border: 1px solid rgba(34, 197, 94, 0.28);
     font-family: 'Inter', sans-serif;
     font-size: 9px;
     font-weight: 700;
     line-height: 1.3;
+    background: rgba(13, 148, 136, 0.1);
+    color: rgb(13 116 106);
+    border: 1px solid rgba(13, 148, 136, 0.22);
+  }
+  html.dark .landing-canvas .mobile-service-card__discount {
+    background: rgba(45, 212, 191, 0.09);
+    color: rgb(94 234 212);
+    border-color: rgba(45, 212, 191, 0.22);
+  }
+  html:not(.dark) .landing-canvas .mobile-service-card__discount {
+    background: rgba(13, 148, 136, 0.08);
+    color: rgb(15 118 110);
+    border-color: rgba(13, 148, 136, 0.2);
   }
 
   .mobile-service-card__chevron {
     flex-shrink: 0;
+    align-self: center;
     color: rgb(100 116 139);
     transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
   }
@@ -1025,7 +1554,7 @@ All colors MUST be HSL.
   /* === Trending Spotlight — "Lo más buscado esta semana" ====== */
   /* ============================================================ */
   .trending-spotlight {
-    --spotlight-accent: 239 68 68; /* red-500 (CAE) */
+    --spotlight-accent: 127 29 29; /* red-800 — urgencia sobria (estudio) */
     position: relative;
     isolation: isolate;
   }
@@ -1034,10 +1563,10 @@ All colors MUST be HSL.
     inset: -10% -5%;
     border-radius: 9999px;
     background:
-      radial-gradient(closest-side, rgba(var(--spotlight-accent), 0.18), transparent 60%),
-      radial-gradient(closest-side at 80% 20%, rgba(251, 191, 36, 0.08), transparent 60%);
+      radial-gradient(closest-side, rgba(var(--spotlight-accent), 0.12), transparent 62%),
+      radial-gradient(closest-side at 80% 20%, rgba(15, 23, 42, 0.06), transparent 60%);
     filter: blur(32px);
-    opacity: 0.85;
+    opacity: 0.75;
     pointer-events: none;
     z-index: -1;
   }
@@ -1046,15 +1575,15 @@ All colors MUST be HSL.
     border-radius: 1.5rem;
     overflow: hidden;
     background:
-      radial-gradient(140% 100% at 0% 0%, rgba(var(--spotlight-accent), 0.08), transparent 55%),
+      radial-gradient(140% 100% at 0% 0%, rgba(var(--spotlight-accent), 0.06), transparent 58%),
       rgba(255, 255, 255, 0.04);
-    -webkit-backdrop-filter: blur(36px) saturate(160%);
-    backdrop-filter: blur(36px) saturate(160%);
-    border: 1px solid rgba(var(--spotlight-accent), 0.22);
+    -webkit-backdrop-filter: blur(36px) saturate(150%);
+    backdrop-filter: blur(36px) saturate(150%);
+    border: 1px solid rgba(var(--spotlight-accent), 0.18);
     box-shadow:
       0 22px 50px -16px rgba(0, 0, 0, 0.55),
       0 0 0 1px rgba(255, 255, 255, 0.04),
-      0 0 60px -20px rgba(var(--spotlight-accent), 0.30),
+      0 0 48px -22px rgba(var(--spotlight-accent), 0.2),
       inset 0 1px 0 rgba(255, 255, 255, 0.10);
   }
   .trending-spotlight__ribbon {
@@ -1064,16 +1593,16 @@ All colors MUST be HSL.
     padding: 0.45rem 0.95rem;
     background: linear-gradient(
       90deg,
-      rgba(var(--spotlight-accent), 0.18),
-      rgba(var(--spotlight-accent), 0.04)
+      rgba(var(--spotlight-accent), 0.12),
+      rgba(255, 255, 255, 0.02)
     );
-    border-bottom: 1px solid rgba(var(--spotlight-accent), 0.20);
+    border-bottom: 1px solid rgba(var(--spotlight-accent), 0.14);
     font-family: 'Inter', sans-serif;
     font-size: 10.5px;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.18em;
-    color: rgb(var(--spotlight-accent));
+    color: rgb(254 226 226);
     width: 100%;
   }
   .trending-spotlight__row {
@@ -1105,8 +1634,8 @@ All colors MUST be HSL.
       rgba(var(--spotlight-accent), 0.72)
     );
     box-shadow:
-      0 14px 30px -10px rgba(var(--spotlight-accent), 0.55),
-      inset 0 1.5px 0 rgba(255, 255, 255, 0.32),
+      0 14px 30px -10px rgba(var(--spotlight-accent), 0.38),
+      inset 0 1.5px 0 rgba(255, 255, 255, 0.28),
       inset 0 -2px 0 rgba(0, 0, 0, 0.20);
   }
   @media (max-width: 640px) {
@@ -1186,7 +1715,7 @@ All colors MUST be HSL.
       rgba(var(--spotlight-accent), 0.78)
     );
     box-shadow:
-      0 14px 32px -10px rgba(var(--spotlight-accent), 0.55),
+      0 14px 32px -10px rgba(var(--spotlight-accent), 0.38),
       inset 0 1px 0 rgba(255, 255, 255, 0.20);
     border: 1px solid rgba(255, 255, 255, 0.14);
     cursor: pointer;
@@ -1199,7 +1728,7 @@ All colors MUST be HSL.
   .trending-spotlight__cta:hover {
     transform: translateY(-1px);
     box-shadow:
-      0 18px 40px -10px rgba(var(--spotlight-accent), 0.7),
+      0 18px 40px -10px rgba(var(--spotlight-accent), 0.45),
       inset 0 1px 0 rgba(255, 255, 255, 0.24);
   }
   @media (max-width: 640px) {
@@ -1208,6 +1737,42 @@ All colors MUST be HSL.
       padding: 0.95rem 1rem;
       font-size: 14px;
     }
+  }
+
+  /* Spotlight "lo más buscado" — landing claro: texto blanco sobre vidrio claro = invisible */
+  html:not(.dark) .landing-canvas #servicios .trending-spotlight__content {
+    background:
+      radial-gradient(130% 90% at 0% 0%, rgba(15, 23, 42, 0.04), transparent 58%),
+      rgba(255, 255, 255, 0.9);
+    border-color: rgba(15, 23, 42, 0.09);
+    box-shadow:
+      0 16px 40px rgba(15, 23, 42, 0.07),
+      inset 0 1px 0 rgba(255, 255, 255, 0.96),
+      0 0 0 1px rgba(15, 23, 42, 0.05);
+  }
+  html:not(.dark) .landing-canvas #servicios .trending-spotlight__title {
+    color: rgb(15 23 42);
+  }
+  html:not(.dark) .landing-canvas #servicios .trending-spotlight__hook {
+    color: rgb(71 85 105);
+  }
+  html:not(.dark) .landing-canvas #servicios .trending-spotlight__stats {
+    color: rgb(100 116 139);
+  }
+  html:not(.dark) .landing-canvas #servicios .trending-spotlight__stat-value {
+    color: rgb(var(--spotlight-accent));
+  }
+  html:not(.dark) .landing-canvas #servicios .trending-spotlight__stat-sep {
+    background: rgb(148 163 184);
+  }
+  html:not(.dark) .landing-canvas #servicios .trending-spotlight__ribbon {
+    color: rgb(127 29 29);
+    background: linear-gradient(
+      90deg,
+      rgba(127, 29, 29, 0.07),
+      rgba(255, 255, 255, 0.65)
+    );
+    border-bottom-color: rgba(127, 29, 29, 0.1);
   }
 
   /* ============================================================ */
@@ -1253,6 +1818,17 @@ All colors MUST be HSL.
     background: hsl(var(--la-fg-muted) / 0.55);
     flex-shrink: 0;
     align-self: center;
+  }
+
+  /* Wordmark en landing modo claro — el base usa blanco (contextos oscuros) */
+  html:not(.dark) .landing-canvas .brand-wordmark__name {
+    color: rgb(15 23 42);
+  }
+  html:not(.dark) .landing-canvas .brand-wordmark__country {
+    color: rgb(100 116 139);
+  }
+  html:not(.dark) .landing-canvas .brand-wordmark__sep {
+    background: rgba(15, 23, 42, 0.22);
   }
 
   /* Variantes de tamaño */
@@ -1306,11 +1882,18 @@ All colors MUST be HSL.
     line-height: 1;
   }
 
+  html:not(.dark) .agendamiento-wordmark__name {
+    color: rgb(15 23 42);
+  }
+  html:not(.dark) .agendamiento-wordmark__country {
+    color: rgb(71 85 105);
+    background: rgba(15, 23, 42, 0.05);
+    border-color: rgba(15, 23, 42, 0.1);
+  }
+
   /* ============================================================ */
-  /* === InstitutionalStat — atributo de marca en dark-glass ===
-        Coherente con el resto del landing (paleta navy + cyan sutil).
-        Comunica solidez institucional sin cifras inventadas ni citas
-        legales imprecisas. Tipografía editorial — Manrope + Inter. */
+  /* === InstitutionalStat — vidrio neutro estudio jurídico (sin lavado cyan) ===
+        Coherente con landing navy / pizarra. Tipografía editorial — Manrope + Inter. */
   /* ============================================================ */
   /* Fila de stats en hero desktop: tres columnas con el mismo alto */
   .institutional-stat-row {
@@ -1329,10 +1912,10 @@ All colors MUST be HSL.
     padding: 0.95rem 0.95rem 0.85rem;
     border-radius: 14px;
     background:
-      radial-gradient(140% 100% at 0% 0%, rgba(34, 211, 238, 0.05), transparent 55%),
+      radial-gradient(140% 100% at 0% 0%, rgba(255, 255, 255, 0.04), transparent 58%),
       rgba(255, 255, 255, 0.035);
-    -webkit-backdrop-filter: blur(28px) saturate(150%);
-    backdrop-filter: blur(28px) saturate(150%);
+    -webkit-backdrop-filter: blur(28px) saturate(145%);
+    backdrop-filter: blur(28px) saturate(145%);
     color: white;
     border: 1px solid rgba(255, 255, 255, 0.08);
     box-shadow:
@@ -1396,14 +1979,58 @@ All colors MUST be HSL.
     z-index: 1;
   }
   .institutional-stat:hover {
-    border-color: rgba(34, 211, 238, 0.24);
+    border-color: rgba(255, 255, 255, 0.14);
     background:
-      radial-gradient(140% 100% at 0% 0%, rgba(34, 211, 238, 0.10), transparent 55%),
-      rgba(255, 255, 255, 0.055);
+      radial-gradient(140% 100% at 0% 0%, rgba(255, 255, 255, 0.06), transparent 58%),
+      rgba(255, 255, 255, 0.048);
     box-shadow:
       0 18px 38px -14px rgba(0, 0, 0, 0.65),
-      0 0 0 1px rgba(34, 211, 238, 0.14),
+      0 0 0 1px rgba(255, 255, 255, 0.06),
       inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  }
+
+  html:not(.dark) .landing-canvas .institutional-stat {
+    color: rgb(15 23 42);
+    background:
+      radial-gradient(140% 100% at 0% 0%, rgba(15, 23, 42, 0.04), transparent 58%),
+      rgba(255, 255, 255, 0.82);
+    border-color: rgba(15, 23, 42, 0.08);
+    box-shadow:
+      0 12px 28px -10px rgba(15, 23, 42, 0.08),
+      inset 0 1px 0 rgba(255, 255, 255, 0.94);
+  }
+  html:not(.dark) .landing-canvas .institutional-stat::before {
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(15, 23, 42, 0.1),
+      transparent
+    );
+  }
+  html:not(.dark) .landing-canvas .institutional-stat:hover {
+    border-color: rgba(15, 23, 42, 0.12);
+    background:
+      radial-gradient(140% 100% at 0% 0%, rgba(30, 58, 138, 0.05), transparent 58%),
+      rgba(255, 255, 255, 0.92);
+    box-shadow:
+      0 16px 36px -10px rgba(15, 23, 42, 0.1),
+      inset 0 1px 0 rgba(255, 255, 255, 1);
+  }
+  html:not(.dark) .landing-canvas .institutional-stat__value {
+    background: linear-gradient(90deg, rgb(15 23 42) 0%, rgb(30 41 59) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  html:not(.dark) .landing-canvas .institutional-stat__label,
+  html:not(.dark) .landing-canvas .institutional-stat__note {
+    color: rgb(71 85 105);
+  }
+  @media (min-width: 1024px) {
+    html:not(.dark) .landing-canvas .institutional-stat--hero .institutional-stat__label,
+    html:not(.dark) .landing-canvas .institutional-stat--hero .institutional-stat__note {
+      color: rgb(71 85 105);
+    }
   }
 
   .institutional-stat__value {
@@ -1413,8 +2040,8 @@ All colors MUST be HSL.
     letter-spacing: -0.028em;
     line-height: 1;
     color: white;
-    /* Leve gradiente blanco → cyan-100 para detalle refinado (no fluor) */
-    background: linear-gradient(90deg, #ffffff 0%, rgb(186, 230, 253) 100%);
+    /* Título institucional: blanco → gris hielo (sin cyan) */
+    background: linear-gradient(90deg, #ffffff 0%, rgb(226 232 240) 100%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -1477,7 +2104,7 @@ All colors MUST be HSL.
     }
   }
 
-  /* === Floating Phone — ilustración 3D del Hero con halo cyan suave === */
+  /* === Floating Phone — ilustración 3D del Hero con halo neutro (tinta / pizarra) === */
   .floating-phone-stage {
     position: relative;
     isolation: isolate;
@@ -1493,8 +2120,8 @@ All colors MUST be HSL.
     inset: 8% 4%;
     border-radius: 50%;
     background:
-      radial-gradient(closest-side, rgba(34, 211, 238, 0.20), transparent 70%),
-      radial-gradient(closest-side, rgba(59, 130, 246, 0.16), transparent 75%);
+      radial-gradient(closest-side, rgba(255, 255, 255, 0.08), transparent 70%),
+      radial-gradient(closest-side, rgba(59, 130, 246, 0.1), transparent 75%);
     filter: blur(40px);
     z-index: 0;
     pointer-events: none;
@@ -1520,7 +2147,7 @@ All colors MUST be HSL.
     justify-content: center;
     /* La sombra inferior simula que el teléfono "levita" sobre la página */
     filter: drop-shadow(0 30px 40px rgba(0, 0, 0, 0.55))
-      drop-shadow(0 8px 16px rgba(34, 211, 238, 0.18));
+      drop-shadow(0 8px 16px rgba(255, 255, 255, 0.06));
   }
   .floating-phone-img img {
     width: 100%;
@@ -1529,6 +2156,16 @@ All colors MUST be HSL.
     object-fit: contain;
     user-select: none;
     -webkit-user-drag: none;
+  }
+  html:not(.dark) .landing-canvas .floating-phone-glow {
+    background:
+      radial-gradient(closest-side, rgba(15, 23, 42, 0.06), transparent 72%),
+      radial-gradient(closest-side, rgba(30, 58, 138, 0.08), transparent 76%);
+    filter: blur(44px);
+  }
+  html:not(.dark) .landing-canvas .floating-phone-img {
+    filter: drop-shadow(0 24px 36px rgba(15, 23, 42, 0.1))
+      drop-shadow(0 8px 14px rgba(15, 23, 42, 0.06));
   }
   @media (prefers-reduced-motion: reduce) {
     .floating-phone-glow {
@@ -1862,6 +2499,14 @@ All colors MUST be HSL.
     padding-top: 1.1rem;
     margin-top: 0.5rem;
   }
+  html:not(.dark) .landing-canvas #servicios .price-well {
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.55) 0%,
+      rgba(248, 250, 252, 0.35) 100%
+    );
+    border-top-color: rgba(15, 23, 42, 0.08);
+  }
 
   /* Mini info-card inside service card — más sutil */
   .info-strip {
@@ -1914,7 +2559,7 @@ All colors MUST be HSL.
     transform: translate(3px, -3px);
   }
 
-  /* Featured price savings badge — etiqueta verde de descuento */
+  /* Ahorro — mismo lenguaje cromático que descuentos móvil (teal sobrio, sin verde neón) */
   .price-savings {
     display: inline-flex;
     align-items: center;
@@ -1925,11 +2570,16 @@ All colors MUST be HSL.
     font-size: 10.5px;
     font-weight: 700;
     line-height: 1;
-    color: rgb(74 222 128); /* green-400 */
-    background: rgba(34, 197, 94, 0.12);
-    border: 1px solid rgba(34, 197, 94, 0.30);
+    color: rgb(94 234 212);
+    background: rgba(45, 212, 191, 0.1);
+    border: 1px solid rgba(45, 212, 191, 0.24);
     text-transform: uppercase;
     letter-spacing: 0.04em;
+  }
+  html:not(.dark) .landing-canvas #servicios .price-savings {
+    color: rgb(15 118 110);
+    background: rgba(13, 148, 136, 0.09);
+    border-color: rgba(13, 148, 136, 0.22);
   }
 
   /* === iOS-grade label badge — refined, restrained, dotted indicator === */
@@ -1965,6 +2615,30 @@ All colors MUST be HSL.
     background: rgba(var(--card-accent), 0.10);
     border-color: rgba(var(--card-accent), 0.30);
     color: rgb(var(--card-accent));
+  }
+
+  html:not(.dark) .landing-canvas .badge-ios {
+    background: rgba(255, 255, 255, 0.82);
+    border-color: rgba(15, 23, 42, 0.1);
+    color: rgb(15 23 42);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.95),
+      0 8px 24px rgba(15, 23, 42, 0.06);
+  }
+  html:not(.dark) .landing-canvas .badge-ios--accent {
+    color: rgb(var(--card-accent));
+    background: rgba(var(--card-accent), 0.12);
+    border-color: rgba(var(--card-accent), 0.3);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.75),
+      0 6px 18px rgba(15, 23, 42, 0.05);
+  }
+
+  html:not(.dark) .landing-canvas .brand-lockup__name {
+    color: rgb(15 23 42);
+  }
+  html:not(.dark) .landing-canvas .brand-lockup__country {
+    color: rgb(100 116 139);
   }
 
   /* ============================================================ */
@@ -2184,6 +2858,31 @@ All colors MUST be HSL.
     font-weight: 500;
   }
 
+  html:not(.dark) .landing-canvas #servicios .feature-pill {
+    color: rgb(30 41 59);
+    background: rgba(248, 250, 252, 0.92);
+    border-color: rgba(15, 23, 42, 0.1);
+  }
+  html:not(.dark) .landing-canvas #servicios .feature-pill:hover {
+    background: rgba(255, 255, 255, 0.98);
+    border-color: rgba(15, 23, 42, 0.14);
+  }
+  html:not(.dark) .landing-canvas #servicios .feature-pill__dot {
+    box-shadow: 0 0 6px rgba(var(--card-accent), 0.35);
+  }
+  html:not(.dark) .landing-canvas #servicios .trust-pill {
+    color: rgb(30 41 59);
+    background: rgba(255, 255, 255, 0.75);
+    border-color: rgba(15, 23, 42, 0.08);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  }
+  html:not(.dark) .landing-canvas #servicios .trust-pill--rating .trust-pill__value {
+    color: rgb(30 41 59);
+  }
+  html:not(.dark) .landing-canvas #servicios .trust-pill--rating .trust-pill__count {
+    color: rgb(71 85 105);
+  }
+
   /* CTA shimmer — barrido de luz al hover */
   .cta-shimmer {
     position: relative;
@@ -2299,7 +2998,7 @@ All colors MUST be HSL.
       0 0 80px -10px rgba(var(--card-accent), 0.32),
       inset 0 1px 0 hsla(var(--la-outline-warm) / 0.30);
   }
-  /* Numero gigante grabado al fondo — efecto Apple Keynote */
+  /* Numero gigante — grabado limpio (sin lavado azul “sucio” sobre vidrio) */
   .step-numeral {
     font-family: 'Manrope', sans-serif;
     font-weight: 900;
@@ -2308,19 +3007,78 @@ All colors MUST be HSL.
     letter-spacing: -0.07em;
     background: linear-gradient(
       180deg,
-      rgba(var(--card-accent), 0.36),
-      rgba(var(--card-accent), 0) 78%
+      rgba(255, 255, 255, 0.14),
+      rgba(255, 255, 255, 0.03) 42%,
+      transparent 76%
     );
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
-    -webkit-text-stroke: 1.5px rgba(var(--card-accent), 0.50);
+    -webkit-text-stroke: 1px rgba(248, 250, 252, 0.22);
     pointer-events: none;
     user-select: none;
     transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
   }
   .step-card:hover .step-numeral {
     transform: scale(1.04) translateY(-2px);
+  }
+
+  html:not(.dark) .landing-canvas .step-card {
+    background:
+      radial-gradient(130% 90% at 100% 0%, rgba(15, 23, 42, 0.035), transparent 62%),
+      radial-gradient(130% 90% at 0% 100%, rgba(14, 116, 144, 0.04), transparent 62%),
+      rgba(255, 255, 255, 0.82);
+    border-color: rgba(15, 23, 42, 0.08);
+    box-shadow:
+      0 18px 44px rgba(15, 23, 42, 0.07),
+      inset 0 1px 0 rgba(255, 255, 255, 0.96),
+      inset 0 -1px 0 rgba(15, 23, 42, 0.03);
+    -webkit-backdrop-filter: blur(40px) saturate(145%);
+    backdrop-filter: blur(40px) saturate(145%);
+  }
+  html:not(.dark) .landing-canvas .step-card:hover {
+    border-color: rgba(15, 23, 42, 0.11);
+    box-shadow:
+      0 24px 52px rgba(15, 23, 42, 0.09),
+      0 0 0 1px rgba(14, 116, 144, 0.1),
+      inset 0 1px 0 rgba(255, 255, 255, 1);
+  }
+
+  /* Numeral — modo claro: solo pizarra (sin teal que ensucia el vidrio) */
+  html:not(.dark) .landing-canvas .step-numeral {
+    -webkit-text-stroke: 1px rgba(148, 163, 184, 0.28);
+    background: linear-gradient(
+      180deg,
+      rgba(15, 23, 42, 0.1),
+      rgba(15, 23, 42, 0.03) 44%,
+      transparent 76%
+    );
+  }
+
+  /* Numeral — modo oscuro: hielo nítido sobre cristal navy */
+  html.dark .landing-canvas .step-numeral {
+    -webkit-text-stroke: 1px rgba(226, 232, 240, 0.18);
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.12),
+      rgba(255, 255, 255, 0.02) 46%,
+      transparent 78%
+    );
+  }
+
+  html.dark .landing-canvas .step-card {
+    background:
+      radial-gradient(140% 100% at 100% 0%, rgba(var(--card-accent), 0.05), transparent 58%),
+      radial-gradient(140% 100% at 0% 100%, rgba(var(--card-accent), 0.03), transparent 58%),
+      rgba(8, 14, 30, 0.52);
+  }
+  html.dark .landing-canvas .step-card:hover {
+    border-color: rgba(var(--card-accent), 0.22);
+    box-shadow:
+      0 40px 72px rgba(0, 0, 0, 0.48),
+      0 0 0 1px rgba(var(--card-accent), 0.12),
+      0 0 56px -14px rgba(var(--card-accent), 0.2),
+      inset 0 1px 0 hsla(var(--la-outline-warm) / 0.24);
   }
 
   /* Step label — pill iOS con accent del paso */
@@ -2342,7 +3100,58 @@ All colors MUST be HSL.
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.10);
   }
 
-  /* Icon "tile" con depth real — capas apiladas */
+  /* Pill "Paso XX" — misma familia visual que .cta-hero--primary */
+  .landing-canvas #como-funciona .step-label.step-label--cta {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    z-index: 0;
+    color: #fff;
+    text-shadow: 0 1px 2px rgba(2, 6, 23, 0.45);
+    border-color: rgba(148, 163, 184, 0.22);
+    background:
+      linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.08) 0%,
+        rgba(255, 255, 255, 0.02) 100%
+      ),
+      linear-gradient(
+        135deg,
+        rgb(2, 6, 23) 0%,
+        rgb(15, 23, 42) 32%,
+        rgb(30, 41, 59) 62%,
+        rgb(30, 58, 138) 100%
+      );
+    box-shadow:
+      0 12px 28px -10px rgba(2, 6, 23, 0.65),
+      0 1px 0 rgba(255, 255, 255, 0.12) inset,
+      0 -1px 0 rgba(0, 0, 0, 0.38) inset,
+      0 0 0 1px rgba(255, 255, 255, 0.03);
+  }
+  html:not(.dark) .landing-canvas #como-funciona .step-label.step-label--cta {
+    box-shadow:
+      0 12px 28px -8px rgba(15, 23, 42, 0.2),
+      0 1px 0 rgba(255, 255, 255, 0.14) inset,
+      0 -1px 0 rgba(0, 0, 0, 0.22) inset,
+      0 0 0 1px rgba(15, 23, 42, 0.06);
+  }
+  .landing-canvas #como-funciona .step-label.step-label--cta::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 14%;
+    right: 14%;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.45),
+      transparent
+    );
+    pointer-events: none;
+    z-index: 0;
+  }
+
   .step-icon-tile {
     position: relative;
     width: 64px;
@@ -2375,6 +3184,36 @@ All colors MUST be HSL.
     );
     pointer-events: none;
   }
+
+  /* Cómo funciona — tile de icono con la misma tinta que el CTA hero */
+  .landing-canvas #como-funciona .step-icon-tile {
+    background:
+      linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.1) 0%,
+        rgba(255, 255, 255, 0.02) 100%
+      ),
+      linear-gradient(
+        135deg,
+        rgb(2, 6, 23) 0%,
+        rgb(15, 23, 42) 35%,
+        rgb(30, 41, 59) 65%,
+        rgb(30, 58, 138) 100%
+      );
+    box-shadow:
+      0 16px 34px -12px rgba(2, 6, 23, 0.75),
+      0 1px 0 rgba(255, 255, 255, 0.14) inset,
+      0 -2px 0 rgba(0, 0, 0, 0.35) inset,
+      0 0 0 1px rgba(255, 255, 255, 0.04);
+  }
+  html:not(.dark) .landing-canvas #como-funciona .step-icon-tile {
+    box-shadow:
+      0 14px 30px -10px rgba(15, 23, 42, 0.22),
+      0 1px 0 rgba(255, 255, 255, 0.16) inset,
+      0 -2px 0 rgba(0, 0, 0, 0.2) inset,
+      0 0 0 1px rgba(15, 23, 42, 0.06);
+  }
+
   /* Brand wordmark — Punto Legal Chile (Apple-styled lockup) */
   .brand-lockup {
     display: inline-flex;
@@ -2550,6 +3389,53 @@ All colors MUST be HSL.
     padding-top: 0.85rem;
   }
 
+  html:not(.dark) .landing-canvas .step-connector {
+    background-image: radial-gradient(
+      circle,
+      rgba(15, 23, 42, 0.14) 1px,
+      transparent 1.2px
+    );
+  }
+
+  html:not(.dark) .landing-canvas .faq-bubble {
+    background:
+      radial-gradient(120% 90% at 100% 0%, rgba(15, 23, 42, 0.04), transparent 58%),
+      rgba(255, 255, 255, 0.82);
+    border-color: rgba(15, 23, 42, 0.08);
+    box-shadow:
+      0 14px 36px rgba(15, 23, 42, 0.06),
+      inset 0 1px 0 rgba(255, 255, 255, 0.95);
+  }
+  html:not(.dark) .landing-canvas .faq-bubble[data-open="true"] {
+    background:
+      radial-gradient(120% 90% at 100% 0%, rgba(14, 116, 144, 0.06), transparent 58%),
+      rgba(255, 255, 255, 0.92);
+    border-color: rgba(15, 23, 42, 0.1);
+    box-shadow:
+      0 20px 44px rgba(15, 23, 42, 0.08),
+      inset 0 1px 0 rgba(255, 255, 255, 1);
+  }
+  html:not(.dark) .landing-canvas .faq-bubble__trigger {
+    color: rgb(15 23 42);
+  }
+  html:not(.dark) .landing-canvas .faq-bubble__trigger:hover {
+    color: rgb(14 116 144);
+  }
+  html:not(.dark) .landing-canvas .faq-bubble__icon {
+    background: rgba(248, 250, 252, 0.98);
+    border-color: rgba(148, 163, 184, 0.4);
+    color: rgb(71 85 105);
+  }
+  html:not(.dark) .landing-canvas .faq-bubble[data-open="true"] .faq-bubble__icon {
+    color: white;
+  }
+  html:not(.dark) .landing-canvas .faq-bubble__panel {
+    color: rgb(71 85 105);
+  }
+  html:not(.dark) .landing-canvas .faq-bubble__panel-inner {
+    border-top-color: rgba(15, 23, 42, 0.08);
+  }
+
   .cta-secondary {
     display: inline-flex;
     align-items: center;
@@ -2573,6 +3459,17 @@ All colors MUST be HSL.
   .cta-secondary:focus-visible {
     outline: none;
     box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.35);
+  }
+
+  html:not(.dark) .landing-canvas .cta-secondary {
+    color: rgb(15 23 42);
+    background: rgba(255, 255, 255, 0.82);
+    border-color: rgba(15, 23, 42, 0.1);
+  }
+  html:not(.dark) .landing-canvas .cta-secondary:hover {
+    color: rgb(3 105 161);
+    background: rgba(255, 255, 255, 0.96);
+    border-color: rgba(56, 189, 248, 0.35);
   }
 
   /* Filtros de categoría (pill chips) */
@@ -2697,6 +3594,21 @@ All colors MUST be HSL.
       border-color 0.4s ease,
       background 0.4s ease;
   }
+  html:not(.dark) .landing-canvas #servicios .cat-bubble__ring {
+    background:
+      radial-gradient(120% 90% at 30% 20%, rgba(255, 255, 255, 0.75), transparent 55%),
+      rgba(255, 255, 255, 0.82);
+    border-color: rgba(15, 23, 42, 0.08);
+    box-shadow:
+      0 14px 32px rgba(15, 23, 42, 0.08),
+      inset 0 1px 0 rgba(255, 255, 255, 0.95);
+  }
+  html:not(.dark) .landing-canvas #servicios .cat-bubble__label {
+    color: rgb(51 65 85);
+  }
+  html:not(.dark) .landing-canvas #servicios .cat-bubble[data-active="true"] .cat-bubble__label {
+    color: rgb(15 23 42);
+  }
   @media (min-width: 640px) {
     .cat-bubble__ring {
       width: 92px;
@@ -2752,39 +3664,39 @@ All colors MUST be HSL.
   /* Estado ACTIVO — el ring brilla con breathing glow + tile elevado */
   .cat-bubble[data-active="true"] .cat-bubble__ring {
     background:
-      radial-gradient(120% 90% at 30% 20%, rgba(var(--bubble-accent), 0.22), transparent 55%),
+      radial-gradient(120% 90% at 30% 20%, rgba(var(--bubble-accent), 0.14), transparent 55%),
       hsla(var(--la-surface-high) / 0.70);
-    border-color: rgba(var(--bubble-accent), 0.55);
+    border-color: rgba(var(--bubble-accent), 0.38);
     box-shadow:
-      0 26px 52px -14px rgba(var(--bubble-accent), 0.55),
-      0 0 0 1px rgba(var(--bubble-accent), 0.20),
-      0 0 70px -8px rgba(var(--bubble-accent), 0.40),
+      0 22px 44px -14px rgba(var(--bubble-accent), 0.32),
+      0 0 0 1px rgba(var(--bubble-accent), 0.14),
+      0 0 48px -10px rgba(var(--bubble-accent), 0.22),
       inset 0 1px 0 hsla(var(--la-outline-warm) / 0.28);
     animation: cat-breathing 3.6s ease-in-out infinite;
   }
   @keyframes cat-breathing {
     0%, 100% {
       box-shadow:
-        0 26px 52px -14px rgba(var(--bubble-accent), 0.55),
-        0 0 0 1px rgba(var(--bubble-accent), 0.20),
-        0 0 70px -8px rgba(var(--bubble-accent), 0.40),
+        0 22px 44px -14px rgba(var(--bubble-accent), 0.32),
+        0 0 0 1px rgba(var(--bubble-accent), 0.14),
+        0 0 48px -10px rgba(var(--bubble-accent), 0.22),
         inset 0 1px 0 hsla(var(--la-outline-warm) / 0.28);
     }
     50% {
       box-shadow:
-        0 30px 60px -14px rgba(var(--bubble-accent), 0.65),
-        0 0 0 1px rgba(var(--bubble-accent), 0.30),
-        0 0 90px -6px rgba(var(--bubble-accent), 0.55),
+        0 26px 50px -14px rgba(var(--bubble-accent), 0.4),
+        0 0 0 1px rgba(var(--bubble-accent), 0.2),
+        0 0 58px -8px rgba(var(--bubble-accent), 0.3),
         inset 0 1px 0 hsla(var(--la-outline-warm) / 0.32);
     }
   }
   .cat-bubble[data-active="true"] .cat-bubble__tile {
     transform: translateY(-7px) scale(1.05);
     box-shadow:
-      0 26px 44px -10px rgba(var(--bubble-accent), 0.75),
-      0 3px 0 rgba(0, 0, 0, 0.22),
-      inset 0 2px 0 rgba(255, 255, 255, 0.40),
-      inset 0 -3px 0 rgba(0, 0, 0, 0.22);
+      0 22px 38px -10px rgba(var(--bubble-accent), 0.45),
+      0 3px 0 rgba(0, 0, 0, 0.2),
+      inset 0 2px 0 rgba(255, 255, 255, 0.34),
+      inset 0 -3px 0 rgba(0, 0, 0, 0.2);
   }
   .cat-bubble:hover .cat-bubble__tile {
     transform: translateY(-5px) scale(1.02);

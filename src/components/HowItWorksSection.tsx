@@ -6,6 +6,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import BrandWordmark from "@/components/BrandWordmark";
+import { useTheme } from "@/hooks/useTheme";
 
 interface Step {
   number: string;
@@ -16,6 +17,9 @@ interface Step {
   accent: string; // RGB triplet
 }
 
+/** Acento único tipo iOS / estudio: azul tinta legible (sin arcoíris por paso). */
+const STEP_ACCENT = "37 99 235"; // blue-600
+
 const steps: Step[] = [
   {
     number: "01",
@@ -24,7 +28,7 @@ const steps: Step[] = [
       "Selecciona la especialidad que necesitas — familia, laboral, sucesorio, inmobiliario o empresarial.",
     detail: "Si no estás seguro, te orientamos en segundos.",
     icon: ListChecks,
-    accent: "59 130 246", // blue-500
+    accent: STEP_ACCENT,
   },
   {
     number: "02",
@@ -33,7 +37,7 @@ const steps: Step[] = [
       "Reservas día y hora desde tu celular. Pago seguro y confirmación instantánea por mail.",
     detail: "Cancelación gratis hasta 1 hora antes.",
     icon: CalendarCheck,
-    accent: "34 211 238", // cyan-400
+    accent: STEP_ACCENT,
   },
   {
     number: "03",
@@ -42,12 +46,14 @@ const steps: Step[] = [
       "45 minutos uno a uno con un abogado especialista. Te entregamos un plan de acción claro y por escrito.",
     detail: "Sin filas, sin oficinas, sin papeleo.",
     icon: Video,
-    accent: "129 140 248", // indigo-400
+    accent: STEP_ACCENT,
   },
 ];
 
 const HowItWorksSection = () => {
   const prefersReducedMotion = useReducedMotion();
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
 
   return (
     <section
@@ -70,17 +76,27 @@ const HowItWorksSection = () => {
         </motion.div>
 
         <div className="mx-auto mb-16 max-w-2xl text-center lg:mb-20">
-          <span className="badge-ios" style={{ color: "rgb(125 211 252)" }}>
+          <span
+            className={`badge-ios ${isDark ? "text-slate-200" : "text-slate-700"}`}
+          >
             Tu consulta en 3 pasos
           </span>
-          <h2 className="font-display mt-6 text-[32px] font-bold leading-[1.04] tracking-tight text-white sm:text-[48px] lg:text-[60px]">
-            <span className="bg-gradient-to-r from-white via-blue-100 to-cyan-100 bg-clip-text text-transparent">
+          <h2
+            className={`font-display mt-6 text-[32px] font-bold leading-[1.04] tracking-tight sm:text-[48px] lg:text-[60px] ${
+              isDark ? "text-white" : "text-slate-900"
+            }`}
+          >
+            <span className={isDark ? "text-white" : "text-slate-950"}>
               Sin filas, sin papeleo,
               <br className="hidden sm:block" />
               sin vueltas innecesarias.
             </span>
           </h2>
-          <p className="mx-auto mt-5 max-w-xl text-base leading-relaxed text-slate-300 sm:text-lg">
+          <p
+            className={`mx-auto mt-5 max-w-xl text-base leading-relaxed sm:text-lg ${
+              isDark ? "text-slate-300" : "text-slate-600"
+            }`}
+          >
             Resuelves tu caso desde donde estés, en tu horario, con un abogado real
             del área que necesitas.
           </p>
@@ -138,12 +154,12 @@ const HowItWorksSection = () => {
 
                   <span
                     className="ambient-orb -right-12 -top-12 h-44 w-44"
-                    style={{ background: `rgba(${step.accent}, 0.28)` }}
+                    style={{ background: `rgba(${step.accent}, 0.12)` }}
                     aria-hidden
                   />
                   <span
                     className="ambient-orb -left-10 -bottom-10 h-36 w-36"
-                    style={{ background: `rgba(${step.accent}, 0.14)` }}
+                    style={{ background: `rgba(${step.accent}, 0.06)` }}
                     aria-hidden
                   />
 
@@ -157,37 +173,36 @@ const HowItWorksSection = () => {
                     <div className="step-icon-tile" aria-hidden>
                       <Icon className="h-7 w-7" strokeWidth={2.2} />
                     </div>
-                    <span
-                      className="step-label"
-                      style={{
-                        color: `rgb(${step.accent})`,
-                        background: `rgba(${step.accent}, 0.10)`,
-                        borderColor: `rgba(${step.accent}, 0.28)`,
-                      }}
-                    >
+                    <span className="step-label step-label--cta">
                       Paso {step.number}
                     </span>
                   </div>
 
                   {/* Body */}
                   <div className="relative z-10 mt-auto">
-                    <h3 className="font-display text-[22px] font-bold leading-[1.15] tracking-tight text-white lg:text-[26px]">
+                    <h3
+                      className={`font-display text-[22px] font-bold leading-[1.15] tracking-tight lg:text-[26px] ${
+                        isDark ? "text-slate-50" : "text-slate-900"
+                      }`}
+                    >
                       {step.title}
                     </h3>
-                    <p className="mt-3 text-[14.5px] leading-relaxed text-slate-300">
+                    <p
+                      className={`mt-3 text-[14.5px] leading-relaxed ${
+                        isDark ? "text-slate-200" : "text-slate-600"
+                      }`}
+                    >
                       {step.description}
                     </p>
-                    {/* Detail con dot accent — sensación de "callout" */}
                     <p
-                      className="mt-4 flex items-center gap-2 text-[12.5px] font-medium"
-                      style={{ color: `rgba(${step.accent}, 0.95)` }}
+                      className={`mt-4 flex items-center gap-2 text-[12.5px] font-medium ${
+                        isDark ? "text-slate-200" : "text-slate-700"
+                      }`}
                     >
                       <span
-                        className="inline-block h-1.5 w-1.5 rounded-full"
-                        style={{
-                          background: `rgb(${step.accent})`,
-                          boxShadow: `0 0 8px rgba(${step.accent}, 0.7)`,
-                        }}
+                        className={`inline-block h-1.5 w-1.5 shrink-0 rounded-full ${
+                          isDark ? "bg-slate-300 shadow-[0_0_0_1px_rgba(255,255,255,0.12)]" : "bg-slate-500/80"
+                        }`}
                         aria-hidden
                       />
                       <span>{step.detail}</span>
@@ -199,9 +214,13 @@ const HowItWorksSection = () => {
           </div>
         </div>
 
-        <p className="mt-12 text-center text-[12px] uppercase tracking-[0.2em] text-slate-500">
+        <p
+          className={`mt-12 text-center text-[12px] uppercase tracking-[0.2em] ${
+            isDark ? "text-slate-300" : "text-slate-600"
+          }`}
+        >
           Tiempo promedio de agendamiento ·{" "}
-          <span className="text-slate-300">2 minutos</span>
+          <span className={isDark ? "text-slate-100" : "text-slate-800"}>2 minutos</span>
         </p>
       </div>
     </section>

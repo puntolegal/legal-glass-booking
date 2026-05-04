@@ -1,882 +1,983 @@
-import { motion } from 'framer-motion'
-import { HomeIcon, FileText, Shield, TrendingUp, CheckCircle, Star, Clock, Award, AlertTriangle, ArrowRight, Calendar } from 'lucide-react'
-import { Link } from 'react-router-dom'
-import SEO from '../components/SEO'
+import { useState, useCallback, useRef, useEffect } from 'react'
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
+import {
+  Lock,
+  ChevronRight,
+  CheckCircle2,
+  Users,
+  FileSearch,
+  ArrowUp,
+  Shield,
+  X,
+  Check,
+} from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { useNavigate } from 'react-router-dom'
+import { Helmet } from 'react-helmet-async'
+import SEO from '@/components/SEO'
+import { siteUrl } from '@/config/siteUrl'
+import { InmobiliarioProcessingTerminal } from '@/components/inmobiliario/InmobiliarioProcessingTerminal'
+import { InmobiliarioAddressStep } from '@/components/inmobiliario/InmobiliarioAddressStep'
+import type { MockOrienteAddress } from '@/constants/inmobiliarioMockAddresses'
+import {
+  inmobiliarioQualificationSchema,
+  INMOB_QUAL_STORAGE_KEY,
+  type InmobiliarioQualification,
+} from '@/constants/inmobiliarioQualification'
 
-const services = [
-  {
-    icon: FileText,
-    title: 'Compraventa de Propiedades',
-    description: 'Asesoría completa en transacciones inmobiliarias seguras.',
-    features: ['Estudio de títulos', 'Redacción de contratos', 'Gestión de escrituras', 'Due diligence inmobiliaria']
-  },
-  {
-    icon: HomeIcon,
-    title: 'Contratos de Arriendo',
-    description: 'Protección legal para propietarios e inquilinos.',
-    features: ['Contratos residenciales', 'Contratos comerciales', 'Gestión de garantías', 'Resolución de conflictos']
-  },
-  {
-    icon: Shield,
-    title: 'Regularización de Propiedades',
-    description: 'Solución a problemas de títulos y documentación.',
-    features: ['Saneamiento de títulos', 'Prescripción adquisitiva', 'Subdivisiones', 'Fusión de predios']
-  },
-  {
-    icon: TrendingUp,
-    title: 'Inversión Inmobiliaria',
-    description: 'Estructuración legal para proyectos de inversión.',
-    features: ['Sociedades inmobiliarias', 'Fideicomisos', 'Joint ventures', 'Análisis de riesgos']
-  }
+/** Estado intermedio del micro-embudo (valores alineados al schema antes de Zod) */
+type HeroFormState = {
+  tipo_propiedad: string
+  ubicacion: string
+  direccion_referencia: string
+  momento_venta: string
+  metros_cuadrados: string
+  precio_esperado: string
+}
+
+const initialForm: HeroFormState = {
+  tipo_propiedad: '',
+  ubicacion: '',
+  direccion_referencia: '',
+  momento_venta: '',
+  metros_cuadrados: '',
+  precio_esperado: '',
+}
+
+const TOTAL_STEPS = 5
+
+const TRANSITION_MS = 280
+const SUCCESS_NAV_MS = 2200
+/** Ilusión de trabajo antes del éxito (3,5 s). */
+const PROCESSING_MS = 3500
+const ADDRESS_LABOR_MS = 720
+
+function mapHeroToQualification(d: HeroFormState): InmobiliarioQualification | null {
+  const parsed = inmobiliarioQualificationSchema.safeParse({
+    tipo_propiedad: d.tipo_propiedad,
+    ubicacion: d.ubicacion,
+    ...(d.direccion_referencia.trim()
+      ? { direccion_referencia: d.direccion_referencia.trim() }
+      : {}),
+    momento_venta: d.momento_venta,
+    metros_cuadrados: d.metros_cuadrados,
+    precio_esperado: d.precio_esperado,
+  })
+  return parsed.success ? parsed.data : null
+}
+
+const TRADITIONAL_PAINS = [
+  'Turismo inmobiliario: visitas de curiosos sin pre-aprobación hipotecaria.',
+  'Ventas caídas a última hora por reparos del abogado del banco del comprador.',
+  'Propiedades “quemadas” por meses de exposición pública bajando de precio.',
 ]
 
-const testimonials = [
-  {
-    name: 'Ana Rodríguez',
-    role: 'Inversionista Inmobiliaria',
-    content: 'Me ayudaron a detectar problemas graves en una propiedad que iba a comprar. Su estudio de títulos me ahorró una pérdida de $200 millones.',
-    rating: 5,
-    image: '/api/placeholder/80/80'
-  },
-  {
-    name: 'Miguel Torres',
-    role: 'Propietario',
-    content: 'Resolvieron un problema de títulos que tenía hace 15 años. Ahora puedo vender mi propiedad sin problemas.',
-    rating: 5,
-    image: '/api/placeholder/80/80'
-  },
-  {
-    name: 'Constructora Del Valle',
-    role: 'Empresa Constructora',
-    content: 'Su asesoría en la adquisición de terrenos para nuestro proyecto fue impecable. Excelente trabajo en due diligence.',
-    rating: 5,
-    image: '/api/placeholder/80/80'
-  }
+const MARSHALL_WINS = [
+  'Exclusividad y filtro financiero estricto antes de cada visita.',
+  'Estudio de títulos preventivo para asegurar la viabilidad de la firma.',
+  'Gestión comercial privada para proteger la percepción de valor.',
 ]
 
-const stats = [
-  { number: '2,500+', label: 'Transacciones exitosas' },
-  { number: '$850M+', label: 'En transacciones asesoradas' },
-  { number: '99.2%', label: 'Sin problemas post-venta' },
-  { number: '48h', label: 'Tiempo promedio estudio títulos' }
-]
+const TIMELINE_PHASES = [
+  {
+    key: 'p1',
+    days: 'Días 1–3',
+    title: 'Reunión Estratégica y Mandato Legal',
+    body: 'Fijamos condiciones claras y exclusividad para proteger su propiedad, su tiempo y la percepción de valor.',
+  },
+  {
+    key: 'p2',
+    days: 'Días 4–15',
+    title: 'Saneamiento y Venta Silenciosa',
+    body: 'Abogados ordenan el camino registral; el comercial identifica al comprador idóneo en modalidad reservada, sin portales abiertos.',
+  },
+  {
+    key: 'p3',
+    days: 'Días 16–30',
+    title: 'Cierre Notarial y Liquidación',
+    body: 'Firma segura de la promesa y traspaso de fondos con acompañamiento hasta el instrumento en notaría.',
+  },
+] as const
+
+const PATRIMONIO_SCANNER_MESSAGES = [
+  'Cruzando datos del Conservador…',
+  'Verificando roles ante el SII…',
+  'Proyectando plusvalía de la zona…',
+  'Buscando coincidencias en cartera privada…',
+] as const
+
+/** Labor illusion en el hero: plano + rayo de escaneo + mensajes en bucle. */
+function InmobiliarioPatrimonioScanner() {
+  const reduce = useReducedMotion()
+  const [msgIndex, setMsgIndex] = useState(0)
+
+  useEffect(() => {
+    if (reduce) return
+    const id = window.setInterval(() => {
+      setMsgIndex((i) => (i + 1) % PATRIMONIO_SCANNER_MESSAGES.length)
+    }, 1500)
+    return () => window.clearInterval(id)
+  }, [reduce])
+
+  const active = reduce ? 0 : msgIndex
+
+  return (
+    <div className="mb-2 rounded-2xl border border-slate-200 bg-white/80 p-4 shadow-sm backdrop-blur-sm sm:p-5">
+      <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-emerald-800">
+        Escáner patrimonial
+      </p>
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-stretch">
+        <div className="relative h-44 min-h-[11rem] flex-1 overflow-hidden rounded-xl border border-slate-200/80 bg-slate-50/95 sm:max-w-[260px]">
+          <div
+            className="absolute inset-0"
+            style={{
+              backgroundImage: `
+                linear-gradient(rgba(100, 116, 139, 0.14) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(100, 116, 139, 0.14) 1px, transparent 1px)
+              `,
+              backgroundSize: '18px 18px',
+            }}
+            aria-hidden
+          />
+          <svg
+            className="absolute inset-2 text-slate-400/35"
+            viewBox="0 0 100 100"
+            preserveAspectRatio="none"
+            aria-hidden
+          >
+            <rect x="6" y="8" width="88" height="52" fill="none" stroke="currentColor" strokeWidth="0.7" />
+            <line x1="6" y1="36" x2="94" y2="36" stroke="currentColor" strokeWidth="0.4" />
+            <line x1="48" y1="8" x2="48" y2="60" stroke="currentColor" strokeWidth="0.4" />
+            <rect x="28" y="68" width="44" height="22" fill="none" stroke="currentColor" strokeWidth="0.55" />
+          </svg>
+          {!reduce && (
+            <motion.div
+              className="absolute left-[10%] right-[10%] z-[1] h-[2px] rounded-full bg-emerald-500 shadow-[0_0_8px_#10b981]"
+              initial={false}
+              animate={{ top: ['6%', '92%', '6%'] }}
+              transition={{ duration: 3.8, repeat: Infinity, ease: 'easeInOut' }}
+              style={{ top: '6%' }}
+            />
+          )}
+        </div>
+        <div className="flex min-h-[11rem] flex-1 items-center sm:pl-1">
+          <AnimatePresence mode="wait">
+            <motion.p
+              key={active}
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -6 }}
+              transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+              className="text-sm font-medium leading-relaxed text-slate-800 sm:text-[15px]"
+            >
+              {PATRIMONIO_SCANNER_MESSAGES[active]}
+            </motion.p>
+          </AnimatePresence>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+/** Ventana tipo escritorio — cristal luminoso (banca privada), mismo lenguaje visual en formulario y dashboard. */
+function MacGlassWindow({
+  title,
+  subtitle,
+  progressPct,
+  bodyClassName,
+  children,
+}: {
+  title: string
+  subtitle?: string
+  progressPct?: number
+  bodyClassName?: string
+  children: React.ReactNode
+}) {
+  return (
+    <div className="relative overflow-hidden rounded-[1.35rem] border border-slate-200/50 bg-white/80 shadow-[0_24px_80px_rgba(15,23,42,0.08)] ring-1 ring-slate-900/[0.04] backdrop-blur-2xl">
+      <div className="relative flex items-center gap-3 border-b border-slate-200/50 bg-slate-50/90 px-4 py-2.5">
+        <div className="flex shrink-0 items-center gap-1.5" aria-hidden>
+          <span className="h-2.5 w-2.5 rounded-full bg-[#FF5F57]" />
+          <span className="h-2.5 w-2.5 rounded-full bg-[#FEBC2E]" />
+          <span className="h-2.5 w-2.5 rounded-full bg-[#28C840]" />
+        </div>
+        <div className="min-w-0 flex-1 text-center">
+          <p className="truncate text-[11px] font-semibold tracking-wide text-slate-800">{title}</p>
+          {subtitle ? <p className="truncate text-[10px] text-slate-500">{subtitle}</p> : null}
+        </div>
+        <div className="w-[52px] shrink-0" aria-hidden />
+      </div>
+      {typeof progressPct === 'number' && (
+        <div className="relative h-[3px] overflow-hidden bg-slate-200/70">
+          <div className="relative h-full overflow-hidden" style={{ width: `${progressPct}%` }}>
+            <div className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-emerald-500" />
+            <motion.div
+              className="absolute inset-y-0 w-[40%] skew-x-[-12deg] bg-gradient-to-r from-transparent via-white/70 to-transparent"
+              initial={false}
+              animate={{ x: ['-120%', '220%'] }}
+              transition={{ duration: 2.4, repeat: Infinity, ease: 'linear' }}
+            />
+          </div>
+        </div>
+      )}
+      <div className={cn('relative', bodyClassName)}>{children}</div>
+    </div>
+  )
+}
 
 export default function ServicioInmobiliarioPage() {
+  const navigate = useNavigate()
+  const prefersReducedMotion = useReducedMotion()
+  const [step, setStep] = useState(1)
+  const [, setFormData] = useState<HeroFormState>(initialForm)
+  const [submitError, setSubmitError] = useState<string | null>(null)
+  const [isTransitioning, setIsTransitioning] = useState(false)
+  const [showStickyCta, setShowStickyCta] = useState(false)
+  const [phase, setPhase] = useState<'questions' | 'processing' | 'success'>('questions')
+  const [addressPreview, setAddressPreview] = useState<MockOrienteAddress | null>(null)
+
+  const heroRef = useRef<HTMLElement>(null)
+  const formDataRef = useRef<HeroFormState>({ ...initialForm })
+  const navigateTimerRef = useRef<ReturnType<typeof window.setTimeout> | null>(null)
+  const processingTimerRef = useRef<ReturnType<typeof window.setTimeout> | null>(null)
+  const addressLaborTimerRef = useRef<ReturnType<typeof window.setTimeout> | null>(null)
+
+  useEffect(() => {
+    return () => {
+      if (navigateTimerRef.current != null) window.clearTimeout(navigateTimerRef.current)
+      if (processingTimerRef.current != null) window.clearTimeout(processingTimerRef.current)
+      if (addressLaborTimerRef.current != null) window.clearTimeout(addressLaborTimerRef.current)
+    }
+  }, [])
+
+  useEffect(() => {
+    const el = heroRef.current
+    if (!el) return
+
+    const onHeroScroll = () => {
+      const rect = el.getBoundingClientRect()
+      setShowStickyCta(rect.bottom < 0)
+    }
+
+    onHeroScroll()
+    window.addEventListener('scroll', onHeroScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onHeroScroll)
+  }, [])
+
+  const scrollToForm = useCallback(() => {
+    document.getElementById('evaluacion-formulario')?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start',
+    })
+  }, [])
+
+  const persistAndNavigate = useCallback(
+    (data: HeroFormState) => {
+      setSubmitError(null)
+      const qual = mapHeroToQualification(data)
+      if (!qual) {
+        setSubmitError('No pudimos validar los datos. Complete los cinco pasos.')
+        setPhase('questions')
+        setStep(1)
+        return
+      }
+      try {
+        sessionStorage.setItem(INMOB_QUAL_STORAGE_KEY, JSON.stringify(qual))
+      } catch {
+        setSubmitError('Active el almacenamiento del navegador para continuar.')
+        setPhase('questions')
+        setStep(5)
+        return
+      }
+      navigate('/agendamiento?plan=inmobiliario-eval')
+    },
+    [navigate],
+  )
+
+  const handleAddressPick = useCallback(
+    (row: MockOrienteAddress) => {
+      if (isTransitioning || phase !== 'questions' || step !== 2) return
+      setSubmitError(null)
+      setIsTransitioning(true)
+      const prev = formDataRef.current
+      const next: HeroFormState = {
+        ...prev,
+        ubicacion: row.comuna,
+        direccion_referencia: row.label,
+      }
+      formDataRef.current = next
+      setFormData(next)
+      setAddressPreview(row)
+      if (addressLaborTimerRef.current != null) window.clearTimeout(addressLaborTimerRef.current)
+      addressLaborTimerRef.current = window.setTimeout(() => {
+        addressLaborTimerRef.current = null
+        setAddressPreview(null)
+        setStep(3)
+        setIsTransitioning(false)
+      }, ADDRESS_LABOR_MS)
+    },
+    [isTransitioning, phase, step],
+  )
+
+  const handleOptionSelect = useCallback(
+    (field: keyof HeroFormState, value: string) => {
+      if (isTransitioning || phase === 'success' || phase === 'processing') return
+      setSubmitError(null)
+      setIsTransitioning(true)
+
+      setFormData((prev) => {
+        const next = { ...prev, [field]: value }
+        formDataRef.current = next
+        window.setTimeout(() => {
+          if (field !== 'precio_esperado') {
+            setStep((s) => Math.min(TOTAL_STEPS, s + 1))
+            setIsTransitioning(false)
+          } else {
+            setIsTransitioning(false)
+            setPhase('processing')
+            if (navigateTimerRef.current != null) window.clearTimeout(navigateTimerRef.current)
+            if (processingTimerRef.current != null) window.clearTimeout(processingTimerRef.current)
+            processingTimerRef.current = window.setTimeout(() => {
+              processingTimerRef.current = null
+              setPhase('success')
+              if (navigateTimerRef.current != null) window.clearTimeout(navigateTimerRef.current)
+              navigateTimerRef.current = window.setTimeout(() => {
+                navigateTimerRef.current = null
+                persistAndNavigate(formDataRef.current)
+              }, SUCCESS_NAV_MS)
+            }, PROCESSING_MS)
+          }
+        }, TRANSITION_MS)
+        return next
+      })
+    },
+    [isTransitioning, phase, persistAndNavigate],
+  )
+
+  const progressPct = phase === 'success' || phase === 'processing' ? 100 : (step / TOTAL_STEPS) * 100
+
   return (
     <>
-      <SEO 
-        title="Derecho Inmobiliario - Especialistas en Propiedades | Punto Legal"
-        description="Expertos en derecho inmobiliario: compraventa, arriendos, estudio de títulos y regularización de propiedades. Protege tu inversión inmobiliaria."
+      <SEO
+        title="Venta inmueble Las Condes, Vitacura, Lo Barnechea, La Reina | Equipo legal y comercial — Punto Legal"
+        description="Venta de inmueble en Las Condes, Vitacura, Lo Barnechea y La Reina: comercialización selectiva, filtro de interesados y saneamiento registral preventivo con equipo legal y comercial. Evaluación confidencial. Agende su reunión con Punto Legal."
+        url={siteUrl('/servicios/inmobiliario')}
+        keywords="vender departamento Las Condes, vender casa Vitacura, venta inmueble Lo Barnechea, La Reina, abogado inmobiliario Santiago Oriente, gestión venta alto patrimonio, tasación orientativa UF, corretaje privado, promesa compraventa Chile, cierre notarial, Punto Legal"
       />
-      
-      <div className="min-h-screen bg-gradient-to-b from-background to-background/95">
-        {/* Hero Section */}
-        <section className="relative py-20 overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-transparent to-primary/10" />
-          
-          <div className="container mx-auto px-4 relative z-10">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              className="text-center max-w-4xl mx-auto"
-            >
-              <div className="inline-flex items-center gap-2 bg-primary/10 rounded-full px-4 py-2 mb-6">
-                <HomeIcon className="w-5 h-5 text-primary" />
-                <span className="text-sm font-medium text-primary">Especialistas en Derecho Inmobiliario</span>
-              </div>
-              
-              <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent">
-                Protege tu Patrimonio Inmobiliario
-              </h1>
-              
-              <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
-                Desde la compra de tu primera casa hasta complejas operaciones de inversión, 
-                te acompañamos con la experiencia y seguridad jurídica que tu patrimonio merece.
-              </p>
-              
-              <div className="flex flex-wrap gap-4 justify-center">
-                <Link
-                  to="/contacto"
-                  className="px-8 py-4 bg-primary text-white rounded-xl font-semibold hover:bg-primary/90 transition-all duration-300 shadow-lg hover:shadow-xl"
-                >
-                  Estudio de Títulos
-                </Link>
-                <Link
-                  to="/calculadora-propiedades"
-                  className="px-8 py-4 bg-white/10 backdrop-blur-sm rounded-xl font-semibold hover:bg-white/20 transition-all duration-300 border border-white/20"
-                >
-                  Calculadora de Costos
-                </Link>
-              </div>
-            </motion.div>
-          </div>
-        </section>
+      <Helmet>
+        <script type="application/ld+json">
+          {JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'ProfessionalService',
+            name: 'Punto Legal — Venta inmobiliaria Sector Oriente (equipo legal y comercial)',
+            description:
+              'Orientación comercial y legal para venta de inmuebles en Las Condes, Vitacura, Lo Barnechea y La Reina: estudio de mercado riguroso, filtro de capacidad de pago y revisión orientativa de dominio y cargas, con criterio de abogados y corredor.',
+            url: siteUrl('/servicios/inmobiliario'),
+            provider: { '@type': 'Organization', name: 'Punto Legal', url: 'https://puntolegal.online' },
+            areaServed: {
+              '@type': 'AdministrativeArea',
+              name: 'Santiago Oriente, Chile',
+            },
+            serviceType: 'Asesoría inmobiliaria y legal orientada a venta de propiedades',
+          })}
+        </script>
+      </Helmet>
 
-        {/* Stats Section */}
-        <section className="py-16 border-y border-white/10">
-          <div className="container mx-auto px-4">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-              {stats.map((stat, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: index * 0.1 }}
-                  className="text-center"
-                >
-                  <div className="text-4xl font-bold text-primary mb-2">{stat.number}</div>
-                  <div className="text-sm text-muted-foreground">{stat.label}</div>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Service Packages */}
-        <section className="py-20">
-          <div className="container mx-auto px-4">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              className="text-center mb-12"
-            >
-              <h2 className="text-4xl font-bold mb-4">Paquetes de Servicios Inmobiliarios</h2>
-              <p className="text-xl text-muted-foreground">Protección completa para tu inversión inmobiliaria</p>
-            </motion.div>
-
-            <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-              {/* Comprador Básico */}
+      <div className="relative min-h-screen overflow-hidden bg-gradient-to-b from-slate-50 via-white to-slate-100 text-slate-800">
+        <div
+          className="pointer-events-none fixed inset-0 z-[1]"
+          style={{
+            backgroundImage:
+              'linear-gradient(to right, rgba(128, 128, 128, 0.045) 1px, transparent 1px), linear-gradient(to bottom, rgba(128, 128, 128, 0.045) 1px, transparent 1px)',
+            backgroundSize: '24px 24px',
+          }}
+          aria-hidden
+        />
+        <div className="relative z-10">
+        <section
+          ref={heroRef}
+          className="relative pt-24 pb-20 md:pt-28 md:pb-24 px-4 z-10 min-h-[min(92vh,920px)] flex flex-col justify-center"
+        >
+          <div className="container mx-auto max-w-6xl">
+            <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-start lg:items-center">
               <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.1 }}
-                className="relative bg-white/5 backdrop-blur-sm rounded-2xl p-8 border border-white/10 hover:border-primary/30 transition-all duration-300"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+                className="order-2 lg:order-1"
               >
-                <div className="text-center mb-6">
-                  <h3 className="text-2xl font-bold mb-2">Comprador Seguro</h3>
-                  <p className="text-muted-foreground mb-4">Para compradores de vivienda</p>
-                  <div className="text-4xl font-bold text-primary mb-2">$450.000</div>
-                  <p className="text-sm text-muted-foreground">Por transacción</p>
+                <div className="mb-4 inline-flex max-w-xl items-start gap-2.5 rounded-2xl border border-slate-200/50 bg-white/80 px-3.5 py-2.5 shadow-[0_8px_32px_rgba(15,23,42,0.06)] backdrop-blur-xl ring-1 ring-white/90 sm:items-center">
+                  <Shield className="mt-0.5 h-4 w-4 shrink-0 text-emerald-700 sm:mt-0" aria-hidden />
+                  <p className="text-[11px] font-semibold leading-snug tracking-wide text-slate-800 sm:text-[12px]">
+                    Atención exclusiva: operamos con un máximo de 4 propiedades para garantizar una gestión impecable.
+                  </p>
                 </div>
-                
-                <ul className="space-y-3 mb-8">
-                  <li className="flex items-start gap-2">
-                    <CheckCircle className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-                    <span className="text-sm">Estudio de títulos completo</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-                    <span className="text-sm">Revisión de certificados</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-                    <span className="text-sm">Informe de observaciones</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-                    <span className="text-sm">Redacción de promesa</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-                    <span className="text-sm">Acompañamiento en firma</span>
-                  </li>
-                </ul>
-                
-                <Link
-                  to="/agendamiento?plan=comprador-seguro"
-                  className="w-full bg-primary/10 text-primary border border-primary/30 rounded-xl py-3 px-6 font-semibold hover:bg-primary/20 transition-all duration-300 text-center block"
-                >
-                  Agendar Consulta
-                </Link>
+
+                <h1 className="mb-5 text-4xl font-bold leading-[1.06] tracking-[-0.02em] text-slate-900 sm:text-5xl lg:text-[3.05rem]">
+                  Protegemos el valor de su propiedad. Comercialización selectiva y blindaje jurídico desde el día uno.
+                </h1>
+
+                <p className="mb-6 max-w-xl text-base leading-relaxed text-slate-600 sm:text-lg">
+                  Evite la sobreexposición en portales y a los turistas inmobiliarios. Filtramos a los interesados por
+                  su capacidad real de pago y anticipamos cualquier reparo legal del banco, con miras a un cierre
+                  ordenado y al mejor precio de mercado defendible.
+                </p>
+
+                <InmobiliarioPatrimonioScanner />
+
+                <div className="mt-8 flex max-w-xl flex-col gap-3 text-sm text-slate-800 sm:gap-3.5">
+                  <div className="flex items-start gap-2.5">
+                    <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-700" strokeWidth={2} />
+                    <span>Exposición controlada: solo visitas con perfil financiero validado.</span>
+                  </div>
+                  <div className="flex items-start gap-2.5">
+                    <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-700" strokeWidth={2} />
+                    <span>Saneamiento registral: evitamos que la venta se caiga en notaría.</span>
+                  </div>
+                </div>
               </motion.div>
 
-              {/* Inversionista Premium */}
               <motion.div
+                id="evaluacion-formulario"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.2 }}
-                className="relative bg-white/5 backdrop-blur-sm rounded-2xl p-8 border-2 border-primary/50 hover:border-primary transition-all duration-300"
+                transition={{ duration: 0.6, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
+                className="order-1 lg:order-2 w-full max-w-md mx-auto lg:mx-0 lg:ml-auto scroll-mt-24"
               >
-                <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                  <div className="bg-gradient-to-r from-primary to-primary/80 text-white px-4 py-1 rounded-full text-sm font-semibold">
-                    Más Completo
-                  </div>
-                </div>
-                
-                <div className="text-center mb-6">
-                  <h3 className="text-2xl font-bold mb-2">Inversionista Pro</h3>
-                  <p className="text-muted-foreground mb-4">Para inversionistas inmobiliarios</p>
-                  <div className="text-4xl font-bold text-primary mb-2">$850.000</div>
-                  <p className="text-sm text-muted-foreground">Por transacción</p>
-                </div>
-                
-                <ul className="space-y-3 mb-8">
-                  <li className="flex items-start gap-2">
-                    <CheckCircle className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-                    <span className="text-sm">Todo lo del plan Comprador</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-                    <span className="text-sm">Due diligence inmobiliaria</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-                    <span className="text-sm">Análisis de rentabilidad legal</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-                    <span className="text-sm">Estructuración tributaria</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-                    <span className="text-sm">Contratos de arrendamiento</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-                    <span className="text-sm">Seguimiento post-compra</span>
-                  </li>
-                </ul>
-                
-                <Link
-                  to="/agendamiento?plan=inversionista-pro"
-                  className="w-full bg-primary text-white rounded-xl py-3 px-6 font-semibold hover:bg-primary/90 transition-all duration-300 text-center block"
+                <MacGlassWindow
+                  title="Evaluación confidencial"
+                  subtitle="Punto Legal · Las Condes, Vitacura, Lo Barnechea, La Reina"
+                  progressPct={progressPct}
+                  bodyClassName="px-6 py-6 sm:px-8 sm:py-8"
                 >
-                  Agendar Consulta
-                </Link>
-              </motion.div>
+                  <AnimatePresence mode="wait">
+                    {phase === 'questions' && (
+                      <motion.div
+                        key="form"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.25 }}
+                      >
+                        <div className="mb-6 mt-1">
+                          <span className="mb-1 block text-[10px] font-semibold uppercase tracking-[0.2em] text-emerald-800">
+                            Paso {step} de {TOTAL_STEPS}
+                          </span>
+                          <p className="mb-2 text-[11px] font-medium tracking-wide text-slate-600">
+                            Cuestionario confidencial
+                          </p>
+                          <h2 className="text-lg font-semibold tracking-tight text-slate-900 sm:text-xl">
+                            {step === 1 && '¿Qué tipo de inmueble quiere vender?'}
+                            {step === 2 && 'Dirección del activo (búsqueda asistida · Sector Oriente)'}
+                            {step === 3 && '¿Qué es lo más importante para usted en las próximas semanas?'}
+                            {step === 4 && '¿Cuál es la superficie útil aproximada?'}
+                            {step === 5 && 'Rango de precio en UF (referencia, se puede afinar después)'}
+                          </h2>
+                        </div>
 
-              {/* Desarrollador Enterprise */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.3 }}
-                className="relative bg-white/5 backdrop-blur-sm rounded-2xl p-8 border border-white/10 hover:border-primary/30 transition-all duration-300"
-              >
-                <div className="text-center mb-6">
-                  <h3 className="text-2xl font-bold mb-2">Desarrollador Elite</h3>
-                  <p className="text-muted-foreground mb-4">Para desarrolladores inmobiliarios</p>
-                  <div className="text-4xl font-bold text-primary mb-2">$2.500.000</div>
-                  <p className="text-sm text-muted-foreground">Por proyecto</p>
-                </div>
-                
-                <ul className="space-y-3 mb-8">
-                  <li className="flex items-start gap-2">
-                    <CheckCircle className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-                    <span className="text-sm">Todo lo del plan Inversionista</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-                    <span className="text-sm">Estudios de factibilidad</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-                    <span className="text-sm">Tramitación de permisos</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-                    <span className="text-sm">Constitución inmobiliarias</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-                    <span className="text-sm">Contratos con constructoras</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-                    <span className="text-sm">Abogado dedicado al proyecto</span>
-                  </li>
-                </ul>
-                
-                <Link
-                  to="/agendamiento?plan=desarrollador-elite"
-                  className="w-full bg-gradient-to-r from-primary to-primary/80 text-white rounded-xl py-3 px-6 font-semibold hover:from-primary/90 hover:to-primary/70 transition-all duration-300 text-center block"
-                >
-                  Agendar Consulta
-                </Link>
-              </motion.div>
-            </div>
-          </div>
-        </section>
+                        <AnimatePresence mode="wait">
+                          <motion.div
+                            key={step}
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -10 }}
+                            transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+                            className="space-y-2.5"
+                          >
+                            {step === 1 && (
+                              <>
+                                <FormButton variant="panel"
+                                  disabled={isTransitioning}
+                                  onClick={() => handleOptionSelect('tipo_propiedad', 'casa')}
+                                  label="Casa"
+                                />
+                                <FormButton variant="panel"
+                                  disabled={isTransitioning}
+                                  onClick={() => handleOptionSelect('tipo_propiedad', 'departamento')}
+                                  label="Departamento"
+                                />
+                                <FormButton variant="panel"
+                                  disabled={isTransitioning}
+                                  onClick={() => handleOptionSelect('tipo_propiedad', 'sitio_terreno')}
+                                  label="Sitio / terreno"
+                                />
+                              </>
+                            )}
+                            {step === 2 && (
+                              <InmobiliarioAddressStep
+                                disabled={isTransitioning}
+                                onConfirm={handleAddressPick}
+                                previewRow={addressPreview}
+                              />
+                            )}
+                            {step === 3 && (
+                              <>
+                                <FormButton variant="panel"
+                                  disabled={isTransitioning}
+                                  onClick={() => handleOptionSelect('momento_venta', 'visitas_pronto')}
+                                  label="Empezar con visitas serias (solo interesados filtrados)"
+                                />
+                                <FormButton variant="panel"
+                                  disabled={isTransitioning}
+                                  onClick={() => handleOptionSelect('momento_venta', 'reunion_equipo')}
+                                  label="Reunión con su equipo antes de exponer el inmueble"
+                                />
+                                <FormButton variant="panel"
+                                  disabled={isTransitioning}
+                                  onClick={() => handleOptionSelect('momento_venta', 'ordenar_documentacion')}
+                                  label="Ordenar títulos o cargas antes de salir al mercado"
+                                />
+                                <FormButton variant="panel"
+                                  disabled={isTransitioning}
+                                  onClick={() => handleOptionSelect('momento_venta', 'explorando')}
+                                  label="Aún evalúo si vendo / sin apuro"
+                                />
+                              </>
+                            )}
+                            {step === 4 && (
+                              <>
+                                <FormButton variant="panel"
+                                  disabled={isTransitioning}
+                                  onClick={() => handleOptionSelect('metros_cuadrados', 'menos_100')}
+                                  label="Menos de 100 m²"
+                                />
+                                <FormButton variant="panel"
+                                  disabled={isTransitioning}
+                                  onClick={() => handleOptionSelect('metros_cuadrados', 'entre_100_200')}
+                                  label="Entre 100 y 200 m²"
+                                />
+                                <FormButton variant="panel"
+                                  disabled={isTransitioning}
+                                  onClick={() => handleOptionSelect('metros_cuadrados', 'mas_200')}
+                                  label="Más de 200 m²"
+                                />
+                              </>
+                            )}
+                            {step === 5 && (
+                              <>
+                                <FormButton variant="panel"
+                                  disabled={isTransitioning}
+                                  onClick={() => handleOptionSelect('precio_esperado', 'por_definir_menos_8000')}
+                                  label="Menos de 8.000 UF"
+                                />
+                                <FormButton variant="panel"
+                                  disabled={isTransitioning}
+                                  onClick={() => handleOptionSelect('precio_esperado', '8000_15000')}
+                                  label="8.000 – 15.000 UF"
+                                />
+                                <FormButton variant="panel"
+                                  disabled={isTransitioning}
+                                  onClick={() => handleOptionSelect('precio_esperado', '15000_30000')}
+                                  label="15.000 – 30.000 UF"
+                                />
+                                <FormButton variant="panel"
+                                  disabled={isTransitioning}
+                                  onClick={() => handleOptionSelect('precio_esperado', 'over_30000')}
+                                  label="Más de 30.000 UF"
+                                />
+                              </>
+                            )}
+                          </motion.div>
+                        </AnimatePresence>
 
-        {/* Services Grid */}
-        <section className="py-20">
-          <div className="container mx-auto px-4">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              className="text-center mb-12"
-            >
-              <h2 className="text-4xl font-bold mb-4">Nuestros Servicios Inmobiliarios</h2>
-              <p className="text-xl text-muted-foreground">Soluciones integrales para todas tus necesidades inmobiliarias</p>
-            </motion.div>
+                        {submitError && (
+                          <p className="mt-4 text-sm text-amber-800" role="alert">
+                            {submitError}
+                          </p>
+                        )}
 
-            <div className="grid md:grid-cols-2 gap-8">
-              {services.map((service, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: index * 0.1 }}
-                  className="group relative"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-primary/10 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                  
-                  <div className="relative bg-white/5 backdrop-blur-sm rounded-2xl p-8 border border-white/10 hover:border-primary/30 transition-all duration-300">
-                    <div className="w-16 h-16 bg-gradient-to-br from-primary/30 to-primary/10 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-                      <service.icon className="w-8 h-8 text-primary" />
-                    </div>
-                    
-                    <h3 className="text-2xl font-bold mb-3">{service.title}</h3>
-                    <p className="text-muted-foreground mb-6">{service.description}</p>
-                    
-                    <ul className="space-y-2">
-                      {service.features.map((feature, idx) => (
-                        <li key={idx} className="flex items-start gap-2">
-                          <CheckCircle className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-                          <span className="text-sm">{feature}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </section>
+                        <div className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-3 border-t border-slate-200/50 pt-6 text-[11px] text-slate-600">
+                          <span className="inline-flex items-center gap-1.5">
+                            <Lock className="h-3.5 w-3.5 text-slate-500" aria-hidden />
+                            100% confidencial
+                          </span>
+                          <span className="inline-flex items-center gap-1.5">
+                            <Users className="w-3.5 h-3.5 text-slate-500" aria-hidden />
+                            Visitas filtradas
+                          </span>
+                          <span className="inline-flex items-center gap-1.5">
+                            <FileSearch className="w-3.5 h-3.5 text-slate-500" aria-hidden />
+                            Revisión orientativa de títulos
+                          </span>
+                        </div>
 
-        {/* Warning Section */}
-        <section className="py-20 bg-gradient-to-b from-red-500/5 to-transparent">
-          <div className="container mx-auto px-4">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              className="max-w-4xl mx-auto"
-            >
-              <div className="bg-red-500/10 border border-red-500/20 rounded-2xl p-8">
-                <div className="flex items-start gap-4">
-                  <AlertTriangle className="w-8 h-8 text-red-400 flex-shrink-0 mt-1" />
-                  <div>
-                    <h3 className="text-2xl font-bold mb-4 text-red-400">
-                      ¿Sabías que el 30% de las propiedades en Chile tienen problemas de títulos?
-                    </h3>
-                    <div className="grid md:grid-cols-2 gap-6">
-                      <div>
-                        <h4 className="font-semibold mb-2">Problemas más comunes:</h4>
-                        <ul className="space-y-2 text-sm">
-                          <li>• Títulos defectuosos o incompletos</li>
-                          <li>• Hipotecas no alzadas</li>
-                          <li>• Problemas de sucesión</li>
-                          <li>• Diferencias en deslindes</li>
-                        </ul>
-                      </div>
-                      <div>
-                        <h4 className="font-semibold mb-2">Consecuencias:</h4>
-                        <ul className="space-y-2 text-sm">
-                          <li>• Imposibilidad de vender</li>
-                          <li>• Pérdida de financiamiento</li>
-                          <li>• Litigios costosos</li>
-                          <li>• Devaluación del inmueble</li>
-                        </ul>
-                      </div>
-                    </div>
-                    <p className="mt-4 font-medium">
-                      Un estudio de títulos profesional puede prevenir estos problemas y proteger tu inversión.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          </div>
-        </section>
-
-        {/* Process Section */}
-        <section className="py-20">
-          <div className="container mx-auto px-4">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              className="text-center mb-12"
-            >
-              <h2 className="text-4xl font-bold mb-4">Nuestro Proceso de Estudio de Títulos</h2>
-              <p className="text-xl text-muted-foreground">Metodología probada para transacciones seguras</p>
-            </motion.div>
-
-            <div className="grid md:grid-cols-4 gap-8 max-w-5xl mx-auto">
-              {[
-                { step: '1', title: 'Análisis Inicial', desc: 'Revisión de antecedentes básicos', icon: Clock },
-                { step: '2', title: 'Investigación', desc: 'Estudio exhaustivo de títulos', icon: FileText },
-                { step: '3', title: 'Informe', desc: 'Reporte detallado de hallazgos', icon: Shield },
-                { step: '4', title: 'Recomendaciones', desc: 'Plan de acción y soluciones', icon: Award }
-              ].map((item, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: index * 0.1 }}
-                  className="text-center"
-                >
-                  <div className="relative mx-auto w-20 h-20 mb-4">
-                    <div className="absolute inset-0 bg-primary/20 rounded-full blur-xl" />
-                    <div className="relative bg-gradient-to-br from-primary to-primary/80 rounded-full flex items-center justify-center text-white font-bold text-2xl">
-                      {item.step}
-                    </div>
-                  </div>
-                  <h3 className="text-xl font-bold mb-2">{item.title}</h3>
-                  <p className="text-muted-foreground">{item.desc}</p>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Testimonials */}
-        <section className="py-20">
-          <div className="container mx-auto px-4">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              className="text-center mb-12"
-            >
-              <h2 className="text-4xl font-bold mb-4">Casos de Éxito Reales</h2>
-              <p className="text-xl text-muted-foreground">Clientes que protegieron su patrimonio</p>
-            </motion.div>
-
-            <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-              {testimonials.map((testimonial, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: index * 0.1 }}
-                  className="relative group"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-transparent rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                  
-                  <div className="relative bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10">
-                    <div className="flex items-center gap-4 mb-4">
-                      <img 
-                        src={testimonial.image} 
-                        alt={testimonial.name}
-                        className="w-16 h-16 rounded-full object-cover"
-                      />
-                      <div>
-                        <h4 className="font-bold">{testimonial.name}</h4>
-                        <p className="text-sm text-muted-foreground">{testimonial.role}</p>
-                      </div>
-                    </div>
-                    
-                    <div className="flex gap-1 mb-3">
-                      {[...Array(testimonial.rating)].map((_, i) => (
-                        <Star key={i} className="w-5 h-5 fill-primary text-primary" />
-                      ))}
-                    </div>
-                    
-                    <p className="text-muted-foreground italic">"{testimonial.content}"</p>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Real Estate Market Updates */}
-        <section className="py-20 bg-gradient-to-b from-primary/5 to-transparent">
-          <div className="container mx-auto px-4">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              className="text-center mb-12"
-            >
-              <h2 className="text-4xl font-bold mb-4">Actualidad del Mercado Inmobiliario</h2>
-              <p className="text-xl text-muted-foreground">Mantente informado sobre cambios legales y tendencias del mercado</p>
-            </motion.div>
-
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
-              {[
-                {
-                  title: "Nueva Ley de Copropiedad 2025: Cambios Importantes",
-                  excerpt: "Las modificaciones a la ley de copropiedad que afectan administradores y propietarios...",
-                  date: "16 Enero 2025",
-                  readTime: "6 min",
-                  category: "Copropiedad",
-                  urgent: true,
-                  link: "/blog/nueva-ley-copropiedad-2025"
-                },
-                {
-                  title: "Crédito Hipotecario: Nuevas Regulaciones SBIF",
-                  excerpt: "Cambios en los requisitos y procedimientos para créditos hipotecarios...",
-                  date: "14 Enero 2025", 
-                  readTime: "5 min",
-                  category: "Financiamiento",
-                  urgent: false,
-                  link: "/blog/regulaciones-credito-hipotecario"
-                },
-                {
-                  title: "Subsidio Habitacional 2025: Nuevos Montos y Requisitos",
-                  excerpt: "Actualizaciones en los programas de subsidio habitacional del gobierno...",
-                  date: "12 Enero 2025",
-                  readTime: "7 min", 
-                  category: "Subsidios",
-                  urgent: true,
-                  link: "/blog/subsidio-habitacional-2025"
-                },
-                {
-                  title: "Inversión Extranjera en Real Estate: Facilidades",
-                  excerpt: "Nuevas facilidades para inversionistas extranjeros en el mercado inmobiliario...",
-                  date: "10 Enero 2025",
-                  readTime: "8 min",
-                  category: "Inversión",
-                  urgent: false,
-                  link: "/blog/inversion-extranjera-inmobiliaria"
-                },
-                {
-                  title: "Ley de Arriendo: Modificaciones que Debes Conocer",
-                  excerpt: "Cambios en la legislación de arriendo que afectan propietarios e inquilinos...",
-                  date: "8 Enero 2025",
-                  readTime: "6 min",
-                  category: "Arriendos",
-                  urgent: true,
-                  link: "/blog/modificaciones-ley-arriendo"
-                },
-                {
-                  title: "Plusvalía Inmobiliaria: Nuevas Exenciones Tributarias",
-                  excerpt: "Beneficios tributarios para la venta de propiedades habitacionales...",
-                  date: "6 Enero 2025",
-                  readTime: "5 min",
-                  category: "Tributario",
-                  urgent: false,
-                  link: "/blog/exenciones-plusvalia-2025"
-                }
-              ].map((article, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: index * 0.1 }}
-                  className="group relative"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-primary/10 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                  
-                  <Link 
-                    to={article.link}
-                    className="relative block bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:border-primary/30 transition-all duration-300"
-                  >
-                    {article.urgent && (
-                      <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
-                        URGENTE
-                      </div>
+                        <div className="mt-5 flex items-center justify-center gap-2 text-[10px] text-slate-500">
+                          <Lock className="h-3 w-3 shrink-0 opacity-70" aria-hidden />
+                          <span>Sin correo masivo: sus datos solo para esta evaluación.</span>
+                        </div>
+                      </motion.div>
                     )}
-                    
-                    <div className="flex items-center gap-2 mb-3">
-                      <span className="bg-primary/20 text-primary px-2 py-1 rounded-full text-xs font-semibold">
-                        {article.category}
+                    {phase === 'processing' && (
+                      <motion.div
+                        key="processing"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.22 }}
+                        className="flex min-h-[20rem] flex-col justify-center"
+                      >
+                        <p className="text-center text-[11px] font-semibold tracking-wide text-emerald-800">
+                          Analizando antecedentes de la zona…
+                        </p>
+                        <InmobiliarioProcessingTerminal variant="light" messageIntervalMs={560} ufTickMs={120} />
+                      </motion.div>
+                    )}
+                    {phase === 'success' && (
+                      <motion.div
+                        key="success"
+                        role="status"
+                        aria-live="polite"
+                        initial={{ opacity: 0, y: 12, scale: 0.98 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+                        className="mt-8 mb-6 text-center px-1"
+                      >
+                        <motion.div
+                          initial={{ scale: 0.85, opacity: 0 }}
+                          animate={{ scale: 1, opacity: 1 }}
+                          transition={{ delay: 0.08, type: 'spring', stiffness: 260, damping: 18 }}
+                          className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl border border-emerald-200/90 bg-emerald-50/90"
+                        >
+                          <CheckCircle2 className="h-7 w-7 text-emerald-700" aria-hidden />
+                        </motion.div>
+                        <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.2em] text-emerald-800">
+                          Antecedentes revisados
+                        </p>
+                        <p className="text-base font-medium leading-snug tracking-tight text-slate-900 sm:text-lg">
+                          Hemos registrado su perfil. Lo invitamos a agendar una reunión con nuestro equipo legal y
+                          comercial para afinar precio, tiempos y próximos pasos con rigor profesional.
+                        </p>
+                        <motion.div
+                          className="mt-6 flex justify-center gap-1"
+                          initial="hidden"
+                          animate="visible"
+                          variants={{
+                            hidden: {},
+                            visible: { transition: { staggerChildren: 0.12 } },
+                          }}
+                        >
+                          {[0, 1, 2].map((i) => (
+                            <motion.span
+                              key={i}
+                              className="h-1 w-1 rounded-full bg-slate-400"
+                              variants={{
+                                hidden: { opacity: 0.3, y: 0 },
+                                visible: {
+                                  opacity: [0.3, 1, 0.3],
+                                  y: [0, -4, 0],
+                                  transition: { duration: 0.9, repeat: Infinity, delay: i * 0.15 },
+                                },
+                              }}
+                            />
+                          ))}
+                        </motion.div>
+                        <p className="mt-5 text-[11px] text-slate-600">Redirigiendo al agendamiento…</p>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </MacGlassWindow>
+              </motion.div>
+            </div>
+          </div>
+        </section>
+
+        {/* Mercado tradicional vs Sistema */}
+        <section className="relative z-10 border-t border-slate-200/80 py-20 md:py-28">
+          <div className="container mx-auto max-w-6xl px-4">
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-80px' }}
+              transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+              className="mb-12 text-center md:mb-16"
+            >
+              <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-500">
+                Comercialización selectiva
+              </p>
+              <h2 className="mx-auto max-w-3xl text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl lg:text-4xl">
+                El costo del mercado masivo vs.{' '}
+                <span className="text-emerald-800">nuestro criterio en Oriente</span>
+              </h2>
+              <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-slate-600 sm:text-base">
+                Mismo barrio, distinta disciplina: menos exposición ruidosa y más certeza frente al banco del
+                comprador.
+              </p>
+            </motion.div>
+
+            <div className="grid gap-5 lg:grid-cols-2 lg:gap-8">
+              <motion.div
+                initial={{ opacity: 0, x: prefersReducedMotion ? 0 : -12 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true, margin: '-40px' }}
+                transition={{ duration: 0.45 }}
+                className="rounded-2xl border border-rose-200/80 bg-white/80 p-7 shadow-[0_12px_40px_rgba(15,23,42,0.06)] backdrop-blur-xl ring-1 ring-white/90 sm:p-9"
+              >
+                <div className="mb-6 flex items-center gap-2">
+                  <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-rose-700">
+                    Corretaje tradicional
+                  </span>
+                </div>
+                <ul className="space-y-4">
+                  {TRADITIONAL_PAINS.map((t, i) => (
+                    <li key={t} className="flex gap-3 text-sm leading-relaxed text-slate-700">
+                      <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border border-rose-200/90 bg-rose-50/90">
+                        <X className="h-3.5 w-3.5 text-rose-600" strokeWidth={2.5} aria-hidden />
                       </span>
-                      <span className="text-xs text-muted-foreground">{article.date}</span>
-                      <span className="text-xs text-muted-foreground">• {article.readTime}</span>
-                    </div>
-                    
-                    <h3 className="text-lg font-bold mb-3 group-hover:text-primary transition-colors">
-                      {article.title}
-                    </h3>
-                    
-                    <p className="text-sm text-muted-foreground mb-4 line-clamp-3">
-                      {article.excerpt}
-                    </p>
-                    
-                    <div className="flex items-center gap-2 text-primary text-sm font-semibold">
-                      <span>Leer más</span>
-                      <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
-                    </div>
-                  </Link>
-                </motion.div>
-              ))}
-            </div>
-            
-            <div className="text-center mt-12">
-              <Link
-                to="/blog?categoria=inmobiliario"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-primary/10 text-primary border border-primary/30 rounded-xl font-semibold hover:bg-primary/20 transition-all duration-300"
+                      <motion.span
+                        initial={{ opacity: 0.5 }}
+                        whileInView={{ opacity: 1 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: prefersReducedMotion ? 0 : i * 0.06 }}
+                      >
+                        {t}
+                      </motion.span>
+                    </li>
+                  ))}
+                </ul>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, x: prefersReducedMotion ? 0 : 12 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true, margin: '-40px' }}
+                transition={{ duration: 0.45, delay: prefersReducedMotion ? 0 : 0.06 }}
+                className="rounded-2xl border border-emerald-200/80 bg-white/85 p-7 shadow-[0_12px_40px_rgba(15,23,42,0.06)] backdrop-blur-xl ring-1 ring-white/90 sm:p-9"
               >
-                Ver Todos los Artículos Inmobiliarios
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                </svg>
-              </Link>
+                <div className="mb-6 flex items-center gap-2">
+                  <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-emerald-900">
+                    Nuestro enfoque (legal + comercial)
+                  </span>
+                </div>
+                <ul className="space-y-4">
+                  {MARSHALL_WINS.map((t, i) => (
+                    <li key={t} className="flex gap-3 text-sm leading-relaxed text-slate-800">
+                      <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border border-emerald-200/90 bg-emerald-50/80">
+                        <Check className="h-3.5 w-3.5 text-emerald-600" strokeWidth={2.5} aria-hidden />
+                      </span>
+                      <motion.span
+                        initial={{ opacity: 0.5 }}
+                        whileInView={{ opacity: 1 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: prefersReducedMotion ? 0 : i * 0.06 }}
+                      >
+                        {t}
+                      </motion.span>
+                    </li>
+                  ))}
+                </ul>
+              </motion.div>
             </div>
           </div>
         </section>
 
-        {/* Sección de Actualidad */}
-        <section className="py-20 bg-gradient-to-b from-background/50 to-background">
-          <div className="container mx-auto px-4">
+        {/* Timeline acelerada */}
+        <section className="relative z-10 overflow-hidden border-t border-slate-200/80 py-20 md:py-28">
+          <div className="container relative mx-auto max-w-6xl px-4">
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 16 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="text-center mb-12"
+              viewport={{ once: true, margin: '-80px' }}
+              transition={{ duration: 0.5 }}
+              className="mb-14 text-center md:mb-16"
             >
-              <h2 className="text-3xl lg:text-4xl font-bold mb-4">
-                Actualidad en Derecho Inmobiliario
+              <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.2em] text-emerald-700">
+                Cómo trabajamos
+              </p>
+              <h2 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl lg:text-4xl">
+                Tres fases con su equipo Legal y Comercial
               </h2>
-              <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-                Mantente al día con las últimas regulaciones del mercado inmobiliario
+              <p className="mx-auto mt-4 max-w-xl text-sm text-slate-600 sm:text-base">
+                Mandato y exclusividad, saneamiento y venta silenciosa, cierre notarial y liquidación: una escalera
+                clara de valor hasta el instrumento.
               </p>
             </motion.div>
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-              {/* Artículo 1 */}
-              <motion.article
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.1 }}
-                className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:border-primary/30 transition-all group"
-              >
-                <div className="flex items-center gap-2 mb-4">
-                  <span className="px-3 py-1 bg-red-500/20 text-red-400 rounded-full text-xs font-semibold">
-                    URGENTE
-                  </span>
-                  <span className="text-xs text-muted-foreground">Arriendos</span>
-                </div>
-                <h3 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors">
-                  Nueva Ley de Arriendos 2025
-                </h3>
-                <div className="flex items-center gap-4 text-sm text-muted-foreground mb-3">
-                  <span>24 Enero 2025</span>
-                  <span>• 8 min</span>
-                </div>
-                <p className="text-muted-foreground mb-4">
-                  Cambios significativos en los contratos de arriendo y nuevos derechos para arrendatarios...
-                </p>
-                <Link 
-                  to="/blog/nueva-ley-arriendos-2025"
-                  className="text-primary hover:text-primary/80 font-medium flex items-center gap-2 group/link"
-                >
-                  Leer más 
-                  <ArrowRight className="w-4 h-4 group-hover/link:translate-x-1 transition-transform" />
-                </Link>
-              </motion.article>
-
-              {/* Artículo 2 */}
-              <motion.article
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.2 }}
-                className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:border-primary/30 transition-all group"
-              >
-                <div className="flex items-center gap-2 mb-4">
-                  <span className="px-3 py-1 bg-red-500/20 text-red-400 rounded-full text-xs font-semibold">
-                    URGENTE
-                  </span>
-                  <span className="text-xs text-muted-foreground">Compraventa</span>
-                </div>
-                <h3 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors">
-                  IVA en Viviendas: Cambios Tributarios
-                </h3>
-                <div className="flex items-center gap-4 text-sm text-muted-foreground mb-3">
-                  <span>22 Enero 2025</span>
-                  <span>• 6 min</span>
-                </div>
-                <p className="text-muted-foreground mb-4">
-                  Modificaciones al IVA en la venta de propiedades nuevas y su impacto en el mercado...
-                </p>
-                <Link 
-                  to="/blog/iva-viviendas-2025"
-                  className="text-primary hover:text-primary/80 font-medium flex items-center gap-2 group/link"
-                >
-                  Leer más 
-                  <ArrowRight className="w-4 h-4 group-hover/link:translate-x-1 transition-transform" />
-                </Link>
-              </motion.article>
-
-              {/* Artículo 3 */}
-              <motion.article
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.3 }}
-                className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:border-primary/30 transition-all group"
-              >
-                <div className="flex items-center gap-2 mb-4">
-                  <span className="text-xs text-muted-foreground">Hipotecas</span>
-                </div>
-                <h3 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors">
-                  Tasas Hipotecarias: Nuevos Límites
-                </h3>
-                <div className="flex items-center gap-4 text-sm text-muted-foreground mb-3">
-                  <span>20 Enero 2025</span>
-                  <span>• 5 min</span>
-                </div>
-                <p className="text-muted-foreground mb-4">
-                  Banco Central establece nuevos límites para tasas de interés en créditos hipotecarios...
-                </p>
-                <Link 
-                  to="/blog/tasas-hipotecarias-2025"
-                  className="text-primary hover:text-primary/80 font-medium flex items-center gap-2 group/link"
-                >
-                  Leer más 
-                  <ArrowRight className="w-4 h-4 group-hover/link:translate-x-1 transition-transform" />
-                </Link>
-              </motion.article>
-
-              {/* Artículo 4 */}
-              <motion.article
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.4 }}
-                className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:border-primary/30 transition-all group"
-              >
-                <div className="flex items-center gap-2 mb-4">
-                  <span className="px-3 py-1 bg-red-500/20 text-red-400 rounded-full text-xs font-semibold">
-                    URGENTE
-                  </span>
-                  <span className="text-xs text-muted-foreground">Condominios</span>
-                </div>
-                <h3 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors">
-                  Ley de Copropiedad: Reforma Total
-                </h3>
-                <div className="flex items-center gap-4 text-sm text-muted-foreground mb-3">
-                  <span>18 Enero 2025</span>
-                  <span>• 10 min</span>
-                </div>
-                <p className="text-muted-foreground mb-4">
-                  Cambios profundos en la administración de edificios y condominios...
-                </p>
-                <Link 
-                  to="/blog/reforma-copropiedad-2025"
-                  className="text-primary hover:text-primary/80 font-medium flex items-center gap-2 group/link"
-                >
-                  Leer más 
-                  <ArrowRight className="w-4 h-4 group-hover/link:translate-x-1 transition-transform" />
-                </Link>
-              </motion.article>
-
-              {/* Artículo 5 */}
-              <motion.article
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.5 }}
-                className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:border-primary/30 transition-all group"
-              >
-                <div className="flex items-center gap-2 mb-4">
-                  <span className="text-xs text-muted-foreground">Inversiones</span>
-                </div>
-                <h3 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors">
-                  REITs en Chile: Marco Regulatorio
-                </h3>
-                <div className="flex items-center gap-4 text-sm text-muted-foreground mb-3">
-                  <span>16 Enero 2025</span>
-                  <span>• 7 min</span>
-                </div>
-                <p className="text-muted-foreground mb-4">
-                  Nueva normativa para fondos de inversión inmobiliaria y su tributación...
-                </p>
-                  <Link
-                  to="/blog/reits-chile-2025"
-                  className="text-primary hover:text-primary/80 font-medium flex items-center gap-2 group/link"
+            {/* Desktop: horizontal */}
+            <div className="relative hidden px-2 md:block">
+              <div className="absolute left-[8%] right-[8%] top-[22px] h-[2px] rounded-full bg-gradient-to-r from-slate-200 via-emerald-200/80 to-sky-200/70" />
+              <div className="grid grid-cols-3 gap-8">
+                {TIMELINE_PHASES.map((p, i) => (
+                  <motion.div
+                    key={p.key}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: '-60px' }}
+                    transition={{
+                      duration: prefersReducedMotion ? 0.01 : 0.45,
+                      delay: prefersReducedMotion ? 0 : i * 0.12,
+                      ease: [0.22, 1, 0.36, 1],
+                    }}
+                    className="relative pt-2 text-center"
                   >
-                  Leer más 
-                  <ArrowRight className="w-4 h-4 group-hover/link:translate-x-1 transition-transform" />
-                  </Link>
-              </motion.article>
-
-              {/* Artículo 6 */}
-              <motion.article
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.6 }}
-                className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:border-primary/30 transition-all group"
-              >
-                <div className="flex items-center gap-2 mb-4">
-                  <span className="text-xs text-muted-foreground">Urbanismo</span>
-                </div>
-                <h3 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors">
-                  Planos Reguladores: Actualizaciones
-                </h3>
-                <div className="flex items-center gap-4 text-sm text-muted-foreground mb-3">
-                  <span>14 Enero 2025</span>
-                  <span>• 4 min</span>
-                </div>
-                <p className="text-muted-foreground mb-4">
-                  Cambios en normativas de construcción y uso de suelo en principales ciudades...
-                </p>
-                <Link 
-                  to="/blog/planos-reguladores-2025"
-                  className="text-primary hover:text-primary/80 font-medium flex items-center gap-2 group/link"
-                >
-                  Leer más 
-                  <ArrowRight className="w-4 h-4 group-hover/link:translate-x-1 transition-transform" />
-                </Link>
-              </motion.article>
+                    <div className="mx-auto mb-5 flex h-11 w-11 items-center justify-center rounded-full border border-slate-200/90 bg-white shadow-sm ring-1 ring-slate-100">
+                      <span className="text-xs font-bold text-emerald-700">{i + 1}</span>
+                    </div>
+                    <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+                      {p.days}
+                    </p>
+                    <h3 className="mb-2 text-base font-semibold tracking-tight text-slate-900">{p.title}</h3>
+                    <p className="px-1 text-sm leading-relaxed text-slate-600">{p.body}</p>
+                  </motion.div>
+                ))}
+              </div>
             </div>
 
-            {/* Botón Ver Todos */}
+            {/* Mobile: vertical */}
+            <div className="relative pl-3 md:hidden">
+              <div className="absolute bottom-3 left-[19px] top-3 w-[2px] rounded-full bg-gradient-to-b from-emerald-200/90 via-slate-200 to-sky-200/80" />
+              <div className="space-y-10">
+                {TIMELINE_PHASES.map((p, i) => (
+                  <motion.div
+                    key={p.key}
+                    initial={{ opacity: 0, x: -8 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true, margin: '-40px' }}
+                    transition={{
+                      duration: prefersReducedMotion ? 0.01 : 0.4,
+                      delay: prefersReducedMotion ? 0 : i * 0.1,
+                    }}
+                    className="relative flex gap-5"
+                  >
+                    <div className="relative z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-slate-200/90 bg-white shadow-sm ring-1 ring-slate-100">
+                      <span className="text-xs font-bold text-emerald-700">{i + 1}</span>
+                    </div>
+                    <div className="pb-2 pt-0.5">
+                      <p className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+                        {p.days}
+                      </p>
+                      <h3 className="mb-1.5 text-base font-semibold text-slate-900">{p.title}</h3>
+                      <p className="text-sm leading-relaxed text-slate-600">{p.body}</p>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* El resultado: dossier de liquidación (anclaje de éxito) */}
+        <section className="relative z-10 border-t border-slate-200/80 py-20 md:py-28">
+          <div className="container mx-auto max-w-6xl px-4">
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 14 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="text-center"
+              viewport={{ once: true, margin: '-80px' }}
+              transition={{ duration: 0.5 }}
+              className="mb-10 text-center md:mb-12"
             >
-              <Link
-                to="/blog/categoria/inmobiliario"
-                className="inline-flex items-center gap-2 bg-primary/10 hover:bg-primary/20 text-primary px-6 py-3 rounded-xl font-semibold transition-all"
+              <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-500">
+                El resultado
+              </p>
+              <h2 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">Liquidación exitosa</h2>
+              <p className="mx-auto mt-3 max-w-lg text-sm text-slate-600">
+                No vendemos “paneles”: mostramos el destino — cifras de referencia que anclan el estándar que
+                buscamos para su activo.
+              </p>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-60px' }}
+              transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+              className="mx-auto max-w-4xl"
+            >
+              <MacGlassWindow
+                title="Dossier de Cierre Confidencial"
+                subtitle="Punto Legal Inmobiliario · referencia de operación"
+                bodyClassName="p-6 sm:p-10 md:p-12"
               >
-                Ver Todos los Artículos Inmobiliarios
-                <ArrowRight className="w-5 h-5" />
-              </Link>
+                <div className="text-center">
+                  <p className="font-mono text-3xl font-semibold tabular-nums tracking-tight text-slate-900 sm:text-4xl md:text-[2.65rem] md:leading-tight">
+                    $ 573.000.000 CLP
+                  </p>
+                  <p className="mt-2 text-sm font-medium text-slate-600 sm:text-base">
+                    Equivalente a 15.200 UF (aprox.)
+                  </p>
+                  <div className="mx-auto mt-8 flex max-w-xl flex-wrap justify-center gap-2 sm:gap-3">
+                    {[
+                      'Cierre Notarial Blindado',
+                      'Reserva de Identidad Mantenida',
+                      'Mandato de Exclusividad Cumplido',
+                    ].map((pill) => (
+                      <span
+                        key={pill}
+                        className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200/90 bg-emerald-50 px-3 py-1.5 text-left text-[11px] font-semibold text-emerald-950 sm:text-xs"
+                      >
+                        <Check className="h-3.5 w-3.5 shrink-0 text-emerald-700" strokeWidth={2.5} aria-hidden />
+                        {pill}
+                      </span>
+                    ))}
+                  </div>
+                  <p className="mx-auto mt-10 max-w-2xl text-sm leading-relaxed text-slate-700 sm:text-[15px]">
+                    Gracias al modelo de Punto Legal Inmobiliario, este activo se liquidó al mejor valor de mercado
+                    defendible, sin exposición innecesaria.
+                  </p>
+                  <p className="mt-6 text-[10px] font-medium uppercase tracking-wider text-slate-500">
+                    Referencia ilustrativa · cada operación es distinta
+                  </p>
+                </div>
+              </MacGlassWindow>
             </motion.div>
           </div>
         </section>
 
-        {/* CTA Final */}
-        <section className="py-20 bg-gradient-to-r from-primary/10 to-primary/5">
-          <div className="container mx-auto px-4">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              className="max-w-4xl mx-auto text-center"
-            >
-              <h2 className="text-3xl lg:text-4xl font-bold mb-6">
-                ¿Listo para Proteger tu Inversión Inmobiliaria?
-              </h2>
-              <p className="text-xl text-muted-foreground mb-8">
-                No dejes que problemas legales afecten tu patrimonio inmobiliario
-              </p>
-              
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link
-                  to="/agendamiento?plan=inmobiliario"
-                  className="bg-primary text-white px-8 py-4 rounded-xl font-semibold hover:bg-primary/90 transition-all inline-flex items-center gap-2"
-                >
-                  <Calendar className="w-5 h-5" />
-                  Consulta Inmobiliaria
-                </Link>
-                
-                <Link
-                  to="/generador-contratos-inmobiliarios"
-                  className="bg-white/10 backdrop-blur-sm text-foreground px-8 py-4 rounded-xl font-semibold hover:bg-white/20 transition-all inline-flex items-center gap-2 border border-white/20"
-                >
-                  <FileText className="w-5 h-5" />
-                  Generador Automático
-                </Link>
-              </div>
-            </motion.div>
-          </div>
-        </section>
+        <motion.button
+          type="button"
+          onClick={scrollToForm}
+          initial={false}
+          animate={{
+            opacity: showStickyCta && phase === 'questions' ? 1 : 0,
+            y: showStickyCta && phase === 'questions' ? 0 : 12,
+            pointerEvents: showStickyCta && phase === 'questions' ? 'auto' : 'none',
+          }}
+          transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+          className="fixed bottom-6 left-1/2 z-50 flex -translate-x-1/2 items-center gap-2 rounded-full border border-emerald-800/25 bg-emerald-800 px-5 py-3 text-sm font-semibold text-white shadow-[0_16px_40px_rgba(6,78,59,0.22)] backdrop-blur-xl transition-all hover:bg-emerald-900 active:scale-[0.98] sm:left-auto sm:right-6 sm:translate-x-0"
+          aria-hidden={!showStickyCta || phase !== 'questions'}
+          tabIndex={showStickyCta && phase === 'questions' ? 0 : -1}
+        >
+          <ArrowUp className="h-4 w-4 text-white/90" aria-hidden />
+          Iniciar evaluación de mi propiedad
+        </motion.button>
+        </div>
       </div>
     </>
   )
-} 
+}
+
+function FormButton({
+  onClick,
+  label,
+  disabled,
+  variant = 'light',
+}: {
+  onClick: () => void
+  label: string
+  disabled?: boolean
+  variant?: 'light' | 'panel'
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      className={cn(
+        'w-full text-left px-5 py-3.5 rounded-xl border backdrop-blur-xl font-medium flex justify-between items-center gap-3 group transition-all duration-200 ease-out hover:scale-[1.02] hover:shadow-md active:scale-[0.99] disabled:pointer-events-none disabled:opacity-45 disabled:hover:scale-100 disabled:hover:shadow-none',
+        variant === 'panel'
+          ? 'border-slate-200/80 bg-white/95 text-slate-900 shadow-sm hover:border-emerald-600/40 hover:bg-emerald-50/60 hover:shadow-[0_8px_28px_rgba(5,150,105,0.12)]'
+          : 'border-slate-200/90 bg-white/90 text-slate-800 shadow-sm hover:border-slate-400/90 hover:bg-white',
+      )}
+    >
+      <span className="leading-snug">{label}</span>
+      <ChevronRight
+        className={cn(
+          'w-5 h-5 shrink-0 transition-colors',
+          variant === 'panel'
+            ? 'text-slate-400 group-hover:text-emerald-800'
+            : 'text-slate-400 group-hover:text-slate-800',
+        )}
+      />
+    </button>
+  )
+}

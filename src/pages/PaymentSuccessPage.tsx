@@ -1,14 +1,29 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { CheckCircle, Calendar, Clock, User, Mail, Phone, ArrowRight, Home, CreditCard, MessageCircle, Download, AlertCircle, XCircle } from 'lucide-react';
+import {
+  CheckCircle,
+  Calendar,
+  Clock,
+  User,
+  Mail,
+  Phone,
+  ArrowRight,
+  Home,
+  CreditCard,
+  MessageCircle,
+  Download,
+  AlertCircle,
+  XCircle,
+} from 'lucide-react';
 import SEO from '../components/SEO';
-import BrandMark from '@/components/BrandMark';
 import { sendRealBookingEmails, type BookingEmailData, type EmailResult } from '@/services/realEmailService';
 import { findReservaByCriteria, getReservaById, updatePaymentStatus, type Reserva } from '../services/supabaseBooking';
 import { supabase } from '@/integrations/supabase/client';
 import { trackMetaEvent } from '@/services/metaConversionsService';
 import { buildBookingIcs, downloadBookingIcsFile, hasConcreteBookingSlot } from '@/utils/bookingIcs';
+import { useTheme } from '@/hooks/useTheme';
+import { LaboralThemeToggle } from '@/components/servicios/LaboralThemeToggle';
 
 interface PaymentSuccessState {
   reservation: Reserva | null;
@@ -100,6 +115,13 @@ export default function PaymentSuccessPage() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [processingStatus, setProcessingStatus] = useState<string>('');
   const [loadError, setLoadError] = useState<string | null>(null);
+  const { theme, toggleTheme } = useTheme();
+  const shellGlass = theme === 'light' ? 'glass-ios-panel-light' : 'glass-ios-panel-dark';
+  const cardGlass = theme === 'light' ? 'glass-ios-card-light' : 'glass-ios-card-dark';
+  const iconTileClass =
+    'flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-200/90 bg-white/80 text-emerald-600 shadow-[inset_0_1px_0_rgba(255,255,255,0.92)] backdrop-blur-md dark:border-white/[0.1] dark:bg-white/[0.07] dark:text-emerald-300';
+  const stepBadgeClass =
+    'mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-slate-200/90 bg-white/85 text-[11px] font-bold tabular-nums text-slate-800 shadow-[inset_0_1px_0_rgba(255,255,255,0.95),0_1px_2px_rgba(15,23,42,0.04)] backdrop-blur-md dark:border-white/[0.12] dark:bg-white/[0.06] dark:text-slate-100';
 
   useEffect(() => {
     processPaymentSuccess();
@@ -218,7 +240,60 @@ export default function PaymentSuccessPage() {
           setIsLoading(false);
           return;
         }
-        
+
+        // Pago aprobado (p. ej. offline / prueba) con referencia pero sin fila en BD ni datos locales
+        if (status.toLowerCase() === 'approved' && external_reference) {
+          const nombre =
+            (typeof parsedStoredData?.nombre === 'string' && parsedStoredData.nombre) ||
+            urlParams.get('nombre') ||
+            'Cliente';
+          const email =
+            (typeof parsedStoredData?.email === 'string' && parsedStoredData.email) ||
+            urlParams.get('email') ||
+            '';
+          const telefono =
+            (typeof parsedStoredData?.telefono === 'string' && parsedStoredData.telefono) ||
+            urlParams.get('telefono') ||
+            '';
+          const servicioNombre =
+            (typeof parsedStoredData?.service === 'string' && parsedStoredData.service) ||
+            urlParams.get('servicio') ||
+            'Consulta Legal';
+          const categoria =
+            (typeof parsedStoredData?.category === 'string' && parsedStoredData.category) || 'General';
+          const { amount: paymentAmount, isFree: isFreeSynth, formatted: formattedSynth } =
+            resolvePriceForSuccess(parsedStoredData?.price);
+
+          console.warn('⚠️ Éxito mínimo: no hay reserva en BD ni paymentData en localStorage');
+
+          setPaymentData({
+            reservation: null,
+            mercadopagoData: {
+              payment_id,
+              status: 'approved',
+              external_reference,
+              collection_status: status,
+            },
+            emailResult: null,
+            cliente: { nombre, email, telefono },
+            servicio: {
+              tipo: servicioNombre,
+              precio: paymentAmount,
+              categoria,
+            },
+            fecha: new Date().toISOString().split('T')[0],
+            hora: 'Por agendar',
+            tipo_reunion: 'online',
+            price: paymentAmount,
+            priceFormatted: formattedSynth,
+            isFreeConsult: isFreeSynth,
+            source: typeof parsedStoredData?.source === 'string' ? parsedStoredData.source : undefined,
+          });
+          setIsProcessing(false);
+          setIsLoading(false);
+          return;
+        }
+
         throw new Error('No se encontró la reserva. Por favor contacta a soporte.');
       }
 
@@ -449,8 +524,8 @@ export default function PaymentSuccessPage() {
     : 'Pago registrado';
   const headerDescription = isPaymentApproved
     ? isFreeConsult
-      ? 'Tu consulta legal gratuita ha sido confirmada. Revisa los detalles a continuación.'
-      : 'Tu consulta legal ha sido confirmada y el pago procesado correctamente.'
+      ? 'Confirmamos tu consulta gratuita. Más abajo tienes el resumen y los siguientes pasos.'
+      : 'Confirmamos tu pago y la consulta. Más abajo tienes el resumen y los siguientes pasos.'
     : 'Hemos registrado tu pago y lo estamos verificando con Mercado Pago. Te avisaremos por email en cuanto se acredite.';
   const visiblePaymentStatus = paymentData?.mercadopagoData?.status || paymentData?.mercadopagoData?.collection_status || 'pendiente';
   const statusDictionary: Record<string, string> = {
@@ -493,7 +568,7 @@ export default function PaymentSuccessPage() {
     if (paymentData?.calendarEmailPending) {
       return {
         Icon: Clock,
-        iconClass: 'text-cyan-400',
+        iconClass: 'text-emerald-500 dark:text-emerald-400',
         text: 'Estamos generando el enlace de videollamada y enviando tu correo de confirmación.',
         detail: 'Suele tardar menos de un minuto. También revisa tu bandeja de entrada.',
       };
@@ -537,12 +612,27 @@ export default function PaymentSuccessPage() {
     return {
       Icon: AlertCircle,
       iconClass: 'text-amber-400',
-      text: 'No pudimos verificar el envío del correo. Si no lo recibes en unos minutos, escríbenos por WhatsApp.',
+      text: 'Envío de correo no verificado desde esta pantalla.',
       detail: undefined as string | undefined,
     };
   })();
   const { Icon: EmailStatusIcon, iconClass: emailStatusIconClass, text: emailStatusText, detail: emailStatusDetail } =
     emailConfirmationStatus;
+
+  const hasDbReservation = Boolean(paymentData?.reservation?.id);
+  const emailSentConfirmed =
+    Boolean(paymentData?.emailResult?.success) || Boolean(paymentData?.emailPreviouslySent);
+  const calendarQueueActive = Boolean(paymentData?.calendarEmailPending);
+  /** Recuadro ámbar: no repetir “Próximos pasos” con el mismo mensaje */
+  const hideNextStepsPanel =
+    isPaymentApproved && !emailSentConfirmed && !calendarQueueActive;
+
+  const dbOrPaymentStatusLine = (() => {
+    if (hasDbReservation) return 'Reserva guardada en la base de datos';
+    if (!isPaymentApproved) return 'Estamos registrando tu solicitud';
+    if (isFreeConsult) return 'Consulta gratuita confirmada en esta sesión';
+    return 'Pago acreditado según Mercado Pago';
+  })();
 
   const seoTitle =
     isPaymentApproved && isFreeConsult
@@ -580,28 +670,34 @@ export default function PaymentSuccessPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center">
-        <div className="text-center max-w-md mx-auto px-4">
-          <div className="animate-spin rounded-full h-12 w-12 border-2 border-cyan-500/30 border-t-cyan-400 mx-auto mb-4"></div>
-          <h2 className="text-xl font-semibold text-white mb-2">
-            {isProcessing ? 'Procesando pago...' : 'Cargando confirmación...'}
-          </h2>
-          {processingStatus && (
-            <p className="text-sm text-slate-400 mb-4">{processingStatus}</p>
-          )}
-          <div className="rounded-2xl p-5 bg-white/[0.04] border border-white/[0.08]">
-            <div className="space-y-2 text-sm text-slate-300">
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-emerald-400 rounded-full"></div>
-                <span>Verificando datos de MercadoPago</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-emerald-400 rounded-full"></div>
-                <span>Guardando reserva en la base de datos</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-emerald-400 rounded-full"></div>
-                <span>Enviando emails de confirmación</span>
+      <div className="landing-canvas relative min-h-screen flex items-center justify-center px-4">
+        <div
+          className="pointer-events-none fixed inset-0 z-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_0%,rgba(5,150,105,0.08),transparent_60%)] dark:hidden"
+          aria-hidden
+        />
+        <div className="text-center max-w-md mx-auto relative z-10 w-full">
+          <div className={`${shellGlass} p-8 shadow-xl`}>
+            <div className="animate-spin rounded-full h-12 w-12 border-2 border-emerald-200/90 border-t-emerald-600 mx-auto mb-4 dark:border-emerald-500/25 dark:border-t-emerald-300" />
+            <h2 className="text-xl font-semibold text-slate-900 dark:text-white mb-2">
+              {isProcessing ? 'Procesando pago...' : 'Cargando confirmación...'}
+            </h2>
+            {processingStatus && (
+              <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">{processingStatus}</p>
+            )}
+            <div className={`${cardGlass} rounded-2xl p-5 text-left`}>
+              <div className="space-y-2 text-sm text-slate-700 dark:text-slate-300">
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full bg-emerald-500" />
+                  <span>Comprobando estado del pago y la reserva</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full bg-emerald-500" />
+                  <span>Sincronizando con la base de datos</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full bg-emerald-500" />
+                  <span>Preparando confirmación por correo</span>
+                </div>
               </div>
             </div>
           </div>
@@ -617,24 +713,25 @@ export default function PaymentSuccessPage() {
           title="No pudimos mostrar tu confirmación | Punto Legal"
           description="Hubo un problema al cargar los datos de tu pago o reserva. Vuelve a intentar o contacta a soporte."
         />
-        <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center px-4 pb-[max(2rem,env(safe-area-inset-bottom,0px))]">
-          <div className="max-w-md w-full rounded-2xl border border-white/[0.08] bg-white/[0.04] p-8 text-center">
-            <AlertCircle className="w-12 h-12 text-amber-400 mx-auto mb-4" aria-hidden />
-            <h1 className="text-xl font-semibold text-white mb-2">No pudimos cargar tu confirmación</h1>
-            <p className="text-sm text-slate-400 mb-6">
+        <div className="landing-canvas relative min-h-screen flex items-center justify-center px-4 pb-[max(2rem,env(safe-area-inset-bottom,0px))]">
+          <div className="max-w-md w-full relative z-10">
+            <div className={`${shellGlass} p-8 text-center shadow-xl`}>
+            <AlertCircle className="w-12 h-12 text-amber-500 dark:text-amber-400 mx-auto mb-4" aria-hidden />
+            <h1 className="text-xl font-semibold text-slate-900 dark:text-white mb-2">No pudimos cargar tu confirmación</h1>
+            <p className="text-sm text-slate-600 dark:text-slate-400 mb-6">
               {loadError ||
                 'Faltan datos de la reserva o el enlace expiró. Si ya pagaste, conserva tu comprobante y escríbenos por WhatsApp.'}
             </p>
             <div className="flex flex-col gap-3">
               <Link
                 to="/agendamiento"
-                className="inline-flex min-h-[48px] items-center justify-center rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-semibold px-4"
+                className="inline-flex min-h-[48px] items-center justify-center rounded-xl bg-[#009EE3] hover:bg-[#0084C7] text-white font-semibold px-4 shadow-lg"
               >
                 Ir a agendamiento
               </Link>
               <Link
                 to="/"
-                className="inline-flex min-h-[48px] items-center justify-center rounded-xl border border-white/[0.12] text-slate-200 font-medium px-4 hover:bg-white/[0.06]"
+                className={`inline-flex min-h-[48px] items-center justify-center rounded-xl font-medium px-4 border border-slate-200/90 text-slate-800 hover:bg-slate-50 dark:border-white/[0.12] dark:text-slate-200 dark:hover:bg-white/[0.06]`}
               >
                 Volver al inicio
               </Link>
@@ -642,11 +739,12 @@ export default function PaymentSuccessPage() {
                 href="https://wa.me/56962321883?text=%23Ayuda%20Pago%20Success"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-4"
+                className="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-xl bg-[#25D366] hover:bg-[#20bd5a] text-white font-semibold px-4"
               >
                 <MessageCircle className="w-5 h-5" />
                 WhatsApp soporte
               </a>
+            </div>
             </div>
           </div>
         </div>
@@ -708,8 +806,18 @@ export default function PaymentSuccessPage() {
         <SEO title="Pago Confirmado - Urgencia Penal | Punto Legal" description="El equipo legal ha sido activado. Un abogado se dirige a la unidad." />
         <div className="min-h-screen bg-black text-white font-sans antialiased">
           <header className="sticky top-0 z-50 bg-black/95 backdrop-blur border-b border-white/10">
-            <div className="max-w-lg mx-auto px-4 py-4 flex justify-center">
-              <BrandMark size="sm" />
+            <div
+              className="max-w-lg mx-auto px-4 py-3.5 flex items-center justify-center"
+              style={{ paddingTop: 'max(0.75rem, env(safe-area-inset-top, 0px))' }}
+            >
+              <Link
+                to="/"
+                className="agendamiento-wordmark inline-flex min-h-[44px] items-center -mx-1 px-1 py-1 rounded-lg hover:bg-white/[0.06] transition-colors"
+                aria-label="Punto Legal Chile — volver al inicio"
+              >
+                <span className="agendamiento-wordmark__name">Punto Legal</span>
+                <span className="agendamiento-wordmark__country">Chile</span>
+              </Link>
             </div>
           </header>
           <main className="max-w-lg mx-auto px-4 py-8">
@@ -748,30 +856,65 @@ export default function PaymentSuccessPage() {
   return (
     <>
       <SEO title={seoTitle} description={seoDescription} />
-      
-      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
-        <header className="sticky top-0 z-50 bg-slate-950/70 backdrop-blur-xl border-b border-white/[0.06]">
-          <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
-            <BrandMark size="sm" />
-            <div className="flex items-center gap-2 text-xs text-emerald-300/90">
-              <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></div>
-              {isPaymentApproved && isFreeConsult ? 'Consulta gratuita' : 'Pago confirmado'}
+
+      <div className="landing-canvas relative min-h-screen pb-[max(6rem,env(safe-area-inset-bottom,0px))]">
+        <div
+          className="pointer-events-none fixed inset-0 z-0 bg-[radial-gradient(ellipse_85%_55%_at_90%_0%,rgba(15,23,42,0.06),transparent_58%),radial-gradient(ellipse_70%_50%_at_10%_100%,rgba(5,150,105,0.07),transparent_55%)] dark:hidden"
+          aria-hidden
+        />
+        <div
+          className="pointer-events-none fixed inset-0 z-0 hidden dark:block bg-[radial-gradient(ellipse_at_top_right,rgba(5,150,105,0.09),transparent_58%),radial-gradient(ellipse_at_bottom_left,rgba(148,163,184,0.08),transparent_58%)]"
+          aria-hidden
+        />
+
+        <header
+          className="sticky top-0 z-40 border-b border-slate-200/75 bg-white/72 backdrop-blur-2xl backdrop-saturate-150 dark:border-white/[0.08] dark:bg-slate-950/65"
+          style={{ paddingTop: 'max(0.875rem, env(safe-area-inset-top, 0px))' }}
+        >
+          <div className="max-w-5xl mx-auto px-4 py-3.5 flex items-center justify-between gap-3">
+            <Link
+              to="/"
+              className="agendamiento-wordmark inline-flex min-h-[44px] items-center -mx-1 px-1 py-1 rounded-lg hover:bg-slate-900/[0.04] dark:hover:bg-white/[0.04] transition-colors"
+              aria-label="Punto Legal Chile — volver al inicio"
+            >
+              <span className="agendamiento-wordmark__name">Punto Legal</span>
+              <span className="agendamiento-wordmark__country">Chile</span>
+            </Link>
+            <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+              <LaboralThemeToggle mode={theme} onToggle={toggleTheme} variant="inline" />
+              <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-[0.14em] text-slate-500 dark:text-slate-400 sm:gap-2 sm:text-[11px] sm:tracking-[0.18em]">
+                <span
+                  className="h-1.5 w-1.5 rounded-full animate-pulse shrink-0 bg-emerald-500"
+                  aria-hidden
+                />
+                <span className="whitespace-nowrap">
+                  {isPaymentApproved && isFreeConsult
+                    ? 'Consulta gratuita'
+                    : isPaymentApproved
+                      ? 'Pago confirmado'
+                      : 'En verificación'}
+                </span>
+              </div>
             </div>
           </div>
         </header>
 
-        <div className="max-w-4xl mx-auto px-4 py-8 md:py-12 pb-[max(6rem,env(safe-area-inset-bottom,0px))]">
+        <div className="relative z-10 max-w-5xl mx-auto px-4 pt-5 pb-10 md:pt-8 md:pb-14">
           {/* Header de éxito */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="text-center mb-10"
           >
-            <div className="w-20 h-20 rounded-2xl bg-emerald-500/20 flex items-center justify-center mx-auto mb-6 border border-emerald-500/30">
-              <CheckCircle className="w-10 h-10 text-emerald-400" />
+            <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-2xl border border-emerald-200/90 bg-emerald-50/80 shadow-[0_14px_32px_rgba(5,150,105,0.14),inset_0_1px_0_rgba(255,255,255,0.85)] backdrop-blur-md dark:border-emerald-500/35 dark:bg-emerald-500/10 dark:shadow-[0_14px_32px_rgba(5,150,105,0.12)]">
+              <CheckCircle className="h-10 w-10 text-emerald-600 dark:text-emerald-300" strokeWidth={2} />
             </div>
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">{headerTitle}</h1>
-            <p className="text-lg text-slate-400 max-w-2xl mx-auto">{headerDescription}</p>
+            <h1 className="font-display text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-4 tracking-tight">
+              {headerTitle}
+            </h1>
+            <p className="text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto leading-relaxed">
+              {headerDescription}
+            </p>
           </motion.div>
 
           {/* Resumen de la consulta */}
@@ -779,98 +922,93 @@ export default function PaymentSuccessPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="rounded-3xl p-6 md:p-8 mb-6 backdrop-blur-xl"
-            style={{
-              background: 'rgba(255,255,255,0.04)',
-              border: '1px solid rgba(255,255,255,0.08)',
-              boxShadow: '0 4px 24px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.06)'
-            }}
+            className={`${shellGlass} p-6 md:p-8 mb-6 shadow-xl`}
           >
-            <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-3">
-              <CreditCard className="w-6 h-6 text-emerald-400" />
+            <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-3">
+              <CreditCard className="w-6 h-6 shrink-0 text-emerald-600 dark:text-emerald-400" />
               Resumen de tu consulta
             </h2>
-            
+
             <div className="grid md:grid-cols-2 gap-6">
                 <div className="space-y-4">
                 <div className="flex items-center gap-3 min-w-0">
-                  <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center border border-emerald-500/30 shrink-0">
-                    <User className="w-5 h-5 text-emerald-400" />
+                  <div className={iconTileClass}>
+                    <User className="h-5 w-5" />
                     </div>
                   <div className="min-w-0">
-                    <p className="text-xs text-slate-500 uppercase tracking-wider">Cliente</p>
-                    <p className="font-semibold text-white break-words">
+                    <p className="text-xs text-slate-500 dark:text-slate-500 uppercase tracking-wider">Cliente</p>
+                    <p className="font-semibold text-slate-900 dark:text-white break-words">
                       {paymentData?.reservation?.nombre || paymentData?.cliente?.nombre || 'Cliente'}
                     </p>
                   </div>
                 </div>
-                
+
                 <div className="flex items-center gap-3 min-w-0">
-                  <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center border border-emerald-500/30 shrink-0">
-                    <Mail className="w-5 h-5 text-emerald-400" />
+                  <div className={iconTileClass}>
+                    <Mail className="h-5 w-5" />
                     </div>
                     <div className="min-w-0">
-                    <p className="text-xs text-slate-500 uppercase tracking-wider">Email</p>
-                    <p className="font-semibold text-white break-all sm:break-words">
+                    <p className="text-xs text-slate-500 dark:text-slate-500 uppercase tracking-wider">Email</p>
+                    <p className="font-semibold text-slate-900 dark:text-white break-all sm:break-words">
                       {paymentData?.reservation?.email || paymentData?.cliente?.email || 'No especificado'}
                       </p>
                     </div>
                   </div>
-                  
+
                 <div className="flex items-center gap-3 min-w-0">
-                  <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center border border-emerald-500/30 shrink-0">
-                    <Phone className="w-5 h-5 text-emerald-400" />
+                  <div className={iconTileClass}>
+                    <Phone className="h-5 w-5" />
                     </div>
                     <div className="min-w-0">
-                    <p className="text-xs text-slate-500 uppercase tracking-wider">Teléfono</p>
-                    <p className="font-semibold text-white break-words">
+                    <p className="text-xs text-slate-500 dark:text-slate-500 uppercase tracking-wider">Teléfono</p>
+                    <p className="font-semibold text-slate-900 dark:text-white break-words">
                       {paymentData?.reservation?.telefono || paymentData?.cliente?.telefono || 'No especificado'}
                     </p>
                   </div>
                 </div>
               </div>
-              
+
               <div className="space-y-4">
                 <div className="flex items-center gap-3 min-w-0">
-                  <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center border border-emerald-500/30 shrink-0">
-                    <Calendar className="w-5 h-5 text-emerald-400" />
+                  <div className={iconTileClass}>
+                    <Calendar className="h-5 w-5" />
                   </div>
                   <div className="min-w-0">
-                    <p className="text-xs text-slate-500 uppercase tracking-wider">Fecha</p>
-                    <p className="font-semibold text-white break-words">{serviceDate}</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-500 uppercase tracking-wider">Fecha</p>
+                    <p className="font-semibold text-slate-900 dark:text-white break-words">{serviceDate}</p>
                     </div>
                   </div>
-                  
+
                 <div className="flex items-center gap-3 min-w-0">
-                  <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center border border-emerald-500/30 shrink-0">
-                    <Clock className="w-5 h-5 text-emerald-400" />
+                  <div className={iconTileClass}>
+                    <Clock className="h-5 w-5" />
                     </div>
                     <div className="min-w-0">
-                    <p className="text-xs text-slate-500 uppercase tracking-wider">Hora</p>
-                    <p className="font-semibold text-white break-words">{serviceTime}</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-500 uppercase tracking-wider">Hora</p>
+                    <p className="font-semibold text-slate-900 dark:text-white break-words">{serviceTime}</p>
                     </div>
                 </div>
-                
+
                 <div className="flex items-center gap-3 min-w-0">
-                  <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center border border-emerald-500/30 shrink-0">
-                    <CreditCard className="w-5 h-5 text-emerald-400" />
+                  <div className={iconTileClass}>
+                    <CreditCard className="h-5 w-5" />
                   </div>
                   <div className="min-w-0">
-                    <p className="text-xs text-slate-500 uppercase tracking-wider">Servicio</p>
-                    <p className="font-semibold text-white break-words">
+                    <p className="text-xs text-slate-500 dark:text-slate-500 uppercase tracking-wider">Servicio</p>
+                    <p className="font-semibold text-slate-900 dark:text-white break-words">
                       {paymentData?.reservation?.servicio || paymentData?.servicio?.tipo || 'Consulta Legal'}
                     </p>
                   </div>
                 </div>
               </div>
             </div>
-            
-            <div className="border-t border-white/[0.06] pt-6 mt-6">
+
+            <div className="border-t border-slate-200/80 dark:border-white/[0.08] pt-6 mt-6">
               <div className="flex items-center justify-between">
-                <span className="text-lg font-semibold text-white">
+                <span className="text-lg font-semibold text-slate-900 dark:text-white">
                   {isFreeConsult ? 'Precio de la consulta' : 'Total pagado'}
                 </span>
-                <span className="text-2xl font-bold text-emerald-400">
+                <span className="text-2xl font-bold tabular-nums text-emerald-700 dark:text-emerald-300">
                   {isFreeConsult
                     ? 'Gratis'
                     : `${paymentData?.priceFormatted ?? ''} CLP`.trim()}
@@ -879,16 +1017,16 @@ export default function PaymentSuccessPage() {
             </div>
 
             {scheduledSlot && isPaymentApproved && (
-              <div className="mt-6 pt-6 border-t border-white/[0.06] flex flex-col sm:flex-row sm:items-center gap-4">
+              <div className="mt-6 pt-6 border-t border-slate-200/80 dark:border-white/[0.08] flex flex-col sm:flex-row sm:items-center gap-4">
                 <button
                   type="button"
                   onClick={handleDownloadCalendarIcs}
-                  className="inline-flex items-center justify-center gap-2 rounded-xl border border-cyan-500/40 bg-cyan-500/10 px-5 py-3 text-sm font-semibold text-cyan-200 hover:bg-cyan-500/20 transition-colors"
+                  className="inline-flex items-center justify-center gap-2 rounded-xl border px-5 py-3 text-sm font-semibold transition-colors border-slate-200/90 bg-white/80 text-slate-900 backdrop-blur-md hover:bg-white dark:border-white/[0.1] dark:bg-white/[0.06] dark:text-slate-100 dark:hover:bg-white/[0.1]"
                 >
                   <Download className="w-4 h-4" />
                   Descargar .ics (añadir al calendario)
                 </button>
-                <p className="text-xs text-slate-500 max-w-md leading-relaxed">
+                <p className="text-xs text-slate-600 dark:text-slate-500 max-w-md leading-relaxed">
                   Abre el archivo en iPhone, Google Calendar o Outlook para guardar automáticamente la misma fecha y hora que figura arriba (referencia hora Chile).
                 </p>
               </div>
@@ -900,54 +1038,46 @@ export default function PaymentSuccessPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
-            className="rounded-2xl p-6 mb-6 bg-white/[0.03] border border-white/[0.06]"
+            className={`${shellGlass} p-6 mb-6 shadow-lg`}
           >
-            <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-4">
+            <h3 className="text-sm font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest mb-4">
               Estado de confirmación
             </h3>
-                <div className="space-y-3">
-              <div className="flex items-center gap-2">
-                <CheckCircle className="w-5 h-5 text-emerald-400" />
-                <span className="text-slate-300">Reserva guardada en la base de datos</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle className="w-5 h-5 text-emerald-400" />
-                <span className="text-slate-300">
-                  {isFreeConsult
-                    ? 'Consulta gratuita confirmada (sin cargo)'
-                    : 'Pago confirmado vía MercadoPago'}
-                </span>
+            <div className="space-y-3">
+              <div className="flex items-start gap-2">
+                <CheckCircle className="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+                <span className="text-slate-700 dark:text-slate-300">{dbOrPaymentStatusLine}</span>
               </div>
               <div className="flex items-start gap-2">
                 <EmailStatusIcon className={`w-5 h-5 flex-shrink-0 mt-0.5 ${emailStatusIconClass}`} aria-hidden />
-                <span className="text-slate-300 text-left">
+                <span className="text-slate-700 dark:text-slate-300 text-left">
                   {emailStatusText}
                   {emailStatusDetail ? (
-                    <span className="block text-xs text-slate-500 mt-1 break-words">{emailStatusDetail}</span>
+                    <span className="block text-xs text-slate-600 dark:text-slate-500 mt-1 break-words">{emailStatusDetail}</span>
                   ) : null}
                 </span>
               </div>
               {paymentData?.reservation && (
-                <div className="mt-4 p-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
-                  <p className="text-[11px] text-slate-500">
-                    <strong className="text-slate-400">ID de Reserva:</strong> {paymentData.reservation.id}
+                <div className={`mt-4 p-3 rounded-xl ${cardGlass}`}>
+                  <p className="text-[11px] text-slate-600 dark:text-slate-500">
+                    <strong className="text-slate-800 dark:text-slate-400">ID de Reserva:</strong> {paymentData.reservation.id}
                   </p>
-                  <p className="text-[11px] text-slate-500">
-                    <strong className="text-slate-400">Estado:</strong> {paymentData.reservation.estado}
+                  <p className="text-[11px] text-slate-600 dark:text-slate-500">
+                    <strong className="text-slate-800 dark:text-slate-400">Estado:</strong> {paymentData.reservation.estado}
                   </p>
                   {trackingCode && (
-                    <p className="text-[11px] text-slate-500">
-                      <strong className="text-slate-400">Código de Seguimiento:</strong> {trackingCode}
+                    <p className="text-[11px] text-slate-600 dark:text-slate-500">
+                      <strong className="text-slate-800 dark:text-slate-400">Código de Seguimiento:</strong> {trackingCode}
                     </p>
                   )}
                   {googleMeetLink && (
-                    <p className="text-[11px] text-slate-500 flex flex-wrap items-center gap-x-2 gap-y-2">
-                      <strong className="text-slate-400 shrink-0">Link de Google Meet:</strong>
+                    <p className="text-[11px] text-slate-600 dark:text-slate-500 flex flex-wrap items-center gap-x-2 gap-y-2">
+                      <strong className="text-slate-800 dark:text-slate-400 shrink-0">Link de Google Meet:</strong>
                       <a
                         href={googleMeetLink}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg px-3 text-sm font-semibold text-cyan-950 bg-cyan-400/90 hover:bg-cyan-300 transition-colors"
+                        className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-xl border border-slate-200/90 bg-white/85 px-3 text-sm font-semibold text-slate-900 shadow-sm backdrop-blur-md transition-colors hover:bg-white dark:border-white/[0.12] dark:bg-white/[0.08] dark:text-emerald-200 dark:hover:bg-white/[0.12]"
                       >
                         Unirse a la reunión
                       </a>
@@ -964,136 +1094,158 @@ export default function PaymentSuccessPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5 }}
-              className="rounded-2xl p-6 mb-6 bg-white/[0.03] border border-white/[0.06]"
+              className={`${shellGlass} p-6 mb-6 shadow-lg`}
             >
-              <h3 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3">
+              <h3 className="text-[10px] font-bold text-slate-600 dark:text-slate-500 uppercase tracking-widest mb-3">
                 Información del pago
               </h3>
               <div className="grid md:grid-cols-2 gap-4 text-[11px]">
                 <div>
-                  <p className="text-slate-400">
-                    <strong className="text-slate-300">ID de Pago:</strong> {String(paymentData.mercadopagoData.payment_id || 'N/A')}
+                  <p className="text-slate-600 dark:text-slate-400">
+                    <strong className="text-slate-800 dark:text-slate-300">ID de Pago:</strong> {String(paymentData.mercadopagoData.payment_id || 'N/A')}
                   </p>
-                  <p className="text-slate-400">
-                    <strong className="text-slate-300">Estado:</strong> {String(readablePaymentStatus || 'N/A')}
+                  <p className="text-slate-600 dark:text-slate-400">
+                    <strong className="text-slate-800 dark:text-slate-300">Estado:</strong> {String(readablePaymentStatus || 'N/A')}
                   </p>
-                  <p className="text-slate-400">
-                    <strong className="text-slate-300">Método:</strong> {String(paymentData.mercadopagoData.payment_type || 'MercadoPago')}
+                  <p className="text-slate-600 dark:text-slate-400">
+                    <strong className="text-slate-800 dark:text-slate-300">Método:</strong> {String(paymentData.mercadopagoData.payment_type || 'MercadoPago')}
                   </p>
                 </div>
                 <div>
-                  <p className="text-slate-400">
-                    <strong className="text-slate-300">Referencia:</strong> {String(paymentData.mercadopagoData.external_reference || 'N/A')}
+                  <p className="text-slate-600 dark:text-slate-400">
+                    <strong className="text-slate-800 dark:text-slate-300">Referencia:</strong> {String(paymentData.mercadopagoData.external_reference || 'N/A')}
                   </p>
-                  <p className="text-slate-400">
-                    <strong className="text-slate-300">Procesado:</strong> {new Date().toLocaleString('es-CL')}
+                  <p className="text-slate-600 dark:text-slate-400">
+                    <strong className="text-slate-800 dark:text-slate-300">Procesado:</strong> {new Date().toLocaleString('es-CL')}
                   </p>
                 </div>
               </div>
             </motion.div>
           )}
 
-          {/* Información importante */}
-          {isPaymentApproved ? (
+          {/* Información importante — copy alineado al estado real del correo */}
+          {isPaymentApproved && calendarQueueActive ? (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5 }}
-              className="rounded-2xl p-6 mb-6 bg-emerald-500/[0.08] border border-emerald-500/20"
+              className={`${shellGlass} p-6 mb-6 ring-1 ring-inset ring-emerald-500/15 dark:ring-emerald-400/15`}
             >
-              <h3 className="text-sm font-bold text-emerald-300 mb-3">
-                Confirmación por email
-              </h3>
-              <p className="text-slate-300 mb-4 text-sm">
-                Hemos enviado un email de confirmación a tu dirección de correo con todos los detalles de tu consulta.
+              <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-2">Correo en preparación</h3>
+              <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
+                Generando enlace de videollamada y enviando confirmación; suele tardar menos de un minuto.
               </p>
-              <div className="text-xs text-slate-400 space-y-2">
-                <p>• Revisa tu bandeja de entrada y carpeta de spam</p>
-                <p>• Un abogado te contactará por WhatsApp en menos de 2 horas</p>
-                <p>• Si no recibes el email en 10 minutos, contáctanos</p>
-              </div>
+            </motion.div>
+          ) : isPaymentApproved && emailSentConfirmed ? (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+              className={`${shellGlass} p-6 mb-6 ring-1 ring-inset ring-emerald-500/15 dark:ring-emerald-400/15`}
+            >
+              <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-2">Correo enviado</h3>
+              <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
+                Revisa tu bandeja y spam; allí están los detalles o el enlace de la sesión.
+              </p>
+            </motion.div>
+          ) : isPaymentApproved ? (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+              className={`${shellGlass} p-6 mb-6 ring-1 ring-inset ring-amber-500/20 dark:ring-amber-400/15`}
+            >
+              <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-2">Correo o WhatsApp</h3>
+              <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
+                No pudimos confirmar el envío automático desde aquí. Tus datos están en el resumen: si no llega el
+                correo, escríbenos por WhatsApp (botón verde abajo).
+              </p>
             </motion.div>
           ) : (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5 }}
-              className="rounded-2xl p-6 mb-6 bg-amber-500/[0.08] border border-amber-500/20"
+              className={`${shellGlass} p-6 mb-6 ring-1 ring-inset ring-amber-500/20 dark:ring-amber-400/15`}
             >
-              <h3 className="text-sm font-bold text-amber-300 mb-3">
-                Confirmación pendiente
-              </h3>
-              <p className="text-slate-300 mb-4 text-sm">
-                Tu pago se encuentra en estado <strong className="text-amber-300">{String(readablePaymentStatus)}</strong>. Apenas Mercado Pago lo confirme te enviaremos un correo con todos los detalles.
+              <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-2">Confirmación pendiente</h3>
+              <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
+                Estado en Mercado Pago:{' '}
+                <strong className="text-slate-800 dark:text-slate-200">{String(readablePaymentStatus)}</strong>. Cuando
+                se acredite, enviaremos el correo con los detalles.
               </p>
-              <div className="text-xs text-slate-400 space-y-2">
-                <p>• Puedes cerrar esta ventana con tranquilidad, guardaremos tu reserva automáticamente.</p>
-                <p>• Ante cualquier duda escríbenos a <a href="mailto:puntolegalelgolf@gmail.com" className="text-cyan-300 hover:text-cyan-200 underline">puntolegalelgolf@gmail.com</a> o WhatsApp <a href="tel:+56962321883" className="text-cyan-300 hover:text-cyan-200 underline">+569 6232 1883</a>.</p>
-              </div>
             </motion.div>
           )}
 
-          {/* Próximos pasos */}
+          {!hideNextStepsPanel && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6 }}
-            className="rounded-2xl p-6 mb-6 bg-white/[0.03] border border-white/[0.06]"
+            className={`${shellGlass} p-6 mb-6 shadow-lg`}
           >
-            <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-4">
+            <h3 className="text-sm font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest mb-4">
               Próximos pasos
             </h3>
             <div className="space-y-3">
               <div className="flex items-start gap-3">
-                <div className="w-6 h-6 rounded-full bg-emerald-500/20 flex items-center justify-center flex-shrink-0 mt-0.5 border border-emerald-500/30">
-                  <span className="text-[10px] font-bold text-emerald-400">1</span>
-                </div>
-                <p className="text-slate-300 text-sm">Recibirás un email de confirmación con los detalles</p>
+                <div className={stepBadgeClass}>1</div>
+                <p className="text-slate-700 dark:text-slate-300 text-sm pt-0.5 leading-relaxed">
+                  {emailSentConfirmed
+                    ? 'Revisa el correo de confirmación (incluido spam).'
+                    : calendarQueueActive
+                      ? 'Espera el correo con el enlace de videollamada; llega en breve.'
+                      : isPaymentApproved
+                        ? 'Cuando Mercado Pago acredite, recibirás el correo con los detalles.'
+                        : 'Te avisaremos por correo cuando el pago quede acreditado.'}
+                </p>
               </div>
               <div className="flex items-start gap-3">
-                <div className="w-6 h-6 rounded-full bg-emerald-500/20 flex items-center justify-center flex-shrink-0 mt-0.5 border border-emerald-500/30">
-                  <span className="text-[10px] font-bold text-emerald-400">2</span>
-                </div>
-                <p className="text-slate-300 text-sm">Un abogado te contactará por WhatsApp en menos de 2 horas</p>
+                <div className={stepBadgeClass}>2</div>
+                <p className="text-slate-700 dark:text-slate-300 text-sm pt-0.5 leading-relaxed">
+                  Coordinación por WhatsApp con el equipo, en horas hábiles.
+                </p>
               </div>
               <div className="flex items-start gap-3">
-                <div className="w-6 h-6 rounded-full bg-emerald-500/20 flex items-center justify-center flex-shrink-0 mt-0.5 border border-emerald-500/30">
-                  <span className="text-[10px] font-bold text-emerald-400">3</span>
-                </div>
-                <p className="text-slate-300 text-sm">
+                <div className={stepBadgeClass}>3</div>
+                <p className="text-slate-700 dark:text-slate-300 text-sm pt-0.5 leading-relaxed">
                   {scheduledSlot
-                    ? 'Tu sesión quedó agendada en la fecha y hora indicadas arriba.'
-                    : 'Coordinarás fecha y hora de tu sesión de 45 min'}
+                    ? 'Sesión de 45 min por Google Meet en la fecha y hora del resumen.'
+                    : 'Agenda tu sesión de 45 min por Meet cuando quieras, desde el botón de abajo.'}
                 </p>
               </div>
             </div>
           </motion.div>
+          )}
 
           {/* CTA Principal: Agendar sesión */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.7 }}
-            className="rounded-3xl p-6 mb-6 overflow-hidden"
-            style={{
-              background: 'rgba(255,255,255,0.04)',
-              border: '1px solid rgba(255,255,255,0.08)',
-              boxShadow: '0 4px 24px rgba(0,0,0,0.2)'
-            }}
+            className={`${shellGlass} p-6 mb-6 shadow-xl overflow-hidden`}
           >
-            <p className="text-[10px] text-slate-500 uppercase tracking-widest font-bold mb-3 text-center">
+            <p className="text-[10px] text-slate-600 dark:text-slate-500 uppercase tracking-widest font-bold mb-3 text-center">
               Siguiente paso
             </p>
             {!scheduledSlot ? (
               <>
-                <p className="text-white font-semibold text-center mb-4">
+                <p className="text-slate-900 dark:text-white font-semibold text-center mb-4">
                   Elige fecha y hora para tu sesión de 45 min
                 </p>
                 <div className="flex flex-col sm:flex-row gap-3 justify-center">
                   <Link
                     to={agendarUrl}
-                    className="inline-flex min-h-[48px] items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-4 px-6 rounded-xl transition-all duration-200"
-                    style={{ boxShadow: '0 4px 20px rgba(79,70,229,0.4)' }}
+                    style={
+                      theme === 'light'
+                        ? ({ ['--agenda-card-accent']: '51 65 85' } as React.CSSProperties)
+                        : undefined
+                    }
+                    className={`inline-flex min-h-[48px] items-center justify-center gap-2 text-white font-bold py-4 px-6 rounded-xl transition-all duration-200 shadow-lg ${
+                      theme === 'light'
+                        ? 'agendamiento-primary-cta cta-shimmer'
+                        : 'bg-gradient-to-br from-slate-600 to-slate-900 shadow-[0_8px_24px_rgba(15,23,42,0.35)] hover:from-slate-500 hover:to-slate-800'
+                    }`}
                   >
                     <Calendar className="w-5 h-5" />
                     Agendar mi sesión
@@ -1102,7 +1254,7 @@ export default function PaymentSuccessPage() {
                     href={whatsappPostPago}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex min-h-[48px] items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-4 px-6 rounded-xl transition-all duration-200"
+                    className="inline-flex min-h-[48px] items-center justify-center gap-2 bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold py-4 px-6 rounded-xl transition-all duration-200 shadow-md"
                   >
                     <MessageCircle className="w-5 h-5" />
                     Hablar por WhatsApp
@@ -1111,7 +1263,7 @@ export default function PaymentSuccessPage() {
               </>
             ) : (
               <>
-                <p className="text-white font-semibold text-center mb-4">
+                <p className="text-slate-900 dark:text-white font-semibold text-center mb-4">
                   ¿Necesitas cambiar la hora o tienes dudas? Escríbenos por WhatsApp.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-3 justify-center">
@@ -1119,7 +1271,7 @@ export default function PaymentSuccessPage() {
                     href={whatsappPostPago}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex min-h-[48px] items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-4 px-6 rounded-xl transition-all duration-200"
+                    className="inline-flex min-h-[48px] items-center justify-center gap-2 bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold py-4 px-6 rounded-xl transition-all duration-200 shadow-md"
                   >
                     <MessageCircle className="w-5 h-5" />
                     Hablar por WhatsApp
@@ -1138,14 +1290,14 @@ export default function PaymentSuccessPage() {
           >
             <Link
               to="/"
-              className="inline-flex items-center justify-center gap-2 bg-white/[0.06] hover:bg-white/[0.1] text-white font-medium py-3 px-6 rounded-xl border border-white/[0.08] transition-all"
+              className={`inline-flex items-center justify-center gap-2 font-medium py-3 px-6 rounded-xl border transition-all ${cardGlass} text-slate-800 hover:opacity-95 dark:text-slate-100`}
             >
               <Home className="w-4 h-4" />
               Volver al inicio
             </Link>
             <Link
               to="/servicios"
-              className="inline-flex items-center justify-center gap-2 bg-white/[0.06] hover:bg-white/[0.1] text-white font-medium py-3 px-6 rounded-xl border border-white/[0.08] transition-all"
+              className={`inline-flex items-center justify-center gap-2 font-medium py-3 px-6 rounded-xl border transition-all ${cardGlass} text-slate-800 hover:opacity-95 dark:text-slate-100`}
             >
               Ver más servicios
               <ArrowRight className="w-4 h-4" />
@@ -1161,7 +1313,7 @@ export default function PaymentSuccessPage() {
         rel="noopener noreferrer"
         className="fixed z-[100] flex items-center gap-3 group bottom-[max(1.25rem,env(safe-area-inset-bottom,0px))] right-[max(1.25rem,env(safe-area-inset-right,0px))]"
       >
-        <div className="bg-slate-900/90 backdrop-blur-xl border border-slate-700 px-3 py-2 rounded-2xl text-white text-xs font-bold shadow-2xl flex items-center gap-2 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
+        <div className="bg-white/85 dark:bg-slate-900/85 backdrop-blur-xl border border-slate-200/80 dark:border-slate-600/60 px-3 py-2 rounded-2xl text-slate-900 dark:text-white text-xs font-bold shadow-2xl flex items-center gap-2 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
           <span className="relative flex h-2 w-2 flex-none">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
             <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>

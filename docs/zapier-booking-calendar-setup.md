@@ -5,19 +5,21 @@ Flujo tras pago aprobado en Mercado Pago: la Edge Function `mercadopago-webhook`
 ## Requisitos en Supabase
 
 1. Aplicar migración `supabase/migrations/20260421180000_booking_calendar_queue.sql` (columnas `google_meet_link`, `confirmation_email_status`, etc.).
-2. Desplegar Edge Functions:
+2. Aplicar migración `supabase/migrations/20260428120000_reservas_qualification_inmobiliario.sql` (`qualification_data`, `risk_level`, trigger de riesgo).
+3. Desplegar Edge Functions:
    - `mercadopago-webhook`
    - `clever-action`
-   - `booking-calendar-callback` (nueva)
+   - `booking-calendar-callback`
+   - `enqueue-booking-calendar` (reservas sin Mercado Pago, p. ej. plan `inmobiliario-eval`)
 
 ## Variables de entorno (Supabase → Edge Functions)
 
 | Variable | Dónde | Descripción |
 |----------|--------|-------------|
-| `ZAPIER_BOOKING_HOOK_URL` | `mercadopago-webhook` | URL completa del Catch Hook del Zap (POST JSON). Si **no** está definida, el webhook sigue llamando a `clever-action` directo (comportamiento anterior). |
+| `ZAPIER_BOOKING_HOOK_URL` | `mercadopago-webhook`, `enqueue-booking-calendar` | URL completa del Catch Hook del Zap (POST JSON). Si **no** está definida, ambas funciones hacen fallback a `clever-action` directo. |
 | `ZAPIER_CALLBACK_SECRET` | `booking-calendar-callback` | Secreto compartido; Zapier debe enviarlo en la cabecera `x-zapier-secret`. Obligatorio para que el callback acepte peticiones. |
-| `SUPABASE_SERVICE_ROLE_KEY` | `mercadopago-webhook` (recomendado), `booking-calendar-callback` | Para actualizar `reservas` sin depender de RLS del anon. |
-| `ADMIN_EDGE_TOKEN` o `EDGE_ADMIN_TOKEN` | `booking-calendar-callback` | Mismo token que usa `clever-action` (`x-admin-token`). |
+| `SUPABASE_SERVICE_ROLE_KEY` | `mercadopago-webhook` (recomendado), `booking-calendar-callback`, `enqueue-booking-calendar` | Para leer/actualizar `reservas` sin depender de RLS del anon. |
+| `ADMIN_EDGE_TOKEN` o `EDGE_ADMIN_TOKEN` | `booking-calendar-callback`, `enqueue-booking-calendar` | Mismo token que usa `clever-action` (`x-admin-token`) para el fallback de correo. |
 
 ## Zap en Zapier (zapier.com)
 
@@ -39,6 +41,35 @@ Flujo tras pago aprobado en Mercado Pago: la Edge Function `mercadopago-webhook`
    ```
    Los campos de Meet/HTML/event id pueden ir vacíos si no aplica; `booking_id` es obligatorio (mismo `id` que envía el webhook en el payload inicial).
 
+### Payload enriquecido (Notion / Gmail interno)
+
+El JSON del Catch Hook incluye además, cuando existan en `reservas`: `risk_level`, `qualification_data` (objeto JSON de la micro-cualificación de `/inmobiliario`). Puedes mapearlos en Zapier a **Notion** o a un correo **Gmail solo al equipo** (evita duplicar el correo al cliente si ya envía Resend vía `clever-action`).
+
+## Reservas sin pago (`pago_estado = waived_inmobiliario`)
+
+1. **Migración:** `supabase/migrations/20260428120000_reservas_qualification_inmobiliario.sql` añade `qualification_data` (jsonb) y `risk_level` en `public.reservas`.
+2. **Landing:** `puntolegal.online/inmobiliario` guarda la cualificación en `sessionStorage` y envía a `/agendamiento?plan=inmobiliario-eval`.
+3. **Al confirmar cita (precio 0):** el cliente invoca `enqueue-booking-calendar` con `{ "booking_id": "<uuid>" }`. La función valida:
+   - `pago_estado === 'waived_inmobiliario'`
+   - `servicio` contiene `inmobiliario` o `evaluación`
+   - reserva creada hace menos de 45 minutos
+   - idempotencia si ya está `pending_calendar` o `email_enviado`
+4. Luego el flujo es **idéntico** al pago MP: mismo Catch Hook → Calendar/Meet → `booking-calendar-callback` → `clever-action`.
+
+## Prompt maestro (copiar a Notion o Agent)
+
+```
+Objetivo: embudo inmobiliario Sector Oriente en puntolegal.online/inmobiliario → cualificación 4 pasos (Zod) → sessionStorage → /agendamiento?plan=inmobiliario-eval → reserva con pago_estado waived_inmobiliario + qualification_data → Edge enqueue-booking-calendar → ZAPIER_BOOKING_HOOK_URL (mismo Zap que MP) → Google Calendar + Meet → POST booking-calendar-callback (x-zapier-secret) → clever-action Resend.
+
+Archivos clave: src/pages/InmobiliarioLandingPage.tsx, src/constants/inmobiliarioQualification.ts, src/contexts/AgendamientoContext.tsx (rama inmobiliario-eval), src/services/enqueueBookingCalendar.ts, supabase/functions/enqueue-booking-calendar/index.ts, supabase/functions/_shared/zapierBookingPayload.ts, mercadopago-webhook (payload unificado), clever-action (asunto/descripcion waived), docs/zapier-booking-calendar-setup.md.
+
+Gmail en Zapier: solo notificación interna; cliente = Resend. Notion: mapear qualification_data y risk_level desde el Catch Hook. Pruebas: reserva eval + polling en /payment-success; reserva pagada inmobiliario + MP sandbox sin regresión.
+```
+
+## Seguridad
+
+No expongas `ZAPIER_CALLBACK_SECRET` en el cliente. Solo Zapier (servidor) y variables de Supabase.
+
 ## Estados en `reservas.confirmation_email_status`
 
 - `pending_calendar`: webhook encoló Zapier; aún no corre `clever-action`.
@@ -48,7 +79,3 @@ Flujo tras pago aprobado en Mercado Pago: la Edge Function `mercadopago-webhook`
 ## Frontend
 
 `PaymentSuccessPage` no reenvía correos si la reserva está en `pending_calendar`; hace polling hasta que `email_enviado` sea true o falle el flujo.
-
-## Seguridad
-
-No expongas `ZAPIER_CALLBACK_SECRET` en el cliente. Solo Zapier (servidor) y variables de Supabase.

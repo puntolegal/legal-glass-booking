@@ -24,12 +24,11 @@ const AccessibilityPanel: React.FC = () => {
   const [isDarkMode, setIsDarkMode] = useState(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('theme');
-      if (saved) {
-        return saved === 'dark';
-      }
-      return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      if (saved === 'light') return false;
+      if (saved === 'dark') return true;
+      return true;
     }
-    return false;
+    return true;
   });
 
   const fontSizeOptions = [
@@ -90,21 +89,6 @@ const AccessibilityPanel: React.FC = () => {
     localStorage.setItem('theme', newDarkMode ? 'dark' : 'light');
   };
 
-  // Sincronizar con cambios externos del tema
-  useEffect(() => {
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    const handleChange = (e: MediaQueryListEvent) => {
-      const savedTheme = localStorage.getItem('theme');
-      if (!savedTheme) {
-        setIsDarkMode(e.matches);
-      }
-    };
-
-    mediaQuery.addEventListener('change', handleChange);
-    return () => mediaQuery.removeEventListener('change', handleChange);
-  }, []);
-
-  // Exponer función para abrir el panel desde el dock
   useEffect(() => {
     const handleAccessibilityToggle = () => {
       setIsOpen(true);
@@ -115,7 +99,17 @@ const AccessibilityPanel: React.FC = () => {
   }, []);
 
   if (!isOpen) {
-    return null; // Ocultar botón flotante ya que está integrado en el dock
+    return (
+      <button
+        type="button"
+        onClick={() => setIsOpen(true)}
+        className="fixed bottom-4 left-4 z-[70] flex h-11 w-11 items-center justify-center rounded-2xl border border-slate-200/90 bg-white/85 text-slate-700 shadow-lg backdrop-blur-xl transition hover:bg-white dark:border-white/10 dark:bg-slate-900/75 dark:text-slate-200 dark:hover:bg-slate-900/90"
+        aria-label="Abrir panel de accesibilidad"
+        title="Accesibilidad"
+      >
+        <Accessibility className="h-5 w-5" aria-hidden />
+      </button>
+    );
   }
 
   return (

@@ -431,7 +431,7 @@ const ApuntesHeader: React.FC<ApuntesHeaderProps> = ({
                       </div>
                       <div className="relative flex-shrink-0">
                         <div className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 rounded-full bg-emerald-500 dark:bg-emerald-600 text-white flex items-center justify-center text-[9px] sm:text-[10px] md:text-xs font-bold shadow-md">
-                          {user.name === 'Amanda G.' ? 'AG' : user.name === 'Benjamin' ? 'BS' : user.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
+                          {user.name === 'Amanda G.' ? 'AG' : user.name === 'Curador' ? 'CR' : user.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
                         </div>
                         {pendingAudits > 0 && (
                           <span className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-full bg-red-500 text-white text-[7px] sm:text-[8px] font-bold flex items-center justify-center border-2 border-white dark:border-[#1c1c1e]">

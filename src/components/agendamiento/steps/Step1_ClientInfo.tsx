@@ -9,6 +9,7 @@ import { validationRules } from '@/hooks/useFormValidation';
 import { getServiceTheme } from '@/config/serviceThemes';
 import { buildWhatsAppUrl } from '@/lib/whatsapp';
 import { saveAgendamientoIntake } from '@/services/agendamientoIntakeService';
+import { useTheme } from '@/hooks/useTheme';
 import type { FormData } from '@/types/agendamiento';
 
 const Step1_ClientInfo: React.FC = () => {
@@ -24,6 +25,7 @@ const Step1_ClientInfo: React.FC = () => {
 
   const [searchParams] = useSearchParams();
   const plan = searchParams.get('plan');
+  const { theme } = useTheme();
 
   // Tema dinámico — alineado con el accent del Plan PDF de la card
   const serviceTheme = useMemo(
@@ -43,6 +45,9 @@ const Step1_ClientInfo: React.FC = () => {
     `linear-gradient(135deg, ${serviceTheme.primary}, ${serviceTheme.accent})`,
     [serviceTheme]
   );
+
+  /** Mismo acento neutro que ACCENT_DEPTH en ServicesSection (slate-700) — CTA modo claro */
+  const lightPrimaryCtaRgb = '51 65 85';
   
   const {
     register,
@@ -218,7 +223,9 @@ const Step1_ClientInfo: React.FC = () => {
       className="space-y-4 md:space-y-6 pb-20 md:pb-6 relative z-10"
     >
       <div 
-        className="bg-slate-900/80 backdrop-blur-md border border-slate-800/70 rounded-3xl p-4 md:p-8 shadow-2xl relative z-10"
+        className={`rounded-[1.75rem] p-4 md:p-8 relative z-10 shadow-xl ${
+          theme === 'light' ? 'glass-ios-panel-light' : 'glass-ios-panel-dark'
+        }`}
         style={{
           boxShadow: `0 32px 65px ${hexToRgba(serviceTheme.primary, 0.08)}`
         }}
@@ -237,8 +244,8 @@ const Step1_ClientInfo: React.FC = () => {
             <User className="w-5 h-5 md:w-6 md:h-6 text-white" />
           </div>
           <div className="min-w-0 flex-1">
-            <h3 className="text-base md:text-xl font-bold text-white">Asistente de Bienvenida</h3>
-            <p className="text-xs md:text-sm text-slate-400 hidden md:block">
+            <h3 className="text-base md:text-xl font-bold text-slate-900 dark:text-white">Asistente de Bienvenida</h3>
+            <p className="text-xs md:text-sm text-slate-600 dark:text-slate-400 hidden md:block">
               Te guiamos paso a paso para preparar tu consulta estratégica
             </p>
           </div>
@@ -247,10 +254,10 @@ const Step1_ClientInfo: React.FC = () => {
         <div className="space-y-4 md:space-y-6">
           {/* Encabezado */}
           <div>
-            <h4 className="text-lg md:text-xl font-bold text-white mb-1 md:mb-2">
+            <h4 className="text-lg md:text-xl font-bold text-slate-900 dark:text-white mb-1 md:mb-2">
               Información de contacto
             </h4>
-            <p className="text-xs md:text-sm text-slate-400">
+            <p className="text-xs md:text-sm text-slate-600 dark:text-slate-400">
               Completa todos los campos para continuar. Tu navegador puede autocompletar esta información automáticamente.
             </p>
           </div>
@@ -272,7 +279,7 @@ const Step1_ClientInfo: React.FC = () => {
                   <div key={field.name} className={fieldSpan}>
                     <label 
                       htmlFor={`input-${field.name}`}
-                      className="block text-sm font-semibold text-white mb-2"
+                      className="block text-sm font-semibold text-slate-800 dark:text-white mb-2"
                     >
                       {field.summaryLabel}
                       {!field.optional && <span className="text-rose-400 ml-1">*</span>}
@@ -290,7 +297,7 @@ const Step1_ClientInfo: React.FC = () => {
                         aria-describedby={field.helper ? `helper-${field.name}` : errors[field.name] ? `error-${field.name}` : undefined}
                         aria-invalid={!!errors[field.name]}
                         aria-required={!field.optional}
-                        className="w-full rounded-xl border bg-slate-900/60 px-4 py-3 text-base text-white placeholder-slate-500 focus:outline-none focus-visible:ring-2 transition-all resize-none"
+                        className="w-full rounded-xl border bg-white px-4 py-3 text-base text-slate-900 placeholder-slate-400 focus:outline-none focus-visible:ring-2 transition-all resize-none dark:bg-slate-900/60 dark:text-white dark:placeholder-slate-500"
                         style={{
                           borderColor: errors[field.name] 
                             ? '#f43f5e' 
@@ -330,7 +337,7 @@ const Step1_ClientInfo: React.FC = () => {
                           aria-describedby={field.helper ? `helper-${field.name}` : errors[field.name] ? `error-${field.name}` : undefined}
                           aria-invalid={!!errors[field.name]}
                           aria-required={!field.optional}
-                          className="w-full rounded-xl border bg-slate-900/60 px-4 py-3 pr-12 text-base text-white placeholder-slate-500 focus:outline-none focus-visible:ring-2 transition-all"
+                          className="w-full rounded-xl border bg-white px-4 py-3 pr-12 text-base text-slate-900 placeholder-slate-400 focus:outline-none focus-visible:ring-2 transition-all dark:bg-slate-900/60 dark:text-white dark:placeholder-slate-500"
                           style={{
                             borderColor: errors[field.name] 
                               ? '#f43f5e' 
@@ -367,7 +374,7 @@ const Step1_ClientInfo: React.FC = () => {
                     {field.helper && !errors[field.name] && (
                       <p 
                         id={`helper-${field.name}`}
-                        className="text-xs text-slate-400 mt-1"
+                        className="text-xs text-slate-600 dark:text-slate-400 mt-1"
                       >
                         {field.helper}
                       </p>
@@ -396,16 +403,24 @@ const Step1_ClientInfo: React.FC = () => {
               animate={{ opacity: 1, y: 0 }}
               className={`w-full min-h-[56px] md:min-h-[52px] rounded-xl font-bold text-base md:text-base flex items-center justify-center gap-2 transition-all duration-200 mt-4 md:mt-6 ${
                 requiredFieldsComplete
-                  ? 'shadow-xl hover:scale-[1.02] active:scale-[0.98]'
+                  ? theme === 'light'
+                    ? 'agendamiento-primary-cta cta-shimmer shadow-xl hover:scale-[1.02] active:scale-[0.98]'
+                    : 'shadow-xl hover:scale-[1.02] active:scale-[0.98]'
                   : 'opacity-50 cursor-not-allowed'
               }`}
-              style={requiredFieldsComplete ? {
-                background: primaryGradient,
-                boxShadow: `0 12px 32px ${hexToRgba(serviceTheme.primary, 0.5)}`,
-              } : {
-                background: 'rgba(148, 163, 184, 0.2)',
-                color: 'rgba(148, 163, 184, 0.5)',
-              }}
+              style={
+                requiredFieldsComplete
+                  ? theme === 'light'
+                    ? ({ ['--agenda-card-accent']: lightPrimaryCtaRgb } as React.CSSProperties)
+                    : {
+                        background: primaryGradient,
+                        boxShadow: `0 12px 32px ${hexToRgba(serviceTheme.primary, 0.5)}`,
+                      }
+                  : {
+                      background: 'rgba(148, 163, 184, 0.2)',
+                      color: 'rgba(148, 163, 184, 0.5)',
+                    }
+              }
             >
               {requiredFieldsComplete ? (
                 <>
@@ -423,7 +438,7 @@ const Step1_ClientInfo: React.FC = () => {
             href={buildWhatsAppUrl('agendando')}
             target="_blank"
             rel="noopener noreferrer"
-            className="w-full flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.03] px-5 py-3 backdrop-blur-xl transition-colors hover:bg-white/[0.06] group mt-4"
+            className="w-full flex items-center gap-3 rounded-2xl border border-slate-200/90 bg-slate-50/90 px-5 py-3 backdrop-blur-xl transition-colors hover:bg-slate-100/90 group mt-4 dark:border-white/10 dark:bg-white/[0.03] dark:hover:bg-white/[0.06]"
           >
             <div
               className="flex h-10 w-10 items-center justify-center rounded-xl shrink-0"
@@ -434,8 +449,8 @@ const Step1_ClientInfo: React.FC = () => {
               </svg>
             </div>
             <div className="min-w-0">
-              <p className="text-sm font-medium text-slate-300 group-hover:text-white transition-colors">¿Tienes dudas?</p>
-              <p className="text-xs text-slate-500">Habla con un abogado antes de agendar</p>
+              <p className="text-sm font-medium text-slate-700 group-hover:text-slate-900 transition-colors dark:text-slate-300 dark:group-hover:text-white">¿Tienes dudas?</p>
+              <p className="text-xs text-slate-500 dark:text-slate-500">Habla con un abogado antes de agendar</p>
             </div>
           </a>
 

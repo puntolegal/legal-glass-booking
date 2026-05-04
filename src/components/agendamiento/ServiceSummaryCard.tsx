@@ -4,9 +4,11 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { FileText, User, Building2, MapPin, Shield, Sparkles } from 'lucide-react';
 import { useAgendamiento } from '@/contexts/AgendamientoContext';
+import { useTheme } from '@/hooks/useTheme';
 
 const ServiceSummaryCard: React.FC = () => {
   const { service, serviceColor, priceCalculation } = useAgendamiento();
+  const { theme } = useTheme();
   const { precioFinal, isConvenioValido, isAdminValido } = priceCalculation;
   
   const getCategoryIcon = () => {
@@ -55,19 +57,19 @@ const ServiceSummaryCard: React.FC = () => {
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="mb-6 rounded-3xl border border-white/10 bg-[rgba(15,23,42,0.75)] p-6 shadow-[0_28px_60px_rgba(15,23,42,0.55)] backdrop-blur-xl"
+      className="mb-6 rounded-3xl border border-slate-200/90 bg-white/95 p-6 shadow-[0_20px_50px_rgba(15,23,42,0.08)] backdrop-blur-xl dark:border-white/10 dark:bg-[rgba(15,23,42,0.75)] dark:shadow-[0_28px_60px_rgba(15,23,42,0.55)]"
     >
       <div className="flex items-center gap-4">
         <div 
-          className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10"
+          className="flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-100 ring-1 ring-slate-200/80 dark:bg-white/5 dark:ring-white/10"
           style={{ color: serviceColor }}
         >
           <Icon className="w-7 h-7" />
         </div>
         
         <div className="flex flex-1 flex-col">
-          <p className="text-xs uppercase tracking-[0.35em] text-white/50">{service.category}</p>
-          <h2 className="text-2xl font-semibold text-white">{service.name}</h2>
+          <p className="text-xs uppercase tracking-[0.35em] text-slate-500 dark:text-white/50">{service.category}</p>
+          <h2 className="text-2xl font-semibold text-slate-900 dark:text-white">{service.name}</h2>
         </div>
         </div>
         
@@ -77,7 +79,7 @@ const ServiceSummaryCard: React.FC = () => {
           <span
             className="text-4xl font-bold text-transparent bg-clip-text"
             style={{
-              backgroundImage: `linear-gradient(135deg, #ffffff, ${serviceColor})`,
+              backgroundImage: `linear-gradient(135deg, ${theme === 'dark' ? '#ffffff' : 'rgb(15 23 42)'}, ${serviceColor})`,
               fontVariantNumeric: 'tabular-nums',
             }}
           >

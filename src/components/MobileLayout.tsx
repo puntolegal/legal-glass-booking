@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom';
 import MobileSidebar from './MobileSidebar';
 import ApuntesHeader from './ApuntesHeader';
 import { useSidebar } from '@/contexts/SidebarContext';
+import { useTheme } from '@/hooks/useTheme';
 
 interface MobileLayoutProps {
   children: React.ReactNode;
@@ -22,6 +23,12 @@ export const MobileLayout: React.FC<MobileLayoutProps> = ({
   const { isOpen, closeSidebar } = useSidebar();
   const location = useLocation();
   const isLanding = location.pathname === '/';
+  const isGlassCanvasRoute =
+    isLanding ||
+    location.pathname === '/servicios/inmobiliario' ||
+    location.pathname === '/inmobiliario';
+  const { theme } = useTheme();
+  const landingLight = isLanding && theme === 'light';
 
   useEffect(() => {
     if (!showHeader) return;
@@ -47,12 +54,14 @@ export const MobileLayout: React.FC<MobileLayoutProps> = ({
   return (
     <div
       className={`lg:hidden min-h-screen relative ${
-        isLanding
-          ? 'bg-transparent text-slate-100 selection:bg-sky-500/30 selection:text-white'
-          : 'bg-[#F5F7FA] dark:bg-[#0B1121] text-slate-900 dark:text-slate-100 selection:bg-indigo-500/30 selection:text-slate-900'
+        isGlassCanvasRoute
+          ? landingLight
+            ? 'bg-transparent text-slate-900 selection:bg-teal-500/20 selection:text-slate-900'
+            : 'bg-transparent text-slate-100 selection:bg-sky-500/30 selection:text-white'
+          : 'bg-slate-50 dark:bg-[#05060a] text-slate-900 dark:text-slate-100 selection:bg-teal-500/15 dark:selection:bg-sky-500/20 selection:text-slate-900 dark:selection:text-white'
       } overflow-hidden`}
     >
-      {!isLanding && (
+      {!isGlassCanvasRoute && (
         <div
           className="pointer-events-none absolute inset-0 bg-noise opacity-40 mix-blend-soft-light"
           aria-hidden="true"

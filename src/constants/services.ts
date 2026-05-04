@@ -38,10 +38,10 @@ export const serviceCatalog: Record<string, Service> = {
     note: 'Primera consulta con abogado especialista',
   },
   'laboral': {
-    name: 'Punto Legal Laboral — Consulta',
-    price: '79.000',
+    name: 'Punto Legal Laboral — Despido y finiquito',
+    price: '0',
     category: 'Laboral',
-    note: 'Consulta paga · 60 min',
+    note: 'Primera sesión sin costo cuando corresponde · plan por escrito según servicio',
   },
   'sucesorio': {
     name: 'Punto Legal Sucesorio',
@@ -148,6 +148,13 @@ export const serviceCatalog: Record<string, Service> = {
     name: 'Punto Legal Inmobiliario',
     price: '119.000',
     category: 'Inmobiliario',
+  },
+  /** Evaluación orientativa Sector Oriente — agenda sin pago; cola Zapier + Meet vía Edge Function */
+  'inmobiliario-eval': {
+    name: 'Punto Legal Inmobiliario — Evaluación estratégica (Sector Oriente)',
+    price: '0',
+    category: 'Inmobiliario',
+    note: 'Sesión orientativa sin costo · calendario Google Meet',
   },
   'cobranza': {
     name: 'Punto Legal Cobranza',

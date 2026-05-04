@@ -1,4 +1,6 @@
 import { useMemo, useState } from "react";
+import { useLocation } from "react-router-dom";
+import { useTheme } from "@/hooks/useTheme";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import {
   ArrowUpRight,
@@ -45,6 +47,16 @@ interface ServicesSectionProps {
 
 type Audience = "all" | "personas" | "empresas" | "patrimonio";
 
+/** Paleta catálogo estudio jurídico / iOS: tinta y pizarra; vino sólo para urgencia grave. */
+const ACCENT_INK = "30 58 138"; // blue-900
+const ACCENT_SLATE = "71 85 105"; // slate-600
+const ACCENT_DEPTH = "51 65 85"; // slate-700
+const ACCENT_WINE = "127 29 29"; // red-800
+/** Mismo triplete que `serviceThemes` tutela-laboral / laboral (teal-600, apagado). */
+const ACCENT_LABOR_TEAL = "13 148 136";
+/** Alineado con `serviceThemes.familia` (indigo-500). */
+const ACCENT_FAMILIA = "99 102 241";
+
 interface InternalService {
   title: string;
   shortName: string;
@@ -71,8 +83,6 @@ interface InternalService {
   testimonial?: { quote: string; author: string };
   /** Plan gratuito (cambia el render del precio) */
   free?: boolean;
-  /** Atajos a otros planes (cluster Laboral personas) */
-  clusterPills?: { label: string; plan: string }[];
   /** Minutos de sesión mostrados en trust pills (default 45) */
   sessionDurationMin?: number;
 }
@@ -100,7 +110,7 @@ const internalServices: InternalService[] = [
       "Defensa administrativa y judicial ante la TGR",
     ],
     audience: "patrimonio",
-    accent: "239 68 68", // red-500 — urgencia financiera
+    accent: ACCENT_WINE,
     badge: "Producto estrella",
     featured: true,
     testimonial: {
@@ -128,11 +138,11 @@ const internalServices: InternalService[] = [
       "Honorarios a porcentaje si asumimos el caso",
     ],
     audience: "personas",
-    accent: "13 148 136", // teal-600 — vertical laboral (alineado a serviceThemes)
-    badge: "Diagnóstico gratis disponible",
+    accent: ACCENT_LABOR_TEAL,
+    badge: "Diagnóstico gratis",
     clusterPills: [
       { label: "Diagnóstico gratis", plan: "tutela-laboral" },
-      { label: "Despido y finiquito", plan: "laboral" },
+      { label: "Despido · gratis", plan: "laboral" },
       { label: "Ley Karin (trabajador)", plan: "defensa-karin-trabajador" },
     ],
     sessionDurationMin: 45,
@@ -154,7 +164,7 @@ const internalServices: InternalService[] = [
       "Plan de acción por escrito",
     ],
     audience: "personas",
-    accent: "129 140 248", // indigo-400
+    accent: ACCENT_FAMILIA,
   },
   {
     title: "Punto Legal Sucesorio",
@@ -172,7 +182,7 @@ const internalServices: InternalService[] = [
       "Partición y cesión de derechos",
     ],
     audience: "personas",
-    accent: "100 116 139", // slate-500
+    accent: ACCENT_SLATE,
   },
   {
     title: "Punto Legal Migratorio",
@@ -190,7 +200,7 @@ const internalServices: InternalService[] = [
       "Recursos contra rechazos o expulsión",
     ],
     audience: "personas",
-    accent: "6 182 212", // cyan-500
+    accent: ACCENT_INK,
   },
   {
     title: "Punto Legal Penal",
@@ -208,7 +218,7 @@ const internalServices: InternalService[] = [
       "Suspensión condicional y acuerdos",
     ],
     audience: "personas",
-    accent: "190 18 60", // rose-700 — gravedad
+    accent: ACCENT_WINE,
     badge: "Atención inmediata",
   },
   {
@@ -228,7 +238,7 @@ const internalServices: InternalService[] = [
       "Procedimiento abreviado y suspensión condicional",
     ],
     audience: "personas",
-    accent: "153 27 27", // red-800 — gravedad corporativa
+    accent: ACCENT_WINE,
     badge: "Alta complejidad",
   },
 
@@ -249,7 +259,7 @@ const internalServices: InternalService[] = [
       "Asesoría legal mensual",
     ],
     audience: "empresas",
-    accent: "139 92 246", // violet-500
+    accent: ACCENT_INK,
   },
   {
     title: "Punto Legal Constitución Empresarial",
@@ -268,7 +278,7 @@ const internalServices: InternalService[] = [
       "Inscripción ante CMF si corresponde",
     ],
     audience: "empresas",
-    accent: "124 58 237", // violet-600
+    accent: ACCENT_DEPTH,
   },
   {
     title: "Punto Legal Reestructuración",
@@ -287,7 +297,7 @@ const internalServices: InternalService[] = [
       "Tramitación Registro de Comercio y DO",
     ],
     audience: "empresas",
-    accent: "79 70 229", // indigo-600
+    accent: ACCENT_INK,
   },
   {
     title: "Punto Legal Holding Patrimonial",
@@ -306,7 +316,7 @@ const internalServices: InternalService[] = [
       "Análisis civil-tributario integrado",
     ],
     audience: "empresas",
-    accent: "30 58 138", // blue-900 — institucional
+    accent: ACCENT_INK,
     badge: "Alto patrimonio",
   },
   {
@@ -327,7 +337,7 @@ const internalServices: InternalService[] = [
       "Planificación tributaria mensual",
     ],
     audience: "empresas",
-    accent: "67 56 202", // indigo-700
+    accent: ACCENT_DEPTH,
     badge: "Asesoría mensual",
   },
   {
@@ -347,7 +357,7 @@ const internalServices: InternalService[] = [
       "Evaluación de riesgo de litigio",
     ],
     audience: "empresas",
-    accent: "147 51 234", // purple-600
+    accent: ACCENT_INK,
   },
   {
     title: "Punto Legal Tributario",
@@ -365,7 +375,7 @@ const internalServices: InternalService[] = [
       "Defensa frente a fiscalizaciones",
     ],
     audience: "empresas",
-    accent: "8 145 178", // cyan-700
+    accent: ACCENT_INK,
   },
   {
     title: "Punto Legal Contratos",
@@ -383,7 +393,7 @@ const internalServices: InternalService[] = [
       "Asesoría en negociación",
     ],
     audience: "empresas",
-    accent: "59 130 246", // blue-500
+    accent: ACCENT_INK,
     badge: "24 horas",
   },
   {
@@ -402,7 +412,7 @@ const internalServices: InternalService[] = [
       "Negociación de avenimiento",
     ],
     audience: "empresas",
-    accent: "168 85 247", // purple-500
+    accent: ACCENT_SLATE,
   },
   {
     title: "Punto Legal Fiscalizaciones DT",
@@ -420,7 +430,7 @@ const internalServices: InternalService[] = [
       "Reclamación judicial de multas",
     ],
     audience: "empresas",
-    accent: "236 72 153", // pink-500
+    accent: ACCENT_SLATE,
   },
   {
     title: "Punto Legal Defensa Empresarial",
@@ -438,7 +448,7 @@ const internalServices: InternalService[] = [
       "Estrategia conciliatoria o contenciosa",
     ],
     audience: "empresas",
-    accent: "67 56 202", // indigo-700
+    accent: ACCENT_DEPTH,
   },
   {
     title: "Punto Legal Ley Karin",
@@ -456,7 +466,7 @@ const internalServices: InternalService[] = [
       "Defensa frente a denuncias",
     ],
     audience: "empresas",
-    accent: "124 58 237", // violet-600
+    accent: ACCENT_INK,
     badge: "Obligación legal",
   },
   {
@@ -475,7 +485,7 @@ const internalServices: InternalService[] = [
       "Capacitación y protocolos internos",
     ],
     audience: "empresas",
-    accent: "147 51 234", // purple-600
+    accent: ACCENT_INK,
   },
   {
     title: "Punto Legal Marcas",
@@ -493,7 +503,7 @@ const internalServices: InternalService[] = [
       "Búsqueda de antecedentes",
     ],
     audience: "empresas",
-    accent: "236 72 153", // pink-500 (compartido visual con fiscalización OK)
+    accent: ACCENT_SLATE,
   },
 
   // ========== PATRIMONIO ==========
@@ -513,7 +523,7 @@ const internalServices: InternalService[] = [
       "Contratos de arriendo a tu medida",
     ],
     audience: "patrimonio",
-    accent: "20 184 166", // teal-500
+    accent: ACCENT_SLATE,
   },
   {
     title: "Punto Legal Cobranza",
@@ -531,7 +541,7 @@ const internalServices: InternalService[] = [
       "Ejecución de pagarés y cheques",
     ],
     audience: "patrimonio",
-    accent: "34 197 94", // green-500
+    accent: ACCENT_INK,
   },
 ];
 
@@ -540,7 +550,7 @@ interface CategoryDef {
   label: string;
   sublabel: string;
   icon: LucideIcon;
-  /** RGB triplet — paleta fría profesional */
+  /** RGB triplet — burbuja categoría (tinta / pizarra, ver constantes ACCENT_*) */
   accent: string;
 }
 
@@ -550,28 +560,28 @@ const categories: CategoryDef[] = [
     label: "Todas",
     sublabel: "Ver todo el catálogo legal",
     icon: LayoutGrid,
-    accent: "186 230 253", // sky-200
+    accent: "100 116 139",
   },
   {
     id: "personas",
     label: "Personas",
     sublabel: "Laboral, familia, sucesorio, migratorio y penal",
     icon: Heart,
-    accent: "96 165 250", // blue-400
+    accent: ACCENT_INK,
   },
   {
     id: "empresas",
     label: "Empresas",
     sublabel: "Sociedades, tributario, laboral empresarial, Ley Karin y marcas",
     icon: Building2,
-    accent: "167 139 250", // violet-400
+    accent: ACCENT_DEPTH,
   },
   {
     id: "patrimonio",
     label: "Patrimonio",
     sublabel: "Inmobiliario, cobranza y defensa CAE",
     icon: Landmark,
-    accent: "45 212 191", // teal-400
+    accent: ACCENT_SLATE,
   },
 ];
 
@@ -581,6 +591,9 @@ const ServicesSection = ({
   onAgendarClick,
 }: ServicesSectionProps) => {
   const [audience, setAudience] = useState<Audience>("all");
+  const { pathname } = useLocation();
+  const { theme } = useTheme();
+  const landingLight = pathname === "/" && theme === "light";
 
   const list = useMemo<InternalService[]>(() => {
     if (services && services.length > 0) {
@@ -638,24 +651,47 @@ const ServicesSection = ({
       {/* Bridge superior — conecta con HowItWorks suavemente */}
       <span className="section-flow__top" aria-hidden />
       <div className="pointer-events-none absolute inset-0">
-        <div className="absolute -left-32 top-12 h-72 w-72 rounded-full bg-blue-500/[0.06] blur-3xl" />
-        <div className="absolute -right-24 bottom-6 h-64 w-64 rounded-full bg-cyan-500/[0.05] blur-3xl" />
+        <div className="absolute -left-32 top-12 h-72 w-72 rounded-full bg-slate-500/[0.05] blur-3xl dark:bg-white/[0.04]" />
+        <div className="absolute -right-24 bottom-6 h-64 w-64 rounded-full bg-blue-950/[0.06] blur-3xl dark:bg-slate-400/[0.05]" />
       </div>
 
       <div className="container relative z-10 mx-auto max-w-7xl">
-        <div className="mx-auto mb-8 max-w-3xl text-center lg:mb-10">
-          <span className="badge-ios" style={{ color: "rgb(186 230 253)" }}>
+        <div className="services-intro mx-auto mb-8 max-w-3xl text-center lg:mb-10">
+          <span
+            className={`badge-ios ${
+              landingLight ? "text-slate-700" : "text-slate-200"
+            }`}
+          >
             Online · Google Meet · Chile
           </span>
-          <h2 className="font-display mt-6 text-[34px] font-bold leading-[1.05] tracking-tight text-white sm:text-5xl lg:text-[56px]">
-            <span className="bg-gradient-to-r from-white via-blue-100 to-cyan-100 bg-clip-text text-transparent">
+          <h2
+            className={`font-display mt-6 text-[34px] font-bold leading-[1.05] tracking-tight sm:text-5xl lg:text-[56px] ${
+              landingLight ? "text-slate-900" : "text-white"
+            }`}
+          >
+            <span className={landingLight ? "text-slate-950" : "text-white"}>
               {title}
             </span>
           </h2>
-          <p className="mx-auto mt-5 max-w-xl text-base leading-relaxed text-slate-300 sm:text-lg">
+          <p
+            className={`mx-auto mt-5 max-w-xl text-base leading-relaxed sm:text-lg ${
+              landingLight ? "text-slate-600" : "text-slate-300"
+            }`}
+          >
             45 minutos por Google Meet con un abogado especialista. Diagnóstico,
             estrategia y un{" "}
-            <strong className="text-white">plan de acción por escrito</strong>.
+            <strong className={landingLight ? "text-slate-900" : "text-slate-50"}>
+              plan de acción por escrito
+            </strong>
+            .
+          </p>
+          <p
+            className={`mx-auto mt-4 max-w-xl text-[13px] leading-relaxed sm:text-sm ${
+              landingLight ? "text-slate-500" : "text-slate-400"
+            }`}
+          >
+            Abogados titulados y colegiados · Secreto profesional · Pago seguro y
+            comprobante por correo
           </p>
         </div>
 
@@ -746,11 +782,25 @@ const ServicesSection = ({
                 animate={{ opacity: 1, y: 0 }}
                 exit={prefersReducedMotion ? undefined : { opacity: 0, y: -6 }}
                 transition={{ duration: 0.32, ease: [0.16, 1, 0.3, 1] }}
-                className="text-center text-[12px] uppercase tracking-[0.22em]"
-                style={{ color: `rgb(${activeCategory.accent})` }}
+                className={`text-center text-[12px] uppercase tracking-[0.18em] ${
+                  theme === "light" ? "text-slate-500" : "text-slate-400"
+                }`}
               >
-                {activeCategory.sublabel} ·{" "}
-                <span className="text-slate-400">
+                <span
+                  className={
+                    theme === "light" ? "font-semibold text-slate-800" : "font-semibold text-slate-200"
+                  }
+                >
+                  {activeCategory.sublabel}
+                </span>
+                <span className="mx-1.5 opacity-50" aria-hidden>
+                  ·
+                </span>
+                <span
+                  className={
+                    theme === "light" ? "text-slate-600" : "text-slate-400"
+                  }
+                >
                   {counts[activeCategory.id]} consultas
                 </span>
               </motion.p>
@@ -823,16 +873,34 @@ const ServicesSection = ({
         </div>
 
         {/* Trust strip al final */}
-        <div className="relative z-10 mt-10 flex flex-col items-center gap-3 text-[12px] text-slate-500 md:flex-row md:justify-center md:gap-6">
+        <div
+          className={`relative z-10 mt-10 flex flex-col items-center gap-3 text-[12px] md:flex-row md:justify-center md:gap-6 ${
+            theme === "light" ? "text-slate-600" : "text-slate-300"
+          }`}
+        >
           <span className="inline-flex items-center gap-2">
-            <span className="h-1 w-1 rounded-full bg-teal-400/90" />
+            <span
+              className={`h-1 w-1 rounded-full ${
+                theme === "light" ? "bg-blue-900/70" : "bg-slate-400"
+              }`}
+            />
             +1.200 consultas resueltas
           </span>
-          <span className="hidden md:inline-flex h-1 w-1 rounded-full bg-slate-700" aria-hidden />
+          <span
+            className={`hidden md:inline-flex h-1 w-1 rounded-full ${
+              theme === "light" ? "bg-slate-300" : "bg-slate-500"
+            }`}
+            aria-hidden
+          />
           <span className="inline-flex items-center gap-2">
             Cupos limitados por agenda
           </span>
-          <span className="hidden md:inline-flex h-1 w-1 rounded-full bg-slate-700" aria-hidden />
+          <span
+            className={`hidden md:inline-flex h-1 w-1 rounded-full ${
+              theme === "light" ? "bg-slate-300" : "bg-slate-500"
+            }`}
+            aria-hidden
+          />
           <span className="inline-flex items-center gap-2">
             Pago seguro · Cancelación gratuita
           </span>
@@ -980,6 +1048,7 @@ const MobileServiceCard = ({
         ease: [0.16, 1, 0.3, 1],
       }}
       data-featured={service.featured ? "true" : undefined}
+      data-free={service.free ? "true" : undefined}
       className="mobile-service-card"
       style={{ ["--card-accent" as string]: service.accent }}
     >
@@ -987,55 +1056,62 @@ const MobileServiceCard = ({
           Antes: estaba en línea con el título y truncaba "Tutela Laboral".
           Ahora: banda independiente arriba (cuando existe) y el título tiene
           todo el espacio horizontal disponible. */}
-      {service.badge && (
-        <div
-          className="mobile-service-card__badge-bar"
-          style={{
-            color: `rgb(${service.accent})`,
-            background: `linear-gradient(90deg, rgba(${service.accent}, 0.16), rgba(${service.accent}, 0.04))`,
-            borderColor: `rgba(${service.accent}, 0.22)`,
-          }}
-          aria-hidden
-        >
-          <span
-            className="mobile-service-card__badge-dot"
-            style={{
-              background: `rgb(${service.accent})`,
-              boxShadow: `0 0 6px rgba(${service.accent}, 0.7)`,
-            }}
-          />
-          {service.badge}
+      {service.clusterPills && service.clusterPills.length > 0 ? (
+        <div className="mobile-service-card__cluster-sheet">
+          {service.badge && (
+            <div className="mobile-service-card__cluster-label" aria-hidden>
+              <span className="mobile-service-card__cluster-label-dot" />
+              {service.badge}
+            </div>
+          )}
+          <div className="mobile-service-card__pills-scroll mobile-service-card__pills-scroll--in-cluster">
+            <div className="mobile-service-card__pills-track">
+              {service.clusterPills.map((pill) => (
+                <button
+                  key={`${pill.label}-${pill.plan}`}
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    void trackMetaEvent({
+                      event_name: "InitiateCheckout",
+                      custom_data: {
+                        content_type: "service_plan",
+                        content_category: "Landing Page",
+                        content_ids: [pill.plan],
+                        content_name: `${service.shortName} — ${pill.label}`,
+                        source: "services_section_cluster_pill_mobile",
+                        value: laborClusterMetaValueClp(pill.plan),
+                        currency: "CLP",
+                      },
+                    });
+                    window.location.href = `/agendamiento?plan=${pill.plan}`;
+                  }}
+                  className="mobile-service-card__pill mobile-service-card__pill--cluster shrink-0"
+                >
+                  {pill.label}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
-      )}
-
-      {service.clusterPills && service.clusterPills.length > 0 && (
-        <div className="flex flex-wrap gap-1.5 px-3 pb-2 pt-1">
-          {service.clusterPills.map((pill) => (
-            <button
-              key={`${pill.label}-${pill.plan}`}
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                void trackMetaEvent({
-                  event_name: "InitiateCheckout",
-                  custom_data: {
-                    content_type: "service_plan",
-                    content_category: "Landing Page",
-                    content_ids: [pill.plan],
-                    content_name: `${service.shortName} — ${pill.label}`,
-                    source: "services_section_cluster_pill_mobile",
-                    value: pill.plan === "tutela-laboral" ? 0 : 79000,
-                    currency: "CLP",
-                  },
-                });
-                window.location.href = `/agendamiento?plan=${pill.plan}`;
-              }}
-              className="rounded-full border border-white/15 bg-white/[0.06] px-2.5 py-1 text-[10px] font-medium text-slate-200 backdrop-blur-sm"
-            >
-              {pill.label}
-            </button>
-          ))}
-        </div>
+      ) : (
+        service.badge && (
+          <div
+            className={`mobile-service-card__badge-bar ${
+              service.featured
+                ? "mobile-service-card__badge-bar--accent"
+                : "mobile-service-card__badge-bar--muted"
+            }`}
+            aria-hidden
+          >
+            <span
+              className={`mobile-service-card__badge-dot ${
+                service.featured ? "" : "mobile-service-card__badge-dot--muted"
+              }`}
+            />
+            {service.badge}
+          </div>
+        )
       )}
 
       {/* Fila principal — tap para expandir features */}
@@ -1062,13 +1138,7 @@ const MobileServiceCard = ({
         </div>
 
         <div className="mobile-service-card__price-col">
-          <p
-            className={`mobile-service-card__price ${
-              service.free
-                ? "bg-gradient-to-r from-teal-300 to-cyan-200 bg-clip-text text-transparent"
-                : ""
-            }`}
-          >
+          <p className="mobile-service-card__price">
             {service.price}
           </p>
           {service.priceBefore && !service.free && (
@@ -1224,6 +1294,7 @@ const ServiceCard = ({
     >
       <article
         data-featured={featured ? "true" : undefined}
+        data-free={service.free ? "true" : undefined}
         className="service-card group relative flex h-full flex-col overflow-hidden p-6 lg:p-7"
         style={{ ["--card-accent" as string]: service.accent }}
       >
@@ -1265,7 +1336,7 @@ const ServiceCard = ({
         {/* === HEADER: icon tile + badge === */}
         <div className="relative z-10 flex items-start justify-between gap-3">
           <span
-            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl text-white lg:h-14 lg:w-14"
+            className="service-card-icon-tile flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl text-white lg:h-14 lg:w-14"
             style={{
               background: `linear-gradient(135deg, rgb(${service.accent}), rgba(${service.accent}, 0.72))`,
               boxShadow: `0 18px 36px -12px rgba(${service.accent}, 0.6), inset 0 1.5px 0 rgba(255,255,255,0.32), inset 0 -2px 0 rgba(0,0,0,0.20)`,
@@ -1299,7 +1370,7 @@ const ServiceCard = ({
             {service.title}
           </h3>
           <p
-            className={`mt-2 leading-snug text-slate-200/90 ${
+            className={`service-card__hook mt-2 leading-snug text-slate-200/90 ${
               featured
                 ? "text-[15px] font-medium lg:text-[16px]"
                 : "text-[13.5px] font-medium"
@@ -1329,13 +1400,13 @@ const ServiceCard = ({
                       content_ids: [pill.plan],
                       content_name: `${service.shortName} — ${pill.label}`,
                       source: "services_section_cluster_pill",
-                      value: pill.plan === "tutela-laboral" ? 0 : 79000,
+                      value: laborClusterMetaValueClp(pill.plan),
                       currency: "CLP",
                     },
                   });
                   window.location.href = `/agendamiento?plan=${pill.plan}`;
                 }}
-                className="rounded-full border border-white/15 bg-white/[0.06] px-3 py-1.5 text-[11px] font-medium text-slate-200 backdrop-blur-sm transition hover:border-white/25 hover:bg-white/10"
+                className="service-cluster-pill rounded-full border border-white/15 bg-white/[0.06] px-3 py-1.5 text-[11px] font-medium text-slate-200 backdrop-blur-sm transition hover:border-white/25 hover:bg-white/10"
               >
                 {pill.label}
               </button>
@@ -1421,9 +1492,7 @@ const ServiceCard = ({
               <div className="mt-1 flex items-end gap-2.5">
                 <p
                   className={`price-ticker font-display font-bold leading-none ${
-                    service.free
-                      ? "bg-gradient-to-r from-teal-300 to-cyan-200 bg-clip-text text-transparent"
-                      : "text-white"
+                    service.free ? "" : "text-white"
                   } ${
                     featured
                       ? "text-[34px] lg:text-[42px]"

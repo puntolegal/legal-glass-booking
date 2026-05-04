@@ -1,8 +1,16 @@
-import { useEffect, type ReactNode } from 'react';
+import { useEffect, useMemo, type ReactNode } from 'react';
 import Header from '@/components/Header';
 import { trackMetaEvent } from '@/services/metaConversionsService';
+import { getServiceTheme } from '@/config/serviceThemes';
 import { SERVICIO_THEMES, type ServicioThemeId } from './servicioThemes';
 import { ServicioThemeProvider } from './servicioThemeContext';
+
+function hexToRgba(hex: string, alpha: number) {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
 
 /** Fondo atmosférico por vertical: base más oscura + columna de luz difusa + orbes a lo largo del scroll. */
 const AMBIENT_BY_THEME: Record<
@@ -17,21 +25,21 @@ const AMBIENT_BY_THEME: Record<
 > = {
   laboral: {
     baseGradient:
-      'bg-gradient-to-b from-[#020617] via-[#04121c] to-[#020617]',
+      'bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950',
     columnGlow:
-      'bg-gradient-to-b from-teal-400/[0.045] via-cyan-400/[0.02] to-sky-500/[0.055]',
-    orbA: 'bg-teal-400/[0.06]',
-    orbB: 'bg-cyan-300/[0.05]',
-    orbC: 'bg-sky-400/[0.045]',
+      'bg-gradient-to-b from-slate-500/[0.02] via-transparent to-slate-600/[0.015]',
+    orbA: 'bg-slate-500/[0.025]',
+    orbB: 'bg-slate-600/[0.02]',
+    orbC: 'bg-slate-700/[0.022]',
   },
   laboralLight: {
     baseGradient:
-      'bg-gradient-to-b from-slate-100 via-white to-slate-100/95',
+      'bg-gradient-to-b from-slate-50 via-[#f3f6fa] to-slate-100',
     columnGlow:
-      'bg-gradient-to-b from-teal-400/[0.08] via-cyan-300/[0.04] to-sky-400/[0.09]',
-    orbA: 'bg-teal-400/[0.14]',
-    orbB: 'bg-cyan-300/[0.1]',
-    orbC: 'bg-sky-300/[0.12]',
+      'bg-gradient-to-b from-teal-400/[0.05] via-transparent to-slate-300/[0.045]',
+    orbA: 'bg-teal-400/[0.075]',
+    orbB: 'bg-sky-300/[0.07]',
+    orbC: 'bg-slate-200/[0.11]',
   },
   civil: {
     baseGradient:
@@ -74,6 +82,19 @@ export default function ServicioPageShell({
   const tokens = SERVICIO_THEMES[theme];
   const ambient = AMBIENT_BY_THEME[theme];
   const isLightSurface = theme === 'laboralLight'
+  const laboralAgendaTint = useMemo(
+    () => (theme === 'laboral' ? getServiceTheme('tutela-laboral', null) : null),
+    [theme],
+  )
+  const laboralSoftAmbient = theme === 'laboral' || theme === 'laboralLight'
+  const colBlur = laboralSoftAmbient ? 'blur-2xl' : 'blur-3xl'
+  const orbBlur = laboralSoftAmbient ? 'blur-[72px]' : 'blur-[100px]'
+  const orbBlurWide = laboralSoftAmbient ? 'blur-[76px]' : 'blur-[110px]'
+  const orbBlurTight = laboralSoftAmbient ? 'blur-[68px]' : 'blur-[95px]'
+  const radialBlur = laboralSoftAmbient ? 'blur-2xl' : 'blur-3xl'
+  const radialOpacity = laboralSoftAmbient && !isLightSurface ? 'opacity-60' : isLightSurface ? 'opacity-90' : ''
+  const radialOpacityBR =
+    laboralSoftAmbient && !isLightSurface ? 'opacity-55' : isLightSurface ? 'opacity-85' : ''
 
   useEffect(() => {
     trackMetaEvent({
@@ -89,7 +110,11 @@ export default function ServicioPageShell({
     <ServicioThemeProvider tokens={tokens}>
       <div
         className={`relative min-h-screen min-h-[100dvh] antialiased ${
-          isLightSurface ? 'text-slate-700' : 'text-slate-300'
+          isLightSurface
+            ? 'bg-slate-50 text-slate-900'
+            : theme === 'laboral'
+              ? 'text-slate-100'
+              : 'text-slate-300'
         }`}
       >
         {/* Capas de fondo: ocupan todo el alto del documento (scroll largo) */}
@@ -98,29 +123,51 @@ export default function ServicioPageShell({
           aria-hidden
         >
           <div className={`absolute inset-0 ${ambient.baseGradient}`} />
+          {theme === 'laboral' && laboralAgendaTint && (
+            <>
+              <div
+                className="pointer-events-none absolute inset-0"
+                style={{
+                  background: `radial-gradient(ellipse at top right, ${hexToRgba(laboralAgendaTint.primary, 0.04)}, transparent 60%)`,
+                }}
+                aria-hidden
+              />
+              <div
+                className="pointer-events-none absolute inset-0"
+                style={{
+                  background: `radial-gradient(ellipse at bottom left, ${hexToRgba(laboralAgendaTint.accent, 0.03)}, transparent 60%)`,
+                }}
+                aria-hidden
+              />
+            </>
+          )}
           {!isLightSurface && (
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_95%_85%_at_50%_45%,transparent_32%,rgba(0,0,0,0.42)_100%)]" />
+            <div
+              className={`absolute inset-0 bg-[radial-gradient(ellipse_95%_85%_at_50%_45%,transparent_32%,rgba(0,0,0,0.42)_100%)] ${
+                theme === 'laboral' ? 'opacity-45' : ''
+              }`}
+            />
           )}
           {isLightSurface && (
             <div className="absolute inset-0 bg-[radial-gradient(ellipse_90%_70%_at_50%_0%,rgba(255,255,255,0.55),transparent_55%)]" />
           )}
           <div
-            className={`absolute left-1/2 top-0 h-full w-[min(92vw,40rem)] -translate-x-1/2 blur-3xl ${ambient.columnGlow}`}
+            className={`absolute left-1/2 top-0 h-full w-[min(92vw,40rem)] -translate-x-1/2 ${colBlur} ${ambient.columnGlow}`}
           />
           <div
-            className={`absolute -left-8 top-[14%] h-[22rem] w-[22rem] rounded-full blur-[100px] ${ambient.orbA}`}
+            className={`absolute -left-8 top-[14%] h-[22rem] w-[22rem] rounded-full ${orbBlur} ${ambient.orbA}`}
           />
           <div
-            className={`absolute -right-12 top-[48%] h-[26rem] w-[26rem] -translate-y-1/2 rounded-full blur-[110px] ${ambient.orbB}`}
+            className={`absolute -right-12 top-[48%] h-[26rem] w-[26rem] -translate-y-1/2 rounded-full ${orbBlurWide} ${ambient.orbB}`}
           />
           <div
-            className={`absolute bottom-[8%] left-[18%] h-[20rem] w-[20rem] rounded-full blur-[95px] ${ambient.orbC}`}
+            className={`absolute bottom-[8%] left-[18%] h-[20rem] w-[20rem] rounded-full ${orbBlurTight} ${ambient.orbC}`}
           />
           <div
-            className={`absolute top-[-20rem] left-[-20rem] h-[50rem] w-[50rem] bg-gradient-radial ${tokens.radialTL} ${isLightSurface ? 'via-white/0' : 'via-slate-950/0'} to-transparent blur-3xl ${isLightSurface ? 'opacity-90' : ''}`}
+            className={`absolute top-[-20rem] left-[-20rem] h-[50rem] w-[50rem] bg-gradient-radial ${tokens.radialTL} ${isLightSurface ? 'via-white/0' : 'via-slate-950/0'} to-transparent ${radialBlur} ${radialOpacity}`}
           />
           <div
-            className={`absolute bottom-[-20rem] right-[-20rem] h-[50rem] w-[50rem] bg-gradient-radial ${tokens.radialBR} ${isLightSurface ? 'via-white/0' : 'via-slate-950/0'} to-transparent blur-3xl ${isLightSurface ? 'opacity-85' : ''}`}
+            className={`absolute bottom-[-20rem] right-[-20rem] h-[50rem] w-[50rem] bg-gradient-radial ${tokens.radialBR} ${isLightSurface ? 'via-white/0' : 'via-slate-950/0'} to-transparent ${radialBlur} ${radialOpacityBR}`}
           />
         </div>
 

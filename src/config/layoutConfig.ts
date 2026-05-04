@@ -184,6 +184,39 @@ export const layoutConfigs: RouteLayoutRule[] = [
     },
   },
 
+  // 5a1. Inmobiliario — mismo patrón que laboral: sin header/footer globales (landing propio)
+  {
+    path: '/servicios/inmobiliario',
+    config: {
+      type: 'default',
+      showHeader: false,
+      showFooter: false,
+      headerVariant: 'none',
+      footerVariant: 'none',
+      useMobileLayout: false,
+      seoConfig: {
+        titleSuffix: 'Inmobiliario Sector Oriente',
+        defaultDescription:
+          'Liquidez y gestión de activos inmobiliarios en Santiago Oriente con enfoque legal preventivo.',
+      },
+    },
+  },
+  {
+    path: '/inmobiliario',
+    config: {
+      type: 'default',
+      showHeader: false,
+      showFooter: false,
+      headerVariant: 'none',
+      footerVariant: 'none',
+      useMobileLayout: false,
+      seoConfig: {
+        titleSuffix: 'Inmobiliario',
+        defaultDescription: 'Evaluación y agenda orientada a operaciones inmobiliarias en Chile.',
+      },
+    },
+  },
+
   // 5. ServicioFamiliaPage (sin footer, tiene el propio)
   {
     path: '/servicios/familia',
@@ -284,6 +317,68 @@ export const layoutConfigs: RouteLayoutRule[] = [
       }
     }
   },
+
+  // Rutas con pie institucional (enlaces legales / navegación secundaria)
+  {
+    pathPrefix: '/blog',
+    config: {
+      type: 'default',
+      showHeader: true,
+      showFooter: true,
+      headerVariant: 'default',
+      footerVariant: 'default',
+      useMobileLayout: false,
+      seoConfig: {
+        titleSuffix: 'Blog',
+        defaultDescription: 'Artículos y guías legales Punto Legal Chile.',
+      },
+    },
+  },
+  {
+    path: '/servicios',
+    config: {
+      type: 'default',
+      showHeader: true,
+      showFooter: true,
+      headerVariant: 'default',
+      footerVariant: 'default',
+      useMobileLayout: false,
+      seoConfig: {
+        titleSuffix: 'Servicios',
+        defaultDescription: 'Catálogo de consultas legales online Punto Legal.',
+      },
+    },
+  },
+  {
+    path: '/privacy-policy',
+    config: {
+      type: 'default',
+      showHeader: true,
+      showFooter: true,
+      headerVariant: 'default',
+      footerVariant: 'default',
+      useMobileLayout: false,
+      seoConfig: {
+        titleSuffix: 'Privacidad',
+        defaultDescription: 'Política de privacidad Punto Legal.',
+      },
+    },
+  },
+  {
+    path: '/terms-of-service',
+    config: {
+      type: 'default',
+      showHeader: true,
+      showFooter: true,
+      headerVariant: 'default',
+      footerVariant: 'default',
+      useMobileLayout: false,
+      seoConfig: {
+        titleSuffix: 'Términos',
+        defaultDescription: 'Términos del servicio Punto Legal.',
+      },
+    },
+  },
   
   // 6. Default - Resto de páginas
   // Esta regla siempre coincide (no tiene path ni pathPrefix)
@@ -307,9 +402,9 @@ export const getLayoutForPath = (pathname: string): LayoutConfig => {
   return {
     type: 'default',
     showHeader: true,
-    showFooter: true,
+    showFooter: false,
     headerVariant: 'default',
-    footerVariant: 'default',
+    footerVariant: 'none',
     useMobileLayout: false,
     seoConfig: {
       titleSuffix: 'Punto Legal',

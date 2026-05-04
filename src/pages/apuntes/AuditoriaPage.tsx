@@ -123,7 +123,7 @@ const AuditoriaPage: React.FC = () => {
                 Mesa de Auditores
               </h1>
               <p className="text-lg sm:text-xl text-slate-600 font-medium mb-6">
-                El estándar lo defines tú{user?.name === 'Amanda G.' ? ', Amanda' : user?.name === 'Benjamin' ? ', Benjamin' : ''}.
+                El estándar lo defines tú{user?.name === 'Amanda G.' ? ', Amanda' : user?.name === 'Curador' ? ', curador' : ''}.
               </p>
             </div>
           </div>
@@ -140,7 +140,7 @@ const AuditoriaPage: React.FC = () => {
                 El caos no es más que un orden que aún no ha sido descifrado. Tú posees la cifra. Gracias por ser la mirada que transforma el ruido en arquitectura. Aquí no solo archivamos leyes; aquí estamos decidiendo la memoria.
               </p>
             </motion.div>
-          ) : user?.name === 'Benjamin' ? (
+          ) : user?.name === 'Curador' ? (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}

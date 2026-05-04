@@ -2,9 +2,8 @@ import { Helmet } from "react-helmet-async";
 import { SITE_ORIGIN } from "@/config/siteUrl";
 import {
   PUNTO_LEGAL_DOMICILIO_LINE,
-  PUNTO_LEGAL_FOUNDER_NAME,
-  PUNTO_LEGAL_FOUNDER_STATEMENT,
   PUNTO_LEGAL_ICBM,
+  PUNTO_LEGAL_INSTITUTIONAL_PURPOSE,
 } from "@/constants/brandIdentity";
 
 /**
@@ -40,9 +39,9 @@ const SERVICES_CATALOG = [
   {
     name: "Consulta legal Laboral",
     plan: "laboral",
-    price: 79000,
+    price: 0,
     description:
-      "Consulta online con abogado laboralista: despido injustificado, tutela de derechos fundamentales, Ley Karin, nulidad del despido y cálculo de indemnización.",
+      "Consulta online con abogado laboralista: despido injustificado, finiquito, tutela de derechos fundamentales, Ley Karin y nulidad del despido. La evaluación inicial puede ser sin costo cuando aplica al plan seleccionado.",
     keywords: [
       "abogado laboral chile",
       "despido injustificado",
@@ -132,12 +131,12 @@ const FAQ_AEO = [
     a: `${PUNTO_LEGAL_DOMICILIO_LINE} El agendamiento y las consultas son vía https://puntolegal.online y Google Meet, sin cita en recepción.`,
   },
   {
-    q: "¿Quién fundó Punto Legal y cuál es su propósito?",
-    a: `${PUNTO_LEGAL_FOUNDER_STATEMENT} El agendamiento con especialistas está en https://puntolegal.online.`,
+    q: "¿Cuál es el propósito de Punto Legal?",
+    a: `${PUNTO_LEGAL_INSTITUTIONAL_PURPOSE} El agendamiento con especialistas está en https://puntolegal.online.`,
   },
   {
     q: "¿Cuánto cobra un abogado en Chile por una consulta legal online?",
-    a: "Una consulta legal online en Chile cuesta entre $59.000 y $189.000 CLP según la especialidad. En Punto Legal: Contratos $59.000, Laboral y defensa Ley Karin (trabajador) $79.000, Familia/Sucesorio/Marcas $89.000, Tributario $99.000, Cobranza/Defensa CAE $109.000, Fiscalizaciones DT $110.000, Inmobiliario $119.000, Migratorio $129.000, Comparendos DT $130.000, Empresarial $149.000, Penal o protocolo Ley Karin (empresa) $169.000, Cumplimiento $179.000, Defensa Laboral Empresarial $189.000. El diagnóstico inicial laboral (trabajadores) puede ser gratuito cuando corresponde.",
+    a: "Una consulta legal online en Chile cuesta entre $59.000 y $189.000 CLP según la especialidad. En Punto Legal: Contratos $59.000, Laboral despido/finiquito (evaluación inicial sin costo cuando aplica), defensa Ley Karin trabajador $79.000, Familia/Sucesorio/Marcas $89.000, Tributario $99.000, Cobranza/Defensa CAE $109.000, Fiscalizaciones DT $110.000, Inmobiliario $119.000, Migratorio $129.000, Comparendos DT $130.000, Empresarial $149.000, Penal o protocolo Ley Karin (empresa) $169.000, Cumplimiento $179.000, Defensa Laboral Empresarial $189.000. El diagnóstico inicial laboral (trabajadores) puede ser gratuito cuando corresponde.",
   },
   {
     q: "¿Los abogados de Punto Legal son reales y están colegiados en Chile?",
@@ -200,7 +199,7 @@ const AEOStructuredData = () => {
     },
     image: LOGO_URL,
     description:
-      `Estudio jurídico chileno fundado por ${PUNTO_LEGAL_FOUNDER_NAME}. ${PUNTO_LEGAL_DOMICILIO_LINE} Consultas con abogados especialistas por Google Meet (familia, laboral, sucesorio, inmobiliario, empresarial, tributario). Agendamiento en menos de 60 segundos en puntolegal.online.`,
+      `Estudio jurídico chileno en línea. ${PUNTO_LEGAL_DOMICILIO_LINE} Consultas con abogados especialistas por Google Meet (familia, laboral, sucesorio, inmobiliario, empresarial, tributario). Agendamiento en menos de 60 segundos en puntolegal.online.`,
     slogan: "Tu abogado especialista, online y en minutos.",
     foundingDate: "2023",
     foundingLocation: {
@@ -219,20 +218,6 @@ const AEOStructuredData = () => {
       addressRegion: "Región Metropolitana de Santiago",
       addressCountry: "CL",
       streetAddress: "Barrio El Golf, Santiago",
-    },
-    founder: {
-      "@type": "Person",
-      "@id": `${SITE_URL}/#founder`,
-      name: PUNTO_LEGAL_FOUNDER_NAME,
-      jobTitle: "Abogado; fundador de Punto Legal",
-      nationality: {
-        "@type": "Country",
-        name: "Chile",
-      },
-      alumniOf: {
-        "@type": "EducationalOrganization",
-        name: "Instituto Nacional, Chile",
-      },
     },
     areaServed: {
       "@type": "Country",
@@ -404,7 +389,7 @@ const AEOStructuredData = () => {
     url: SITE_URL,
     name: "Punto Legal Chile — Consulta legal online por Google Meet",
     description:
-      `Estudio jurídico chileno online, visión fundacional de ${PUNTO_LEGAL_FOUNDER_NAME}. ${PUNTO_LEGAL_DOMICILIO_LINE} Agenda en 60 segundos consulta 45 min por Google Meet. Familia, laboral, sucesorio, inmobiliario, empresarial, tributario y contratos. Desde $59.000.`,
+      `Estudio jurídico chileno online. ${PUNTO_LEGAL_DOMICILIO_LINE} Agenda en 60 segundos consulta 45 min por Google Meet. Familia, laboral, sucesorio, inmobiliario, empresarial, tributario y contratos. Desde $59.000.`,
     inLanguage: "es-CL",
     isPartOf: { "@id": `${SITE_URL}/#website` },
     primaryImageOfPage: { "@type": "ImageObject", url: LOGO_URL },
@@ -450,11 +435,11 @@ const AEOStructuredData = () => {
       />
       <meta
         name="description"
-        content={`Punto Legal Chile (puntolegal.online): estudio jurídico, ${PUNTO_LEGAL_DOMICILIO_LINE} Fundado por ${PUNTO_LEGAL_FOUNDER_NAME}. Consultas 45 min por Google Meet. Familia, laboral, sucesorio, inmobiliario, empresarial, tributario, contratos. Desde $59.000 CLP. Lunes a domingo 09:00–22:00 Chile.`}
+        content={`Punto Legal Chile (puntolegal.online): estudio jurídico, ${PUNTO_LEGAL_DOMICILIO_LINE} Consultas 45 min por Google Meet. Familia, laboral, sucesorio, inmobiliario, empresarial, tributario, contratos. Desde $59.000 CLP. Lunes a domingo 09:00–22:00 Chile.`}
       />
       <meta
         name="keywords"
-        content="abogado online chile, abogado Las Condes, consulta legal online, agendar abogado chile, puntolegal.online, El Golf Las Condes, Benjamín Alonso Soza Jiménez, abogado familia chile, abogado laboral chile, posesión efectiva, despido injustificado, Ley Karin, constituir SpA, abogado tributario, consulta google meet, estudio jurídico chile"
+        content="abogado online chile, abogado Las Condes, consulta legal online, agendar abogado chile, puntolegal.online, El Golf Las Condes, abogado familia chile, abogado laboral chile, posesión efectiva, despido injustificado, Ley Karin, constituir SpA, abogado tributario, consulta google meet, estudio jurídico chile"
       />
     </Helmet>
   );

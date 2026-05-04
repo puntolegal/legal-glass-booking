@@ -492,14 +492,15 @@ export const serviceInfoMap: Record<string, ServiceInfo> = {
     deliverable: 'PDF + asesoría'
   },
   'laboral': {
-    title: 'Punto Legal Laboral — Consulta',
-    subtitle: 'Protección de derechos laborales',
-    description: 'Asesoría en derecho laboral: despido injustificado, tutela laboral, Ley 21.643 (Ley Karin), finiquitos y nulidad del despido. Si tu caso califica para primera sesión sin costo, te indicamos cómo agendar el diagnóstico gratuito.',
+    title: 'Punto Legal Laboral — Despido y finiquito',
+    subtitle: 'Evaluación inicial · despido y finiquito',
+    description:
+      'Orientación en despido injustificado, finiquito, nulidad y tutela laboral. Cuando corresponde, la primera sesión de evaluación puede ser sin costo; si el caso avanza a patrocinio con honorarios a porcentaje, se acuerda por escrito.',
     benefits: [
       'Sesión con abogado especialista en derecho laboral.',
-      'Cálculo real de tu indemnización.',
+      'Cálculo orientativo de indemnización y finiquito.',
       'Estrategia para tutela laboral o nulidad del despido.',
-      'Plan de acción por escrito (PDF) adaptado a tu caso.'
+      'Plan de acción por escrito (PDF) cuando aplique al servicio.'
     ],
     testimonial: {
       quote: 'Me ayudaron a recuperar lo que me correspondía después de un despido injustificado. Profesionales y comprometidos.',
@@ -530,6 +531,26 @@ export const serviceInfoMap: Record<string, ServiceInfo> = {
     icon: Home,
     duration: '60 minutos',
     deliverable: 'PDF + asesoría'
+  },
+  'inmobiliario-eval': {
+    title: 'Evaluación inmobiliaria — Sector Oriente',
+    subtitle: 'Orientación jurídica y comercial previa',
+    description:
+      'Primera sesión orientativa sin costo para propiedades en Las Condes, Vitacura, Lo Barnechea o La Reina. Revisión de enfoque y próximos pasos; no constituye estudio de títulos completo ni promesa de resultado.',
+    benefits: [
+      'Agenda con videollamada (Google Meet) tras completar el formulario.',
+      'Equipo alineado a transacciones de mayor complejidad patrimonial.',
+      'Si contratas un plan de honorarios, el valor de esta consulta puede reconocerse según condiciones vigentes.',
+    ],
+    testimonial: {
+      quote: 'Proceso claro y profesional para ordenar la venta sin sorpresas de último minuto.',
+      author: 'Cliente',
+      location: 'Las Condes',
+      initials: 'CL',
+    },
+    icon: Home,
+    duration: '45 minutos',
+    deliverable: 'Orientación + próximos pasos',
   },
   'sucesorio': {
     title: 'Punto Legal Sucesorio',

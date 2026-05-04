@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { trackMetaEvent } from "@/services/metaConversionsService";
 import { serviceThemes } from "@/config/serviceThemes";
+import { laborClusterMetaValueClp } from "@/constants/laborAgendamientoPlans";
 
 type MobileService = {
   id: string;
@@ -59,9 +60,9 @@ const services: MobileService[] = [
     id: "laboral",
     name: "Consulta Laboral",
     description:
-      "Despido, finiquito, tutela laboral y Ley 21.643 (Ley Karin). Elige diagnóstico gratis o consulta paga según tu etapa.",
+      "Despido, finiquito, tutela laboral y Ley 21.643 (Ley Karin). Diagnóstico inicial o evaluación despido/finiquito sin costo cuando aplica; otras vías con tarifa publicada en la agenda.",
     plan: "laboral",
-    price: "$79.000",
+    price: "Gratis",
     icon: Shield,
     highlights: ["Despido y finiquito", "Tutela laboral", "Ley Karin (trabajador)"],
     gradient: serviceThemes.laboral.gradient,
@@ -69,7 +70,7 @@ const services: MobileService[] = [
     sessionMinutes: 60,
     intentPills: [
       { label: "Diagnóstico gratis", plan: "tutela-laboral" },
-      { label: "Consulta pagada", plan: "laboral" },
+      { label: "Despido · gratis", plan: "laboral" },
       { label: "Ley Karin", plan: "defensa-karin-trabajador" },
     ],
   },
@@ -245,7 +246,7 @@ export const PremiumServiceSelector: React.FC = () => {
                             content_ids: [pill.plan],
                             content_name: `Mobile selector — ${pill.label}`,
                             source: "mobile_service_selector_cluster_pill",
-                            value: pill.plan === "tutela-laboral" ? 0 : 79000,
+                            value: laborClusterMetaValueClp(pill.plan),
                             currency: "CLP",
                           },
                         });

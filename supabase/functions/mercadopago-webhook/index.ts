@@ -3,6 +3,7 @@
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { buildZapierBookingPayloadFromRow } from "../_shared/zapierBookingPayload.ts"
 
 // Configuración desde variables de entorno
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL') || 'https://qrgelocijmwnxcckxbdg.supabase.co'
@@ -197,7 +198,11 @@ serve(async (req) => {
       let emailsSent = false;
       let zapierDispatched = false;
       if (paymentInfo.status === 'approved') {
-        const EDGE_ADMIN_TOKEN = Deno.env.get('EDGE_ADMIN_TOKEN') || 'puntolegal-admin-token-2025';
+        /** Misma prioridad que `clever-action` (ADMIN_EDGE_TOKEN) + alias histórico EDGE_ADMIN_TOKEN */
+        const EDGE_ADMIN_TOKEN =
+          Deno.env.get('ADMIN_EDGE_TOKEN') ||
+          Deno.env.get('EDGE_ADMIN_TOKEN') ||
+          'puntolegal-admin-token-2025';
         const ZAPIER_BOOKING_HOOK_URL = (Deno.env.get('ZAPIER_BOOKING_HOOK_URL') || '').trim();
 
         const invokeCleverActionAndMarkEmail = async (): Promise<boolean> => {
@@ -233,21 +238,9 @@ serve(async (req) => {
             console.error('❌ No se pudo marcar pending_calendar:', pendErr);
             emailsSent = await invokeCleverActionAndMarkEmail();
           } else {
-            const tipo = String(updatedReservation.tipo_reunion ?? 'online');
-            const zapPayload = {
-              booking_id: updatedReservation.id,
-              id: updatedReservation.id,
-              nombre: updatedReservation.nombre,
-              email: updatedReservation.email,
-              telefono: updatedReservation.telefono,
-              servicio: updatedReservation.servicio,
-              fecha: updatedReservation.fecha,
-              hora: updatedReservation.hora,
-              tipo_reunion: tipo,
-              external_reference: updatedReservation.external_reference,
-              precio: updatedReservation.precio,
-              descripcion: updatedReservation.descripcion,
-            };
+            const zapPayload = buildZapierBookingPayloadFromRow(
+              updatedReservation as Record<string, unknown>,
+            );
 
             try {
               const zr = await fetch(ZAPIER_BOOKING_HOOK_URL, {

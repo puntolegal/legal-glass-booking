@@ -35,7 +35,8 @@ export const EnvSchema = z.object({
   MAIL_FROM: z.string().email().optional(),
   ADMIN_EMAIL: z.string().email().optional(),
 
-  // Edge Functions
+  // Edge Functions (clever-action / webhook; alias en Supabase Dashboard)
+  ADMIN_EDGE_TOKEN: z.string().min(10).optional(),
   EDGE_ADMIN_TOKEN: z.string().min(10).optional(),
 });
 

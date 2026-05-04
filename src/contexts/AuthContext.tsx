@@ -16,7 +16,7 @@ interface AuthContextType {
   user: UserProfile | null;
   isAuthenticated: boolean;
   isCurator: boolean;
-  login: (userType?: 'amanda' | 'benjamin') => void;
+  login: (userType?: 'amanda' | 'curator') => void;
   logout: () => void;
   profile: UserProfile | null;
   isAdmin: () => boolean;
@@ -38,11 +38,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             ...parsed,
             name: 'Amanda G.'
           });
-        } else if (parsed?.id === 'usr_benjamin_legal') {
-          setUser({
+        } else if (parsed?.id === 'usr_curator_legal' || parsed?.id === 'usr_benjamin_legal') {
+          const curatorProfile: UserProfile = {
             ...parsed,
-            name: 'Benjamin'
-          });
+            id: 'usr_curator_legal',
+            name: 'Curador',
+            role: 'curator',
+          };
+          setUser(curatorProfile);
+          if (parsed?.id === 'usr_benjamin_legal') {
+            localStorage.setItem('pl_session', JSON.stringify(curatorProfile));
+          }
         } else {
           setUser(parsed);
         }
@@ -53,7 +59,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, []);
 
-  const login = (userType: 'amanda' | 'benjamin' = 'amanda') => {
+  const login = (userType: 'amanda' | 'curator' = 'amanda') => {
     if (userType === 'amanda') {
       // Perfil de Amanda
       const amanda: UserProfile = {
@@ -70,10 +76,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(amanda);
       localStorage.setItem('pl_session', JSON.stringify(amanda));
     } else {
-      // Perfil de Benjamin
-      const benjamin: UserProfile = {
-        id: 'usr_benjamin_legal',
-        name: 'Benjamin',
+      // Perfil curador (acceso demo interno)
+      const curator: UserProfile = {
+        id: 'usr_curator_legal',
+        name: 'Curador',
         role: 'curator',
         badgeId: 'CUR-002',
         stats: {
@@ -82,8 +88,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           activeCases: 0
         }
       };
-      setUser(benjamin);
-      localStorage.setItem('pl_session', JSON.stringify(benjamin));
+      setUser(curator);
+      localStorage.setItem('pl_session', JSON.stringify(curator));
     }
   };
 

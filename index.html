@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es-CL">
+<html lang="es-CL" class="dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -108,6 +108,17 @@
   <meta name="twitter:title" content="Punto Legal Chile — Consulta legal online por Google Meet">
   <meta property="og:description" content="Punto Legal (puntolegal.online): estudio jurídico con domicilio comercial en El Golf, Las Condes, Santiago. Consultas 100% online por Google Meet. Agenda en 60 segundos, 45 min con especialista. Familia, laboral, sucesorio, inmobiliario, empresarial, tributario, contratos.">
   <meta name="twitter:description" content="Punto Legal (puntolegal.online): estudio jurídico con domicilio comercial en El Golf, Las Condes, Santiago. Consultas 100% online por Google Meet. Agenda en 60 segundos, 45 min con especialista. Familia, laboral, sucesorio, inmobiliario, empresarial, tributario, contratos.">
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('theme');
+        if (t === 'light') document.documentElement.classList.remove('dark');
+        else document.documentElement.classList.add('dark');
+      } catch (e) {
+        document.documentElement.classList.add('dark');
+      }
+    })();
+  </script>
 </head>
 
   <body>

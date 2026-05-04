@@ -8,6 +8,7 @@ import { GamificationProvider } from '@/contexts/GamificationContext';
 import { ConceptNavigationProvider } from '@/contexts/ConceptNavigationContext';
 import { AccessibilityProvider } from '@/contexts/AccessibilityContext';
 import { AuthProvider } from '@/contexts/AuthContext';
+import { ThemeProvider } from '@/hooks/useTheme';
 import ScrollToTop from '@/components/ScrollToTop';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import AccessibilityPanel from '@/components/AccessibilityPanel';
@@ -34,6 +35,7 @@ import TestMetaPixel from '@/pages/TestMetaPixel';
 import ApuntesHome from './pages/ApuntesHome';
 import AmandaLogin from '@/pages/AmandaLogin';
 import ExpressPage from '@/pages/ExpressPage';
+import InmobiliarioLandingPage from '@/pages/InmobiliarioLandingPage';
 
 // Service Pages
 import ServicioCorporativoPage from '@/pages/ServicioCorporativoPage';
@@ -79,6 +81,7 @@ function App() {
           <GamificationProvider>
             <ConceptNavigationProvider>
               <SidebarProvider>
+                <ThemeProvider>
                 <Router>
                   <ErrorBoundary>
                     <ScrollToTop />
@@ -88,6 +91,7 @@ function App() {
                         <Route path="/" element={<Index />} />
                         <Route path="/centro" element={<ExpressPage />} />
                         <Route path="/express" element={<ExpressPage />} />
+                        <Route path="/inmobiliario" element={<InmobiliarioLandingPage />} />
                         <Route path="/servicios" element={<ServicesPage />} />
                         <Route path="/blog" element={<BlogPage />} />
                         <Route path="/agendamiento" element={<AgendamientoPage />} />
@@ -151,6 +155,7 @@ function App() {
                     <Toaster />
                   </ErrorBoundary>
                 </Router>
+                </ThemeProvider>
               </SidebarProvider>
             </ConceptNavigationProvider>
           </GamificationProvider>

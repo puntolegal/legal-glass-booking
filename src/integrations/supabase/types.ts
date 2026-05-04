@@ -270,6 +270,8 @@ export type Database = {
           google_calendar_event_id: string | null
           google_calendar_html_link: string | null
           google_meet_link: string | null
+          qualification_data: unknown | null
+          risk_level: string | null
         }
         Insert: {
           agendamiento_intake_id?: string | null
@@ -300,6 +302,8 @@ export type Database = {
           google_calendar_event_id?: string | null
           google_calendar_html_link?: string | null
           google_meet_link?: string | null
+          qualification_data?: unknown | null
+          risk_level?: string | null
         }
         Update: {
           agendamiento_intake_id?: string | null
@@ -330,6 +334,8 @@ export type Database = {
           google_calendar_event_id?: string | null
           google_calendar_html_link?: string | null
           google_meet_link?: string | null
+          qualification_data?: unknown | null
+          risk_level?: string | null
         }
         Relationships: []
       }

@@ -58,6 +58,7 @@ const HeaderService: React.FC<HeaderServiceProps> = ({ theme, transparentOnTop =
   const location = useLocation();
   const isLanding = location.pathname === '/';
   const isLaboralServicioPage = location.pathname.includes('/servicios/laboral');
+  const landingLight = isLanding && colorTheme === 'light';
   const whatsappLaboralHref = buildWhatsAppUrlWithMessage(WHATSAPP_URGENCIA_LABORAL);
 
   useEffect(() => {
@@ -176,15 +177,20 @@ const HeaderService: React.FC<HeaderServiceProps> = ({ theme, transparentOnTop =
           <motion.div
             className={`
               relative mx-auto max-w-6xl rounded-2xl border transition-all duration-500
-              ${isLanding
-                ? isScrolled
-                  ? 'bg-slate-900/70 backdrop-blur-2xl border-white/10 shadow-2xl shadow-black/30'
-                  : 'bg-slate-900/40 backdrop-blur-xl border-white/5 shadow-xl'
-                : isScrolled
-                  ? 'bg-slate-900/70 backdrop-blur-2xl border-slate-700/50 shadow-2xl shadow-black/20'
-                  : transparentOnTop
-                    ? 'bg-slate-900/50 backdrop-blur-xl border-slate-700/30 shadow-xl'
-                    : 'bg-slate-900/70 backdrop-blur-2xl border-slate-700/50 shadow-xl'
+              ${
+                isLanding
+                  ? landingLight
+                    ? isScrolled
+                      ? 'bg-white/80 backdrop-blur-2xl border-slate-200/90 shadow-xl shadow-slate-900/10'
+                      : 'bg-white/65 backdrop-blur-xl border-white/70 shadow-lg shadow-slate-900/5'
+                    : isScrolled
+                      ? 'bg-slate-900/70 backdrop-blur-2xl border-white/10 shadow-2xl shadow-black/30'
+                      : 'bg-slate-900/40 backdrop-blur-xl border-white/5 shadow-xl'
+                  : isScrolled
+                    ? 'bg-slate-900/70 backdrop-blur-2xl border-slate-700/50 shadow-2xl shadow-black/20'
+                    : transparentOnTop
+                      ? 'bg-slate-900/50 backdrop-blur-xl border-slate-700/30 shadow-xl'
+                      : 'bg-slate-900/70 backdrop-blur-2xl border-slate-700/50 shadow-xl'
               }
             `}
             style={{
@@ -198,7 +204,9 @@ const HeaderService: React.FC<HeaderServiceProps> = ({ theme, transparentOnTop =
                 className="absolute inset-0 opacity-50"
                 style={{
                   background: isLanding
-                    ? 'linear-gradient(to right, rgba(56,189,248,0.10), transparent, rgba(34,211,238,0.10))'
+                    ? landingLight
+                      ? 'linear-gradient(to right, rgba(45,212,191,0.14), transparent, rgba(125,211,252,0.14))'
+                      : 'linear-gradient(to right, rgba(56,189,248,0.10), transparent, rgba(34,211,238,0.10))'
                     : `linear-gradient(to right, ${theme.primary}15, transparent, ${theme.secondary}15)`
                 }}
               />
@@ -253,7 +261,13 @@ const HeaderService: React.FC<HeaderServiceProps> = ({ theme, transparentOnTop =
                   >
                     <theme.icon className="w-5 h-5" style={{ color: theme.primary }} />
                   </motion.div>
-                  <span className="text-base font-bold text-slate-100 group-hover:text-white transition-colors">
+                  <span
+                    className={`text-base font-bold transition-colors ${
+                      isLanding && landingLight
+                        ? 'text-slate-900 group-hover:text-slate-800'
+                        : 'text-slate-100 group-hover:text-white'
+                    }`}
+                  >
                     Punto Legal
                   </span>
                 </Link>
@@ -492,17 +506,29 @@ const HeaderService: React.FC<HeaderServiceProps> = ({ theme, transparentOnTop =
                 <motion.button
                   type="button"
                   onClick={toggleTheme}
-                  className={`p-2.5 rounded-xl bg-slate-800/50 hover:bg-slate-700/50 border border-slate-700/50 hover:border-slate-600/50 transition-all duration-300 group ${
-                    isLaboralServicioPage ? 'hidden lg:flex' : 'flex'
+                  className={`p-2.5 rounded-xl border transition-all duration-300 group ${
+                    isLaboralServicioPage || isLanding ? 'hidden lg:flex' : 'flex'
+                  } ${
+                    landingLight
+                      ? 'bg-white/70 hover:bg-white/90 border-slate-200/90 hover:border-slate-300/90 shadow-sm'
+                      : 'bg-slate-800/50 hover:bg-slate-700/50 border-slate-700/50 hover:border-slate-600/50'
                   }`}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   aria-label="Cambiar tema claro u oscuro"
                 >
                   {colorTheme === 'dark' ? (
-                    <Sun className="w-4 h-4 text-slate-300 group-hover:text-amber-400 transition-colors" />
+                    <Sun
+                      className={`w-4 h-4 transition-colors ${
+                        landingLight ? 'text-amber-600 group-hover:text-amber-500' : 'text-slate-300 group-hover:text-amber-400'
+                      }`}
+                    />
                   ) : (
-                    <Moon className="w-4 h-4 text-slate-300 group-hover:text-blue-400 transition-colors" />
+                    <Moon
+                      className={`w-4 h-4 transition-colors ${
+                        landingLight ? 'text-slate-600 group-hover:text-sky-700' : 'text-slate-300 group-hover:text-blue-400'
+                      }`}
+                    />
                   )}
                 </motion.button>
 
@@ -590,51 +616,6 @@ const HeaderService: React.FC<HeaderServiceProps> = ({ theme, transparentOnTop =
         />
       )}
 
-      {/* Mobile Floating Dock — no en laboral: la página tiene barra sticky + CTA propios */}
-      {!isLaboralServicioPage && (
-        <motion.div
-          initial={{ y: 100, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.5, type: 'spring', stiffness: 300 }}
-          className="lg:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50"
-        >
-          <div className="relative">
-            <div
-              className="absolute inset-0 rounded-full blur-xl"
-              style={{ backgroundColor: `${theme.primary}20` }}
-            />
-
-            <div
-              className="relative bg-slate-900/90 backdrop-blur-xl border rounded-full px-6 py-3 shadow-2xl shadow-black/50 flex items-center gap-4"
-              style={{ borderColor: `${theme.primary}30` }}
-            >
-              <Link to="/" className="p-2 hover:bg-slate-800/50 rounded-xl transition-colors">
-                <Home className="w-5 h-5 text-slate-300" />
-              </Link>
-
-              <Link to="/blog" className="p-2 hover:bg-slate-800/50 rounded-xl transition-colors">
-                <FileText className="w-5 h-5 text-slate-300" />
-              </Link>
-
-              <button
-                type="button"
-                onClick={() => navigate('/agendamiento?plan=emergencia')}
-                className="p-2 bg-red-500/20 hover:bg-red-500/30 rounded-xl transition-colors"
-              >
-                <Phone className="w-5 h-5 text-red-400" />
-              </button>
-
-              <Link
-                to={`/agendamiento?plan=${agendarPlanSlug}`}
-                className="px-4 py-2 text-white rounded-xl font-medium text-sm shadow-lg"
-                style={{ background: theme.gradient }}
-              >
-                Agendar
-              </Link>
-            </div>
-          </div>
-        </motion.div>
-      )}
     </>
   );
 };
