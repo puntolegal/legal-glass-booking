@@ -171,6 +171,16 @@ export const createBookingWithRealEmail = async (
 };
 
 // Función principal para crear reserva en Supabase
+/** Llama a la RPC que copia fecha/hora de la reserva al intake (si hay vínculo). */
+export async function syncIntakeCitaFromReserva(reservaId: string): Promise<void> {
+  const { error } = await supabase.rpc('apply_intake_cita_from_reserva', {
+    p_reserva_id: reservaId,
+  });
+  if (error) {
+    console.warn('[syncIntakeCitaFromReserva]', error.message);
+  }
+}
+
 export const crearReserva = async (bookingData: BookingData): Promise<{
   success: boolean;
   reserva?: Reserva;
@@ -244,6 +254,8 @@ export const crearReserva = async (bookingData: BookingData): Promise<{
     }
 
     console.log('✅ Reserva creada exitosamente:', reserva.id);
+
+    await syncIntakeCitaFromReserva(reserva.id);
 
     // CRÍTICO: Actualizar external_reference = id para que siempre esté disponible
     const { error: updateError } = await supabase

@@ -71,6 +71,8 @@ const Step1_ClientInfo: React.FC = () => {
   const watchedValues = watch();
   const { isConvenioValido, isAdminValido } = priceCalculation;
   const [fieldValidationState, setFieldValidationState] = useState<Record<string, boolean>>({});
+  const [intakeSaveError, setIntakeSaveError] = useState<string | null>(null);
+  const [isSavingIntake, setIsSavingIntake] = useState(false);
   
   type FieldKey = keyof FormData;
 
@@ -184,18 +186,37 @@ const Step1_ClientInfo: React.FC = () => {
     }
     
     if (allValid) {
+      setIntakeSaveError(null);
       const vals = form.getValues();
-      const saved = await saveAgendamientoIntake({
-        form: vals,
-        planSlug: plan || 'general',
-        serviceName: service.name,
-        category: service.category,
-        precioIndicativo: priceCalculation.precioFinal,
-      });
-      if (saved.success && saved.id) {
-        setAgendamientoIntakeId(saved.id);
+      setIsSavingIntake(true);
+      try {
+        let saved = await saveAgendamientoIntake({
+          form: vals,
+          planSlug: plan || 'general',
+          serviceName: service.name,
+          category: service.category,
+          precioIndicativo: priceCalculation.precioFinal,
+        });
+        if (!saved.success) {
+          saved = await saveAgendamientoIntake({
+            form: vals,
+            planSlug: plan || 'general',
+            serviceName: service.name,
+            category: service.category,
+            precioIndicativo: priceCalculation.precioFinal,
+          });
+        }
+        if (saved.success && saved.id) {
+          setAgendamientoIntakeId(saved.id);
+          setStep(2);
+        } else {
+          setIntakeSaveError(
+            'No pudimos guardar tu información. Revisa tu conexión e inténtalo de nuevo. Si el problema continúa, escríbenos por WhatsApp.',
+          );
+        }
+      } finally {
+        setIsSavingIntake(false);
       }
-      setStep(2);
     }
   };
 
@@ -396,9 +417,18 @@ const Step1_ClientInfo: React.FC = () => {
             </div>
 
             {/* Botón Continuar - Optimizado para móvil */}
+            {intakeSaveError && (
+              <p
+                className="mt-3 rounded-xl border border-rose-400/40 bg-rose-500/[0.08] px-4 py-3 text-sm text-rose-700 dark:border-rose-500/30 dark:bg-rose-500/10 dark:text-rose-200"
+                role="alert"
+              >
+                {intakeSaveError}
+              </p>
+            )}
+
             <motion.button
               type="submit"
-              disabled={!requiredFieldsComplete}
+              disabled={!requiredFieldsComplete || isSavingIntake}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               className={`w-full min-h-[56px] md:min-h-[52px] rounded-xl font-bold text-base md:text-base flex items-center justify-center gap-2 transition-all duration-200 mt-4 md:mt-6 ${
@@ -422,7 +452,9 @@ const Step1_ClientInfo: React.FC = () => {
                     }
               }
             >
-              {requiredFieldsComplete ? (
+              {isSavingIntake ? (
+                <span className="text-white text-base font-bold">Guardando…</span>
+              ) : requiredFieldsComplete ? (
                 <>
                   <span className="text-white text-base md:text-base font-bold">Continuar a seleccionar fecha</span>
                   <ArrowRight className="w-5 h-5 md:w-5 md:h-5 text-white flex-shrink-0" />

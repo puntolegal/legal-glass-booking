@@ -473,6 +473,40 @@ const AgendamientoProviderInner: React.FC<{ children: ReactNode; initialService?
             custom_data: { content_name: service.name, value: normalizedPriceForPayment, currency: 'CLP' },
           });
 
+          try {
+            const paymentSnapshot = {
+              id: result.reserva.id,
+              reservationId: result.reserva.id,
+              reservaId: result.reserva.id,
+              external_reference: externalReference || result.reserva.id,
+              nombre: formData.nombre,
+              email: formData.email,
+              telefono: formData.telefono,
+              service: service.name,
+              category: service.category || 'General',
+              description: formData.descripcion,
+              price: normalizedPriceForPayment,
+              priceFormatted: precioFinal,
+              originalPrice: originalPriceValue ?? undefined,
+              fecha: selectedDate,
+              hora: selectedTime,
+              date: selectedDate,
+              time: selectedTime,
+              tipo_reunion: selectedMeetingType,
+              codigoConvenio: formData.codigoConvenio || null,
+              descuentoConvenio: isConvenioValido,
+              porcentajeDescuento: isConvenioValido ? '80%' : service.discount || null,
+              method: null,
+              preferenceId: preferenceResult.preference_id ?? null,
+              timestamp: Date.now(),
+              agendamiento_intake_id: agendamientoIntakeId || undefined,
+              source: 'agendamiento_mp_redirect',
+            };
+            localStorage.setItem('paymentData', JSON.stringify(paymentSnapshot));
+          } catch (lsErr) {
+            console.warn('No se pudo persistir paymentData antes de Mercado Pago:', lsErr);
+          }
+
           window.location.assign(redirectUrl);
         } else {
           setError('Error al crear la reserva. Por favor intenta nuevamente.');

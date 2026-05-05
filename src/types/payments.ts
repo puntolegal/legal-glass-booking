@@ -29,6 +29,8 @@ export interface PendingPaymentData {
   matter?: string | null;
   protectionType?: string | null;
   source?: string;
+  /** Lead paso 1; usado en éxito de pago y sync con reserva */
+  agendamiento_intake_id?: string;
 }
 
 export interface MercadoPagoMetadata {

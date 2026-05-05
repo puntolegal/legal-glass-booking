@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 import SEO from '../components/SEO';
 import { sendRealBookingEmails, type BookingEmailData, type EmailResult } from '@/services/realEmailService';
-import { findReservaByCriteria, getReservaById, updatePaymentStatus, type Reserva } from '../services/supabaseBooking';
+import { findReservaByCriteria, getReservaById, updatePaymentStatus, syncIntakeCitaFromReserva, type Reserva } from '../services/supabaseBooking';
 import { supabase } from '@/integrations/supabase/client';
 import { trackMetaEvent } from '@/services/metaConversionsService';
 import { buildBookingIcs, downloadBookingIcsFile, hasConcreteBookingSlot } from '@/utils/bookingIcs';
@@ -299,6 +299,8 @@ export default function PaymentSuccessPage() {
 
       const reserva = result.reserva;
       console.log('✅ Reserva encontrada:', reserva.id);
+
+      await syncIntakeCitaFromReserva(reserva.id);
 
       const priceResolved = resolvePriceForSuccess(reserva.precio, parsedStoredData?.price);
 
