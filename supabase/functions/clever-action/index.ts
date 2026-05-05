@@ -63,16 +63,59 @@ function normalizeForMatch(s: string): string {
 }
 
 /** Diagnóstico / consulta laboral gratuita (plan tutela-laboral), no otros planes gratis. */
-function shouldSendTutelaLaboralGratisFollowUp(reserva: {
+function shouldSendTutelaLaboralGratisFollowUp(args: {
   servicio: string | null;
   precio: unknown;
+  /** Desde `agendamiento_intakes.servicio_slug` cuando existe `agendamiento_intake_id`. */
+  servicioSlug?: string | null;
 }): boolean {
-  if (parseClpToNumber(reserva.precio) !== 0) return false;
-  const s = normalizeForMatch(String(reserva.servicio ?? ""));
+  if (parseClpToNumber(args.precio) !== 0) return false;
+  const slug = String(args.servicioSlug ?? "").trim().toLowerCase();
+  if (slug === "tutela-laboral") return true;
+
+  const s = normalizeForMatch(String(args.servicio ?? ""));
   if (s.includes("tutela")) return true;
   if (s.includes("diagnostico") && s.includes("gratis")) return true;
   if (s.includes("laboral") && s.includes("diagnostico")) return true;
+  // Catálogo: "Punto Legal Laboral — Diagnóstico gratis" (sin la palabra "tutela")
+  if (s.includes("punto legal laboral") && s.includes("diagnostico")) return true;
+  if (s.includes("laboral") && s.includes("diagnostico") && s.includes("gratis")) return true;
   return false;
+}
+
+async function sendResendEmail(
+  apiKey: string,
+  payload: Record<string, unknown>,
+): Promise<Response> {
+  return fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+}
+
+/** Reintentos ante 429 (rate limit) de Resend. */
+async function sendLaboralFollowUpWithRetry(
+  apiKey: string,
+  payload: Record<string, unknown>,
+): Promise<{ ok: boolean; detail?: string }> {
+  const maxAttempts = 2;
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    const res = await sendResendEmail(apiKey, payload);
+    if (res.ok) return { ok: true };
+    const text = await res.text();
+    const is429 = res.status === 429;
+    console.error(`clever-action: seguimiento laboral intento ${attempt}/${maxAttempts}`, res.status, text);
+    if (attempt < maxAttempts && is429) {
+      await new Promise((r) => setTimeout(r, 2000));
+      continue;
+    }
+    return { ok: false, detail: text };
+  }
+  return { ok: false, detail: "max reintentos alcanzados" };
 }
 
 /** Fila compatible con `reservas` para armar correos cuando sólo existe el intake (paso 1). */
@@ -275,6 +318,21 @@ serve(async (req) => {
       }
     }
 
+    /** Fuente de verdad del agendador para plan tutela / diagnóstico gratis. */
+    let servicioSlugFromIntake: string | null = null;
+    const linkedIntakeId = (reserva as { agendamiento_intake_id?: string | null }).agendamiento_intake_id;
+    if (linkedIntakeId) {
+      const { data: intakeRow, error: intakeSlugErr } = await supabase
+        .from("agendamiento_intakes")
+        .select("servicio_slug")
+        .eq("id", String(linkedIntakeId).trim())
+        .maybeSingle();
+      if (intakeSlugErr) {
+        console.error("clever-action: lectura servicio_slug intake", intakeSlugErr);
+      }
+      servicioSlugFromIntake = (intakeRow as { servicio_slug?: string | null } | null)?.servicio_slug ?? null;
+    }
+
     const tipoLabel = mapTipoReunion(reserva.tipo_reunion as string | null | undefined);
     const precioDisplay = formatPrecioForEmail(reserva.precio);
     const isFreeConsult = parseClpToNumber(reserva.precio) === 0;
@@ -396,34 +454,38 @@ serve(async (req) => {
       ];
     }
 
-    const clienteEmailResponse = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${RESEND_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(clientePayload),
-    });
+    const clienteEmailResponse = await sendResendEmail(RESEND_API_KEY, clientePayload);
 
-    const adminEmailResponse = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${RESEND_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        from: MAIL_FROM,
-        to: [ADMIN_EMAIL],
-        subject: `Nueva consulta${asuntoFecha} — ${reserva.nombre} · ${reserva.servicio}`,
-        html: adminHtml,
-      }),
+    const adminEmailResponse = await sendResendEmail(RESEND_API_KEY, {
+      from: MAIL_FROM,
+      to: [ADMIN_EMAIL],
+      subject: `Nueva consulta${asuntoFecha} — ${reserva.nombre} · ${reserva.servicio}`,
+      html: adminHtml,
     });
 
     if (clienteEmailResponse.ok && adminEmailResponse.ok) {
-      let followUpOk: boolean | null = null;
+      if (persistedReservaId) {
+        const now = new Date().toISOString();
+        await supabase
+          .from("reservas")
+          .update({
+            email_enviado: true,
+            email_enviado_at: now,
+            confirmation_email_status: "sent",
+          })
+          .eq("id", persistedReservaId);
+      }
+
+      let followUpLaboralGratisSent: boolean | null = null;
       let followUpDetail: string | undefined;
 
-      if (shouldSendTutelaLaboralGratisFollowUp(reserva as { servicio: string | null; precio: unknown })) {
+      const shouldFollow = shouldSendTutelaLaboralGratisFollowUp({
+        servicio: reserva.servicio as string | null,
+        precio: reserva.precio,
+        servicioSlug: servicioSlugFromIntake,
+      });
+
+      if (shouldFollow) {
         await new Promise((r) => setTimeout(r, 1200));
         const followUpHtml = buildTutelaLaboralGratisFollowUpHtml({
           nombre: reserva.nombre as string,
@@ -446,31 +508,22 @@ serve(async (req) => {
             { filename: "cita-punto-legal.ics", content: icsToBase64(icsContent) },
           ];
         }
-        const followUpRes = await fetch("https://api.resend.com/emails", {
-          method: "POST",
-          headers: {
-            "Authorization": `Bearer ${RESEND_API_KEY}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(followUpPayload),
-        });
-        followUpOk = followUpRes.ok;
-        if (!followUpRes.ok) {
-          followUpDetail = await followUpRes.text();
-          console.error("clever-action: falló correo de seguimiento laboral gratis:", followUpDetail);
+        try {
+          const followResult = await sendLaboralFollowUpWithRetry(RESEND_API_KEY, followUpPayload);
+          followUpLaboralGratisSent = followResult.ok;
+          if (!followResult.ok) {
+            followUpDetail = followResult.detail;
+            console.error("clever-action: seguimiento laboral gratis no enviado tras reintentos");
+          }
+        } catch (followErr) {
+          followUpLaboralGratisSent = false;
+          followUpDetail = followErr instanceof Error ? followErr.message : String(followErr);
+          console.error("clever-action: excepción enviando seguimiento laboral gratis", followErr);
         }
-      }
-
-      if (persistedReservaId) {
-        const now = new Date().toISOString();
-        await supabase
-          .from("reservas")
-          .update({
-            email_enviado: true,
-            email_enviado_at: now,
-            confirmation_email_status: "sent",
-          })
-          .eq("id", persistedReservaId);
+      } else {
+        console.log(
+          "clever-action: seguimiento laboral gratis omitido (criterio plan/precio o sin tutela-laboral en intake)",
+        );
       }
 
       return new Response(
@@ -483,7 +536,7 @@ serve(async (req) => {
           email: reserva.email,
           admin_email: ADMIN_EMAIL,
           calendar_ics_attached: Boolean(icsContent),
-          follow_up_laboral_gratis_sent: followUpOk,
+          follow_up_laboral_gratis_sent: followUpLaboralGratisSent,
           ...(followUpDetail ? { follow_up_error: followUpDetail } : {}),
         }),
         { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },

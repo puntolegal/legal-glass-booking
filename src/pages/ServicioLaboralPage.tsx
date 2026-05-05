@@ -19,11 +19,16 @@ import {
   ListOrdered,
   Sparkles,
   Receipt,
+  Timer,
+  Map,
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import SEO from '../components/SEO'
 import { PUNTO_LEGAL_PUBLIC_AUTHOR } from '@/constants/brandIdentity'
+import { LABORAL_FAQ_ITEMS, type LaboralFaqItem as LaboralFaqEntry } from '@/constants/laboralPageContent'
+import { siteUrl } from '@/config/siteUrl'
+import { ServicioLaboralStructuredData } from '@/components/servicios/ServicioLaboralStructuredData'
 import ServicioPageShell from '@/components/servicios/ServicioPageShell'
 import { LaboralThemeToggle } from '@/components/servicios/LaboralThemeToggle'
 import { getLaboralPageSkin } from '@/components/servicios/laboralPageSkin'
@@ -150,6 +155,65 @@ const procesoMicroPasos = [
   },
 ] as const
 
+const laboralPlazosCards: { icon: LucideIcon; title: string; body: string }[] = [
+  {
+    icon: Calendar,
+    title: '60 días hábiles para demandar (despido)',
+    body:
+      'En regla general tienes 60 días hábiles desde la separación para presentar la demanda laboral ante el Juzgado de Letras del Trabajo competente. Es orientación: tu abogado cuenta el cómputo según actos y notificaciones de tu caso.',
+  },
+  {
+    icon: Scale,
+    title: 'Mediación en la Inspección del Trabajo',
+    body:
+      'Cuando procede la mediación obligatoria, el plazo de 60 días puede suspenderse hasta por 10 días según reglas legales. No sustituye la demanda; ordena plazos y posibilidad de acuerdo.',
+  },
+  {
+    icon: Timer,
+    title: 'Prescripción 2 años (materias individuales)',
+    body:
+      'Muchas acciones laborales individuales prescriben a 2 años según hechos y tipo de obligación. La orientación es general: conviene acumular prueba y actuar a tiempo; en sesión se revisa tu situación concreta.',
+  },
+  {
+    icon: Shield,
+    title: 'Ley Karin: investigación en la empresa',
+    body:
+      'La ley fija plazos máximos para la investigación interna (30 días hábiles, con ampliaciones calificadas). Si el protocolo no se respetó, puede ser relevante en la estrategia; tu abogado aplica al expediente.',
+  },
+]
+
+const laboralDecisionMap = [
+  {
+    title: 'Despido, finiquito o carta de término',
+    body:
+      'Revisión de causal, plazo hacia el Juzgado de Letras del Trabajo y alternativas (negociación, mediación, demanda).',
+    to: '/agendamiento?plan=laboral',
+    cta: 'Ir a despido y finiquito',
+    priceHint: 'Evaluación sin costo cuando aplica',
+  },
+  {
+    title: 'Acoso, hostigamiento o vulneración de derechos',
+    body: 'Tutela de derechos fundamentales: documentación, plazos y siguientes pasos con lenguaje claro.',
+    to: '/agendamiento?plan=tutela-laboral',
+    cta: 'Diagnóstico gratis',
+    priceHint: 'Sin costo cuando corresponde',
+  },
+  {
+    title: 'Ley 21.643 — defensa del trabajador',
+    body: 'Sesión de defensa con análisis de protocolo, investigación interna y posición ante la DT.',
+    to: '/agendamiento?plan=defensa-karin-trabajador',
+    cta: 'Agendar defensa Ley Karin',
+    priceHint: '$79.000',
+  },
+  {
+    title: 'Comparendo de conciliación (RM)',
+    body: 'Instancia ante la Dirección del Trabajo; no reemplaza una demanda laboral si no hay acuerdo.',
+    to: '/agendamiento?plan=comparendo-rm',
+    cta: 'Agendar comparendo RM',
+    priceHint: '$35.000',
+  },
+] as const
+
 const differentiators = [
   {
     icon: Sparkles,
@@ -248,43 +312,14 @@ const laboralPlanes = [
   },
 ] as const
 
-const laboralFaq = [
-  {
-    question: '¿Qué es la Ley Karin y cómo me protege?',
-    answer:
-      'La Ley Karin (Ley 21.643) amplió la obligación de los empleadores de prevenir y sancionar el acoso laboral y sexual. Exige protocolos de prevención, canales de denuncia y proceso de investigación. Si sufriste acoso, la ley te protege con tutela de derechos fundamentales y posibles indemnizaciones.',
-  },
-  {
-    question: '¿Cuánto tiempo tengo para demandar por despido injustificado?',
-    answer:
-      'Tienes 60 días hábiles desde la separación para presentar la demanda laboral. Este plazo se suspende por la mediación ante la Inspección del Trabajo (hasta por 10 días). Es fundamental actuar rápido para no perder el derecho.',
-  },
-  {
-    question: '¿Qué incluye la indemnización por años de servicio?',
-    answer:
-      'En líneas generales, corresponde una suma equivalente a 30 días de remuneración por cada año de servicio (con reglas de fracción y topes legales). Para contratos posteriores al 14 de agosto de 1981 suele computarse un tope de 11 años de servicio en la indemnización por años de servicio. Los montos finales dependen de hechos, contrato y prueba; en la consulta se revisa una estimación orientativa.',
-  },
-  {
-    question: '¿Qué es la “última remuneración” para fines de indemnización (Art. 172)?',
-    answer:
-      'Es un concepto técnico: suele incluir el sueldo y otras sumas permanentes que percibías por el trabajo al término del contrato, con exclusiones legales (por ejemplo, la asignación familiar no forma parte de esa base). El cálculo exacto lo aplica tu abogado según tus liquidaciones y la normativa vigente.',
-  },
-  {
-    question: '¿El empleador puede descontar el AFC de la indemnización si gano la demanda?',
-    answer:
-      'Hay criterios jurisprudenciales recientes en torno al descuento del aporte del empleador al seguro de cesantía en ciertos escenarios de despido injustificado. Es un tema casuístico: en la sesión se evalúa si aplica a tus hechos y documentos, sin promesa de resultado.',
-  },
-  {
-    question: '¿Puedo reclamar horas extra no pagadas con prescripción?',
-    answer:
-      'El plazo de prescripción de las acciones laborales individuales es de 2 años desde que las obligaciones se hicieron exigibles (o desde la terminación del contrato). En la práctica, conviene actuar antes de los 2 años para acumular evidencia y testigos.',
-  },
-  {
-    question: '¿Cómo funciona la consulta inicial?',
-    answer:
-      'Agendas una consulta online o presencial donde revisamos tu caso, contrato, liquidaciones y documentación relevante. Recibes una evaluación de viabilidad y estrategia recomendada. Los descuentos entre servicios, si corresponden, se indican al contratar.',
-  },
-]
+const LABORAL_SEO_DESCRIPTION =
+  'Asesoría laboral en Chile: despido injustificado y nulidad, plazo 60 días hábiles, mediación obligatoria Inspección del Trabajo, demanda en Juzgado de Letras del Trabajo, Ley 21.643 (Ley Karin), base indemnizatoria Art. 172. Diagnóstico inicial sin costo cuando corresponde; tarifas publicadas al agendar — Punto Legal.'
+
+const LABORAL_SEO_KEYWORDS =
+  'abogado laboral Chile, Juzgado de Letras del Trabajo, mediación Inspección del Trabajo, nulidad del despido, despido injustificado, tutela laboral, Ley 21.643, Ley Karin, Art. 172 última remuneración, comparendo conciliación, Punto Legal Chile, consulta laboral online'
+
+const LABORAL_JSONLD_PAGE_NAME =
+  'Derecho laboral en Chile: despido, tutela, mediación DT y Ley Karin — Punto Legal'
 
 export default function ServicioLaboralPage() {
   const { theme: colorMode, toggleTheme } = useTheme()
@@ -293,10 +328,16 @@ export default function ServicioLaboralPage() {
   return (
     <>
       <SEO
-        title="Derecho laboral Chile: despido, tutela laboral, Ley 21.643 (Ley Karin) | Punto Legal"
-        description="Asesoría laboral en Chile con lenguaje claro: despido, plazos, tutela, Ley 21.643 (Ley Karin) y DT. Diagnóstico inicial sin costo cuando corresponde y tarifas publicadas antes de pagar."
-        keywords="abogado laboral chile, despido injustificado, tutela laboral, Ley 21.643, Ley Karin, Punto Legal Chile, consulta laboral online"
+        title="Abogado laboral Chile: despido, tutela, mediación DT, Juzgado de Letras del Trabajo"
+        description={LABORAL_SEO_DESCRIPTION}
+        keywords={LABORAL_SEO_KEYWORDS}
+        url={siteUrl('/servicios/laboral')}
         author={PUNTO_LEGAL_PUBLIC_AUTHOR}
+      />
+      <ServicioLaboralStructuredData
+        faq={LABORAL_FAQ_ITEMS}
+        pageName={LABORAL_JSONLD_PAGE_NAME}
+        pageDescription={LABORAL_SEO_DESCRIPTION}
       />
       <ServicioPageShell
         theme={shellTheme}
@@ -379,7 +420,7 @@ function ServicioLaboralInner({
         </div>
       </header>
 
-      <div className="pb-[calc(5.75rem+env(safe-area-inset-bottom))] md:pb-0">
+      <div className="pb-[calc(8rem+env(safe-area-inset-bottom))] md:pb-0">
         {/* HERO — superficie clara, menos contraste fatigante */}
         <section className="relative pt-14 md:pt-16 pb-10 md:pb-16 overflow-hidden">
           <div
@@ -416,6 +457,7 @@ function ServicioLaboralInner({
               </p>
 
               <h1
+                id="laboral-hero-title"
                 className={`text-4xl md:text-5xl lg:text-6xl font-extrabold mb-6 leading-[1.05] tracking-tight font-[family-name:Manrope] ${ui.textTitle}`}
               >
                 Asesoría laboral
@@ -423,7 +465,10 @@ function ServicioLaboralInner({
                 <span className={ui.headlineAccent}>para personas y trabajadores</span>
               </h1>
 
-              <p className={`text-lg md:text-xl mb-4 leading-relaxed max-w-2xl mx-auto ${ui.textBody}`}>
+              <p
+                id="laboral-hero-lead"
+                className={`text-lg md:text-xl mb-4 leading-relaxed max-w-2xl mx-auto ${ui.textBody}`}
+              >
                 Traducimos la ley a decisiones posibles. Sin jerga incomprensible.
               </p>
               <ul
@@ -478,20 +523,31 @@ function ServicioLaboralInner({
                 </Link>
                 <Link
                   to="/agendamiento?plan=laboral"
-                  className={`group min-h-[44px] px-7 py-3.5 rounded-2xl font-semibold inline-flex items-center justify-center gap-2 transition-all duration-300 touch-manipulation active:scale-[0.98] ${t.btnOutline} ${t.btnOutlineHover}`}
+                  className={`group min-h-[44px] px-7 py-3.5 rounded-2xl font-semibold inline-flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 transition-all duration-300 touch-manipulation active:scale-[0.98] ${t.btnOutline} ${t.btnOutlineHover}`}
                 >
-                  <span aria-hidden="true">⚡</span>
-                  Despido y finiquito · gratis cuando aplica
+                  <span className="inline-flex items-center gap-2">
+                    <Briefcase className="w-4 h-4 shrink-0" aria-hidden />
+                    <span>Despido y finiquito</span>
+                  </span>
+                  <span className={`text-xs font-medium ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                    $0 en catálogo cuando aplica
+                  </span>
                 </Link>
               </div>
 
               <div
-                className={`mx-auto mt-3 flex max-w-lg items-center justify-center gap-1.5 text-center text-xs font-medium ${
-                  isDark ? 'text-slate-400' : 'text-slate-500'
+                className={`mx-auto mt-3 max-w-lg text-center text-[11px] font-medium leading-snug sm:text-xs ${
+                  isDark ? 'text-slate-500' : 'text-slate-500'
                 }`}
               >
-                <Clock className="h-3.5 w-3.5 shrink-0" aria-hidden />
-                <span>Cupos limitados de diagnóstico semanal según capacidad de agenda.</span>
+                <p className="mb-1.5">
+                  <Clock className="mr-1 inline h-3.5 w-3.5 align-text-bottom" aria-hidden />
+                  Cupos limitados de diagnóstico semanal según capacidad de agenda.
+                </p>
+                <p>
+                  Consultas pagadas con tarifa publicada: defensa Ley Karin $79.000 · comparendo RM $35.000 (CLP, sin
+                  IVA, según catálogo al agendar).
+                </p>
               </div>
 
               <div className="mt-10 -mx-4 px-4 sm:mx-0 sm:px-0 max-w-3xl sm:max-w-3xl mx-auto">
@@ -609,6 +665,87 @@ function ServicioLaboralInner({
                   </li>
                 ))}
               </ol>
+            </div>
+          </div>
+        </section>
+
+        {/* Plazos frecuentes (SEO + CRO) */}
+        <section className={`relative border-b py-10 md:py-14 ${ui.borderSection}`}>
+          <div className="container mx-auto max-w-6xl px-4">
+            <div className={`${ui.glassPanel} p-6 md:p-8`}>
+              <h2 className={`text-xl md:text-2xl font-bold ${ui.textTitle}`}>
+                Plazos que suelen buscar trabajadores
+              </h2>
+              <p className={`mt-2 max-w-3xl text-sm leading-relaxed ${ui.textBody}`}>
+                Referencia general en derecho laboral chileno; no reemplaza el análisis de tu abogado sobre hechos,
+                notificaciones y vía procesal.
+              </p>
+              <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                {laboralPlazosCards.map(({ icon: Icon, title, body }) => (
+                  <div key={title} className={`${ui.glassCard} p-4`}>
+                    <div
+                      className={`mb-3 flex h-10 w-10 items-center justify-center rounded-xl ${
+                        isDark
+                          ? 'border border-white/[0.08] bg-white/[0.06]'
+                          : 'border border-slate-200/80 bg-white/80'
+                      }`}
+                    >
+                      <Icon className={`h-5 w-5 ${isDark ? 'text-slate-400' : 'text-slate-600'}`} aria-hidden />
+                    </div>
+                    <h3 className={`text-sm font-semibold leading-snug ${ui.textTitle}`}>{title}</h3>
+                    <p className={`mt-2 text-xs leading-relaxed ${ui.textBody}`}>{body}</p>
+                  </div>
+                ))}
+              </div>
+              <p className={`mt-6 text-xs leading-relaxed ${ui.textCaption}`}>
+                Orientación informativa; cada caso tiene matices de cómputo, feriados y excepciones legales.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Mapa de decisiones internas */}
+        <section className={`relative border-b py-10 md:py-12 ${ui.borderSection}`}>
+          <div className="container mx-auto max-w-6xl px-4">
+            <div className={`${ui.glassPanel} p-6 md:p-8`}>
+              <div className="mb-4 flex items-start gap-3">
+                <span
+                  className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${
+                    isDark
+                      ? 'border border-white/[0.08] bg-white/[0.06]'
+                      : 'border border-slate-200/80 bg-white/80'
+                  }`}
+                >
+                  <Map className={`h-5 w-5 ${isDark ? 'text-slate-400' : 'text-slate-600'}`} aria-hidden />
+                </span>
+                <div>
+                  <h2 className={`text-xl md:text-2xl font-bold ${ui.textTitle}`}>Mapa de decisiones</h2>
+                  <p className={`mt-1 text-sm leading-relaxed ${ui.textBody}`}>
+                    Elige la puerta de entrada al agendador según tu situación; las tarifas publicadas se confirman al
+                    reservar.
+                  </p>
+                </div>
+              </div>
+              <ul className="grid gap-3 md:grid-cols-2">
+                {laboralDecisionMap.map((row) => (
+                  <li key={row.title}>
+                    <Link
+                      to={row.to}
+                      className={`group flex min-h-[44px] flex-col rounded-2xl p-4 transition touch-manipulation active:scale-[0.99] ${ui.glassCard} ${isDark ? 'hover:bg-white/[0.07]' : 'hover:bg-white/[0.85]'}`}
+                    >
+                      <span className={`text-sm font-semibold ${ui.textTitle}`}>{row.title}</span>
+                      <span className={`mt-1 text-xs leading-relaxed ${ui.textBody}`}>{row.body}</span>
+                      <span className={`mt-3 flex items-center justify-between gap-2 text-xs font-medium ${ui.textStrong}`}>
+                        <span className="inline-flex items-center gap-1">
+                          {row.cta}
+                          <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+                        </span>
+                        <span className={`font-normal ${ui.textCaption}`}>{row.priceHint}</span>
+                      </span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
         </section>
@@ -757,7 +894,7 @@ function ServicioLaboralInner({
         </section>
 
         {/* PAQUETES */}
-        <section className="py-16 md:py-20">
+        <section className="py-16 md:py-20" id="entrada-laboral">
           <div className="container mx-auto px-4">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -912,7 +1049,7 @@ function ServicioLaboralInner({
               Respuestas claras a las dudas más comunes sobre derecho laboral en Chile.
             </p>
             <div>
-              {laboralFaq.map((item, i) => (
+              {LABORAL_FAQ_ITEMS.map((item, i) => (
                 <LaboralFaqItem key={i} item={item} accentClass={ui.faqAccent} isDark={isDark} />
               ))}
             </div>
@@ -964,20 +1101,49 @@ function ServicioLaboralInner({
         </section>
       </div>
 
-      {/* Barra inferior móvil */}
+      {/* Barra inferior móvil: CTA primario + carril secundario hacia despido y ancla planes */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.5 }}
         className={`md:hidden fixed bottom-0 left-0 right-0 z-40 ${ui.mobileDock}`}
       >
-        <Link
-          to="/agendamiento?plan=tutela-laboral"
-          className={`flex min-h-[52px] w-full items-center justify-center px-6 py-3 text-center text-base font-bold touch-manipulation active:brightness-95 ${t.btnPrimary}`}
-          style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}
+        <div
+          className="mx-auto max-w-lg"
+          style={{ paddingBottom: 'max(0.25rem, env(safe-area-inset-bottom))' }}
         >
-          Diagnóstico gratis · Agendar
-        </Link>
+          <Link
+            to="/agendamiento?plan=tutela-laboral"
+            className={`flex min-h-[48px] w-full items-center justify-center gap-2 px-4 py-2.5 text-center text-[15px] font-bold touch-manipulation active:brightness-95 ${t.btnPrimary}`}
+          >
+            <Calendar className="h-4 w-4 shrink-0" aria-hidden />
+            Diagnóstico gratis
+          </Link>
+          <div
+            className={`grid grid-cols-1 gap-0 border-t ${
+              isDark ? 'border-white/[0.08]' : 'border-slate-200/85'
+            } px-2 pt-1`}
+          >
+            <Link
+              to="/agendamiento?plan=laboral"
+              className={`flex min-h-[40px] items-center justify-center rounded-xl px-2 py-1.5 text-center text-[13px] font-semibold touch-manipulation active:opacity-90 ${
+                isDark
+                  ? 'text-teal-200/95 hover:bg-white/[0.05]'
+                  : 'text-teal-800 hover:bg-slate-100/80'
+              }`}
+            >
+              Despido y finiquito · $0 en catálogo si aplica
+            </Link>
+            <a
+              href="#entrada-laboral"
+              className={`min-h-[36px] flex items-center justify-center rounded-lg px-2 py-1 text-center text-[11px] font-medium ${
+                isDark ? 'text-slate-400 hover:text-slate-200' : 'text-slate-500 hover:text-slate-800'
+              }`}
+            >
+              Ver planes pagados (desde $35.000)
+            </a>
+          </div>
+        </div>
       </motion.div>
     </>
   )
@@ -988,7 +1154,7 @@ function LaboralFaqItem({
   accentClass,
   isDark,
 }: {
-  item: { question: string; answer: string }
+  item: LaboralFaqEntry
   accentClass: string
   isDark: boolean
 }) {
