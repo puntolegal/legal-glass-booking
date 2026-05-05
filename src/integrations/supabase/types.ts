@@ -199,6 +199,8 @@ export type Database = {
           /** Sincronizado desde reservas (trigger) al confirmar cita */
           fecha_cita: string | null
           hora_cita: string | null
+          /** Modalidad elegida en agendador; refuerzo desde reservas.tipo_reunion */
+          tipo_reunion_cita: string | null
         }
         Insert: {
           id?: string
@@ -218,6 +220,7 @@ export type Database = {
           created_at?: string
           fecha_cita?: string | null
           hora_cita?: string | null
+          tipo_reunion_cita?: string | null
         }
         Update: {
           id?: string
@@ -237,6 +240,7 @@ export type Database = {
           created_at?: string
           fecha_cita?: string | null
           hora_cita?: string | null
+          tipo_reunion_cita?: string | null
         }
         Relationships: []
       }

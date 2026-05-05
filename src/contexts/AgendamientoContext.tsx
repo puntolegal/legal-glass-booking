@@ -15,6 +15,7 @@ import { calculatePrice, formatRUT, getServiceColors } from '@/utils/agendamient
 import { serviceCatalog } from '@/constants/services';
 import { validationRules } from '@/hooks/useFormValidation';
 import { enqueueBookingCalendarForWaived } from '@/services/enqueueBookingCalendar';
+import { saveIntakeSchedule } from '@/services/agendamientoIntakeService';
 import { INMOB_QUAL_STORAGE_KEY } from '@/constants/inmobiliarioQualification';
 
 interface AgendamientoContextType extends BookingState {
@@ -122,6 +123,18 @@ const AgendamientoProviderInner: React.FC<{ children: ReactNode; initialService?
     setError(null);
     
     try {
+      if (agendamientoIntakeId) {
+        const sched = await saveIntakeSchedule({
+          intakeId: agendamientoIntakeId,
+          fecha: selectedDate,
+          hora: selectedTime,
+          tipoReunion: selectedMeetingType,
+        });
+        if (!sched.success) {
+          console.warn('[agendamiento] saveIntakeSchedule antes de reserva:', sched.error);
+        }
+      }
+
       const { precioFinal, precioConConvenio, isAdminValido, isConvenioValido, precioOriginal } = priceCalculation;
       
       const originalPriceValue = typeof service.price === 'number'
@@ -164,7 +177,8 @@ const AgendamientoProviderInner: React.FC<{ children: ReactNode; initialService?
         porcentajeDescuento: isConvenioValido ? '80%' : (service.discount || null),
         method: null,
         preferenceId: null,
-        timestamp: Date.now()
+        timestamp: Date.now(),
+        agendamiento_intake_id: agendamientoIntakeId || undefined,
       };
       
       // Si el precio es 0, crear reserva directamente (sin pasar por MercadoPago)
@@ -346,7 +360,8 @@ const AgendamientoProviderInner: React.FC<{ children: ReactNode; initialService?
             porcentajeDescuento: null,
             method: 'offline',
             preferenceId: null,
-            timestamp: now
+            timestamp: now,
+            agendamiento_intake_id: agendamientoIntakeId || undefined,
           };
 
           localStorage.setItem('paymentData', JSON.stringify(paymentDataOffline));
@@ -531,24 +546,45 @@ const AgendamientoProviderInner: React.FC<{ children: ReactNode; initialService?
     }
     setError(null);
 
-    // Meta AddToCart — user ya eligió fecha+hora+modalidad, su intención
-    // de compra es alta. Este evento es clave para las audiencias de
-    // remarketing "dejó el carrito" en Meta Ads.
-    void trackMetaEvent({
-      event_name: 'AddToCart',
-      custom_data: {
-        content_type: 'service_plan',
-        content_name: service.name,
-        content_category: service.category,
-        content_ids: [service.category?.toLowerCase() || 'general'],
-        value: priceCalculation?.precioFinal ?? service.price,
-        currency: 'CLP',
-        source: 'agendamiento_step2',
-      },
-    });
+    void (async () => {
+      if (agendamientoIntakeId) {
+        const sched = await saveIntakeSchedule({
+          intakeId: agendamientoIntakeId,
+          fecha: selectedDate,
+          hora: timeToCheck,
+          tipoReunion: selectedMeetingType,
+        });
+        if (!sched.success) {
+          console.warn('[agendamiento] saveIntakeSchedule al ir a pago:', sched.error);
+        }
+      }
 
-    setStep(3);
-  }, [selectedDate, selectedTime, selectedMeetingType, service, priceCalculation]);
+      // Meta AddToCart — user ya eligió fecha+hora+modalidad, su intención
+      // de compra es alta. Este evento es clave para las audiencias de
+      // remarketing "dejó el carrito" en Meta Ads.
+      void trackMetaEvent({
+        event_name: 'AddToCart',
+        custom_data: {
+          content_type: 'service_plan',
+          content_name: service.name,
+          content_category: service.category,
+          content_ids: [service.category?.toLowerCase() || 'general'],
+          value: priceCalculation?.precioFinal ?? service.price,
+          currency: 'CLP',
+          source: 'agendamiento_step2',
+        },
+      });
+
+      setStep(3);
+    })();
+  }, [
+    selectedDate,
+    selectedTime,
+    selectedMeetingType,
+    service,
+    priceCalculation,
+    agendamientoIntakeId,
+  ]);
   
   const value: AgendamientoContextType = {
     step,

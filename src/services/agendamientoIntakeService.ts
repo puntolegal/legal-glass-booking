@@ -61,3 +61,32 @@ export async function saveAgendamientoIntake(
     return { success: false, error: msg };
   }
 }
+
+/**
+ * Persiste fecha, hora y modalidad en el lead tras el paso 2 (antes de pago / reserva).
+ * RPC SECURITY DEFINER en Supabase (save_intake_schedule).
+ */
+export async function saveIntakeSchedule(params: {
+  intakeId: string;
+  fecha: string;
+  hora: string;
+  tipoReunion: string;
+}): Promise<{ success: boolean; error?: string }> {
+  try {
+    const { error } = await supabase.rpc('save_intake_schedule', {
+      p_intake_id: params.intakeId,
+      p_fecha: params.fecha.trim(),
+      p_hora: params.hora.trim(),
+      p_tipo_reunion: params.tipoReunion.trim(),
+    });
+    if (error) {
+      console.warn('[saveIntakeSchedule]', error.message);
+      return { success: false, error: error.message };
+    }
+    return { success: true };
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : 'Error desconocido';
+    console.warn('[saveIntakeSchedule] excepción:', msg);
+    return { success: false, error: msg };
+  }
+}
