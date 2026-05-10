@@ -4,7 +4,9 @@ import path from "path";
 import fs from "fs";
 // import { componentTagger } from "lovable-tagger";
 
-// Plugin: copiar index.html a /centro y /express para que hosting estático (Lovable) sirva esas rutas
+// Plugin: copiar index.html a /centro y /express para que hosting estático (Lovable) sirva esas rutas.
+// Lovable lee `lovable.json` → output `dist`. Si cambias index.html o tema, ejecuta `npm run build`
+// y sube `dist/` al repo (este proyecto versiona dist para despliegues estáticos).
 function spaFallbackRoutes() {
   return {
     name: "spa-fallback-routes",
