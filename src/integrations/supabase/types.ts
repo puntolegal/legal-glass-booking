@@ -14,6 +14,69 @@ export type Database = {
   }
   public: {
     Tables: {
+      agendamiento_intakes: {
+        Row: {
+          categoria: string | null
+          codigo_convenio: string | null
+          created_at: string
+          descripcion: string | null
+          email: string
+          empresa: string | null
+          fecha_cita: string | null
+          hora_cita: string | null
+          id: string
+          nombre: string
+          precio_indicativo: string | null
+          rut: string | null
+          servicio_nombre: string
+          servicio_slug: string | null
+          source_url: string | null
+          telefono: string
+          tipo_reunion_cita: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          categoria?: string | null
+          codigo_convenio?: string | null
+          created_at?: string
+          descripcion?: string | null
+          email: string
+          empresa?: string | null
+          fecha_cita?: string | null
+          hora_cita?: string | null
+          id?: string
+          nombre: string
+          precio_indicativo?: string | null
+          rut?: string | null
+          servicio_nombre: string
+          servicio_slug?: string | null
+          source_url?: string | null
+          telefono: string
+          tipo_reunion_cita?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          categoria?: string | null
+          codigo_convenio?: string | null
+          created_at?: string
+          descripcion?: string | null
+          email?: string
+          empresa?: string | null
+          fecha_cita?: string | null
+          hora_cita?: string | null
+          id?: string
+          nombre?: string
+          precio_indicativo?: string | null
+          rut?: string | null
+          servicio_nombre?: string
+          servicio_slug?: string | null
+          source_url?: string | null
+          telefono?: string
+          tipo_reunion_cita?: string | null
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
       apuntes_audits: {
         Row: {
           audited_at: string
@@ -179,74 +242,12 @@ export type Database = {
         }
         Relationships: []
       }
-      agendamiento_intakes: {
-        Row: {
-          id: string
-          nombre: string
-          email: string
-          telefono: string
-          rut: string | null
-          empresa: string | null
-          codigo_convenio: string | null
-          descripcion: string | null
-          servicio_slug: string | null
-          servicio_nombre: string
-          categoria: string | null
-          precio_indicativo: string | null
-          source_url: string | null
-          user_agent: string | null
-          created_at: string
-          /** Sincronizado desde reservas (trigger) al confirmar cita */
-          fecha_cita: string | null
-          hora_cita: string | null
-          /** Modalidad elegida en agendador; refuerzo desde reservas.tipo_reunion */
-          tipo_reunion_cita: string | null
-        }
-        Insert: {
-          id?: string
-          nombre: string
-          email: string
-          telefono: string
-          rut?: string | null
-          empresa?: string | null
-          codigo_convenio?: string | null
-          descripcion?: string | null
-          servicio_slug?: string | null
-          servicio_nombre: string
-          categoria?: string | null
-          precio_indicativo?: string | null
-          source_url?: string | null
-          user_agent?: string | null
-          created_at?: string
-          fecha_cita?: string | null
-          hora_cita?: string | null
-          tipo_reunion_cita?: string | null
-        }
-        Update: {
-          id?: string
-          nombre?: string
-          email?: string
-          telefono?: string
-          rut?: string | null
-          empresa?: string | null
-          codigo_convenio?: string | null
-          descripcion?: string | null
-          servicio_slug?: string | null
-          servicio_nombre?: string
-          categoria?: string | null
-          precio_indicativo?: string | null
-          source_url?: string | null
-          user_agent?: string | null
-          created_at?: string
-          fecha_cita?: string | null
-          hora_cita?: string | null
-          tipo_reunion_cita?: string | null
-        }
-        Relationships: []
-      }
       reservas: {
         Row: {
           agendamiento_intake_id: string | null
+          calendar_sync_completed_at: string | null
+          calendar_sync_requested_at: string | null
+          confirmation_email_status: string | null
           created_at: string | null
           descripcion: string | null
           email: string
@@ -255,6 +256,9 @@ export type Database = {
           estado: string | null
           external_reference: string | null
           fecha: string
+          google_calendar_event_id: string | null
+          google_calendar_html_link: string | null
+          google_meet_link: string | null
           hora: string
           id: string
           nombre: string
@@ -268,17 +272,12 @@ export type Database = {
           tipo_reunion: string | null
           updated_at: string | null
           webhook_sent: boolean | null
-          calendar_sync_completed_at: string | null
-          calendar_sync_requested_at: string | null
-          confirmation_email_status: string | null
-          google_calendar_event_id: string | null
-          google_calendar_html_link: string | null
-          google_meet_link: string | null
-          qualification_data: unknown | null
-          risk_level: string | null
         }
         Insert: {
           agendamiento_intake_id?: string | null
+          calendar_sync_completed_at?: string | null
+          calendar_sync_requested_at?: string | null
+          confirmation_email_status?: string | null
           created_at?: string | null
           descripcion?: string | null
           email: string
@@ -287,6 +286,9 @@ export type Database = {
           estado?: string | null
           external_reference?: string | null
           fecha: string
+          google_calendar_event_id?: string | null
+          google_calendar_html_link?: string | null
+          google_meet_link?: string | null
           hora: string
           id?: string
           nombre: string
@@ -300,17 +302,12 @@ export type Database = {
           tipo_reunion?: string | null
           updated_at?: string | null
           webhook_sent?: boolean | null
-          calendar_sync_completed_at?: string | null
-          calendar_sync_requested_at?: string | null
-          confirmation_email_status?: string | null
-          google_calendar_event_id?: string | null
-          google_calendar_html_link?: string | null
-          google_meet_link?: string | null
-          qualification_data?: unknown | null
-          risk_level?: string | null
         }
         Update: {
           agendamiento_intake_id?: string | null
+          calendar_sync_completed_at?: string | null
+          calendar_sync_requested_at?: string | null
+          confirmation_email_status?: string | null
           created_at?: string | null
           descripcion?: string | null
           email?: string
@@ -319,6 +316,9 @@ export type Database = {
           estado?: string | null
           external_reference?: string | null
           fecha?: string
+          google_calendar_event_id?: string | null
+          google_calendar_html_link?: string | null
+          google_meet_link?: string | null
           hora?: string
           id?: string
           nombre?: string
@@ -332,16 +332,16 @@ export type Database = {
           tipo_reunion?: string | null
           updated_at?: string | null
           webhook_sent?: boolean | null
-          calendar_sync_completed_at?: string | null
-          calendar_sync_requested_at?: string | null
-          confirmation_email_status?: string | null
-          google_calendar_event_id?: string | null
-          google_calendar_html_link?: string | null
-          google_meet_link?: string | null
-          qualification_data?: unknown | null
-          risk_level?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "reservas_agendamiento_intake_id_fkey"
+            columns: ["agendamiento_intake_id"]
+            isOneToOne: false
+            referencedRelation: "agendamiento_intakes"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       reservas_backup: {
         Row: {
@@ -459,6 +459,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      apply_intake_cita_from_reserva: {
+        Args: { p_reserva_id: string }
+        Returns: undefined
+      }
       get_note_audit_status: {
         Args: { note_id_param: string }
         Returns: {
@@ -467,6 +471,15 @@ export type Database = {
           comments: string
           is_audited: boolean
         }[]
+      }
+      save_intake_schedule: {
+        Args: {
+          p_fecha: string
+          p_hora: string
+          p_intake_id: string
+          p_tipo_reunion: string
+        }
+        Returns: undefined
       }
     }
     Enums: {
