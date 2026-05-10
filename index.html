@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es-CL" class="dark">
+<html lang="es-CL">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -81,15 +81,18 @@
     <!-- Meta Pixel noscript fallback moved to body -->
     <!-- End Meta Pixel Code -->
 
-    <!-- Dark mode script to prevent flash -->
+    <!-- Tema antes del primer paint: default claro; oscuro solo si theme=dark en localStorage -->
     <script>
-      (function() {
+      (function () {
         try {
-          var theme = localStorage.getItem('theme');
-          if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+          if (localStorage.getItem('theme') === 'dark') {
             document.documentElement.classList.add('dark');
+          } else {
+            document.documentElement.classList.remove('dark');
           }
-        } catch (e) {}
+        } catch (e) {
+          document.documentElement.classList.remove('dark');
+        }
       })();
     </script>
     
@@ -108,17 +111,8 @@
   <meta name="twitter:title" content="Punto Legal Chile — Consulta legal online por Google Meet">
   <meta property="og:description" content="Punto Legal (puntolegal.online): estudio jurídico con domicilio comercial en El Golf, Las Condes, Santiago. Consultas 100% online por Google Meet. Agenda en 60 segundos, 45 min con especialista. Familia, laboral, sucesorio, inmobiliario, empresarial, tributario, contratos.">
   <meta name="twitter:description" content="Punto Legal (puntolegal.online): estudio jurídico con domicilio comercial en El Golf, Las Condes, Santiago. Consultas 100% online por Google Meet. Agenda en 60 segundos, 45 min con especialista. Familia, laboral, sucesorio, inmobiliario, empresarial, tributario, contratos.">
-  <script>
-    (function () {
-      try {
-        var t = localStorage.getItem('theme');
-        if (t === 'light') document.documentElement.classList.remove('dark');
-        else document.documentElement.classList.add('dark');
-      } catch (e) {
-        document.documentElement.classList.add('dark');
-      }
-    })();
-  </script>
+  
+
 </head>
 
   <body>

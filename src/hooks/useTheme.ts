@@ -12,10 +12,10 @@ import {
 export type AppTheme = 'light' | 'dark';
 
 function readStoredTheme(): AppTheme {
-  if (typeof window === 'undefined') return 'dark';
+  if (typeof window === 'undefined') return 'light';
   const raw = localStorage.getItem('theme');
   if (raw === 'light' || raw === 'dark') return raw;
-  return 'dark';
+  return 'light';
 }
 
 function applyThemeClass(next: AppTheme) {
