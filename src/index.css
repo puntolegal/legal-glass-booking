@@ -697,6 +697,149 @@ All colors MUST be HSL.
       inset 0 1px 0 rgba(255, 255, 255, 0.65) !important;
   }
 
+  /* Foco /urgencia — cyan/azul (evita anillo naranja global) */
+  .urgencia-focus button:focus-visible,
+  .urgencia-focus summary:focus-visible {
+    outline: none !important;
+    box-shadow:
+      0 0 0 2px hsl(218 52% 7%),
+      0 0 0 4px hsla(var(--la-accent-to) / 0.48) !important;
+  }
+
+  html:not(.dark) .urgencia-focus button:focus-visible,
+  html:not(.dark) .urgencia-focus summary:focus-visible {
+    box-shadow:
+      0 0 0 2px rgb(255 255 255),
+      0 0 0 4px hsla(217 91% 48% / 0.38) !important;
+  }
+
+  .urgencia-focus .urgencia-input:focus-visible {
+    outline: none !important;
+    box-shadow:
+      0 0 0 3px hsla(var(--la-accent-to) / 0.14),
+      0 16px 40px -24px hsla(var(--la-accent-from) / 0.22),
+      inset 0 1px 0 hsla(var(--la-outline-warm) / 0.22) !important;
+  }
+
+  .urgencia-secondary-cta {
+    position: relative;
+    min-height: 3.5rem;
+    width: 100%;
+    border-radius: 1.125rem;
+    padding: 0.75rem 1.125rem;
+    font-weight: 700;
+    font-size: 0.9375rem;
+    letter-spacing: -0.02em;
+    line-height: 1.25;
+    color: hsl(var(--la-fg));
+    background: hsla(var(--la-surface-mid) / 0.4);
+    border: 1px solid hsla(var(--la-outline) / 0.14);
+    -webkit-backdrop-filter: blur(26px) saturate(140%);
+    backdrop-filter: blur(26px) saturate(140%);
+    box-shadow:
+      inset 0 1px 0 hsla(var(--la-outline-warm) / 0.18),
+      0 14px 40px -22px rgba(0, 0, 0, 0.42);
+    transition: transform 0.2s cubic-bezier(0.32, 0.72, 0, 1), background 0.2s ease, border-color 0.2s ease,
+      box-shadow 0.2s ease;
+  }
+
+  .urgencia-secondary-cta:hover:not(:disabled) {
+    background: hsla(var(--la-surface-high) / 0.48);
+    border-color: hsla(var(--la-accent-from) / 0.32);
+    box-shadow:
+      inset 0 1px 0 hsla(var(--la-outline-warm) / 0.22),
+      0 18px 44px -20px hsla(var(--la-accent-from) / 0.12);
+  }
+
+  .urgencia-secondary-cta:active:not(:disabled) {
+    transform: scale(0.985);
+  }
+
+  .urgencia-secondary-cta:disabled {
+    cursor: not-allowed;
+    opacity: 0.55;
+    filter: saturate(0.85);
+  }
+
+  .urgencia-mp-cta {
+    position: relative;
+    min-height: 3.25rem;
+    width: 100%;
+    border-radius: 1.125rem;
+    padding: 0.65rem 1rem;
+    font-weight: 700;
+    font-size: 0.875rem;
+    letter-spacing: -0.02em;
+    line-height: 1.25;
+    color: rgb(248 250 252);
+    background: linear-gradient(
+      155deg,
+      hsla(199 72% 42% / 0.55) 0%,
+      hsla(215 55% 22% / 0.72) 45%,
+      hsla(222 48% 14% / 0.88) 100%
+    );
+    border: 1px solid hsla(187 70% 55% / 0.35);
+    -webkit-backdrop-filter: blur(28px) saturate(150%);
+    backdrop-filter: blur(28px) saturate(150%);
+    box-shadow:
+      inset 0 1px 0 hsl(0 0% 100% / 0.14),
+      0 12px 40px -16px hsl(199 80% 35% / 0.35),
+      0 8px 24px -12px rgba(0, 0, 0, 0.4);
+    transition: transform 0.2s cubic-bezier(0.32, 0.72, 0, 1), filter 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .urgencia-mp-cta:hover:not(:disabled) {
+    filter: brightness(1.06);
+    box-shadow:
+      inset 0 1px 0 hsl(0 0% 100% / 0.18),
+      0 16px 48px -14px hsl(199 75% 38% / 0.4),
+      0 8px 28px -12px rgba(0, 0, 0, 0.45);
+  }
+
+  .urgencia-mp-cta:active:not(:disabled) {
+    transform: scale(0.985);
+  }
+
+  .urgencia-mp-cta:disabled {
+    cursor: not-allowed;
+    opacity: 0.55;
+  }
+
+  .urgencia-mp-cta:disabled.urgencia-mp-cta--pending {
+    opacity: 0.92;
+    cursor: wait;
+    filter: none;
+  }
+
+  .urgencia-mp-cta--pending {
+    cursor: wait;
+    opacity: 0.92;
+    background: linear-gradient(
+      155deg,
+      hsla(199 65% 48% / 0.65) 0%,
+      hsla(215 50% 28% / 0.8) 100%
+    );
+  }
+
+  html:not(.dark) .urgencia-focus .urgencia-mp-cta {
+    color: rgb(15 23 42);
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.92) 0%,
+      hsla(199 95% 97% / 0.88) 50%,
+      hsla(210 40% 96% / 0.9) 100%
+    );
+    border: 1px solid hsl(199 70% 42% / 0.35);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.95),
+      0 12px 36px -14px hsl(199 60% 45% / 0.2),
+      0 6px 20px -10px rgba(15, 23, 42, 0.12);
+  }
+
+  html:not(.dark) .urgencia-focus .urgencia-mp-cta:hover:not(:disabled) {
+    filter: brightness(1.02);
+  }
+
   /* Campos: mismo lenguaje que glass-ios-* (blur + ghost border + trazo interior) */
   .urgencia-input {
     min-height: 3.375rem;
@@ -1200,6 +1343,24 @@ All colors MUST be HSL.
     backdrop-filter: blur(24px) saturate(130%);
   }
 
+  /* Secreto profesional — mismo lenguaje glass que el resto del flujo */
+  .urgencia-secreto-profesional {
+    border-radius: 1.125rem;
+    padding: 1rem 1.125rem;
+    background: linear-gradient(
+      145deg,
+      hsla(var(--la-accent-from) / 0.1) 0%,
+      hsla(var(--la-surface-low) / 0.4) 55%,
+      hsla(var(--la-surface-mid) / 0.32) 100%
+    );
+    border: 1px solid hsla(var(--la-accent-from) / 0.22);
+    box-shadow:
+      0 12px 32px -20px rgba(0, 0, 0, 0.35),
+      inset 0 1px 0 hsla(var(--la-outline-warm) / 0.16);
+    -webkit-backdrop-filter: blur(26px) saturate(135%);
+    backdrop-filter: blur(26px) saturate(135%);
+  }
+
   .urgencia-alert-soft {
     border-radius: 1.125rem;
     padding: 1rem 1.125rem;
@@ -1332,6 +1493,7 @@ All colors MUST be HSL.
 
     .urgencia-terminal-chrome,
     .urgencia-disclaimer-card,
+    .urgencia-secreto-profesional,
     .urgencia-alert-soft {
       -webkit-backdrop-filter: blur(10px) saturate(110%);
       backdrop-filter: blur(10px) saturate(110%);
@@ -5669,10 +5831,19 @@ html {
   transition-duration: 0.01ms !important;
 }
 
-/* Focus visible mejorado */
+/* Focus visible (panel accesibilidad): anillo sobrio, sin naranja chillón */
 .focus-visible :focus {
-  outline: 3px solid #f59e0b !important;
-  outline-offset: 2px !important;
+  outline: none !important;
+  box-shadow:
+    0 0 0 2px hsl(210 40% 98%),
+    0 0 0 4px hsl(217 91% 52% / 0.45) !important;
+}
+
+.dark.focus-visible :focus,
+.dark .focus-visible :focus {
+  box-shadow:
+    0 0 0 2px hsl(222 47% 8%),
+    0 0 0 4px hsl(188 86% 48% / 0.5) !important;
 }
 
 /* Mejoras de accesibilidad general */

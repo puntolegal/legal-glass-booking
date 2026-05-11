@@ -31,7 +31,7 @@ export const URGENCIA_FAQ_ITEMS: { question: string; answer: string }[] = [
   {
     question: '¿Qué tipo de causas cubre esta vía de urgencia?',
     answer:
-      'Está pensada para contextos de detención o riesgo inminente de formalización, con foco en situaciones frecuentes como desórdenes públicos, infracciones a la ley de alcoholes, maltrato a funcionarios, barricadas o materias de seguridad del Estado, violencia intrafamiliar, hurto o robo simple, amenazas, tenencia o microtráfico, conducción bajo efectos u otros delitos graves. El encargo concreto se ajusta siempre a los hechos que cuentes.',
+      'Está pensada para contextos de detención o riesgo inminente de formalización, con foco en situaciones frecuentes como desórdenes públicos, infracciones a la ley de alcoholes, maltrato a funcionarios, barricadas o materias de seguridad del Estado, violencia intrafamiliar, hurto o robo simple, amenazas, lesiones o riña, daños o vandalismo, receptación, porte de arma o munición, tenencia o microtráfico, conducción bajo efectos u otros delitos graves. El encargo concreto se ajusta siempre a los hechos que cuentes.',
   },
   {
     question: '¿La atención puede ser presencial en la comisaría?',

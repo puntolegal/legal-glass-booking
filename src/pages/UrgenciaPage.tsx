@@ -3,7 +3,6 @@
 // Arquitectura: Captura → Cualificación → Terminal (simulación orientativa) + Checkout
 
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
-import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ChevronRight,
@@ -29,6 +28,10 @@ import {
   Shield,
   Scale,
   Lock,
+  Activity,
+  Hammer,
+  Package,
+  Crosshair,
   type LucideIcon,
 } from 'lucide-react';
 import SEO from '@/components/SEO';
@@ -57,6 +60,10 @@ type Situacion =
   | 'amenazas'
   | 'microtrafico'
   | 'conduccion_ebriedad'
+  | 'lesiones'
+  | 'danos'
+  | 'receptacion'
+  | 'porte_arma'
   | 'grave'
   | null;
 type Step = 'captura' | 'cualificacion' | 'terminal';
@@ -70,6 +77,10 @@ const SITUACIONES: { id: Exclude<Situacion, null>; label: string; Icon: LucideIc
   { id: 'hurto', label: 'Hurto / robo simple', Icon: ShoppingBag },
   { id: 'amenazas', label: 'Amenazas', Icon: Siren },
   { id: 'microtrafico', label: 'Tenencia / microtráfico', Icon: Pill },
+  { id: 'lesiones', label: 'Lesiones (riña / agresión)', Icon: Activity },
+  { id: 'danos', label: 'Daños / vandalismo', Icon: Hammer },
+  { id: 'receptacion', label: 'Receptación', Icon: Package },
+  { id: 'porte_arma', label: 'Porte arma / munición', Icon: Crosshair },
   { id: 'conduccion_ebriedad', label: 'Conducción bajo efectos', Icon: Car },
   { id: 'grave', label: 'Otro delito grave', Icon: Gavel },
 ];
@@ -83,6 +94,10 @@ const SITUACION_TERMINAL_LABEL: Record<Exclude<Situacion, null>, string> = {
   hurto: 'HURTO / ROBO SIMPLE',
   amenazas: 'AMENAZAS',
   microtrafico: 'TENENCIA / MICROTRÁFICO',
+  lesiones: 'LESIONES / RIÑA',
+  danos: 'DAÑOS / VANDALISMO',
+  receptacion: 'RECEPTACIÓN',
+  porte_arma: 'PORTE ARMA / MUNICIÓN',
   conduccion_ebriedad: 'CONDUCCIÓN BAJO EFECTOS',
   grave: 'OTRO DELITO GRAVE',
 };
@@ -94,6 +109,9 @@ const SITUACION_BASE_COMPLEJA: ReadonlySet<Exclude<Situacion, null>> = new Set([
   'maltrato',
   'microtrafico',
   'vif',
+  'lesiones',
+  'receptacion',
+  'porte_arma',
 ]);
 
 const PRECIO_SIMPLE = 300000;
@@ -165,6 +183,14 @@ const PAIN_MESSAGES: Record<Exclude<Situacion, null>, string> = {
     'En amenazas la gravedad y el contexto fáctico marcan el curso del proceso; conviene asesoría temprana para el control de detención o audiencias.',
   microtrafico:
     'En tenencia o microtráfico la estrategia defensiva depende del relato fiscal, pericias y circunstancias del caso.',
+  lesiones:
+    'En lesiones o riñas la valoración médico-legal y el contexto fáctico marcan el curso; conviene asesoría temprana para el control de detención o formalización.',
+  danos:
+    'En daños o vandalismo la calificación y las eventuales medidas dependen del tribunal y la Fiscalía según los antecedentes.',
+  receptacion:
+    'En receptación la cadena de custodia y el conocimiento del origen de la cosa suelen ser centrales; la defensa debe alinearse rápido con el expediente.',
+  porte_arma:
+    'En porte de arma o munición la gravedad aparente y las medidas suelen ser sensibles; conviene coordinación profesional desde el primer contacto.',
   conduccion_ebriedad:
     'En conducción bajo efectos o estado de ebriedad pueden concurrir infracciones penales y administrativas; conviene revisar el procedimiento y el control.',
   grave:
@@ -344,9 +370,9 @@ export default function UrgenciaPage() {
     let base = 22;
     if (tieneAntecedentes) base += 34;
     if (situacion) {
-      if (['grave', 'barricadas', 'maltrato', 'microtrafico'].includes(situacion)) base += 26;
+      if (['grave', 'barricadas', 'maltrato', 'microtrafico', 'porte_arma', 'lesiones'].includes(situacion)) base += 26;
       else if (situacion === 'vif') base += 22;
-      else if (situacion === 'amenazas' || situacion === 'hurto') base += 14;
+      else if (['amenazas', 'hurto', 'receptacion', 'danos'].includes(situacion)) base += 14;
       else if (situacion === 'conduccion_ebriedad' || situacion === 'ley_alcohol') base += 10;
       else if (situacion === 'desordenes') base += 6;
     }
@@ -772,6 +798,15 @@ export default function UrgenciaPage() {
                 transition={{ type: 'spring', stiffness: 300, damping: 30 }}
                 className="space-y-7"
               >
+                <form
+                  autoComplete="on"
+                  lang="es-CL"
+                  className="space-y-7"
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    if (canAdvanceCaptura) handleCapturaNext();
+                  }}
+                >
                 <div className="space-y-2">
                   <p className="urgencia-kicker-pill">
                     <span className="relative flex h-1.5 w-1.5 shrink-0">
@@ -821,29 +856,42 @@ export default function UrgenciaPage() {
                         : 'Indica la unidad correcta (ej. 17.ª Las Condes, 19.ª Providencia, 16.ª Ñuñoa). Atendemos urgencias en el oriente y en toda la RM; el encargo se ajusta a tus antecedentes.'}
                     </motion.p>
                   )}
+                  <label htmlFor="urgencia-unidad" className="sr-only">
+                    Comisaría o unidad policial
+                  </label>
                   <input
+                    id="urgencia-unidad"
+                    name="address-line1"
                     type="text"
                     placeholder="Ej: 17.ª Comisaría Las Condes, 19.ª Providencia"
                     value={unidadPolicial}
                     onChange={(e) => setUnidadPolicial(e.target.value)}
                     className="urgencia-input"
                     autoComplete="address-line1"
+                    enterKeyHint="next"
                   />
                 </div>
 
                 {/* Nombre */}
                 <div className="glass-ios-panel-dark p-4 sm:p-5 space-y-3">
-                  <label className="block text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">
+                  <label
+                    htmlFor="urgencia-nombre-contacto"
+                    className="block text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500"
+                  >
                     Nombre del detenido o quien activa
                   </label>
                   <input
                     ref={nombreInputRef}
+                    id="urgencia-nombre-contacto"
+                    name="name"
                     type="text"
                     placeholder="Solo nombre"
                     value={nombre}
                     onChange={(e) => setNombre(e.target.value)}
                     className="urgencia-input"
                     autoComplete="name"
+                    autoCapitalize="words"
+                    enterKeyHint="done"
                   />
                 </div>
 
@@ -888,8 +936,7 @@ export default function UrgenciaPage() {
                     </p>
                   )}
                   <button
-                    type="button"
-                    onClick={handleCapturaNext}
+                    type="submit"
                     disabled={!canAdvanceCaptura}
                     className="urgencia-primary-cta flex items-center justify-center gap-2.5"
                   >
@@ -920,6 +967,7 @@ export default function UrgenciaPage() {
                     ))}
                   </div>
                 </section>
+                </form>
               </motion.div>
             )}
 
@@ -950,6 +998,15 @@ export default function UrgenciaPage() {
                   </p>
                 </div>
 
+                <form
+                  autoComplete="on"
+                  lang="es-CL"
+                  className="space-y-7"
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    if (canAdvanceCualificacion) handleCualificacionNext();
+                  }}
+                >
                 {/* Antecedentes */}
                 <div className="glass-ios-panel-dark p-4 sm:p-5 space-y-3">
                   <label className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">
@@ -1051,10 +1108,15 @@ export default function UrgenciaPage() {
 
                 {/* RUT detenido - opcional con formateo automático */}
                 <div className="glass-ios-panel-dark p-4 sm:p-5 space-y-3">
-                  <label className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">
-                    RUT del detenido <span className="font-normal normal-case tracking-normal text-slate-600">(opcional)</span>
+                  <label
+                    htmlFor="urgencia-rut-detenido"
+                    className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500"
+                  >
+                    RUT del detenido <span className="font-normal normal-case tracking-normal text-slate-600 dark:text-slate-400">(opcional)</span>
                   </label>
                   <input
+                    id="urgencia-rut-detenido"
+                    name="urgencia-rut-detenido"
                     type="text"
                     inputMode="numeric"
                     placeholder="12.345.678-9"
@@ -1069,32 +1131,53 @@ export default function UrgenciaPage() {
                     maxLength={12}
                     className="urgencia-input"
                     autoComplete="off"
+                    enterKeyHint="next"
                   />
                 </div>
 
-                <p className="text-[11px] text-slate-500 leading-relaxed">
-                  Usaremos correo y WhatsApp solo para contactarte por esta urgencia y coordinar la atención, según nuestra{' '}
-                  <Link to="/privacy-policy" className="urgencia-inline-link">
-                    política de privacidad
-                  </Link>{' '}
-                  y la normativa aplicable.
-                </p>
+                <div className="urgencia-secreto-profesional" role="note">
+                  <div className="flex gap-3">
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-slate-200/80 bg-white/50 dark:border-white/[0.12] dark:bg-white/[0.06]">
+                      <Lock className="h-4 w-4 text-slate-700 dark:text-slate-200" strokeWidth={2} aria-hidden />
+                    </div>
+                    <div className="min-w-0 space-y-1">
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-600 dark:text-slate-300">
+                        Secreto profesional
+                      </p>
+                      <p className="text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed">
+                        Los datos que entregues quedan protegidos por el deber de confidencialidad del abogado frente a terceros,
+                        conforme a la ley y al reglamento del ejercicio profesional. Solo se usan para coordinar esta urgencia y
+                        la defensa técnica.
+                      </p>
+                    </div>
+                  </div>
+                </div>
 
                 <div className="glass-ios-panel-dark p-4 sm:p-5 space-y-4">
                   <div className="relative">
-                    <label className="mb-2 block text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">
+                    <label
+                      htmlFor="urgencia-email"
+                      className="mb-2 block text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500"
+                    >
                       Email
                     </label>
                     <div className="relative w-full">
                       <Mail className="pointer-events-none absolute left-3.5 top-1/2 z-[1] h-4 w-4 -translate-y-1/2 urgencia-input-icon" />
                       <input
                         ref={emailInputRef}
+                        id="urgencia-email"
+                        name="email"
                         type="email"
                         placeholder="correo@ejemplo.cl"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         className={`urgencia-input pl-11 pr-11 ${email && emailValid ? 'urgencia-input--valid' : ''}`}
                         autoComplete="email"
+                        autoCapitalize="off"
+                        autoCorrect="off"
+                        spellCheck={false}
+                        inputMode="email"
+                        enterKeyHint="next"
                       />
                       {email && emailValid && (
                         <div className="urgencia-input-check absolute right-3.5 top-1/2 -translate-y-1/2">
@@ -1104,12 +1187,17 @@ export default function UrgenciaPage() {
                     </div>
                   </div>
                   <div className="relative">
-                    <label className="mb-2 block text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">
+                    <label
+                      htmlFor="urgencia-telefono-movil"
+                      className="mb-2 block text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500"
+                    >
                       WhatsApp
                     </label>
                     <div className="relative w-full">
                       <Phone className="pointer-events-none absolute left-3.5 top-1/2 z-[1] h-4 w-4 -translate-y-1/2 urgencia-input-icon" />
                       <input
+                        id="urgencia-telefono-movil"
+                        name="tel"
                         type="tel"
                         inputMode="tel"
                         placeholder="+56 9 1234 5678"
@@ -1129,6 +1217,10 @@ export default function UrgenciaPage() {
                         maxLength={17}
                         className={`urgencia-input pl-11 pr-11 ${whatsapp && whatsappValid ? 'urgencia-input--valid' : ''}`}
                         autoComplete="tel"
+                        autoCapitalize="off"
+                        autoCorrect="off"
+                        spellCheck={false}
+                        enterKeyHint="done"
                       />
                       {whatsapp && whatsappValid && (
                         <div className="urgencia-input-check absolute right-3.5 top-1/2 -translate-y-1/2">
@@ -1140,8 +1232,7 @@ export default function UrgenciaPage() {
                 </div>
 
                 <button
-                  type="button"
-                  onClick={handleCualificacionNext}
+                  type="submit"
                   disabled={!canAdvanceCualificacion}
                   className="urgencia-primary-cta flex items-center justify-center gap-2.5"
                 >
@@ -1150,6 +1241,7 @@ export default function UrgenciaPage() {
                   </span>
                   <ChevronRight className="h-5 w-5 shrink-0 opacity-90" aria-hidden />
                 </button>
+                </form>
               </motion.div>
             )}
 
@@ -1221,7 +1313,7 @@ export default function UrgenciaPage() {
                     aria-hidden
                     style={{
                       background:
-                        'radial-gradient(ellipse 120% 80% at 0% 0%, rgba(251,191,36,0.07), transparent 50%), radial-gradient(ellipse 90% 70% at 100% 100%, rgba(244,63,94,0.06), transparent 55%)',
+                        'radial-gradient(ellipse 120% 80% at 0% 0%, hsla(199 70% 52% / 0.07), transparent 52%), radial-gradient(ellipse 90% 70% at 100% 100%, hsla(217 45% 48% / 0.06), transparent 55%)',
                     }}
                   />
                   <div className="relative space-y-2.5">
@@ -1236,10 +1328,6 @@ export default function UrgenciaPage() {
                       <strong className="text-slate-900 dark:text-white font-semibold">
                         al pagar y activar el servicio puedes comenzar tu defensa ya en comisaría
                       </strong>, con coordinación profesional hacia el control de detención.
-                    </p>
-                    <p className="text-[0.8125rem] text-slate-600 dark:text-slate-400 leading-relaxed">
-                      Nadie puede prometer libertad ni un resultado: esas decisiones las adoptan el juez y la Fiscalía. Sí puedes
-                      priorizar el contacto, reducir declaraciones improvisadas y alinear tu actuación con garantías reales.
                     </p>
                   </div>
                 </div>
@@ -1446,8 +1534,8 @@ export default function UrgenciaPage() {
                               handleActivar();
                             }}
                             disabled={isPaying}
-                            className={`urgencia-primary-cta flex-1 min-h-[52px] flex items-center justify-center gap-2 ${
-                              isPaying ? 'urgencia-primary-cta--pending' : ''
+                            className={`urgencia-mp-cta flex-1 min-h-[52px] flex items-center justify-center gap-2 ${
+                              isPaying ? 'urgencia-mp-cta--pending' : ''
                             }`}
                           >
                             {isPaying ? (
