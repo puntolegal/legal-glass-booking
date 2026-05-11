@@ -1,7 +1,7 @@
 // RUTA: src/App.tsx
 
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import { SidebarProvider } from '@/contexts/SidebarContext';
 import { GamificationProvider } from '@/contexts/GamificationContext';
@@ -35,18 +35,11 @@ import TestMetaPixel from '@/pages/TestMetaPixel';
 import ApuntesHome from './pages/ApuntesHome';
 import AmandaLogin from '@/pages/AmandaLogin';
 import ExpressPage from '@/pages/ExpressPage';
-import InmobiliarioLandingPage from '@/pages/InmobiliarioLandingPage';
-
 // Service Pages
 import ServicioCorporativoPage from '@/pages/ServicioCorporativoPage';
 import ServicioLaboralPage from '@/pages/ServicioLaboralPage';
-import ServicioDigitalPage from '@/pages/ServicioDigitalPage';
 import ServicioInmobiliarioPage from '@/pages/ServicioInmobiliarioPage';
-import ServicioCivilPage from '@/pages/ServicioCivilPage';
 import ServicioFamiliaPage from '@/pages/ServicioFamiliaPage';
-import ServicioPenalPage from '@/pages/ServicioPenalPage';
-import ServicioTributarioPage from '@/pages/ServicioTributarioPage';
-import ServicioPenalEconomicoPage from '@/pages/ServicioPenalEconomicoPage';
 import PagoDiagnosticoIA from '@/pages/PagoDiagnosticoIA';
 import DiagnosticoIniciar from '@/pages/DiagnosticoIniciar';
 import PortalReconstruccionPage from '@/pages/PortalReconstruccionPage';
@@ -91,7 +84,10 @@ function App() {
                         <Route path="/" element={<Index />} />
                         <Route path="/centro" element={<ExpressPage />} />
                         <Route path="/express" element={<ExpressPage />} />
-                        <Route path="/inmobiliario" element={<InmobiliarioLandingPage />} />
+                        <Route
+                          path="/inmobiliario"
+                          element={<Navigate to="/servicios/inmobiliario" replace />}
+                        />
                         <Route path="/servicios" element={<ServicesPage />} />
                         <Route path="/blog" element={<BlogPage />} />
                         <Route path="/agendamiento" element={<AgendamientoPage />} />
@@ -119,20 +115,20 @@ function App() {
                         {/* Service Routes */}
                         <Route path="/servicios/corporativo" element={<ServicioCorporativoPage />} />
                         <Route path="/servicios/laboral" element={<ServicioLaboralPage />} />
-                        <Route path="/servicios/digital" element={<ServicioDigitalPage />} />
                         <Route path="/servicios/inmobiliario" element={<ServicioInmobiliarioPage />} />
-                        <Route path="/servicios/civil" element={<ServicioCivilPage />} />
                         <Route path="/servicios/familia" element={<ServicioFamiliaPage />} />
                         <Route path="/servicios/familia/calculadora" element={<CalculadoraPensionPage />} />
-                        <Route path="/servicios/penal" element={<ServicioPenalPage />} />
+                        <Route path="/servicios/digital" element={<Navigate to="/" replace />} />
+                        <Route path="/servicios/civil" element={<Navigate to="/" replace />} />
+                        <Route path="/servicios/tributario" element={<Navigate to="/" replace />} />
+                        <Route path="/servicios/penal-economico" element={<Navigate to="/" replace />} />
+                        <Route path="/servicios/penal" element={<Navigate to="/urgencia" replace />} />
                         
                         {/* Diagnóstico Routes */}
                         <Route path="/pago/diagnostico-ia" element={<PagoDiagnosticoIA />} />
                         <Route path="/diagnostico/iniciar" element={<DiagnosticoIniciar />} />
                         <Route path="/portal-reconstruccion" element={<PortalReconstruccionPage />} />
                         <Route path="/rugby" element={<RugbyPage />} />
-                        <Route path="/servicios/tributario" element={<ServicioTributarioPage />} />
-                        <Route path="/servicios/penal-economico" element={<ServicioPenalEconomicoPage />} />
                         
                         {/* Blog Routes */}
                         <Route path="/blog/post-1" element={<BlogPost1 />} />

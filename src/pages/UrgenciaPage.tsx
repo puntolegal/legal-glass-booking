@@ -1,11 +1,11 @@
 // RUTA: src/pages/UrgenciaPage.tsx
-// Máquina de conversión penal - 3 pantallas, diseño Escudo Negro
-// Arquitectura: Captura emocional → Cualificación ninja → Terminal + Checkout
+// Máquina de conversión penal — 3 pasos, canvas glass iOS (tema penal)
+// Arquitectura: Captura → Cualificación → Terminal (simulación orientativa) + Checkout
 
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Shield,
   ChevronRight,
   Loader2,
   MapPin,
@@ -14,26 +14,93 @@ import {
   Mail,
   Phone,
   Check,
+  Wine,
+  ShieldAlert,
+  Flame,
+  Gavel,
+  Clock,
+  ArrowLeft,
+  Megaphone,
+  HeartCrack,
+  ShoppingBag,
+  Siren,
+  Pill,
+  Car,
+  Shield,
+  Scale,
+  Lock,
+  type LucideIcon,
 } from 'lucide-react';
 import SEO from '@/components/SEO';
+import { UrgenciaPenalFocusLayout } from '@/components/urgencia/UrgenciaPenalFocusLayout';
+import {
+  URGENCIA_CANONICAL_URL,
+  URGENCIA_SEO_DESCRIPTION,
+  URGENCIA_SEO_KEYWORDS,
+  URGENCIA_SEO_TITLE,
+  URGENCIA_FAQ_ITEMS,
+  buildUrgenciaFaqJsonLd,
+} from '@/lib/urgenciaPenalSeo';
+import { getNearestComisariaOriente } from '@/lib/urgenciaOrienteComisarias';
 import { createCheckoutPreference } from '@/services/mercadopagoBackend';
+import { mergeUrgenciaPenalRow, type UrgenciaPenalMergeRow } from '@/services/urgenciaPenalRecordService';
 import { supabase } from '@/integrations/supabase/client';
 import { trackMetaEvent } from '@/services/metaConversionsService';
 
-type Situacion = 'desordenes' | 'maltrato' | 'grave' | 'barricadas' | null;
+type Situacion =
+  | 'desordenes'
+  | 'ley_alcohol'
+  | 'maltrato'
+  | 'barricadas'
+  | 'vif'
+  | 'hurto'
+  | 'amenazas'
+  | 'microtrafico'
+  | 'conduccion_ebriedad'
+  | 'grave'
+  | null;
 type Step = 'captura' | 'cualificacion' | 'terminal';
 
-const SITUACIONES = [
-  { id: 'desordenes' as const, label: 'Desórdenes / Ley de Alcoholes', icon: '🍺' },
-  { id: 'maltrato' as const, label: 'Maltrato a Carabineros', icon: '👮' },
-  { id: 'barricadas' as const, label: 'Barricadas / Ley Seguridad', icon: '🔥' },
-  { id: 'grave' as const, label: 'Delito Grave (VIF, Robo, Otros)', icon: '⚠️' },
+const SITUACIONES: { id: Exclude<Situacion, null>; label: string; Icon: LucideIcon }[] = [
+  { id: 'desordenes', label: 'Desórdenes públicos', Icon: Megaphone },
+  { id: 'ley_alcohol', label: 'Ley de alcoholes', Icon: Wine },
+  { id: 'maltrato', label: 'Maltrato a Carabineros', Icon: ShieldAlert },
+  { id: 'barricadas', label: 'Barricadas / seguridad del Estado', Icon: Flame },
+  { id: 'vif', label: 'Violencia intrafamiliar', Icon: HeartCrack },
+  { id: 'hurto', label: 'Hurto / robo simple', Icon: ShoppingBag },
+  { id: 'amenazas', label: 'Amenazas', Icon: Siren },
+  { id: 'microtrafico', label: 'Tenencia / microtráfico', Icon: Pill },
+  { id: 'conduccion_ebriedad', label: 'Conducción bajo efectos', Icon: Car },
+  { id: 'grave', label: 'Otro delito grave', Icon: Gavel },
 ];
+
+const SITUACION_TERMINAL_LABEL: Record<Exclude<Situacion, null>, string> = {
+  desordenes: 'DESÓRDENES PÚBLICOS',
+  ley_alcohol: 'LEY DE ALCOHOLES',
+  maltrato: 'MALTRATO A CARABINEROS',
+  barricadas: 'LEY SEGURIDAD DEL ESTADO',
+  vif: 'VIOLENCIA INTRAFAMILIAR',
+  hurto: 'HURTO / ROBO SIMPLE',
+  amenazas: 'AMENAZAS',
+  microtrafico: 'TENENCIA / MICROTRÁFICO',
+  conduccion_ebriedad: 'CONDUCCIÓN BAJO EFECTOS',
+  grave: 'OTRO DELITO GRAVE',
+};
+
+/** Situaciones que por defecto encajan en tarifa “compleja” salvo que solo apliquen agravantes menores */
+const SITUACION_BASE_COMPLEJA: ReadonlySet<Exclude<Situacion, null>> = new Set([
+  'grave',
+  'barricadas',
+  'maltrato',
+  'microtrafico',
+  'vif',
+]);
 
 const PRECIO_SIMPLE = 300000;
 const PRECIO_COMPLEJO = 600000;
 const WHATSAPP_NUMBER = '56962321883';
-const COUNTDOWN_SECONDS = 10;
+/** Si el callback del teletipo fallara, forzar fin de “razonamiento” para no bloquear el pago */
+const TERMINAL_COMPLETE_FALLBACK_MS = 120_000;
 
 // Formateo automático RUT
 const formatRut = (value: string): string => {
@@ -80,20 +147,42 @@ const triggerHaptic = (style: 'light' | 'medium' | 'heavy' = 'light') => {
   }
 };
 
-// Pain messages por tipo de delito
-const PAIN_MESSAGES: Record<string, string> = {
+// Mensajes orientativos por tipo (sin prometer resultado judicial)
+const PAIN_MESSAGES: Record<Exclude<Situacion, null>, string> = {
   desordenes:
-    'La fiscalía usa las protestas para dar señales políticas. Sin defensa técnica, el juez puede aplicar prisión preventiva ejemplar.',
+    'En desórdenes públicos suele ser clave ordenar el relato, revisar el parte y preparar la defensa técnica para el control de detención.',
+  ley_alcohol:
+    'En infracciones a la ley de alcoholes conviene revisar el procedimiento de fiscalización y el control de detención con estándar técnico.',
   maltrato:
-    'Maltrato a Carabineros tiene presunción de culpabilidad. Si el funcionario dice que hubo agresión, necesitas contradecir el parte YA.',
+    'En maltrato a funcionarios el relato policial pesa; conviene contradicción técnica y estrategia temprana con abogado.',
   barricadas:
-    'Ley de Seguridad del Estado. Si no entramos ahora a limpiar el relato policial, tu familiar duerme en Santiago 1.',
+    'En figuras de seguridad del Estado la complejidad procesal es alta; la defensa debe alinearse rápido con los antecedentes del expediente.',
+  vif:
+    'En violencia intrafamiliar las medidas y la valoración de los hechos dependen del tribunal y la Fiscalía; la defensa debe prepararse con el expediente completo.',
+  hurto:
+    'En hurto o robo simple la calificación y las eventuales medidas cautelares las define el tribunal según los antecedentes.',
+  amenazas:
+    'En amenazas la gravedad y el contexto fáctico marcan el curso del proceso; conviene asesoría temprana para el control de detención o audiencias.',
+  microtrafico:
+    'En tenencia o microtráfico la estrategia defensiva depende del relato fiscal, pericias y circunstancias del caso.',
+  conduccion_ebriedad:
+    'En conducción bajo efectos o estado de ebriedad pueden concurrir infracciones penales y administrativas; conviene revisar el procedimiento y el control.',
   grave:
-    'Con antecedentes previos, la Fiscalía va a pedir internación inmediata. Tenemos 4 horas para construir la estrategia de libertad.',
+    'En delitos graves las medidas cautelares dependen del juez y la Fiscalía; cuanto antes exista asesoría, mejor se puede preparar la actuación.',
 };
 
-// Terminal forense - líneas animadas
+function terminalLineClass(line: string): string {
+  const t = line.trim();
+  if (!t) return 'urgencia-mono-dim';
+  if (t.includes('Indicador resumido')) return 'urgencia-mono-warn font-medium';
+  if (t.includes('Complejidad aparente')) return 'urgencia-mono-accent font-medium';
+  if (t.includes('RECOMENDACIÓN')) return 'text-rose-200/95 font-medium';
+  if (t.includes('MODO SIMULACIÓN')) return 'text-slate-300';
+  return 'urgencia-mono-dim';
+}
+
 const TerminalLines: React.FC<{
+  sessionKey: number;
   nombre: string;
   situacion: Situacion;
   antecedentes: boolean;
@@ -101,44 +190,54 @@ const TerminalLines: React.FC<{
   gravedadLesiones: number;
   riesgoPorcentaje: number;
   isComplejo: boolean;
-}> = ({ nombre, situacion, antecedentes, horasDetenido, gravedadLesiones, riesgoPorcentaje, isComplejo }) => {
+  onTypingComplete: () => void;
+}> = ({
+  sessionKey,
+  nombre,
+  situacion,
+  antecedentes,
+  horasDetenido,
+  gravedadLesiones,
+  riesgoPorcentaje,
+  isComplejo,
+  onTypingComplete,
+}) => {
   const [visibleLines, setVisibleLines] = useState<string[]>([]);
   const [currentText, setCurrentText] = useState('');
   const [lineIndex, setLineIndex] = useState(0);
   const [charIndex, setCharIndex] = useState(0);
+  const typingDoneRef = useRef(false);
+  const onCompleteRef = useRef(onTypingComplete);
+  onCompleteRef.current = onTypingComplete;
 
-  const situacionLabel =
-    situacion === 'desordenes'
-      ? 'DESÓRDENES PÚBLICOS'
-      : situacion === 'maltrato'
-        ? 'MALTRATO A CARABINEROS'
-        : situacion === 'barricadas'
-          ? 'LEY SEGURIDAD DEL ESTADO'
-          : situacion === 'grave'
-            ? 'DELITO GRAVE'
-            : 'NO ESPECIFICADO';
+  const situacionLabel = situacion ? SITUACION_TERMINAL_LABEL[situacion] : 'NO ESPECIFICADO';
+
+  useEffect(() => {
+    typingDoneRef.current = false;
+    setVisibleLines([]);
+    setCurrentText('');
+    setLineIndex(0);
+    setCharIndex(0);
+  }, [sessionKey]);
 
   const lines = useMemo(
     () => [
-      `> INICIANDO ANÁLISIS PENAL...`,
-      `> CONSULTANDO BASE DE DATOS: FISCALÍA METROPOLITANA CENTRO NORTE`,
-      `> DETECTOR DE ANTECEDENTES: [${antecedentes ? '●●●●●○○○○○' : '○○○○○○○○○○'}] PROCESANDO...`,
-      `> TITULAR: ${(nombre || 'N/A').toUpperCase()}`,
+      `> MODO SIMULACIÓN ORIENTATIVA (no vinculante ni predicción judicial)`,
+      `> Procesando datos del formulario...`,
+      `> Antecedentes declarados: ${antecedentes ? 'SÍ (según formulario)' : 'NO (según formulario)'}`,
+      `> TITULAR / CONTACTO: ${(nombre || 'N/A').toUpperCase()}`,
       `> SITUACIÓN: ${situacionLabel}`,
-      `> TIEMPO EN RETÉN: ${horasDetenido} HORAS`,
-      gravedadLesiones >= 3
-        ? `> ⚠️ ALERTA: LESIONES O DAÑOS REPORTADOS (NIVEL ${gravedadLesiones}/5)`
-        : `> NIVEL LESIONES: ${gravedadLesiones}/5`,
+      `> TIEMPO EN RETÉN (declarado): ${horasDetenido} HORAS`,
+      `> Lesiones o daños (escala declarada): ${gravedadLesiones}/5${gravedadLesiones >= 3 ? ' — conviene revisarlo con defensa' : ''}`,
       ``,
-      `> ⚠️ ALERTA: Caso clasificado como ${isComplejo ? 'ALTA' : 'MEDIA'} COMPLEJIDAD`,
+      `> Complejidad aparente según formulario: ${isComplejo ? 'ALTA' : 'MEDIA'}`,
       ``,
-      `> RIESGO DE PRISIÓN PREVENTIVA: ${riesgoPorcentaje}%`,
-      `> TIEMPO ESTIMADO SIN DEFENSA: ${horasDetenido + 12}-${horasDetenido + 36} HORAS EN RETÉN`,
-      `> PROBABILIDAD DE FORMALIZACIÓN: ${Math.min(95, riesgoPorcentaje + 4)}%`,
+      `> Indicador resumido (solo orientación): ${riesgoPorcentaje}%`,
+      `> Recuerde: medidas cautelares y formalización las define el tribunal/Fiscalía.`,
       ``,
-      `> RECOMENDACIÓN: ACTIVAR DEFENSA LEGAL INMEDIATO`,
+      `> RECOMENDACIÓN: ACTIVAR CONTACTO CON DEFENSA`,
     ],
-    [nombre, situacion, situacionLabel, antecedentes, horasDetenido, gravedadLesiones, riesgoPorcentaje, isComplejo]
+    [nombre, situacionLabel, antecedentes, horasDetenido, gravedadLesiones, riesgoPorcentaje, isComplejo]
   );
 
   useEffect(() => {
@@ -150,37 +249,38 @@ const TerminalLines: React.FC<{
         setCharIndex((prev) => prev + 1);
       }, 12);
       return () => clearTimeout(t);
-    } else {
-      const t = setTimeout(() => {
-        setVisibleLines((prev) => [...prev, line]);
-        setCurrentText('');
-        setCharIndex(0);
-        setLineIndex((prev) => prev + 1);
-      }, 150);
-      return () => clearTimeout(t);
     }
+    const t = setTimeout(() => {
+      setVisibleLines((prev) => [...prev, line]);
+      setCurrentText('');
+      setCharIndex(0);
+      setLineIndex((prev) => prev + 1);
+    }, 150);
+    return () => clearTimeout(t);
   }, [charIndex, lineIndex, lines]);
+
+  useEffect(() => {
+    if (lines.length === 0) return;
+    if (lineIndex === lines.length && !typingDoneRef.current) {
+      typingDoneRef.current = true;
+      onCompleteRef.current();
+    }
+  }, [lineIndex, lines.length]);
 
   return (
     <div className="space-y-1.5 min-h-[140px]">
       {visibleLines.map((line, i) => (
-        <p
-          key={i}
-          className="text-[11px] leading-relaxed font-mono"
-          style={{
-            color: line.includes('⚠️') ? 'rgb(252,165,165)' : line.includes('RIESGO') ? 'rgb(251,191,36)' : 'rgba(148,163,184,0.85)',
-          }}
-        >
+        <p key={`${sessionKey}-${i}`} className={`text-[11px] leading-relaxed font-mono tracking-tight ${terminalLineClass(line)}`}>
           {line}
         </p>
       ))}
       {lineIndex < lines.length && (
-        <p className="text-[11px] text-slate-300 leading-relaxed font-mono">
+        <p className="text-[11px] text-slate-300 leading-relaxed font-mono tracking-tight">
           {currentText}
           <motion.span
-            className="inline-block w-1.5 h-3 bg-rose-400 ml-0.5 align-middle"
-            animate={{ opacity: [1, 0] }}
-            transition={{ duration: 0.5, repeat: Infinity }}
+            className="inline-block w-[2px] h-3.5 rounded-[1px] bg-rose-400 ml-1 align-middle"
+            animate={{ opacity: [1, 0.35] }}
+            transition={{ duration: 0.55, repeat: Infinity, ease: 'easeInOut' }}
           />
         </p>
       )}
@@ -201,19 +301,21 @@ export default function UrgenciaPage() {
   const [whatsapp, setWhatsapp] = useState('');
   const [rutDetenido, setRutDetenido] = useState('');
   const [isTerminalComplete, setIsTerminalComplete] = useState(false);
-  const [countdownActive, setCountdownActive] = useState(false);
-  const [countdownSeconds, setCountdownSeconds] = useState(COUNTDOWN_SECONDS);
   const [isPaying, setIsPaying] = useState(false);
   const [error, setError] = useState('');
   const [leadSaved, setLeadSaved] = useState(false);
-  const [priceIncreased, setPriceIncreased] = useState(false);
   const [stepCompleted, setStepCompleted] = useState(false);
   const [paymentInitiated, setPaymentInitiated] = useState(false);
+  const [terminalSessionId, setTerminalSessionId] = useState(0);
   const nombreInputRef = useRef<HTMLInputElement>(null);
   const emailInputRef = useRef<HTMLInputElement>(null);
 
   const scrollToTop = useCallback(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
+
+  const handleTerminalTypingComplete = useCallback(() => {
+    setIsTerminalComplete(true);
   }, []);
 
   const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -222,21 +324,32 @@ export default function UrgenciaPage() {
     return (cleaned.length === 11 && cleaned.startsWith('569')) || (cleaned.length === 9 && cleaned.startsWith('9'));
   }, [whatsapp]);
 
-  // Geoloc: siempre mostrar "última detención" (simulado)
-  const ultimaDetencionMinutos = useMemo(() => Math.floor(Math.random() * 30) + 5, []);
-  const abogadoKm = useMemo(() => (Math.random() * 5 + 2).toFixed(1), []);
-  const isComplejo = situacion === 'grave' || situacion === 'barricadas' || tieneAntecedentes === true || gravedadLesiones >= 4;
-  const precio = isComplejo ? PRECIO_COMPLEJO : PRECIO_SIMPLE;
-  const servicioNombre = isComplejo ? 'Blindaje Penal Estratégico' : 'Intervención de Urgencia';
-  const servicioDesc = isComplejo
-    ? 'Incluye: Gestión de Medidas Cautelares, abogado especialista y Defensa 24/7.'
-    : 'Incluye: Defensa en Comisaría y Representación en Control de Detención.';
+  // Geoloc: solo ayuda a sugerir comisaría; sin métricas simuladas
+  const isComplejo = useMemo(() => {
+    if (!situacion) return false;
+    const baseCompleja = SITUACION_BASE_COMPLEJA.has(situacion);
+    const agravante = tieneAntecedentes === true || gravedadLesiones >= 4;
+    return baseCompleja || agravante;
+  }, [situacion, tieneAntecedentes, gravedadLesiones]);
 
-  // Riesgo dinámico
+  const precio = isComplejo ? PRECIO_COMPLEJO : PRECIO_SIMPLE;
+  const precioFmt = useMemo(() => new Intl.NumberFormat('es-CL').format(precio), [precio]);
+  const servicioNombre = isComplejo ? 'Defensa penal prioritaria (caso complejo)' : 'Intervención de urgencia penal';
+  const servicioDesc = isComplejo
+    ? 'Incluye coordinación prioritaria, abogado especialista y seguimiento según el encargo acordado.'
+    : 'Incluye orientación en detención y representación en control de detención según el encargo acordado.';
+
+  // Riesgo dinámico (orientación; no predicción judicial)
   const riesgoPorcentaje = useMemo(() => {
-    let base = 25;
-    if (tieneAntecedentes) base += 35;
-    if (situacion === 'grave' || situacion === 'barricadas') base += 25;
+    let base = 22;
+    if (tieneAntecedentes) base += 34;
+    if (situacion) {
+      if (['grave', 'barricadas', 'maltrato', 'microtrafico'].includes(situacion)) base += 26;
+      else if (situacion === 'vif') base += 22;
+      else if (situacion === 'amenazas' || situacion === 'hurto') base += 14;
+      else if (situacion === 'conduccion_ebriedad' || situacion === 'ley_alcohol') base += 10;
+      else if (situacion === 'desordenes') base += 6;
+    }
     if (gravedadLesiones >= 4) base += 20;
     if (horasDetenido >= 6) base += 10;
     return Math.min(95, base);
@@ -245,33 +358,81 @@ export default function UrgenciaPage() {
   const painMessage = useMemo(() => {
     const base = situacion ? PAIN_MESSAGES[situacion] : PAIN_MESSAGES.grave;
     if (horasDetenido >= 18) {
-      return `⏰ CRÍTICO: Ya llevas ${horasDetenido} horas. La formalización puede ser en cualquier momento. ${base}`;
+      return `Llevas ${horasDetenido} horas en retén (según lo indicado). En tiempos prolongados suele ser más urgente contar con asesoría. ${base}`;
     }
     if (horasDetenido >= 12) {
-      return `⚠️ ALERTA: ${horasDetenido} horas detenido. ${base}`;
+      return `Con ${horasDetenido} horas detenido (según lo indicado), conviene avanzar sin demora. ${base}`;
     }
     return base;
   }, [situacion, horasDetenido]);
 
-  // Geolocalización simulada
+  const pushUrgenciaPenal = useCallback(
+    async (overrides: Partial<UrgenciaPenalMergeRow> = {}) => {
+      if (!emailValid || !email.trim()) return;
+      await mergeUrgenciaPenalRow({
+        email: email.trim(),
+        nombre: nombre.trim() || null,
+        telefono: whatsapp.replace(/\D/g, '') || null,
+        rut_detenido: rutDetenido.trim() || null,
+        situacion,
+        unidad_policial: unidadPolicial.trim() || null,
+        geoloc_status: geolocStatus,
+        tiene_antecedentes: tieneAntecedentes,
+        gravedad_lesiones: gravedadLesiones,
+        horas_detenido: horasDetenido,
+        is_complejo: isComplejo,
+        precio_clp: precio,
+        lead_score: isComplejo ? 'HOT_URGENCIA_COMPLEJA' : 'WARM_URGENCIA_SIMPLE',
+        paso: step,
+        riesgo_porcentaje: riesgoPorcentaje,
+        user_agent: typeof navigator !== 'undefined' ? navigator.userAgent : null,
+        mercado_pago_iniciado: false,
+        ...overrides,
+      });
+    },
+    [
+      email,
+      emailValid,
+      nombre,
+      whatsapp,
+      rutDetenido,
+      situacion,
+      unidadPolicial,
+      geolocStatus,
+      tieneAntecedentes,
+      gravedadLesiones,
+      horasDetenido,
+      isComplejo,
+      precio,
+      step,
+      riesgoPorcentaje,
+    ]
+  );
+
+  // Geolocalización: sugerir comisaría Carabineros del sector oriente más cercana (Haversine)
   useEffect(() => {
     const t = setTimeout(() => {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          () => {
-            setGeolocStatus('detected');
-            if (!unidadPolicial) setUnidadPolicial('Comisaría 3ª de Santiago Centro');
-          },
-          () => {
-            setGeolocStatus('manual');
-            if (!unidadPolicial) setUnidadPolicial('');
-          },
-          { timeout: 3000 }
-        );
-      } else {
+      if (!navigator.geolocation) {
         setGeolocStatus('manual');
+        return;
       }
-    }, 800);
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const { latitude, longitude } = pos.coords;
+          const near = getNearestComisariaOriente(latitude, longitude);
+          if (near) {
+            setGeolocStatus('detected');
+            setUnidadPolicial((prev) => (prev.trim() ? prev : near.label));
+          } else {
+            setGeolocStatus('manual');
+          }
+        },
+        () => {
+          setGeolocStatus('manual');
+        },
+        { timeout: 10000, maximumAge: 120000, enableHighAccuracy: true }
+      );
+    }, 600);
     return () => clearTimeout(t);
   }, []);
 
@@ -319,6 +480,7 @@ export default function UrgenciaPage() {
           },
         });
         console.log('✅ Lead urgencia actualizado');
+        void pushUrgenciaPenal();
       } else {
         const { error: insertErr } = await supabase.from('leads_quiz').insert([
           {
@@ -341,6 +503,7 @@ export default function UrgenciaPage() {
             },
           });
           console.log('✅ Lead urgencia creado');
+          void pushUrgenciaPenal();
         } else {
           console.warn('❌ Error guardando lead urgencia:', insertErr);
         }
@@ -348,7 +511,46 @@ export default function UrgenciaPage() {
     } catch (e) {
       console.warn('Lead save:', e);
     }
-  }, [email, emailValid, nombre, whatsapp, situacion, tieneAntecedentes, gravedadLesiones, horasDetenido, unidadPolicial, rutDetenido, isComplejo, leadSaved]);
+  }, [
+    email,
+    emailValid,
+    nombre,
+    whatsapp,
+    situacion,
+    tieneAntecedentes,
+    gravedadLesiones,
+    horasDetenido,
+    unidadPolicial,
+    rutDetenido,
+    isComplejo,
+    leadSaved,
+    pushUrgenciaPenal,
+  ]);
+
+  useEffect(() => {
+    if (step === 'captura' || !emailValid || !email.trim()) return;
+    const t = window.setTimeout(() => {
+      void pushUrgenciaPenal();
+    }, 1400);
+    return () => clearTimeout(t);
+  }, [
+    step,
+    emailValid,
+    email,
+    nombre,
+    whatsapp,
+    rutDetenido,
+    situacion,
+    unidadPolicial,
+    geolocStatus,
+    tieneAntecedentes,
+    gravedadLesiones,
+    horasDetenido,
+    isComplejo,
+    precio,
+    riesgoPorcentaje,
+    pushUrgenciaPenal,
+  ]);
 
   useEffect(() => {
     if (emailValid && email) saveLead();
@@ -367,6 +569,8 @@ export default function UrgenciaPage() {
     setIsPaying(true);
     triggerHaptic('heavy');
     try {
+      await pushUrgenciaPenal({ paso: 'terminal', mercado_pago_iniciado: true });
+
       const rutLimpio = rutDetenido.replace(/\D/g, '');
       const externalRef = `urgencia-${rutLimpio || 'sin-rut'}-${Date.now()}`;
 
@@ -430,8 +634,14 @@ export default function UrgenciaPage() {
 
       localStorage.setItem('paymentData', JSON.stringify(paymentDataForStorage));
 
-      if (result.init_point) {
-        window.location.assign(result.init_point);
+      const mp = result as {
+        init_point?: string;
+        sandbox_init_point?: string;
+      };
+      const checkoutUrl =
+        mp.init_point || (import.meta.env.DEV ? mp.sandbox_init_point : undefined);
+      if (checkoutUrl) {
+        window.location.assign(checkoutUrl);
       } else {
         throw new Error('No se recibió URL de pago');
       }
@@ -460,42 +670,20 @@ export default function UrgenciaPage() {
     unidadPolicial,
     situacion,
     tieneAntecedentes,
+    pushUrgenciaPenal,
   ]);
 
-  // Detectar fin del terminal
+  useEffect(() => {
+    setIsTerminalComplete(false);
+  }, [step, terminalSessionId]);
+
   useEffect(() => {
     if (step !== 'terminal') return;
-    const t = setTimeout(() => setIsTerminalComplete(true), 5500);
+    const t = window.setTimeout(() => {
+      setIsTerminalComplete(true);
+    }, TERMINAL_COMPLETE_FALLBACK_MS);
     return () => clearTimeout(t);
-  }, [step]);
-
-  // Countdown que redirige a pago
-  useEffect(() => {
-    if (!isTerminalComplete) return;
-    const t = setTimeout(() => setCountdownActive(true), 800);
-    return () => clearTimeout(t);
-  }, [isTerminalComplete]);
-
-  useEffect(() => {
-    if (!countdownActive) return;
-    const id = setInterval(() => {
-      setCountdownSeconds((s) => {
-        if (s <= 1) {
-          clearInterval(id);
-          return 0;
-        }
-        return s - 1;
-      });
-    }, 1000);
-    return () => clearInterval(id);
-  }, [countdownActive]);
-
-  // Countdown: al llegar a 0, mostrar "precio aumentó" (NO auto-redirigir)
-  useEffect(() => {
-    if (countdownSeconds === 0 && countdownActive && !priceIncreased) {
-      setPriceIncreased(true);
-    }
-  }, [countdownSeconds, countdownActive, priceIncreased]);
+  }, [step, terminalSessionId]);
 
   const canAdvanceCaptura = nombre.trim().length >= 2 && situacion && (unidadPolicial.trim().length >= 3 || geolocStatus === 'detected');
   const canAdvanceCualificacion =
@@ -523,6 +711,7 @@ export default function UrgenciaPage() {
     triggerHaptic('medium');
     setStepCompleted(true);
     setTimeout(() => {
+      setTerminalSessionId((k) => k + 1);
       setStep('terminal');
       scrollToTop();
       setStepCompleted(false);
@@ -547,18 +736,23 @@ export default function UrgenciaPage() {
   const whatsappButtonText = useMemo(() => {
     if (step === 'captura') return 'Hablar ahora';
     if (step === 'cualificacion') return 'Consultar mi caso';
-    return 'Hablar con Director YA';
+    return 'Hablar con el equipo';
   }, [step]);
 
   return (
     <>
       <SEO
-        title="Urgencia Penal - Defensa Inmediata | Punto Legal"
-        description="Defensa legal inmediata en situaciones de detención. Intervención en comisaría, abogado especialista y representación en control de detención."
+        title={URGENCIA_SEO_TITLE}
+        description={URGENCIA_SEO_DESCRIPTION}
+        keywords={URGENCIA_SEO_KEYWORDS}
+        url={URGENCIA_CANONICAL_URL}
+        additionalJsonLd={[buildUrgenciaFaqJsonLd()]}
       />
-      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-black to-slate-900 text-white font-sans antialiased pb-safe-bottom">
+      <UrgenciaPenalFocusLayout
+        headerAriaLabel="Punto Legal Chile — Urgencia penal"
+        headerSubtitle="Urgencia penal"
+      >
         <style>{`
-          footer, .footer, [data-testid="footer"] { display: none !important; }
           input, select, textarea { font-size: 16px !important; }
           @supports (padding: max(0px)) {
             .pb-safe-bottom { padding-bottom: max(1.5rem, env(safe-area-inset-bottom)); }
@@ -566,46 +760,7 @@ export default function UrgenciaPage() {
           }
         `}</style>
 
-        {/* Header Escudo Negro */}
-        <header className="sticky top-0 z-50 bg-black/95 backdrop-blur border-b border-white/10">
-          <div className="max-w-lg mx-auto px-4 py-4 flex justify-center">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center border border-white/20">
-                <Shield className="w-4 h-4 text-white" />
-              </div>
-              <span className="text-sm font-semibold tracking-tight text-white">Punto Legal</span>
-            </div>
-          </div>
-        </header>
-
-        {/* Progreso visual (3 dots) */}
-        <div className="max-w-lg mx-auto px-4 py-3">
-          <div className="flex items-center justify-center gap-3">
-            {(['captura', 'cualificacion', 'terminal'] as const).map((s, i) => {
-              const stepIndex = ['captura', 'cualificacion', 'terminal'].indexOf(step);
-              const currentIndex = ['captura', 'cualificacion', 'terminal'].indexOf(s);
-              const isActive = step === s;
-              const isCompleted = currentIndex < stepIndex;
-              return (
-                <motion.div
-                  key={s}
-                  className={`h-2 rounded-full transition-all ${
-                    isActive
-                      ? 'w-10 bg-white shadow-[0_0_12px_rgba(255,255,255,0.5)]'
-                      : isCompleted
-                        ? 'w-2 bg-emerald-500/90'
-                        : 'w-2 bg-white/50 ring-1 ring-white/20'
-                  }`}
-                  initial={{ opacity: 0, scale: 0.5 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: i * 0.1 }}
-                />
-              );
-            })}
-          </div>
-        </div>
-
-        <main className="max-w-lg mx-auto px-4 py-6 pb-24">
+        <main className="relative z-10 max-w-lg mx-auto px-4 sm:px-5 py-6 pb-28 pb-safe-bottom">
           <AnimatePresence mode="wait">
             {/* ══ PANTALLA 1: CAPTURA EMOCIONAL ══ */}
             {step === 'captura' && (
@@ -615,34 +770,43 @@ export default function UrgenciaPage() {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-                className="space-y-6"
+                className="space-y-7"
               >
-                <h1 className="text-2xl font-bold text-white">¿Tu familiar está detenido?</h1>
-                <p className="text-slate-400 text-sm">
-                  Activa la defensa en <span className="text-white font-bold">menos de 60 segundos</span>. Un abogado se dirige a la comisaría ahora.
-                </p>
+                <div className="space-y-2">
+                  <p className="urgencia-kicker-pill">
+                    <span className="relative flex h-1.5 w-1.5 shrink-0">
+                      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[hsl(var(--la-accent-from))] opacity-40" />
+                      <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[hsl(var(--la-accent-to))] ring-1 ring-white/15" />
+                    </span>
+                    Punto Legal Chile · Urgencia penal
+                  </p>
+                  <h1 className="font-display text-[1.65rem] sm:text-[1.85rem] font-bold tracking-[-0.03em] text-white leading-[1.15]">
+                    ¿Tu familiar está detenido?
+                  </h1>
+                  <p className="text-slate-400 text-[0.9375rem] leading-relaxed">
+                    Coordinación prioritaria con abogado penal para{' '}
+                    <strong className="text-slate-200 font-medium">detención y control de detención</strong> en la Región
+                    Metropolitana, con foco en el <strong className="text-slate-200 font-medium">sector oriente</strong> (Las
+                    Condes, Providencia, Ñuñoa, Vitacura, Lo Barnechea, La Florida y comunas cercanas). En pocos pasos dejas tus
+                    datos y la unidad; la presencia en comisaría o el formato de atención dependen del caso y de la disponibilidad
+                    del equipo.
+                  </p>
+                </div>
 
-                {/* Geolocalización - skeleton cuando detect */}
-                <div
-                  className="rounded-xl p-4"
-                  style={{
-                    background: 'rgba(255,255,255,0.04)',
-                    border: '1px solid rgba(255,255,255,0.08)',
-                    boxShadow: '0 4px 24px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.06)',
-                    backdropFilter: 'blur(20px)',
-                  }}
-                >
-                  <div className="flex items-center gap-2 mb-2">
-                    <MapPin className="w-4 h-4 text-slate-400" />
-                    <span className="text-xs text-slate-400 uppercase tracking-wider">
+                <div className="glass-ios-panel-dark p-4 sm:p-5 space-y-3">
+                  <div className="flex items-center gap-2">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-white/[0.06] border border-white/[0.08]">
+                      <MapPin className="w-4 h-4 text-rose-300/90" />
+                    </div>
+                    <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
                       {geolocStatus === 'detecting' ? (
                         <span className="inline-flex items-center gap-2">
                           <span className="w-24 h-3 bg-white/10 rounded animate-pulse" />
                         </span>
                       ) : geolocStatus === 'detected' ? (
-                        'Comisaría más cercana'
+                        'Ubicación aproximada'
                       ) : (
-                        'Unidad policial'
+                        'Unidad policial o comisaría'
                       )}
                     </span>
                   </div>
@@ -650,40 +814,45 @@ export default function UrgenciaPage() {
                     <motion.p
                       initial={{ opacity: 0, y: -4 }}
                       animate={{ opacity: 1, y: 0 }}
-                      className="text-xs text-emerald-400/90 mb-2"
+                      className="text-xs text-slate-300 mb-3 leading-relaxed"
                     >
-                      📍 Última detención registrada: Hace {ultimaDetencionMinutos} min · Abogado más cercano: {abogadoKm} km
-                      <span className="block mt-1 text-rose-300 font-medium">
-                        🚨 Tiempo de respuesta promedio: 8 minutos
-                      </span>
+                      {geolocStatus === 'detected'
+                        ? 'Según tu ubicación aproximada, sugerimos la comisaría de Carabineros del sector oriente más cercana. Comprueba que sea la unidad donde podría estar la persona; si no, corrígelo.'
+                        : 'Indica la unidad correcta (ej. 17.ª Las Condes, 19.ª Providencia, 16.ª Ñuñoa). Atendemos urgencias en el oriente y en toda la RM; el encargo se ajusta a tus antecedentes.'}
                     </motion.p>
                   )}
                   <input
                     type="text"
-                    placeholder="Ej: 1ª Comisaría de Santiago, 17ª Las Condes"
+                    placeholder="Ej: 17.ª Comisaría Las Condes, 19.ª Providencia"
                     value={unidadPolicial}
                     onChange={(e) => setUnidadPolicial(e.target.value)}
-                    className="w-full py-3 px-4 rounded-lg bg-black/40 border border-white/10 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-white/40 text-sm"
+                    className="urgencia-input"
+                    autoComplete="address-line1"
                   />
                 </div>
 
                 {/* Nombre */}
-                <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">Nombre del detenido o quien activa</label>
+                <div className="glass-ios-panel-dark p-4 sm:p-5 space-y-3">
+                  <label className="block text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">
+                    Nombre del detenido o quien activa
+                  </label>
                   <input
                     ref={nombreInputRef}
                     type="text"
                     placeholder="Solo nombre"
                     value={nombre}
                     onChange={(e) => setNombre(e.target.value)}
-                    className="w-full py-4 px-4 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-white/40"
+                    className="urgencia-input"
+                    autoComplete="name"
                   />
                 </div>
 
                 {/* Motivo - Selector visual */}
-                <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-3">Motivo de detención</label>
-                  <div className="grid grid-cols-2 gap-2">
+                <div className="space-y-3">
+                  <label className="block text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">
+                    Motivo de detención
+                  </label>
+                  <div className="urgencia-situacion-grid" role="group" aria-label="Motivos de detención">
                     {SITUACIONES.map((s) => (
                       <motion.button
                         key={s.id}
@@ -693,37 +862,64 @@ export default function UrgenciaPage() {
                           setSituacion(s.id);
                         }}
                         whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                        className={`py-4 px-3 rounded-xl text-left font-medium transition-all border flex items-center gap-2 ${
-                          situacion === s.id
-                            ? 'bg-white/15 border-white/40 text-white'
-                            : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/[0.08]'
-                        }`}
+                        whileTap={{ scale: 0.97 }}
+                        className={`urgencia-chip urgencia-chip--watch ${situacion === s.id ? 'urgencia-chip--active' : ''}`}
                       >
-                        <span className="text-lg">{s.icon}</span>
-                        <span className="text-sm">{s.label}</span>
+                        <span className="urgencia-chip__icon">
+                          <s.Icon className="w-[1.1rem] h-[1.1rem] sm:w-[1.15rem] sm:h-[1.15rem]" strokeWidth={2} />
+                        </span>
+                        <span className="urgencia-chip-watch-label">{s.label}</span>
                       </motion.button>
                     ))}
                   </div>
                 </div>
 
-                <button
-                  type="button"
-                  onClick={handleCapturaNext}
-                  disabled={!canAdvanceCaptura}
-                  className={`w-full py-5 rounded-xl font-bold flex items-center justify-center gap-2 text-lg transition-all ${
-                    canAdvanceCaptura
-                      ? 'bg-gradient-to-r from-white to-slate-100 text-black hover:from-slate-100 hover:to-white active:scale-[0.98] shadow-[0_4px_20px_rgba(255,255,255,0.2)]'
-                      : 'bg-white/20 text-white/40 cursor-not-allowed'
-                  }`}
-                >
+                <div className="space-y-2">
                   {!canAdvanceCaptura && (
-                    <span className="text-xs mr-2">
-                      {!nombre.trim() ? '(Falta nombre)' : !situacion ? '(Falta motivo)' : '(Falta comisaría)'}
-                    </span>
+                    <p
+                      className="text-center text-[11px] font-medium leading-snug text-slate-400 px-1"
+                      role="status"
+                    >
+                      {!nombre.trim()
+                        ? 'Falta el nombre de quien activa o del detenido.'
+                        : !situacion
+                          ? 'Elige el motivo de la detención.'
+                          : 'Indica la comisaría o unidad policial.'}
+                    </p>
                   )}
-                  ACTIVAR AHORA · ABOGADO EN CAMINO <ChevronRight className="w-5 h-5" />
-                </button>
+                  <button
+                    type="button"
+                    onClick={handleCapturaNext}
+                    disabled={!canAdvanceCaptura}
+                    className="urgencia-primary-cta flex items-center justify-center gap-2.5"
+                  >
+                    <span className="flex min-w-0 flex-1 flex-col items-center justify-center gap-0.5">
+                      <span className="urgencia-primary-cta__label font-bold leading-tight">
+                        <span className="sm:hidden">Continuar</span>
+                        <span className="hidden sm:inline">Continuar — Coordinar defensa</span>
+                      </span>
+                      <span className="urgencia-primary-cta__sub sm:hidden">Coordinar defensa</span>
+                    </span>
+                    <ChevronRight className="h-5 w-5 shrink-0 opacity-90" aria-hidden />
+                  </button>
+                </div>
+
+                <section className="urgencia-faq pt-2 space-y-3" aria-labelledby="urgencia-faq-heading">
+                  <h2 id="urgencia-faq-heading" className="font-display text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 px-1">
+                    Preguntas frecuentes
+                  </h2>
+                  <div className="space-y-2">
+                    {URGENCIA_FAQ_ITEMS.map((item, idx) => (
+                      <details key={`urgencia-faq-${idx}`} className="group">
+                        <summary className="cursor-pointer text-slate-100 pr-10 relative">
+                          {item.question}
+                          <ChevronRight className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 transition-transform duration-200 group-open:rotate-90" />
+                        </summary>
+                        <p>{item.answer}</p>
+                      </details>
+                    ))}
+                  </div>
+                </section>
               </motion.div>
             )}
 
@@ -735,111 +931,90 @@ export default function UrgenciaPage() {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-                className="space-y-6"
+                className="space-y-7"
               >
-                <button type="button" onClick={() => setStep('captura')} className="text-slate-400 text-sm hover:text-white">
-                  ← Volver
+                <button
+                  type="button"
+                  onClick={() => setStep('captura')}
+                  className="urgencia-glass-back"
+                >
+                  <ArrowLeft className="w-4 h-4 opacity-80" />
+                  Volver
                 </button>
-                <h1 className="text-xl font-bold text-white">Necesitamos 3 datos más</h1>
-                <p className="text-slate-400 text-sm">
-                  Para asignar el abogado correcto y calcular el riesgo de prisión preventiva.
-                </p>
+                <div className="space-y-2">
+                  <h1 className="font-display text-xl sm:text-[1.35rem] font-bold tracking-[-0.03em] text-white leading-tight">
+                    Necesitamos 3 datos más
+                  </h1>
+                  <p className="text-slate-400 text-[0.9375rem] leading-relaxed">
+                    Para orientar la asignación y mostrarte un indicador resumido (simulación, no predicción judicial).
+                  </p>
+                </div>
 
                 {/* Antecedentes */}
-                <div
-                  style={{
-                    background: 'rgba(255,255,255,0.04)',
-                    border: '1px solid rgba(255,255,255,0.08)',
-                    boxShadow: '0 4px 24px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.06)',
-                    backdropFilter: 'blur(20px)',
-                  }}
-                  className="rounded-xl p-4"
-                >
-                  <label className="block text-sm font-medium text-slate-300 mb-2">¿Antecedentes previos?</label>
-                  <div className="flex gap-3">
+                <div className="glass-ios-panel-dark p-4 sm:p-5 space-y-3">
+                  <label className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">
+                    ¿Antecedentes previos?
+                  </label>
+                  <div className="flex gap-2.5">
                     <motion.button
                       type="button"
                       onClick={() => { triggerHaptic('light'); setTieneAntecedentes(false); }}
-                      whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
-                      className={`flex-1 py-4 px-4 rounded-xl font-medium border flex items-center justify-center gap-2 transition-all ${
-                        tieneAntecedentes === false
-                          ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-300 shadow-[0_0_20px_rgba(16,185,129,0.3)]'
-                          : 'bg-white/5 border-white/10 text-slate-400'
+                      className={`urgencia-seg-btn flex-1 min-h-[3.25rem] ${
+                        tieneAntecedentes === false ? 'urgencia-seg-btn--on' : 'urgencia-seg-btn--idle'
                       }`}
                     >
-                      <span>✓</span> No
+                      <span className="urgencia-seg-lead mr-1.5 inline">✓</span> No
                     </motion.button>
                     <motion.button
                       type="button"
                       onClick={() => { triggerHaptic('light'); setTieneAntecedentes(true); }}
-                      whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
-                      className={`flex-1 py-4 px-4 rounded-xl font-medium border flex items-center justify-center gap-2 transition-all ${
-                        tieneAntecedentes === true
-                          ? 'bg-rose-500/20 border-rose-500/40 text-rose-300 shadow-[0_0_20px_rgba(239,68,68,0.3)]'
-                          : 'bg-white/5 border-white/10 text-slate-400'
+                      className={`urgencia-seg-btn flex-1 min-h-[3.25rem] ${
+                        tieneAntecedentes === true ? 'urgencia-seg-btn--on-warn' : 'urgencia-seg-btn--idle'
                       }`}
                     >
-                      <AlertTriangle className="w-4 h-4" /> Sí
+                      <AlertTriangle className="w-4 h-4 inline mr-1.5 align-text-bottom opacity-90" /> Sí
                     </motion.button>
                   </div>
                 </div>
 
                 {/* Lesiones / Daños */}
-                <div
-                  style={{
-                    background: 'rgba(255,255,255,0.04)',
-                    border: '1px solid rgba(255,255,255,0.08)',
-                    boxShadow: '0 4px 24px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.06)',
-                    backdropFilter: 'blur(20px)',
-                  }}
-                  className="rounded-xl p-4"
-                >
-                  <label className="block text-sm font-medium text-slate-300 mb-2">
-                    ¿Lesiones o daños reportados? (1-5)
+                <div className="glass-ios-panel-dark p-4 sm:p-5 space-y-3">
+                  <label className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">
+                    Lesiones o daños reportados (1–5)
                   </label>
-                  <div className="flex gap-1">
+                  <div className="flex gap-1.5">
                     {[1, 2, 3, 4, 5].map((n) => (
                       <motion.button
                         key={n}
                         type="button"
                         onClick={() => { triggerHaptic('light'); setGravedadLesiones(n); }}
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                        className={`flex-1 py-4 px-4 rounded-lg text-sm font-medium border transition-all ${
-                          gravedadLesiones >= n
-                            ? 'bg-amber-500/20 border-amber-500/40 text-amber-300 shadow-[0_0_20px_rgba(245,158,11,0.3)]'
-                            : 'bg-white/5 border-white/10 text-slate-500'
+                        whileTap={{ scale: 0.96 }}
+                        className={`urgencia-seg-btn flex-1 min-h-[2.75rem] text-sm font-semibold ${
+                          gravedadLesiones >= n ? 'urgencia-seg-btn--on' : 'urgencia-seg-btn--idle'
                         }`}
                       >
                         {n}
                       </motion.button>
                     ))}
                   </div>
-                  <p className="text-[10px] text-slate-500 mt-1">1 = ninguno · 5 = graves</p>
+                  <p className="text-[11px] text-slate-500 leading-snug">1 = ninguno · 5 = graves</p>
                 </div>
 
                 {/* Horas detenido - selector de botones */}
-                <div
-                  style={{
-                    background: 'rgba(255,255,255,0.04)',
-                    border: '1px solid rgba(255,255,255,0.08)',
-                    boxShadow: '0 4px 24px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.06)',
-                    backdropFilter: 'blur(20px)',
-                  }}
-                  className="rounded-xl p-4"
-                >
-                  <label className="block text-sm font-medium text-slate-300 mb-3">
-                    ⏱️ ¿Cuánto tiempo lleva detenido?
+                <div className="glass-ios-panel-dark p-4 sm:p-5 space-y-3">
+                  <label className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">
+                    <Clock className="w-3.5 h-3.5 urgencia-input-icon" strokeWidth={2} />
+                    Tiempo en retén
                   </label>
-                  <div className="grid grid-cols-3 gap-2">
+                  <div className="grid grid-cols-2 gap-2.5">
                     {[
-                      { label: 'Menos de 6h', value: 3, icon: '🕐', warn: false },
-                      { label: '6-12 horas', value: 9, icon: '🕘', warn: false },
-                      { label: '12-18 horas', value: 15, icon: '🕐', warn: true },
-                      { label: '18-24 horas', value: 21, icon: '🕘', warn: true },
-                      { label: 'Más de 24h', value: 30, icon: '⚠️', warn: true },
+                      { label: 'Menos de 6h', value: 3, warn: false },
+                      { label: '6–12 h', value: 9, warn: false },
+                      { label: '12–18 h', value: 15, warn: true },
+                      { label: '18–24 h', value: 21, warn: true },
+                      { label: 'Más de 24 h', value: 30, warn: true },
                     ].map((option) => (
                       <motion.button
                         key={option.value}
@@ -848,18 +1023,17 @@ export default function UrgenciaPage() {
                           triggerHaptic(option.warn ? 'medium' : 'light');
                           setHorasDetenido(option.value);
                         }}
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                        className={`py-4 px-3 rounded-xl text-center font-medium transition-all border flex flex-col items-center gap-1 ${
+                        whileTap={{ scale: 0.985 }}
+                        className={`urgencia-seg-btn min-h-[4.25rem] flex flex-col items-center justify-center gap-1.5 px-2 text-center ${
                           horasDetenido === option.value
                             ? option.warn
-                              ? 'bg-rose-500/20 border-rose-500/40 text-rose-300 shadow-[0_0_20px_rgba(239,68,68,0.3)]'
-                              : 'bg-white/15 border-white/40 text-white shadow-[0_0_20px_rgba(255,255,255,0.2)]'
-                            : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/[0.08]'
-                        }`}
+                              ? 'urgencia-seg-btn--on-warn'
+                              : 'urgencia-seg-btn--on'
+                            : 'urgencia-seg-btn--idle'
+                        } ${option.value === 30 ? 'col-span-2 max-w-[14rem] mx-auto w-full' : ''}`}
                       >
-                        <span className="text-lg">{option.icon}</span>
-                        <span className="text-xs leading-tight">{option.label}</span>
+                        <Clock className="w-4 h-4 shrink-0" strokeWidth={2} />
+                        <span className="text-[11px] font-semibold leading-tight">{option.label}</span>
                       </motion.button>
                     ))}
                   </div>
@@ -867,22 +1041,23 @@ export default function UrgenciaPage() {
                     <motion.p
                       initial={{ opacity: 0, y: -4 }}
                       animate={{ opacity: 1, y: 0 }}
-                      className="text-[10px] text-rose-400 mt-3 font-medium"
+                      className="text-[10px] text-amber-200/90 mt-3 font-medium leading-relaxed"
                     >
-                      ⚠️ CRÍTICO: A las 12+ horas sin defensa, el riesgo de formalización sube 340%
+                      En detenciones prolongadas suele ser más urgente contar con asesoría temprana; el curso del proceso lo
+                      define el tribunal y la Fiscalía.
                     </motion.p>
                   )}
                 </div>
 
                 {/* RUT detenido - opcional con formateo automático */}
-                <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">
-                    RUT del detenido <span className="text-slate-500">(opcional)</span>
+                <div className="glass-ios-panel-dark p-4 sm:p-5 space-y-3">
+                  <label className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">
+                    RUT del detenido <span className="font-normal normal-case tracking-normal text-slate-600">(opcional)</span>
                   </label>
                   <input
                     type="text"
                     inputMode="numeric"
-                    placeholder="12.345.678-9 (o déjalo en blanco)"
+                    placeholder="12.345.678-9"
                     value={rutDetenido}
                     onChange={(e) => {
                       const raw = e.target.value;
@@ -892,55 +1067,48 @@ export default function UrgenciaPage() {
                       }
                     }}
                     maxLength={12}
-                    className="w-full py-3 px-4 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-white/40"
+                    className="urgencia-input"
+                    autoComplete="off"
                   />
                 </div>
 
-                {/* Email + WhatsApp - checks premium */}
-                <div className="space-y-3">
+                <p className="text-[11px] text-slate-500 leading-relaxed">
+                  Usaremos correo y WhatsApp solo para contactarte por esta urgencia y coordinar la atención, según nuestra{' '}
+                  <Link to="/privacy-policy" className="urgencia-inline-link">
+                    política de privacidad
+                  </Link>{' '}
+                  y la normativa aplicable.
+                </p>
+
+                <div className="glass-ios-panel-dark p-4 sm:p-5 space-y-4">
                   <div className="relative">
-                    <div className="flex items-center gap-2">
-                      <Mail className="w-4 h-4 text-slate-400 flex-none" />
+                    <label className="mb-2 block text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">
+                      Email
+                    </label>
+                    <div className="relative w-full">
+                      <Mail className="pointer-events-none absolute left-3.5 top-1/2 z-[1] h-4 w-4 -translate-y-1/2 urgencia-input-icon" />
                       <input
                         ref={emailInputRef}
                         type="email"
-                        placeholder="Email"
+                        placeholder="correo@ejemplo.cl"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        className={`flex-1 py-3 px-4 pr-12 rounded-xl bg-white/5 border text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-white/40 transition-colors ${
-                          email && emailValid ? 'border-emerald-500/40 focus:border-emerald-500/60' : 'border-white/10 focus:border-white/30'
-                        }`}
+                        className={`urgencia-input pl-11 pr-11 ${email && emailValid ? 'urgencia-input--valid' : ''}`}
+                        autoComplete="email"
                       />
                       {email && emailValid && (
-                        <motion.div
-                          initial={{ scale: 0, opacity: 0 }}
-                          animate={{ scale: 1, opacity: 1 }}
-                          transition={{ type: 'spring', stiffness: 400, damping: 20 }}
-                          className="absolute right-3 top-1/2 -translate-y-1/2"
-                        >
-                          <motion.div
-                            className="relative w-6 h-6 rounded-full bg-emerald-500 flex items-center justify-center"
-                            style={{
-                              boxShadow: '0 0 16px rgba(16,185,129,0.6), 0 0 8px rgba(16,185,129,0.4), inset 0 1px 0 rgba(255,255,255,0.3)',
-                            }}
-                            animate={{
-                              boxShadow: [
-                                '0 0 16px rgba(16,185,129,0.6), 0 0 8px rgba(16,185,129,0.4)',
-                                '0 0 20px rgba(16,185,129,0.8), 0 0 12px rgba(16,185,129,0.6)',
-                                '0 0 16px rgba(16,185,129,0.6), 0 0 8px rgba(16,185,129,0.4)',
-                              ],
-                            }}
-                            transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-                          >
-                            <Check className="w-3.5 h-3.5 text-white" strokeWidth={3} />
-                          </motion.div>
-                        </motion.div>
+                        <div className="urgencia-input-check absolute right-3.5 top-1/2 -translate-y-1/2">
+                          <Check className="h-3.5 w-3.5" strokeWidth={2.5} />
+                        </div>
                       )}
                     </div>
                   </div>
                   <div className="relative">
-                    <div className="flex items-center gap-2">
-                      <Phone className="w-4 h-4 text-slate-400 flex-none" />
+                    <label className="mb-2 block text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">
+                      WhatsApp
+                    </label>
+                    <div className="relative w-full">
+                      <Phone className="pointer-events-none absolute left-3.5 top-1/2 z-[1] h-4 w-4 -translate-y-1/2 urgencia-input-icon" />
                       <input
                         type="tel"
                         inputMode="tel"
@@ -959,34 +1127,13 @@ export default function UrgenciaPage() {
                           if (e.target.value === '') setWhatsapp('+56 ');
                         }}
                         maxLength={17}
-                        className={`flex-1 py-3 px-4 pr-12 rounded-xl bg-white/5 border text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-white/40 transition-colors ${
-                          whatsapp && whatsappValid ? 'border-emerald-500/40 focus:border-emerald-500/60' : 'border-white/10 focus:border-white/30'
-                        }`}
+                        className={`urgencia-input pl-11 pr-11 ${whatsapp && whatsappValid ? 'urgencia-input--valid' : ''}`}
+                        autoComplete="tel"
                       />
                       {whatsapp && whatsappValid && (
-                        <motion.div
-                          initial={{ scale: 0, opacity: 0 }}
-                          animate={{ scale: 1, opacity: 1 }}
-                          transition={{ type: 'spring', stiffness: 400, damping: 20 }}
-                          className="absolute right-3 top-1/2 -translate-y-1/2"
-                        >
-                          <motion.div
-                            className="relative w-6 h-6 rounded-full bg-emerald-500 flex items-center justify-center"
-                            style={{
-                              boxShadow: '0 0 16px rgba(16,185,129,0.6), 0 0 8px rgba(16,185,129,0.4), inset 0 1px 0 rgba(255,255,255,0.3)',
-                            }}
-                            animate={{
-                              boxShadow: [
-                                '0 0 16px rgba(16,185,129,0.6), 0 0 8px rgba(16,185,129,0.4)',
-                                '0 0 20px rgba(16,185,129,0.8), 0 0 12px rgba(16,185,129,0.6)',
-                                '0 0 16px rgba(16,185,129,0.6), 0 0 8px rgba(16,185,129,0.4)',
-                              ],
-                            }}
-                            transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-                          >
-                            <Check className="w-3.5 h-3.5 text-white" strokeWidth={3} />
-                          </motion.div>
-                        </motion.div>
+                        <div className="urgencia-input-check absolute right-3.5 top-1/2 -translate-y-1/2">
+                          <Check className="h-3.5 w-3.5" strokeWidth={2.5} />
+                        </div>
                       )}
                     </div>
                   </div>
@@ -996,13 +1143,12 @@ export default function UrgenciaPage() {
                   type="button"
                   onClick={handleCualificacionNext}
                   disabled={!canAdvanceCualificacion}
-                  className={`w-full py-5 rounded-xl font-bold flex items-center justify-center gap-2 transition-all ${
-                    canAdvanceCualificacion
-                      ? 'bg-gradient-to-r from-white to-slate-100 text-black hover:from-slate-100 hover:to-white active:scale-[0.98] shadow-[0_4px_20px_rgba(255,255,255,0.2)]'
-                      : 'bg-white/20 text-white/40 cursor-not-allowed'
-                  }`}
+                  className="urgencia-primary-cta flex items-center justify-center gap-2.5"
                 >
-                  Ver análisis y opción de pago <ChevronRight className="w-5 h-5" />
+                  <span className="urgencia-primary-cta__label min-w-0 flex-1 leading-snug">
+                    Ver análisis y opción de pago
+                  </span>
+                  <ChevronRight className="h-5 w-5 shrink-0 opacity-90" aria-hidden />
                 </button>
               </motion.div>
             )}
@@ -1015,181 +1161,318 @@ export default function UrgenciaPage() {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-                className="space-y-6"
+                className={`space-y-6 ${isTerminalComplete ? 'pb-[max(11rem,calc(7rem+env(safe-area-inset-bottom)))]' : ''}`}
               >
-                {/* Terminal forense */}
-                <div
-                  className="rounded-2xl p-4 font-mono"
-                  style={{ background: 'rgba(0,0,0,0.5)', border: '1px solid rgba(255,255,255,0.06)' }}
+                <button
+                  type="button"
+                  onClick={() => {
+                    triggerHaptic('light');
+                    setStep('cualificacion');
+                  }}
+                  className="urgencia-glass-back"
                 >
-                  <div className="flex items-center gap-1.5 mb-3 pb-2.5 border-b border-white/[0.06]">
-                    <div className="w-2 h-2 rounded-full bg-rose-500/60" />
-                    <div className="w-2 h-2 rounded-full bg-amber-500/60" />
-                    <div className="w-2 h-2 rounded-full bg-emerald-500/60" />
-                    <span className="text-slate-600 text-[9px] ml-2 uppercase tracking-widest">punto-legal · análisis-penal-v1</span>
+                  <ArrowLeft className="w-4 h-4 opacity-80" />
+                  Volver
+                </button>
+
+                <div className="space-y-1.5">
+                  <h1 className="font-display text-xl sm:text-[1.4rem] font-bold tracking-[-0.03em] text-white leading-tight">
+                    Resumen y pago
+                  </h1>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
+                    Simulación orientativa · no vinculante
+                  </p>
+                </div>
+
+                <div className="urgencia-terminal-chrome">
+                  <div className="urgencia-terminal-body">
+                    <div className="flex items-center gap-2 mb-3 pb-3 border-b border-white/[0.07]">
+                      <div className="flex gap-1.5">
+                        <div className="w-2.5 h-2.5 rounded-full bg-rose-500/75 ring-1 ring-black/20" />
+                        <div className="w-2.5 h-2.5 rounded-full bg-amber-400/75 ring-1 ring-black/20" />
+                        <div className="w-2.5 h-2.5 rounded-full bg-slate-500/80 ring-1 ring-black/20" />
+                      </div>
+                      <span className="text-slate-500 text-[9px] ml-1 uppercase tracking-[0.2em] font-medium">
+                        punto-legal · simulación
+                      </span>
+                    </div>
+                    <TerminalLines
+                      sessionKey={terminalSessionId}
+                      nombre={nombre.trim().split(' ')[0] || 'N/A'}
+                      situacion={situacion}
+                      antecedentes={tieneAntecedentes ?? false}
+                      horasDetenido={horasDetenido}
+                      gravedadLesiones={gravedadLesiones}
+                      riesgoPorcentaje={riesgoPorcentaje}
+                      isComplejo={isComplejo}
+                      onTypingComplete={handleTerminalTypingComplete}
+                    />
                   </div>
-                  <TerminalLines
-                    nombre={nombre.trim().split(' ')[0] || 'N/A'}
-                    situacion={situacion}
-                    antecedentes={tieneAntecedentes ?? false}
-                    horasDetenido={horasDetenido}
-                    gravedadLesiones={gravedadLesiones}
-                    riesgoPorcentaje={riesgoPorcentaje}
-                    isComplejo={isComplejo}
+                </div>
+
+                <p className="urgencia-disclaimer-card text-[11px] text-slate-400 leading-relaxed">
+                  Lo anterior es una <strong className="text-slate-300 font-medium">simulación orientativa</strong> con los
+                  datos que ingresaste. No reemplaza la valoración de un abogado ni anticipa lo que resolverá el tribunal.
+                </p>
+
+                <div className="glass-ios-panel-dark relative overflow-hidden rounded-[1.35rem] border border-white/[0.09] p-4 sm:p-5 shadow-[0_20px_60px_-36px_rgba(0,0,0,0.65)]">
+                  <div
+                    className="pointer-events-none absolute inset-0 opacity-100"
+                    aria-hidden
+                    style={{
+                      background:
+                        'radial-gradient(ellipse 120% 80% at 0% 0%, rgba(251,191,36,0.07), transparent 50%), radial-gradient(ellipse 90% 70% at 100% 100%, rgba(244,63,94,0.06), transparent 55%)',
+                    }}
                   />
-                </div>
-
-                {/* Alerta presunción de culpabilidad */}
-                <div
-                  className="rounded-xl p-4 bg-amber-500/10 border border-amber-500/20"
-                  style={{
-                    boxShadow: '0 4px 24px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.06)',
-                    backdropFilter: 'blur(20px)',
-                  }}
-                >
-                  <p className="text-xs text-amber-300 font-medium">
-                    ⚖️ Sin defensa técnica, el juez aplica presunción de culpabilidad. El parte policial se convierte en verdad absoluta.
-                  </p>
-                </div>
-
-                {/* Riesgo visual */}
-                <div
-                  className={`rounded-xl p-4 ${
-                    riesgoPorcentaje >= 70 ? 'bg-rose-500/10 border border-rose-500/30' : riesgoPorcentaje >= 50 ? 'bg-amber-500/10 border border-amber-500/30' : 'bg-emerald-500/10 border border-emerald-500/30'
-                  }`}
-                  style={{
-                    boxShadow: '0 4px 24px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.06)',
-                    backdropFilter: 'blur(20px)',
-                  }}
-                >
-                  <p className="text-[10px] uppercase tracking-wider text-slate-400 mb-1">Riesgo de prisión preventiva</p>
-                  <p className="text-3xl font-bold text-white">{riesgoPorcentaje}%</p>
-                  <p className="text-xs text-slate-400 mt-1">{painMessage}</p>
-                </div>
-
-                {/* Anclaje táctico */}
-                <div
-                  className="rounded-xl p-4 space-y-2"
-                  style={{
-                    background: 'rgba(255,255,255,0.04)',
-                    border: '1px solid rgba(255,255,255,0.08)',
-                    boxShadow: '0 4px 24px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.06)',
-                    backdropFilter: 'blur(20px)',
-                  }}
-                >
-                  <p className="text-[10px] text-slate-500 line-through">
-                    {isComplejo
-                      ? 'Abogado de turno: Sin experiencia en casos complejos'
-                      : 'Defensoría Pública: Mañana a las 9 AM (Gratis pero tardío)'}
-                  </p>
-                  <p className="text-sm text-white font-medium">
-                    ✅ Punto Legal: Ahora mismo · Abogado especialista · {new Intl.NumberFormat('es-CL').format(precio)} en 12 cuotas sin interés
-                  </p>
-                </div>
-
-                {/* Checkout card */}
-                <div
-                  className="rounded-2xl p-6 space-y-4"
-                  style={{
-                    background: 'rgba(255,255,255,0.04)',
-                    border: '1px solid rgba(255,255,255,0.08)',
-                    boxShadow: '0 4px 24px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.06)',
-                    backdropFilter: 'blur(20px)',
-                  }}
-                >
-                  <div className="flex items-baseline gap-3 flex-wrap">
-                    <h2 className="text-2xl font-bold text-white">
-                      ${new Intl.NumberFormat('es-CL').format(precio)}
-                    </h2>
-                    <span className="text-sm text-slate-500 line-through">
-                      ${new Intl.NumberFormat('es-CL').format(Math.round(precio * 1.5))}
-                    </span>
-                    <span className="text-xs font-bold uppercase text-emerald-400 bg-emerald-500/20 px-2 py-1 rounded">
-                      Precio de urgencia
-                    </span>
+                  <div className="relative space-y-2.5">
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">
+                      Por qué coordinar abogado ahora
+                    </p>
+                    <p className="text-sm text-slate-100/95 leading-relaxed font-medium">
+                      La defensa técnica te permite <strong className="text-white font-semibold">contrastar</strong> el relato
+                      policial y fiscal con rigor procesal y estándar constitucional. La diferencia suele ser esta:{' '}
+                      <strong className="text-white font-semibold">quien no contrata abogado queda a la suerte</strong>, sin orden
+                      ni contradicción técnica frente a lo que ocurra en la unidad; en cambio,{' '}
+                      <strong className="text-white font-semibold">
+                        al pagar y activar el servicio puedes comenzar tu defensa ya en comisaría
+                      </strong>, con coordinación profesional hacia el control de detención.
+                    </p>
+                    <p className="text-[0.8125rem] text-slate-400 leading-relaxed">
+                      Nadie puede prometer libertad ni un resultado: esas decisiones las adoptan el juez y la Fiscalía. Sí puedes
+                      priorizar el contacto, reducir declaraciones improvisadas y alinear tu actuación con garantías reales.
+                    </p>
                   </div>
-                  <p className="text-slate-400 text-sm">{servicioNombre} · {servicioDesc}</p>
+                </div>
 
-                  {/* Countdown: NO auto-redirige, muestra "precio aumentó" al llegar a 0 */}
+                <div className="glass-ios-panel-dark relative overflow-hidden rounded-[1.35rem] border border-white/[0.08] p-5 sm:p-6 ring-1 ring-white/[0.05]">
+                  <div
+                    className="pointer-events-none absolute -right-8 -top-12 h-36 w-36 rounded-full opacity-[0.14] blur-3xl bg-rose-500"
+                    aria-hidden
+                  />
+                  <p className="relative text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500 mb-2">
+                    Indicador orientativo
+                  </p>
+                  <p className="relative font-display text-4xl sm:text-[2.75rem] font-bold tracking-tighter text-white tabular-nums">
+                    {riesgoPorcentaje}
+                    <span className="text-2xl text-slate-400 font-semibold ml-0.5">%</span>
+                  </p>
+                  <p className="relative text-[0.8125rem] text-slate-400 mt-3 leading-relaxed">{painMessage}</p>
+                </div>
+
+                {!isTerminalComplete && (
+                  <div className="glass-ios-panel-dark rounded-[1.25rem] border border-dashed border-white/[0.12] p-6 sm:p-7">
+                    <p className="text-center text-[0.8125rem] text-slate-400 leading-relaxed">
+                      Estamos cerrando el resumen en pantalla. Al terminar la animación verás el{' '}
+                      <strong className="text-slate-200 font-semibold">monto</strong> y el acceso a{' '}
+                      <strong className="text-slate-200 font-semibold">Mercado Pago</strong> fijo abajo.
+                    </p>
+                    <div className="mt-5 space-y-2.5" aria-hidden>
+                      <div className="h-3 rounded-lg bg-white/[0.07] animate-pulse" />
+                      <div className="mx-auto h-3 w-[88%] rounded-lg bg-white/[0.05] animate-pulse" />
+                      <div className="mx-auto h-10 max-w-[12rem] rounded-xl bg-white/[0.06] animate-pulse mt-4" />
+                    </div>
+                  </div>
+                )}
+
+                <AnimatePresence mode="wait">
                   {isTerminalComplete && (
                     <motion.div
-                      initial={{ opacity: 0, scale: 0.95 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      className={`rounded-xl p-4 border ${priceIncreased ? 'bg-amber-500/20 border-amber-500/40' : 'bg-rose-500/10 border-rose-500/20'}`}
+                      key="urgencia-checkout"
+                      initial={{ opacity: 0, y: 12 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 8 }}
+                      transition={{ type: 'spring', stiffness: 300, damping: 34 }}
+                      className="glass-ios-panel-dark rounded-[1.35rem] border border-white/[0.09] overflow-hidden shadow-[0_24px_80px_-44px_rgba(0,0,0,0.7)]"
                     >
-                      {priceIncreased ? (
-                        <>
-                          <p className="text-sm font-bold text-amber-300">
-                            ⚠️ El precio cambió a ${new Intl.NumberFormat('es-CL').format(precio + 100000)}
-                          </p>
-                          <p className="text-xs text-slate-300 mt-1">
-                            Activa ahora para asegurar el precio original de ${new Intl.NumberFormat('es-CL').format(precio)}
-                          </p>
-                        </>
-                      ) : (
-                        <>
-                          <p className="text-xs text-rose-300 mb-2 flex items-center gap-2">
-                            <span className="relative flex h-2 w-2">
-                              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75" />
-                              <span className="relative inline-flex rounded-full h-2 w-2 bg-rose-500" />
-                            </span>
-                            {countdownActive
-                              ? `⚠️ ${countdownSeconds} segundos para asegurar este precio`
-                              : 'Preparando pago seguro...'}
-                          </p>
-                          {countdownActive && (
-                            <div className="h-2 rounded-full bg-white/10 overflow-hidden">
-                              <motion.div
-                                className="h-full bg-rose-500"
-                                initial={{ width: '100%' }}
-                                animate={{ width: `${(countdownSeconds / COUNTDOWN_SECONDS) * 100}%` }}
-                                transition={{ duration: 0.3 }}
-                              />
-                            </div>
-                          )}
-                        </>
-                      )}
-                    </motion.div>
-                  )}
+                      <div className="px-4 py-3.5 sm:px-5 border-b border-white/[0.07] bg-white/[0.025] backdrop-blur-sm">
+                        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
+                          Listo para activar
+                        </p>
+                        <p className="text-sm text-slate-200 mt-1 leading-snug">
+                          Un pago seguro con <strong className="text-white font-semibold">Mercado Pago</strong> prioriza tu
+                          alerta al equipo. Revisa estos puntos; el botón de pago queda fijo abajo.
+                        </p>
+                      </div>
 
-                  {error && (
-                    <div className="rounded-xl p-4 bg-rose-500/10 border border-rose-500/20">
-                      <div className="flex items-start gap-2">
-                        <AlertTriangle className="w-4 h-4 text-rose-400 flex-none mt-0.5" />
-                        <div className="flex-1">
-                          <p className="text-sm text-rose-300 font-medium mb-2">❌ {error}</p>
-                          <a
-                            href={whatsappUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-xs text-white underline hover:text-rose-200 flex items-center gap-1"
-                          >
-                            <MessageCircle className="w-3 h-3" />
-                            Contactar por WhatsApp ahora
-                          </a>
+                      <div className="divide-y divide-white/[0.06]">
+                        <div className="px-4 py-4 sm:px-5 flex gap-3">
+                          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-white/[0.06] border border-white/[0.1] backdrop-blur-md">
+                            <Shield className="h-5 w-5 text-rose-200/95" strokeWidth={2} aria-hidden />
+                          </div>
+                          <div className="min-w-0 space-y-1.5">
+                            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">
+                              Derecho al silencio
+                            </p>
+                            <p className="text-[0.8125rem] sm:text-sm text-slate-200/95 leading-relaxed">
+                              Tienes <strong className="text-white font-semibold">derecho a guardar silencio</strong> y no estás
+                              obligado a declarar contra ti mismo. Evita hablar de los hechos sin asesoría:{' '}
+                              <strong className="text-white font-semibold">cualquier dicho puede ser usado en tu contra</strong>.
+                              Lo prudente es esperar defensa antes de rendir versión.
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="px-4 py-4 sm:px-5 flex gap-3">
+                          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[#009EE3]/12 border border-[#009EE3]/28 backdrop-blur-md">
+                            <Lock className="h-5 w-5 text-sky-200" strokeWidth={2} aria-hidden />
+                          </div>
+                          <div className="min-w-0 space-y-1.5">
+                            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">
+                              Checkout oficial
+                            </p>
+                            <p className="text-[0.8125rem] sm:text-sm text-slate-300 leading-relaxed">
+                              El botón fijo abre el <strong className="text-slate-100 font-semibold">Checkout Pro</strong> de
+                              Mercado Pago (mercadopago.cl). Verás el mismo total que aquí, medios habilitados y comprobante.
+                              Punto Legal no guarda datos de tarjeta.
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="px-4 py-4 sm:px-5 flex gap-3">
+                          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-white/[0.06] border border-white/[0.1] backdrop-blur-md">
+                            <Scale className="h-5 w-5 text-slate-200" strokeWidth={2} aria-hidden />
+                          </div>
+                          <div className="min-w-0 space-y-1.5">
+                            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">
+                              Tras confirmar el pago
+                            </p>
+                            <p className="text-[0.8125rem] sm:text-sm text-slate-300 leading-relaxed">
+                              El equipo recibe la <strong className="text-slate-100 font-semibold">alerta de urgencia</strong> con
+                              tus datos y la unidad indicada. Un abogado se coordinará contigo para{' '}
+                              <strong className="text-slate-100 font-semibold">comisaría o unidad</strong> y la{' '}
+                              <strong className="text-slate-100 font-semibold">audiencia de control de detención</strong>, según
+                              disponibilidad y el encargo contratado.
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="px-4 py-4 sm:px-5 flex gap-3 bg-white/[0.02]">
+                          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-rose-500/12 border border-rose-400/22 backdrop-blur-md">
+                            <AlertTriangle className="h-5 w-5 text-rose-200/90" strokeWidth={2} aria-hidden />
+                          </div>
+                          <div className="min-w-0 space-y-1.5">
+                            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">
+                              Sin patrocinio, más exposición
+                            </p>
+                            <p className="text-[0.8125rem] sm:text-sm text-slate-300 leading-relaxed">
+                              Actuar solo en detención suele implicar{' '}
+                              <strong className="text-slate-100 font-semibold">más riesgo de declarar sin contradicción técnica</strong>{' '}
+                              y de no revisar a tiempo el procedimiento. Contratar defensa{' '}
+                              <strong className="text-slate-100 font-semibold">no garantiza</strong> resultado judicial, pero
+                              acerca la actuación a estándar constitucional y procesal — y te deja enfocado en garantías, no en
+                              improvisar bajo presión.
+                            </p>
+                          </div>
                         </div>
                       </div>
-                    </div>
+
+                      <div className="px-4 py-4 sm:px-5 border-t border-white/[0.07] bg-white/[0.02]">
+                        <div className="flex flex-wrap items-start justify-between gap-3">
+                          <div>
+                            <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500 mb-1">
+                              Servicio · CLP
+                            </p>
+                            <p className="text-slate-200 text-sm font-medium leading-snug">{servicioNombre}</p>
+                            <p className="text-slate-400 text-xs mt-1 leading-relaxed max-w-md">{servicioDesc}</p>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500">Total</p>
+                            <p className="font-display text-2xl font-bold text-white tabular-nums mt-0.5">${precioFmt}</p>
+                            <span className="inline-flex mt-1 text-[9px] font-bold uppercase tracking-wider text-rose-200/95 bg-rose-500/18 px-2 py-0.5 rounded-md border border-rose-500/25">
+                              Urgencia
+                            </span>
+                          </div>
+                        </div>
+
+                        {error && (
+                          <div className="mt-4 urgencia-alert-soft urgencia-alert-soft--rose">
+                            <div className="flex gap-3">
+                              <AlertTriangle className="w-5 h-5 text-rose-300 shrink-0" />
+                              <div className="min-w-0 flex-1 space-y-2">
+                                <p className="text-sm font-semibold text-rose-100 leading-snug">{error}</p>
+                                <p className="text-xs text-slate-400 leading-relaxed">
+                                  En local hace falta backend o función Supabase; en producción el enlace es el checkout oficial.
+                                </p>
+                                <a
+                                  href={whatsappUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/[0.07] px-3.5 py-2.5 text-xs font-semibold text-white hover:bg-white/[0.11] transition-colors"
+                                >
+                                  <MessageCircle className="w-3.5 h-3.5" />
+                                  WhatsApp al equipo
+                                </a>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </motion.div>
                   )}
-                  <button
-                    type="button"
-                    onClick={() => {
-                      triggerHaptic('heavy');
-                      handleActivar();
-                    }}
-                    disabled={isPaying}
-                    className="w-full py-5 rounded-xl font-bold bg-gradient-to-r from-white to-slate-100 text-black hover:from-slate-100 hover:to-white disabled:opacity-60 disabled:from-white/20 disabled:to-white/20 flex items-center justify-center gap-2 text-lg shadow-[0_4px_20px_rgba(255,255,255,0.2)]"
-                  >
-                    {isPaying ? (
-                      <>
-                        <Loader2 className="w-5 h-5 animate-spin" />
-                        <span className="ml-2">Conectando con MercadoPago...</span>
-                      </>
-                    ) : (
-                      <>ACTIVAR DEFENSA INMEDIATA</>
-                    )}
-                  </button>
-                </div>
+                </AnimatePresence>
+
+                <AnimatePresence>
+                  {isTerminalComplete && (
+                    <motion.div
+                      key="urgencia-checkout-dock"
+                      initial={{ y: 100, opacity: 0 }}
+                      animate={{ y: 0, opacity: 1 }}
+                      exit={{ y: 80, opacity: 0 }}
+                      transition={{ type: 'spring', stiffness: 380, damping: 38, delay: 0.05 }}
+                      className="urgencia-checkout-dock fixed inset-x-0 bottom-0 z-[46] px-3 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pointer-events-none"
+                    >
+                      <div className="pointer-events-auto max-w-lg mx-auto rounded-[1.25rem] border border-white/[0.12] bg-slate-950/72 backdrop-blur-2xl backdrop-saturate-150 shadow-[0_-12px_48px_-12px_rgba(0,0,0,0.55)] ring-1 ring-white/[0.06] px-3.5 py-3 sm:px-4 sm:py-3.5">
+                        {error ? (
+                          <p className="text-[11px] text-rose-200/95 text-center mb-2 font-medium leading-snug">{error}</p>
+                        ) : null}
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-2.5 sm:gap-3">
+                          <div className="flex sm:flex-col sm:items-start sm:justify-center gap-2 sm:gap-0 sm:min-w-[7rem] items-center justify-between">
+                            <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-500 sm:hidden">
+                              Total a pagar
+                            </span>
+                            <div>
+                              <p className="hidden sm:block text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-500 mb-0.5">
+                                Total
+                              </p>
+                              <p className="font-display text-xl sm:text-2xl font-bold text-white tabular-nums leading-none">
+                                ${precioFmt}
+                              </p>
+                            </div>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              triggerHaptic('heavy');
+                              handleActivar();
+                            }}
+                            disabled={isPaying}
+                            className={`urgencia-primary-cta flex-1 min-h-[52px] flex items-center justify-center gap-2 ${
+                              isPaying ? 'urgencia-primary-cta--pending' : ''
+                            }`}
+                          >
+                            {isPaying ? (
+                              <>
+                                <Loader2 className="h-5 w-5 shrink-0 animate-spin" aria-hidden />
+                                <span className="urgencia-primary-cta__label">Abriendo Mercado Pago…</span>
+                              </>
+                            ) : (
+                              <>
+                                <Lock className="h-4 w-4 shrink-0 opacity-90" aria-hidden />
+                                <span className="urgencia-primary-cta__label min-w-0 leading-snug">
+                                  Pagar ${precioFmt} · Mercado Pago
+                                </span>
+                                <ChevronRight className="h-5 w-5 shrink-0 opacity-90" aria-hidden />
+                              </>
+                            )}
+                          </button>
+                        </div>
+                        <p className="text-center text-[9px] text-slate-500 leading-relaxed mt-2 px-1">
+                          Checkout Pro en mercadopago.cl · confirma monto y medio antes de pagar
+                        </p>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </motion.div>
             )}
           </AnimatePresence>
@@ -1200,12 +1483,15 @@ export default function UrgenciaPage() {
           href={whatsappUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="fixed bottom-6 right-4 bottom-safe z-50 flex items-center gap-2 px-4 py-3 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold shadow-lg transition-all active:scale-95"
+          className={`fixed right-4 bottom-safe z-50 flex min-h-[52px] items-center gap-2.5 rounded-2xl border border-white/20 bg-[#25D366]/92 px-5 py-3 text-white shadow-[0_20px_50px_-12px_rgba(0,0,0,0.55)] backdrop-blur-xl backdrop-saturate-150 font-semibold text-[0.9375rem] ring-1 ring-inset ring-white/15 transition-all duration-300 hover:bg-[#22c55e]/95 active:scale-[0.97] ${
+            step === 'terminal' && isTerminalComplete
+              ? 'bottom-[max(9.5rem,calc(8.5rem+env(safe-area-inset-bottom)))]'
+              : 'bottom-6'
+          }`}
           initial={{ scale: 0, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ delay: 0.5, type: 'spring', stiffness: 300 }}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
+          whileTap={{ scale: 0.96 }}
         >
           <div className="relative">
             <MessageCircle className="w-5 h-5" />
@@ -1229,20 +1515,21 @@ export default function UrgenciaPage() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
+              className="fixed inset-0 z-[60] flex items-center justify-center urgencia-overlay-scrim px-6"
             >
               <motion.div
-                initial={{ scale: 0.5, opacity: 0 }}
+                initial={{ scale: 0.85, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.8, opacity: 0 }}
-                className="w-24 h-24 rounded-full bg-emerald-500 flex items-center justify-center"
+                exit={{ scale: 0.9, opacity: 0 }}
+                transition={{ type: 'spring', stiffness: 400, damping: 28 }}
+                className="urgencia-overlay-check"
               >
-                <Check className="w-12 h-12 text-white" strokeWidth={3} />
+                <Check className="w-9 h-9 text-white drop-shadow-sm" strokeWidth={2.5} />
               </motion.div>
             </motion.div>
           )}
         </AnimatePresence>
-      </div>
+      </UrgenciaPenalFocusLayout>
     </>
   );
 }
