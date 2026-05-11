@@ -9,7 +9,7 @@ export const URGENCIA_SEO_DESCRIPTION =
   '¿Tu familiar está detenido? Coordinación prioritaria con abogado penal para detención y control de detención en la Región Metropolitana, foco sector oriente (Las Condes, Providencia, Ñuñoa, Vitacura, Lo Barnechea, La Florida y cercanas). En pocos pasos dejas tus datos; la presencia en comisaría depende del caso y la disponibilidad del equipo.';
 
 export const URGENCIA_SEO_KEYWORDS =
-  'familiar detenido abogado, abogado penal urgente Santiago, control de detención RM, defensa penal Las Condes, abogado comisaría Providencia, detención Ñuñoa, urgencia penal Vitacura, abogado penal Lo Barnechea, defensa penal La Florida, Región Metropolitana oriente, formalización penal Chile, Punto Legal Chile';
+  'familiar detenido abogado, abogado penal urgente Santiago, Ley Emilia abogado, control de detención RM, delito sexual abogado urgencia, orden detención PDI abogado, drogas sintéticas defensa, VIF detención abogado, alcoholemia abogado, desórdenes públicos defensa, defensa penal Las Condes, abogado comisaría Providencia, Punto Legal Chile';
 
 export const URGENCIA_FAQ_ITEMS: { question: string; answer: string }[] = [
   {
@@ -31,7 +31,7 @@ export const URGENCIA_FAQ_ITEMS: { question: string; answer: string }[] = [
   {
     question: '¿Qué tipo de causas cubre esta vía de urgencia?',
     answer:
-      'Está pensada para contextos de detención o riesgo inminente de formalización, con foco en situaciones frecuentes como desórdenes públicos, infracciones a la ley de alcoholes, maltrato a funcionarios, barricadas o materias de seguridad del Estado, violencia intrafamiliar, hurto o robo simple, amenazas, lesiones o riña, daños o vandalismo, receptación, porte de arma o munición, tenencia o microtráfico, conducción bajo efectos u otros delitos graves. El encargo concreto se ajusta siempre a los hechos que cuentes.',
+      'Está pensada para contextos de detención o riesgo inminente de formalización en flagrancia, con foco en situaciones como accidente de tránsito (Ley Emilia / lesiones graves), delitos sexuales o abuso, orden de detención (PDI, aeropuerto), ley de drogas en contexto de sintéticas o fiestas, violencia intrafamiliar (VIF), conducción en estado de ebriedad (caso simple), desórdenes o altercado público, y otras urgencias penales afines. El encargo concreto y el monto orientativo se ajustan al motivo indicado y a los hechos que cuentes.',
   },
   {
     question: '¿La atención puede ser presencial en la comisaría?',
@@ -39,9 +39,9 @@ export const URGENCIA_FAQ_ITEMS: { question: string; answer: string }[] = [
       'La modalidad (remota o presencial) y el desplazamiento se coordinan caso a caso, según la urgencia, la ubicación y lo que permita el procedimiento. No garantizamos un resultado ni un formato de actuación sin conocer los antecedentes.',
   },
   {
-    question: '¿Para qué usan mi correo y mi teléfono?',
+    question: '¿Para qué usan mi teléfono y los datos de contacto?',
     answer:
-      'Solo para contactarte en relación con tu consulta de urgencia, coordinar la atención y, si contratas el servicio, las comunicaciones propias del encargo. El tratamiento se rige por nuestra política de privacidad y por la normativa aplicable.',
+      'Para contactarte en relación con tu consulta de urgencia, coordinar la atención y, si contratas el servicio, las comunicaciones propias del encargo. Si completas el flujo con WhatsApp válido, puede generarse un correo técnico interno asociado a tu número para la pasarela de pago y el registro del lead, sin que tengas que escribir un email en el formulario. El tratamiento se rige por nuestra política de privacidad y por la normativa aplicable.',
   },
   {
     question: 'Busqué “abogado penal” tras una detención: ¿esto es orientación o patrocinio?',

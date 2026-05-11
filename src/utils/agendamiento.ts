@@ -1,6 +1,7 @@
 // RUTA: src/utils/agendamiento.ts
 
 import type { Service, FormData, PriceCalculation } from '@/types/agendamiento';
+import { getServiceTheme } from '@/config/serviceThemes';
 
 const CODIGO_CONVENIO_VALIDO = "PUNTOLEGAL!";
 const CODIGO_ADMIN_VALIDO = "PUNTOLEGALADMIN";
@@ -68,83 +69,19 @@ export const calculatePrice = (service: Service, formData: FormData): PriceCalcu
 };
 
 /**
- * Obtiene los colores del servicio según su categoría
+ * Colores de UI del flujo agendamiento.
+ * El acento (`color`) sigue el mismo tema que las auroras / CTAs (`getServiceTheme`),
+ * alineado al color del botón/tarjeta del landing cuando existe `plan` en la URL.
  */
-export const getServiceColors = (category: string) => {
-  const colorMap: Record<string, { bg: string; darkBg: string; text: string; darkText: string; color: string }> = {
-    'General': {
-      bg: 'bg-blue-100',
-      darkBg: 'dark:bg-blue-900/30',
-      text: 'text-blue-600',
-      darkText: 'dark:text-blue-400',
-      color: '#3b82f6',
-    },
-    'Familia': {
-      bg: 'bg-pink-100',
-      darkBg: 'dark:bg-pink-900/30',
-      text: 'text-pink-600',
-      darkText: 'dark:text-pink-400',
-      color: '#ec4899',
-    },
-    'Corporativo': {
-      bg: 'bg-indigo-100',
-      darkBg: 'dark:bg-indigo-900/30',
-      text: 'text-indigo-600',
-      darkText: 'dark:text-indigo-400',
-      color: '#6366f1',
-    },
-    'Laboral': {
-      bg: 'bg-orange-100',
-      darkBg: 'dark:bg-orange-900/30',
-      text: 'text-orange-600',
-      darkText: 'dark:text-orange-400',
-      color: '#f97316',
-    },
-    'Inmobiliario': {
-      bg: 'bg-emerald-100',
-      darkBg: 'dark:bg-emerald-900/30',
-      text: 'text-emerald-600',
-      darkText: 'dark:text-emerald-400',
-      color: '#059669',
-    },
-    'Civil': {
-      bg: 'bg-emerald-100',
-      darkBg: 'dark:bg-emerald-900/30',
-      text: 'text-emerald-600',
-      darkText: 'dark:text-emerald-400',
-      color: '#10b981',
-    },
-    'Penal': {
-      bg: 'bg-red-100',
-      darkBg: 'dark:bg-red-900/30',
-      text: 'text-red-600',
-      darkText: 'dark:text-red-400',
-      color: '#ef4444',
-    },
-    'Tributario': {
-      bg: 'bg-teal-100',
-      darkBg: 'dark:bg-teal-900/30',
-      text: 'text-teal-600',
-      darkText: 'dark:text-teal-400',
-      color: '#14b8a6',
-    },
-    'Digital': {
-      bg: 'bg-violet-100',
-      darkBg: 'dark:bg-violet-900/30',
-      text: 'text-violet-600',
-      darkText: 'dark:text-violet-400',
-      color: '#8b5cf6',
-    },
-    'Penal-Economico': {
-      bg: 'bg-amber-100',
-      darkBg: 'dark:bg-amber-900/30',
-      text: 'text-amber-600',
-      darkText: 'dark:text-amber-400',
-      color: '#d97706',
-    },
+export const getServiceColors = (category: string, plan?: string | null) => {
+  const theme = getServiceTheme(plan || undefined, category);
+  return {
+    bg: 'slate-100',
+    darkBg: 'slate-900/30',
+    text: 'slate-600',
+    darkText: 'slate-300',
+    color: theme.accent,
   };
-  
-  return colorMap[category] || colorMap['General'];
 };
 
 /**

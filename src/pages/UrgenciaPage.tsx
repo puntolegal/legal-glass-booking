@@ -10,28 +10,30 @@ import {
   MapPin,
   AlertTriangle,
   MessageCircle,
-  Mail,
   Phone,
   Check,
   Wine,
   ShieldAlert,
-  Flame,
-  Gavel,
   Clock,
   ArrowLeft,
   Megaphone,
   HeartCrack,
-  ShoppingBag,
   Siren,
   Pill,
-  Car,
+  CarFront,
+  Plane,
   Shield,
   Scale,
   Lock,
+  Flame,
+  Gavel,
+  ShoppingBag,
   Activity,
   Hammer,
   Package,
   Crosshair,
+  Car,
+  Beer,
   type LucideIcon,
 } from 'lucide-react';
 import SEO from '@/components/SEO';
@@ -46,54 +48,75 @@ import {
 } from '@/lib/urgenciaPenalSeo';
 import { getNearestComisariaOriente } from '@/lib/urgenciaOrienteComisarias';
 import { createCheckoutPreference } from '@/services/mercadopagoBackend';
-import { mergeUrgenciaPenalRow, type UrgenciaPenalMergeRow } from '@/services/urgenciaPenalRecordService';
+import {
+  getUrgenciaPenalSessionId,
+  mergeUrgenciaPenalRow,
+  type UrgenciaPenalMergeRow,
+} from '@/services/urgenciaPenalRecordService';
 import { supabase } from '@/integrations/supabase/client';
 import { trackMetaEvent } from '@/services/metaConversionsService';
 
 type Situacion =
+  | 'ley_emilia'
+  | 'delito_sexual'
+  | 'orden_detencion'
+  | 'drogas_sinteticas'
+  | 'vif'
+  | 'alcoholemia'
   | 'desordenes'
   | 'ley_alcohol'
   | 'maltrato'
   | 'barricadas'
-  | 'vif'
+  | 'microtrafico'
   | 'hurto'
   | 'amenazas'
-  | 'microtrafico'
-  | 'conduccion_ebriedad'
   | 'lesiones'
   | 'danos'
   | 'receptacion'
   | 'porte_arma'
+  | 'conduccion_ebriedad'
   | 'grave'
   | null;
 type Step = 'captura' | 'cualificacion' | 'terminal';
 
 const SITUACIONES: { id: Exclude<Situacion, null>; label: string; Icon: LucideIcon }[] = [
-  { id: 'desordenes', label: 'Desórdenes públicos', Icon: Megaphone },
-  { id: 'ley_alcohol', label: 'Ley de alcoholes', Icon: Wine },
-  { id: 'maltrato', label: 'Maltrato a Carabineros', Icon: ShieldAlert },
-  { id: 'barricadas', label: 'Barricadas / seguridad del Estado', Icon: Flame },
-  { id: 'vif', label: 'Violencia intrafamiliar', Icon: HeartCrack },
-  { id: 'hurto', label: 'Hurto / robo simple', Icon: ShoppingBag },
-  { id: 'amenazas', label: 'Amenazas', Icon: Siren },
+  { id: 'ley_emilia', label: 'Accidente tránsito (Ley Emilia / Lesiones graves)', Icon: CarFront },
+  { id: 'delito_sexual', label: 'Delito Sexual / Abuso', Icon: ShieldAlert },
+  { id: 'orden_detencion', label: 'Orden de Detención (PDI / Aeropuerto)', Icon: Plane },
+  { id: 'drogas_sinteticas', label: 'Ley de Drogas (Sintéticas / Fiestas)', Icon: Pill },
+  { id: 'vif', label: 'Violencia Intrafamiliar (VIF)', Icon: HeartCrack },
   { id: 'microtrafico', label: 'Tenencia / microtráfico', Icon: Pill },
+  { id: 'maltrato', label: 'Maltrato a Carabineros', Icon: Gavel },
+  { id: 'barricadas', label: 'Barricadas / seguridad del Estado', Icon: Flame },
   { id: 'lesiones', label: 'Lesiones (riña / agresión)', Icon: Activity },
-  { id: 'danos', label: 'Daños / vandalismo', Icon: Hammer },
   { id: 'receptacion', label: 'Receptación', Icon: Package },
   { id: 'porte_arma', label: 'Porte arma / munición', Icon: Crosshair },
+  { id: 'alcoholemia', label: 'Conducción Estado Ebriedad (Simple)', Icon: Wine },
+  { id: 'ley_alcohol', label: 'Ley de alcoholes', Icon: Beer },
   { id: 'conduccion_ebriedad', label: 'Conducción bajo efectos', Icon: Car },
+  { id: 'desordenes', label: 'Desórdenes / Altercado público', Icon: Megaphone },
+  { id: 'hurto', label: 'Hurto / robo simple', Icon: ShoppingBag },
+  { id: 'amenazas', label: 'Amenazas', Icon: Siren },
+  { id: 'danos', label: 'Daños / vandalismo', Icon: Hammer },
   { id: 'grave', label: 'Otro delito grave', Icon: Gavel },
 ];
 
+const GRAVE_CHIP = SITUACIONES.find((s) => s.id === 'grave')!;
+
 const SITUACION_TERMINAL_LABEL: Record<Exclude<Situacion, null>, string> = {
-  desordenes: 'DESÓRDENES PÚBLICOS',
+  ley_emilia: 'ACCIDENTE TRÁNSITO (LEY EMILIA / LESIONES GRAVES)',
+  delito_sexual: 'DELITO SEXUAL / ABUSO',
+  orden_detencion: 'ORDEN DE DETENCIÓN (PDI / AEROPUERTO)',
+  drogas_sinteticas: 'LEY DE DROGAS (SINTÉTICAS / FIESTAS)',
+  vif: 'VIOLENCIA INTRAFAMILIAR (VIF)',
+  alcoholemia: 'CONDUCCIÓN ESTADO EBRIEDAD (SIMPLE)',
+  desordenes: 'DESÓRDENES / ALTERCADO PÚBLICO',
   ley_alcohol: 'LEY DE ALCOHOLES',
   maltrato: 'MALTRATO A CARABINEROS',
-  barricadas: 'LEY SEGURIDAD DEL ESTADO',
-  vif: 'VIOLENCIA INTRAFAMILIAR',
+  barricadas: 'LEY SEGURIDAD DEL ESTADO / BARRICADAS',
+  microtrafico: 'TENENCIA / MICROTRÁFICO',
   hurto: 'HURTO / ROBO SIMPLE',
   amenazas: 'AMENAZAS',
-  microtrafico: 'TENENCIA / MICROTRÁFICO',
   lesiones: 'LESIONES / RIÑA',
   danos: 'DAÑOS / VANDALISMO',
   receptacion: 'RECEPTACIÓN',
@@ -102,20 +125,48 @@ const SITUACION_TERMINAL_LABEL: Record<Exclude<Situacion, null>, string> = {
   grave: 'OTRO DELITO GRAVE',
 };
 
-/** Situaciones que por defecto encajan en tarifa “compleja” salvo que solo apliquen agravantes menores */
-const SITUACION_BASE_COMPLEJA: ReadonlySet<Exclude<Situacion, null>> = new Set([
-  'grave',
-  'barricadas',
-  'maltrato',
-  'microtrafico',
-  'vif',
-  'lesiones',
-  'receptacion',
-  'porte_arma',
-]);
-
 const PRECIO_SIMPLE = 300000;
 const PRECIO_COMPLEJO = 600000;
+const PRECIO_PREMIUM = 1_500_000;
+
+const PRECIO_POR_SITUACION: Record<Exclude<Situacion, null>, number> = {
+  alcoholemia: PRECIO_SIMPLE,
+  desordenes: PRECIO_SIMPLE,
+  ley_alcohol: PRECIO_SIMPLE,
+  hurto: PRECIO_SIMPLE,
+  amenazas: PRECIO_SIMPLE,
+  danos: PRECIO_SIMPLE,
+  conduccion_ebriedad: PRECIO_SIMPLE,
+  vif: PRECIO_COMPLEJO,
+  drogas_sinteticas: PRECIO_COMPLEJO,
+  microtrafico: PRECIO_COMPLEJO,
+  maltrato: PRECIO_COMPLEJO,
+  barricadas: PRECIO_COMPLEJO,
+  lesiones: PRECIO_COMPLEJO,
+  receptacion: PRECIO_COMPLEJO,
+  porte_arma: PRECIO_COMPLEJO,
+  grave: PRECIO_COMPLEJO,
+  ley_emilia: PRECIO_PREMIUM,
+  delito_sexual: PRECIO_PREMIUM,
+  orden_detencion: PRECIO_PREMIUM,
+};
+
+const PREMIUM_CRIME_IDS: ReadonlySet<Exclude<Situacion, null>> = new Set([
+  'ley_emilia',
+  'delito_sexual',
+  'orden_detencion',
+]);
+
+function precioPorSituacion(s: Situacion): number {
+  if (!s) return PRECIO_SIMPLE;
+  return PRECIO_POR_SITUACION[s];
+}
+
+function leadScoreForPrecio(precioClp: number): string {
+  if (precioClp >= PRECIO_PREMIUM) return 'HOT_URGENCIA_PREMIUM';
+  if (precioClp >= PRECIO_COMPLEJO) return 'HOT_URGENCIA_COMPLEJA';
+  return 'WARM_URGENCIA_SIMPLE';
+}
 const WHATSAPP_NUMBER = '56962321883';
 /** Si el callback del teletipo fallara, forzar fin de “razonamiento” para no bloquear el pago */
 const TERMINAL_COMPLETE_FALLBACK_MS = 120_000;
@@ -167,22 +218,32 @@ const triggerHaptic = (style: 'light' | 'medium' | 'heavy' = 'light') => {
 
 // Mensajes orientativos por tipo (sin prometer resultado judicial)
 const PAIN_MESSAGES: Record<Exclude<Situacion, null>, string> = {
+  ley_emilia:
+    'En accidentes con lesiones graves o figuras asociadas a la Ley Emilia la cadena pericial y el control de detención suelen ser sensibles; conviene defensa técnica alineada con el expediente desde el inicio.',
+  delito_sexual:
+    'En materia de delitos sexuales la valoración probatoria y las medidas pueden ser estrictas; la defensa requiere rigor procesal y estrategia temprana.',
+  orden_detencion:
+    'Ante orden de detención o interceptación (PDI, aeropuerto u otras unidades) los plazos y la actuación policial suelen ser acelerados; conviene coordinación profesional inmediata.',
+  drogas_sinteticas:
+    'En figuras por drogas sintéticas o contextos de fiscalización masiva la complejidad probatoria y cautelar suele ser alta; la defensa debe prepararse con el relato fiscal y los antecedentes disponibles.',
+  vif:
+    'En violencia intrafamiliar las medidas y la valoración dependen del tribunal y la Fiscalía; la defensa debe prepararse con el expediente y estándar técnico.',
+  alcoholemia:
+    'En conducción en estado de ebriedad pueden concurrir infracciones penales y administrativas; conviene revisar el procedimiento y el control de detención con asesoría.',
   desordenes:
-    'En desórdenes públicos suele ser clave ordenar el relato, revisar el parte y preparar la defensa técnica para el control de detención.',
+    'En desórdenes o altercados públicos suele ser clave ordenar el relato, el parte y la defensa técnica para el control de detención.',
   ley_alcohol:
     'En infracciones a la ley de alcoholes conviene revisar el procedimiento de fiscalización y el control de detención con estándar técnico.',
   maltrato:
     'En maltrato a funcionarios el relato policial pesa; conviene contradicción técnica y estrategia temprana con abogado.',
   barricadas:
     'En figuras de seguridad del Estado la complejidad procesal es alta; la defensa debe alinearse rápido con los antecedentes del expediente.',
-  vif:
-    'En violencia intrafamiliar las medidas y la valoración de los hechos dependen del tribunal y la Fiscalía; la defensa debe prepararse con el expediente completo.',
+  microtrafico:
+    'En tenencia o microtráfico la estrategia defensiva depende del relato fiscal, pericias y circunstancias del caso.',
   hurto:
     'En hurto o robo simple la calificación y las eventuales medidas cautelares las define el tribunal según los antecedentes.',
   amenazas:
     'En amenazas la gravedad y el contexto fáctico marcan el curso del proceso; conviene asesoría temprana para el control de detención o audiencias.',
-  microtrafico:
-    'En tenencia o microtráfico la estrategia defensiva depende del relato fiscal, pericias y circunstancias del caso.',
   lesiones:
     'En lesiones o riñas la valoración médico-legal y el contexto fáctico marcan el curso; conviene asesoría temprana para el control de detención o formalización.',
   danos:
@@ -200,9 +261,11 @@ const PAIN_MESSAGES: Record<Exclude<Situacion, null>, string> = {
 function terminalLineClass(line: string): string {
   const t = line.trim();
   if (!t) return 'urgencia-mono-dim';
+  if (t.startsWith('> ALERTA:')) return 'urgencia-mono-warn font-semibold';
+  if (t.startsWith('> RIESGO ALTO:')) return 'urgencia-mono-warn font-semibold';
+  if (t.startsWith('> SOLUCIÓN:')) return 'urgencia-mono-accent font-semibold';
   if (t.includes('Indicador resumido')) return 'urgencia-mono-warn font-medium';
   if (t.includes('Complejidad aparente')) return 'urgencia-mono-accent font-medium';
-  if (t.includes('RECOMENDACIÓN')) return 'text-rose-700 dark:text-rose-200/95 font-medium';
   if (t.includes('MODO SIMULACIÓN')) return 'text-slate-600 dark:text-slate-300';
   return 'urgencia-mono-dim';
 }
@@ -216,6 +279,7 @@ const TerminalLines: React.FC<{
   gravedadLesiones: number;
   riesgoPorcentaje: number;
   isComplejo: boolean;
+  isPremiumCrime: boolean;
   onTypingComplete: () => void;
 }> = ({
   sessionKey,
@@ -226,6 +290,7 @@ const TerminalLines: React.FC<{
   gravedadLesiones,
   riesgoPorcentaje,
   isComplejo,
+  isPremiumCrime,
   onTypingComplete,
 }) => {
   const [visibleLines, setVisibleLines] = useState<string[]>([]);
@@ -246,8 +311,8 @@ const TerminalLines: React.FC<{
     setCharIndex(0);
   }, [sessionKey]);
 
-  const lines = useMemo(
-    () => [
+  const lines = useMemo(() => {
+    const base: string[] = [
       `> MODO SIMULACIÓN ORIENTATIVA (no vinculante ni predicción judicial)`,
       `> Procesando datos del formulario...`,
       `> Antecedentes declarados: ${antecedentes ? 'SÍ (según formulario)' : 'NO (según formulario)'}`,
@@ -259,12 +324,31 @@ const TerminalLines: React.FC<{
       `> Complejidad aparente según formulario: ${isComplejo ? 'ALTA' : 'MEDIA'}`,
       ``,
       `> Indicador resumido (solo orientación): ${riesgoPorcentaje}%`,
-      `> Recuerde: medidas cautelares y formalización las define el tribunal/Fiscalía.`,
-      ``,
-      `> RECOMENDACIÓN: ACTIVAR CONTACTO CON DEFENSA`,
-    ],
-    [nombre, situacionLabel, antecedentes, horasDetenido, gravedadLesiones, riesgoPorcentaje, isComplejo]
-  );
+    ];
+    if (horasDetenido >= 12) {
+      base.push(
+        `> ALERTA: Plazo para Control de Detención inminente, revisar hora y sala de audiencia.`
+      );
+    }
+    if (isPremiumCrime) {
+      base.push(
+        `> RIESGO ALTO: Delito de máxima gravedad. Ingresar a audiencia sin defensa privada activa arriesga prisión preventiva.`
+      );
+    }
+    base.push(`> Recuerde: medidas cautelares y formalización las define el tribunal/Fiscalía.`);
+    base.push(``);
+    base.push(`> SOLUCIÓN: DESPLIEGUE INMEDIATO DE ABOGADO A COMISARÍA REQUERIDO.`);
+    return base;
+  }, [
+    nombre,
+    situacionLabel,
+    antecedentes,
+    horasDetenido,
+    gravedadLesiones,
+    riesgoPorcentaje,
+    isComplejo,
+    isPremiumCrime,
+  ]);
 
   useEffect(() => {
     if (lineIndex >= lines.length) return;
@@ -323,7 +407,6 @@ export default function UrgenciaPage() {
   const [tieneAntecedentes, setTieneAntecedentes] = useState<boolean | null>(null);
   const [gravedadLesiones, setGravedadLesiones] = useState(0);
   const [horasDetenido, setHorasDetenido] = useState(3);
-  const [email, setEmail] = useState('');
   const [whatsapp, setWhatsapp] = useState('');
   const [rutDetenido, setRutDetenido] = useState('');
   const [isTerminalComplete, setIsTerminalComplete] = useState(false);
@@ -334,7 +417,7 @@ export default function UrgenciaPage() {
   const [paymentInitiated, setPaymentInitiated] = useState(false);
   const [terminalSessionId, setTerminalSessionId] = useState(0);
   const nombreInputRef = useRef<HTMLInputElement>(null);
-  const emailInputRef = useRef<HTMLInputElement>(null);
+  const whatsappInputRef = useRef<HTMLInputElement>(null);
 
   const scrollToTop = useCallback(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -344,36 +427,58 @@ export default function UrgenciaPage() {
     setIsTerminalComplete(true);
   }, []);
 
-  const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   const whatsappValid = useMemo(() => {
     const cleaned = whatsapp.replace(/\D/g, '');
     return (cleaned.length === 11 && cleaned.startsWith('569')) || (cleaned.length === 9 && cleaned.startsWith('9'));
   }, [whatsapp]);
 
-  // Geoloc: solo ayuda a sugerir comisaría; sin métricas simuladas
-  const isComplejo = useMemo(() => {
-    if (!situacion) return false;
-    const baseCompleja = SITUACION_BASE_COMPLEJA.has(situacion);
-    const agravante = tieneAntecedentes === true || gravedadLesiones >= 4;
-    return baseCompleja || agravante;
-  }, [situacion, tieneAntecedentes, gravedadLesiones]);
+  const dummyEmail = useMemo(() => {
+    const digits = whatsapp.replace(/\D/g, '');
+    if (digits.length >= 9) return `urgencia-${digits}@puntolegal.cl`;
+    return `urgencia-pendiente-${getUrgenciaPenalSessionId().slice(0, 8)}@puntolegal.cl`;
+  }, [whatsapp]);
 
-  const precio = isComplejo ? PRECIO_COMPLEJO : PRECIO_SIMPLE;
+  const precio = useMemo(() => precioPorSituacion(situacion), [situacion]);
   const precioFmt = useMemo(() => new Intl.NumberFormat('es-CL').format(precio), [precio]);
-  const servicioNombre = isComplejo ? 'Defensa penal prioritaria (caso complejo)' : 'Intervención de urgencia penal';
-  const servicioDesc = isComplejo
-    ? 'Incluye coordinación prioritaria, abogado especialista y seguimiento según el encargo acordado.'
-    : 'Incluye orientación en detención y representación en control de detención según el encargo acordado.';
+  const leadScore = useMemo(() => leadScoreForPrecio(precio), [precio]);
+
+  /** Compat DB / terminal: true si el arancel supera el tier simple */
+  const isComplejo = precio > PRECIO_SIMPLE;
+
+  const isPremiumCrime = situacion !== null && PREMIUM_CRIME_IDS.has(situacion);
+
+  const servicioNombre = useMemo(() => {
+    if (precio >= PRECIO_PREMIUM) return 'Defensa penal prioritaria premium (máxima gravedad)';
+    if (precio >= PRECIO_COMPLEJO) return 'Defensa penal prioritaria (alta complejidad)';
+    return 'Intervención de urgencia penal';
+  }, [precio]);
+
+  const servicioDesc = useMemo(() => {
+    if (precio >= PRECIO_PREMIUM) {
+      return 'Incluye coordinación prioritaria con abogado especialista, despliegue hacia comisaría o unidad según encargo y seguimiento según el caso.';
+    }
+    if (precio >= PRECIO_COMPLEJO) {
+      return 'Incluye coordinación prioritaria, abogado especialista y seguimiento según el encargo acordado.';
+    }
+    return 'Incluye orientación en detención y representación en control de detención según el encargo acordado.';
+  }, [precio]);
+
+  const unidadCortaCheckout = useMemo(() => {
+    const u = unidadPolicial.trim();
+    if (!u) return 'Comisaría';
+    return u.length > 32 ? `${u.slice(0, 30)}…` : u;
+  }, [unidadPolicial]);
 
   // Riesgo dinámico (orientación; no predicción judicial)
   const riesgoPorcentaje = useMemo(() => {
     let base = 22;
     if (tieneAntecedentes) base += 34;
     if (situacion) {
-      if (['grave', 'barricadas', 'maltrato', 'microtrafico', 'porte_arma', 'lesiones'].includes(situacion)) base += 26;
-      else if (situacion === 'vif') base += 22;
-      else if (['amenazas', 'hurto', 'receptacion', 'danos'].includes(situacion)) base += 14;
-      else if (situacion === 'conduccion_ebriedad' || situacion === 'ley_alcohol') base += 10;
+      if (['ley_emilia', 'delito_sexual', 'orden_detencion'].includes(situacion)) base += 28;
+      else if (['maltrato', 'barricadas', 'microtrafico', 'porte_arma', 'lesiones', 'grave'].includes(situacion)) base += 26;
+      else if (['vif', 'drogas_sinteticas', 'receptacion'].includes(situacion)) base += 22;
+      else if (['amenazas', 'hurto', 'danos'].includes(situacion)) base += 14;
+      else if (['conduccion_ebriedad', 'ley_alcohol', 'alcoholemia'].includes(situacion)) base += 10;
       else if (situacion === 'desordenes') base += 6;
     }
     if (gravedadLesiones >= 4) base += 20;
@@ -382,7 +487,7 @@ export default function UrgenciaPage() {
   }, [tieneAntecedentes, situacion, gravedadLesiones, horasDetenido]);
 
   const painMessage = useMemo(() => {
-    const base = situacion ? PAIN_MESSAGES[situacion] : PAIN_MESSAGES.grave;
+    const base = situacion ? PAIN_MESSAGES[situacion] : PAIN_MESSAGES.ley_emilia;
     if (horasDetenido >= 18) {
       return `Llevas ${horasDetenido} horas en retén (según lo indicado). En tiempos prolongados suele ser más urgente contar con asesoría. ${base}`;
     }
@@ -394,9 +499,9 @@ export default function UrgenciaPage() {
 
   const pushUrgenciaPenal = useCallback(
     async (overrides: Partial<UrgenciaPenalMergeRow> = {}) => {
-      if (!emailValid || !email.trim()) return;
+      if (!whatsappValid) return;
       await mergeUrgenciaPenalRow({
-        email: email.trim(),
+        email: dummyEmail,
         nombre: nombre.trim() || null,
         telefono: whatsapp.replace(/\D/g, '') || null,
         rut_detenido: rutDetenido.trim() || null,
@@ -408,17 +513,18 @@ export default function UrgenciaPage() {
         horas_detenido: horasDetenido,
         is_complejo: isComplejo,
         precio_clp: precio,
-        lead_score: isComplejo ? 'HOT_URGENCIA_COMPLEJA' : 'WARM_URGENCIA_SIMPLE',
+        lead_score: leadScore,
         paso: step,
         riesgo_porcentaje: riesgoPorcentaje,
         user_agent: typeof navigator !== 'undefined' ? navigator.userAgent : null,
         mercado_pago_iniciado: false,
+        extra: { lead_score_tier: leadScore, precio_clp: precio },
         ...overrides,
       });
     },
     [
-      email,
-      emailValid,
+      dummyEmail,
+      whatsappValid,
       nombre,
       whatsapp,
       rutDetenido,
@@ -430,6 +536,7 @@ export default function UrgenciaPage() {
       horasDetenido,
       isComplejo,
       precio,
+      leadScore,
       step,
       riesgoPorcentaje,
     ]
@@ -464,24 +571,25 @@ export default function UrgenciaPage() {
 
   // Auto-save lead en cualificación (ninja)
   const saveLead = useCallback(async () => {
-    if (!emailValid || !email.trim() || leadSaved) return;
+    if (!whatsappValid || leadSaved) return;
     try {
       const quizData = {
-        email: email.trim(),
+        email: dummyEmail,
         name: nombre.trim() || 'Urgencia',
         status: 'urgencia_cualificacion',
         quiz_answers: {
           source: 'urgencia_penal',
           nombre: nombre.trim(),
           whatsapp: whatsapp.replace(/\s/g, ''),
-          email: email.trim(),
+          email: dummyEmail,
           situacion,
           antecedentes: tieneAntecedentes,
           gravedad_lesiones: gravedadLesiones,
           horas_detenido: horasDetenido,
           unidad_policial: unidadPolicial.trim(),
           rut_detenido: rutDetenido.trim(),
-          lead_score: isComplejo ? 'HOT_URGENCIA_COMPLEJA' : 'WARM_URGENCIA_SIMPLE',
+          lead_score: leadScore,
+          precio_clp: precio,
         },
       };
       const { data: updatedRows, error: updateErr } = await supabase
@@ -490,14 +598,14 @@ export default function UrgenciaPage() {
           status: 'urgencia_cualificacion',
           quiz_answers: quizData.quiz_answers as any,
         })
-        .eq('email', email.trim())
+        .eq('email', dummyEmail)
         .select('id');
       const didUpdate = !updateErr && updatedRows && updatedRows.length > 0;
       if (didUpdate) {
         setLeadSaved(true);
         trackMetaEvent({
           event_name: 'Lead',
-          user_data: { em: email.trim() },
+          user_data: { em: dummyEmail },
           custom_data: {
             content_name: 'Urgencia Penal - Lead Capturado',
             content_category: 'Urgencia',
@@ -510,7 +618,7 @@ export default function UrgenciaPage() {
       } else {
         const { error: insertErr } = await supabase.from('leads_quiz').insert([
           {
-            email: email.trim(),
+            email: dummyEmail,
             name: nombre.trim() || 'Urgencia',
             status: 'urgencia_cualificacion',
             quiz_answers: quizData.quiz_answers as any,
@@ -520,7 +628,7 @@ export default function UrgenciaPage() {
           setLeadSaved(true);
           trackMetaEvent({
             event_name: 'Lead',
-            user_data: { em: email.trim() },
+            user_data: { em: dummyEmail },
             custom_data: {
               content_name: 'Urgencia Penal - Lead Capturado',
               content_category: 'Urgencia',
@@ -538,8 +646,8 @@ export default function UrgenciaPage() {
       console.warn('Lead save:', e);
     }
   }, [
-    email,
-    emailValid,
+    dummyEmail,
+    whatsappValid,
     nombre,
     whatsapp,
     situacion,
@@ -548,21 +656,21 @@ export default function UrgenciaPage() {
     horasDetenido,
     unidadPolicial,
     rutDetenido,
-    isComplejo,
+    leadScore,
+    precio,
     leadSaved,
     pushUrgenciaPenal,
   ]);
 
   useEffect(() => {
-    if (step === 'captura' || !emailValid || !email.trim()) return;
+    if (step === 'captura' || !whatsappValid) return;
     const t = window.setTimeout(() => {
       void pushUrgenciaPenal();
     }, 1400);
     return () => clearTimeout(t);
   }, [
     step,
-    emailValid,
-    email,
+    whatsappValid,
     nombre,
     whatsapp,
     rutDetenido,
@@ -574,22 +682,23 @@ export default function UrgenciaPage() {
     horasDetenido,
     isComplejo,
     precio,
+    leadScore,
     riesgoPorcentaje,
     pushUrgenciaPenal,
   ]);
 
   useEffect(() => {
-    if (emailValid && email) saveLead();
-  }, [emailValid, email, situacion, tieneAntecedentes, gravedadLesiones, horasDetenido, saveLead]);
+    if (whatsappValid) saveLead();
+  }, [whatsappValid, situacion, tieneAntecedentes, gravedadLesiones, horasDetenido, saveLead]);
 
   // Autofocus en el primer campo de cada paso
   useEffect(() => {
     if (step === 'captura') setTimeout(() => nombreInputRef.current?.focus(), 300);
-    if (step === 'cualificacion') setTimeout(() => emailInputRef.current?.focus(), 300);
+    if (step === 'cualificacion') setTimeout(() => whatsappInputRef.current?.focus(), 300);
   }, [step]);
 
   const handleActivar = useCallback(async () => {
-    if (paymentInitiated || isPaying) return;
+    if (!whatsappValid || paymentInitiated || isPaying) return;
     setPaymentInitiated(true);
     setError('');
     setIsPaying(true);
@@ -611,7 +720,7 @@ export default function UrgenciaPage() {
         ],
         payer: {
           name: nombre.trim(),
-          email: email.trim(),
+          email: dummyEmail,
           phone: { number: whatsapp.replace(/\D/g, '') },
         },
         back_urls: {
@@ -637,7 +746,7 @@ export default function UrgenciaPage() {
       const paymentDataForStorage = {
         id: externalRef,
         nombre: nombre.trim(),
-        email: email.trim(),
+        email: dummyEmail,
         telefono: whatsapp.trim(),
         service: servicioNombre,
         category: 'Urgencia Penal',
@@ -687,11 +796,12 @@ export default function UrgenciaPage() {
   }, [
     paymentInitiated,
     isPaying,
+    whatsappValid,
+    dummyEmail,
     rutDetenido,
     servicioNombre,
     precio,
     nombre,
-    email,
     whatsapp,
     unidadPolicial,
     situacion,
@@ -712,8 +822,7 @@ export default function UrgenciaPage() {
   }, [step, terminalSessionId]);
 
   const canAdvanceCaptura = nombre.trim().length >= 2 && situacion && (unidadPolicial.trim().length >= 3 || geolocStatus === 'detected');
-  const canAdvanceCualificacion =
-    tieneAntecedentes !== null && emailValid && whatsappValid;
+  const canAdvanceCualificacion = tieneAntecedentes !== null && whatsappValid;
 
   const handleCapturaNext = () => {
     if (!canAdvanceCaptura) return;
@@ -744,7 +853,7 @@ export default function UrgenciaPage() {
     }, 400);
     trackMetaEvent({
       event_name: 'InitiateCheckout',
-      user_data: { em: email },
+      user_data: { em: dummyEmail },
       custom_data: {
         content_name: servicioNombre,
         content_category: 'Urgencia Penal',
@@ -759,11 +868,10 @@ export default function UrgenciaPage() {
     return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
   }, [nombre, servicioNombre, situacion]);
 
-  const whatsappButtonText = useMemo(() => {
-    if (step === 'captura') return 'Hablar ahora';
-    if (step === 'cualificacion') return 'Consultar mi caso';
-    return 'Hablar con el equipo';
-  }, [step]);
+  const whatsappVipUrl = useMemo(() => {
+    const msg = `🚨 URGENCIA PREMIUM / LÍNEA DIRECTA: Caso de extrema gravedad (${situacion || 'detalle en formulario'}). Solicito contacto inmediato con Socio del Estudio — disponibilidad 24/7. Contacto: ${nombre || '—'}. Unidad: ${unidadPolicial.trim() || '—'}.`;
+    return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
+  }, [nombre, situacion, unidadPolicial]);
 
   return (
     <>
@@ -830,7 +938,7 @@ export default function UrgenciaPage() {
 
                 <div className="glass-ios-panel-dark p-4 sm:p-5 space-y-3">
                   <div className="flex items-center gap-2">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-slate-100/90 border border-slate-200/90 dark:bg-white/[0.06] dark:border-white/[0.08]">
+                    <div className="urgencia-icon-well flex h-8 w-8 items-center justify-center">
                       <MapPin className="w-4 h-4 text-rose-600/90 dark:text-rose-300/90" />
                     </div>
                     <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
@@ -900,25 +1008,47 @@ export default function UrgenciaPage() {
                   <label className="block text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">
                     Motivo de detención
                   </label>
-                  <div className="urgencia-situacion-grid" role="group" aria-label="Motivos de detención">
-                    {SITUACIONES.map((s) => (
-                      <motion.button
-                        key={s.id}
-                        type="button"
-                        onClick={() => {
-                          triggerHaptic('medium');
-                          setSituacion(s.id);
-                        }}
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.97 }}
-                        className={`urgencia-chip urgencia-chip--watch ${situacion === s.id ? 'urgencia-chip--active' : ''}`}
-                      >
-                        <span className="urgencia-chip__icon">
-                          <s.Icon className="w-[1.1rem] h-[1.1rem] sm:w-[1.15rem] sm:h-[1.15rem]" strokeWidth={2} />
-                        </span>
-                        <span className="urgencia-chip-watch-label">{s.label}</span>
-                      </motion.button>
-                    ))}
+                  <div className="relative isolate min-h-[1px]">
+                    <div className="urgencia-situacion-glow urgencia-situacion-glow--left" aria-hidden />
+                    <div className="urgencia-situacion-glow urgencia-situacion-glow--right" aria-hidden />
+                    <div className="urgencia-situacion-grid relative z-10" role="group" aria-label="Motivos de detención">
+                      {SITUACIONES.filter((s) => s.id !== 'grave').map((s) => (
+                        <motion.button
+                          key={s.id}
+                          type="button"
+                          onClick={() => {
+                            triggerHaptic('medium');
+                            setSituacion(s.id);
+                          }}
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.97 }}
+                          className={`urgencia-chip urgencia-chip--watch ${situacion === s.id ? 'urgencia-chip--active' : ''}`}
+                        >
+                          <span className="urgencia-chip__icon">
+                            <s.Icon className="w-[1.1rem] h-[1.1rem] sm:w-[1.15rem] sm:h-[1.15rem]" strokeWidth={2} />
+                          </span>
+                          <span className="urgencia-chip-watch-label">{s.label}</span>
+                        </motion.button>
+                      ))}
+                      <div className="urgencia-situacion-grave-row">
+                        <motion.button
+                          key={GRAVE_CHIP.id}
+                          type="button"
+                          onClick={() => {
+                            triggerHaptic('medium');
+                            setSituacion(GRAVE_CHIP.id);
+                          }}
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.97 }}
+                          className={`urgencia-chip urgencia-chip--watch urgencia-chip--otro-grave ${situacion === GRAVE_CHIP.id ? 'urgencia-chip--active' : ''}`}
+                        >
+                          <span className="urgencia-chip__icon">
+                            <GRAVE_CHIP.Icon className="w-[1.1rem] h-[1.1rem] sm:w-[1.15rem] sm:h-[1.15rem]" strokeWidth={2} />
+                          </span>
+                          <span className="urgencia-chip-watch-label">{GRAVE_CHIP.label}</span>
+                        </motion.button>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
@@ -1153,39 +1283,7 @@ export default function UrgenciaPage() {
                   </div>
                 </div>
 
-                <div className="glass-ios-panel-dark p-4 sm:p-5 space-y-4">
-                  <div className="relative">
-                    <label
-                      htmlFor="urgencia-email"
-                      className="mb-2 block text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500"
-                    >
-                      Email
-                    </label>
-                    <div className="relative w-full">
-                      <Mail className="pointer-events-none absolute left-3.5 top-1/2 z-[1] h-4 w-4 -translate-y-1/2 urgencia-input-icon" />
-                      <input
-                        ref={emailInputRef}
-                        id="urgencia-email"
-                        name="email"
-                        type="email"
-                        placeholder="correo@ejemplo.cl"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        className={`urgencia-input pl-11 pr-11 ${email && emailValid ? 'urgencia-input--valid' : ''}`}
-                        autoComplete="email"
-                        autoCapitalize="off"
-                        autoCorrect="off"
-                        spellCheck={false}
-                        inputMode="email"
-                        enterKeyHint="next"
-                      />
-                      {email && emailValid && (
-                        <div className="urgencia-input-check absolute right-3.5 top-1/2 -translate-y-1/2">
-                          <Check className="h-3.5 w-3.5" strokeWidth={2.5} />
-                        </div>
-                      )}
-                    </div>
-                  </div>
+                <div className="glass-ios-panel-dark p-4 sm:p-5 space-y-3">
                   <div className="relative">
                     <label
                       htmlFor="urgencia-telefono-movil"
@@ -1196,6 +1294,7 @@ export default function UrgenciaPage() {
                     <div className="relative w-full">
                       <Phone className="pointer-events-none absolute left-3.5 top-1/2 z-[1] h-4 w-4 -translate-y-1/2 urgencia-input-icon" />
                       <input
+                        ref={whatsappInputRef}
                         id="urgencia-telefono-movil"
                         name="tel"
                         type="tel"
@@ -1297,6 +1396,7 @@ export default function UrgenciaPage() {
                       gravedadLesiones={gravedadLesiones}
                       riesgoPorcentaje={riesgoPorcentaje}
                       isComplejo={isComplejo}
+                      isPremiumCrime={isPremiumCrime}
                       onTypingComplete={handleTerminalTypingComplete}
                     />
                   </div>
@@ -1365,11 +1465,14 @@ export default function UrgenciaPage() {
                 <AnimatePresence mode="wait">
                   {isTerminalComplete && (
                     <motion.div
-                      key="urgencia-checkout"
+                      key="urgencia-checkout-group"
                       initial={{ opacity: 0, y: 12 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: 8 }}
                       transition={{ type: 'spring', stiffness: 300, damping: 34 }}
+                      className="space-y-4"
+                    >
+                    <div
                       className="glass-ios-panel-dark rounded-[1.35rem] border border-slate-200/90 dark:border-white/[0.09] overflow-hidden shadow-[0_24px_80px_-44px_rgba(15,23,42,0.1)] dark:shadow-[0_24px_80px_-44px_rgba(0,0,0,0.7)]"
                     >
                       <div className="px-4 py-3.5 sm:px-5 border-b border-slate-200/80 dark:border-white/[0.07] bg-slate-50/80 dark:bg-white/[0.025] backdrop-blur-sm">
@@ -1495,6 +1598,22 @@ export default function UrgenciaPage() {
                           </div>
                         )}
                       </div>
+                    </div>
+                    {isPremiumCrime && (
+                      <div className="pt-0">
+                        <a
+                          href={whatsappVipUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="urgencia-secondary-cta flex w-full items-center justify-center gap-2 px-4 py-3.5 text-center text-[0.8125rem] font-semibold leading-snug text-slate-800 dark:text-slate-100"
+                        >
+                          <MessageCircle className="h-4 w-4 shrink-0 opacity-90" aria-hidden />
+                          <span>
+                            ¿Caso de extrema gravedad? Toca aquí para despertar a un Socio del Estudio (Línea Directa 24/7)
+                          </span>
+                        </a>
+                      </div>
+                    )}
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -1545,9 +1664,9 @@ export default function UrgenciaPage() {
                               </>
                             ) : (
                               <>
-                                <Lock className="h-4 w-4 shrink-0 opacity-90" aria-hidden />
+                                <Siren className="h-4 w-4 shrink-0 opacity-90" aria-hidden />
                                 <span className="urgencia-primary-cta__label min-w-0 leading-snug">
-                                  Pagar ${precioFmt} · Mercado Pago
+                                  Desplegar Abogado a {unidadCortaCheckout} por ${precioFmt}
                                 </span>
                                 <ChevronRight className="h-5 w-5 shrink-0 opacity-90" aria-hidden />
                               </>
@@ -1565,36 +1684,6 @@ export default function UrgenciaPage() {
             )}
           </AnimatePresence>
         </main>
-
-        {/* WhatsApp flotante - badge en terminal, animación */}
-        <motion.a
-          href={whatsappUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className={`fixed right-4 bottom-safe z-50 flex min-h-[52px] items-center gap-2.5 rounded-2xl border border-white/20 bg-[#25D366]/92 px-5 py-3 text-white shadow-[0_20px_50px_-12px_rgba(0,0,0,0.55)] backdrop-blur-xl backdrop-saturate-150 font-semibold text-[0.9375rem] ring-1 ring-inset ring-white/15 transition-all duration-300 hover:bg-[#22c55e]/95 active:scale-[0.97] ${
-            step === 'terminal' && isTerminalComplete
-              ? 'bottom-[max(9.5rem,calc(8.5rem+env(safe-area-inset-bottom)))]'
-              : 'bottom-6'
-          }`}
-          initial={{ scale: 0, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ delay: 0.5, type: 'spring', stiffness: 300 }}
-          whileTap={{ scale: 0.96 }}
-        >
-          <div className="relative">
-            <MessageCircle className="w-5 h-5" />
-            {step === 'terminal' && (
-              <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: [1, 1.2, 1] }}
-                transition={{ duration: 1, repeat: Infinity }}
-                className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-rose-500 rounded-full"
-                style={{ boxShadow: '0 0 12px rgba(239,68,68,1)' }}
-              />
-            )}
-          </div>
-          <span className="text-sm">{whatsappButtonText}</span>
-        </motion.a>
 
         {/* Overlay success al completar paso */}
         <AnimatePresence>

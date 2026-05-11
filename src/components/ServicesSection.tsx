@@ -29,6 +29,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { trackMetaEvent } from "@/services/metaConversionsService";
+import { laborClusterMetaValueClp } from "@/constants/laborAgendamientoPlans";
 
 interface ExternalService {
   title: string;
@@ -85,6 +86,8 @@ interface InternalService {
   free?: boolean;
   /** Minutos de sesión mostrados en trust pills (default 45) */
   sessionDurationMin?: number;
+  /** Atajos laboral (desktop) — mismo plan que agendamiento */
+  clusterPills?: { label: string; plan: string }[];
 }
 
 /** Catálogo web/móvil: al cambiar títulos, sincronizar `supabase/functions/_shared/landingServiceTitles.ts` (correos / WhatsApp). */
@@ -955,8 +958,8 @@ interface MobileServiceCardProps {
  *   - Icon tile (48px, color del servicio)
  *   - Title + hook breve (1-2 líneas)
  *   - Price right-aligned + chevron expandible
- *   - Tap en chevron → expande features + CTA
- *   - Tap en cuerpo → directo al agendamiento
+ *   - Tap en chevron → expande features + CTA secundario
+ *   - Tap en cuerpo (fila principal) → directo al agendamiento con el plan de la tarjeta
  *
  * Reemplaza el horizontal snap carousel (incómodo con 17 cards).
  * Pensado para scroll vertical natural con thumb-zone óptima.
@@ -1018,50 +1021,63 @@ const MobileServiceCard = ({
         </div>
       )}
 
-      {/* Fila principal — tap para expandir features */}
-      <button
-        type="button"
-        onClick={() => setExpanded((e) => !e)}
-        className="mobile-service-card__row"
-        aria-expanded={expanded}
-        aria-label={`${service.title} — toca para ver detalles`}
-      >
-        <span
-          className="mobile-service-card__tile"
-          style={{
-            background: `linear-gradient(135deg, rgb(${service.accent}), rgba(${service.accent}, 0.72))`,
-          }}
-          aria-hidden
+      {/* Fila principal: cuerpo → agendamiento; chevron → ver detalles */}
+      <div className="mobile-service-card__row">
+        <button
+          type="button"
+          onClick={onClick}
+          className="mobile-service-card__row-main"
+          aria-label={`${service.ctaLabel} — ${service.title}`}
         >
-          <Icon className="h-5 w-5" strokeWidth={2.2} />
-        </span>
+          <span
+            className="mobile-service-card__tile"
+            style={{
+              background: `linear-gradient(135deg, rgb(${service.accent}), rgba(${service.accent}, 0.72))`,
+            }}
+            aria-hidden
+          >
+            <Icon className="h-5 w-5" strokeWidth={2.2} />
+          </span>
 
-        <div className="mobile-service-card__body">
-          <h3 className="mobile-service-card__title">{service.shortName}</h3>
-          <p className="mobile-service-card__hook">{service.hook}</p>
-        </div>
+          <div className="mobile-service-card__body">
+            <h3 className="mobile-service-card__title">{service.shortName}</h3>
+            <p className="mobile-service-card__hook">{service.hook}</p>
+          </div>
 
-        <div className="mobile-service-card__price-col">
-          <p className="mobile-service-card__price">
-            {service.price}
-          </p>
-          {service.priceBefore && !service.free && (
-            <p className="mobile-service-card__price-before">
-              {service.priceBefore}
+          <div className="mobile-service-card__price-col">
+            <p className="mobile-service-card__price">
+              {service.price}
             </p>
-          )}
-          {discount !== null && (
-            <span className="mobile-service-card__discount">−{discount}%</span>
-          )}
-        </div>
+            {service.priceBefore && !service.free && (
+              <p className="mobile-service-card__price-before">
+                {service.priceBefore}
+              </p>
+            )}
+            {discount !== null && (
+              <span className="mobile-service-card__discount">−{discount}%</span>
+            )}
+          </div>
+        </button>
 
-        <ChevronDown
-          className={`mobile-service-card__chevron h-4 w-4 transition-transform ${
-            expanded ? "rotate-180" : ""
-          }`}
-          aria-hidden
-        />
-      </button>
+        <button
+          type="button"
+          className="mobile-service-card__row-chevron"
+          aria-expanded={expanded}
+          aria-label={
+            expanded
+              ? `Ocultar qué incluye ${service.shortName}`
+              : `Ver qué incluye ${service.shortName}`
+          }
+          onClick={() => setExpanded((e) => !e)}
+        >
+          <ChevronDown
+            className={`mobile-service-card__chevron h-4 w-4 transition-transform ${
+              expanded ? "rotate-180" : ""
+            }`}
+            aria-hidden
+          />
+        </button>
+      </div>
 
       {/* Expandible — features + CTA */}
       <AnimatePresence initial={false}>

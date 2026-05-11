@@ -49,7 +49,8 @@ All colors MUST be HSL.
     --destructive-foreground: 0 0% 98%;
     --border: 0 0% 92%; /* #ebebeb - Bordes muy sutiles */
     --input: 0 0% 95%; /* #f2f2f2 - Inputs claros */
-    --ring: 20 95% 55%;
+    /* Anillo de foco accesible — slate/cyan (nunca naranja: evita halo al tocar) */
+    --ring: 215 20% 46%;
 
     /* Variables CSS Premium Unificadas - Modo Claro */
     --accent-start: 20 95% 55%; /* #ff6b35 */
@@ -92,7 +93,7 @@ All colors MUST be HSL.
     --sidebar-accent: 30 10% 94%;
     --sidebar-accent-foreground: 0 0% 20%;
     --sidebar-border: 0 0% 92%;
-    --sidebar-ring: 20 95% 55%;
+    --sidebar-ring: 215 20% 46%;
   }
 
   .dark {
@@ -118,7 +119,7 @@ All colors MUST be HSL.
     --destructive-foreground: 0 0% 98%;
     --border: 0 0% 15%;
     --input: 0 0% 6%;
-    --ring: 22 100% 50%;
+    --ring: 199 70% 48%;
 
     /* Variables CSS Premium Unificadas - Modo Oscuro */
     --accent-start: 22 100% 50%; /* #FF7A00 */
@@ -166,6 +167,37 @@ All colors MUST be HSL.
   .dark body {
     background: hsl(222 47% 5%);
     color: hsl(210 20% 98%);
+  }
+
+  /*
+   * Halo naranja al tocar: venía del --ring en focus (shadcn) + tap highlight del SO.
+   * Neutralizamos highlight táctil y outline en foco mouse/touch; :focus-visible sigue disponible en componentes que lo definen.
+   */
+  button,
+  [type='button'],
+  [type='submit'],
+  [type='reset'],
+  [role='button'],
+  summary {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  button,
+  [type='button'],
+  [type='submit'],
+  [type='reset'] {
+    accent-color: transparent;
+  }
+
+  button:focus:not(:focus-visible),
+  [type='button']:focus:not(:focus-visible),
+  [type='submit']:focus:not(:focus-visible),
+  [role='button']:focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  .landing-canvas #servicios a[href] {
+    -webkit-tap-highlight-color: transparent;
   }
   
   /* Orbes ambient — alineados con la paleta brand (cyan/blue, sin orange).
@@ -610,16 +642,21 @@ All colors MUST be HSL.
     color: hsl(var(--la-fg));
   }
 
+  html:not(.dark) .urgencia-focus .urgencia-icon-well,
   html:not(.dark) .urgencia-focus .urgencia-chip__icon {
-    background: hsla(350 45% 94% / 0.95);
-    border: 1px solid hsla(350 35% 88% / 0.9);
-    color: hsl(350 45% 38%);
+    background: rgba(255, 255, 255, 0.94);
+    border: 1px solid rgba(226, 232, 240, 0.95);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.98);
+    color: hsl(350 55% 42%);
   }
 
   html:not(.dark) .urgencia-focus .urgencia-chip--active .urgencia-chip__icon {
-    background: hsla(350 55% 92% / 0.98);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.99) 0%, hsl(350 100% 98.5% / 0.97) 100%);
     border-color: hsla(350 48% 72% / 0.55);
     color: hsl(350 42% 32%);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.95),
+      0 0 0 1px hsla(350 45% 70% / 0.12);
   }
 
   html:not(.dark) .urgencia-focus .urgencia-seg-btn--on-warn {
@@ -646,10 +683,13 @@ All colors MUST be HSL.
   }
 
   html:not(.dark) .urgencia-focus .urgencia-kicker-pill {
-    border-color: hsla(var(--la-outline) / 0.14);
+    background: rgba(255, 255, 255, 0.88);
+    border-color: rgba(226, 232, 240, 0.95);
     box-shadow:
       0 12px 32px -22px rgba(15, 23, 42, 0.08),
-      inset 0 1px 0 rgba(255, 255, 255, 0.9);
+      inset 0 1px 0 rgba(255, 255, 255, 0.95);
+    -webkit-backdrop-filter: blur(28px) saturate(160%);
+    backdrop-filter: blur(28px) saturate(160%);
   }
 
   html:not(.dark) .urgencia-focus .urgencia-input:-webkit-autofill,
@@ -697,8 +737,8 @@ All colors MUST be HSL.
       inset 0 1px 0 rgba(255, 255, 255, 0.65) !important;
   }
 
-  /* Foco /urgencia — cyan/azul (evita anillo naranja global) */
-  .urgencia-focus button:focus-visible,
+  /* Foco /urgencia — cyan/azul; excluye chips (definen su propio foco, sin heredar anillo genérico) */
+  .urgencia-focus button:not(.urgencia-chip):focus-visible,
   .urgencia-focus summary:focus-visible {
     outline: none !important;
     box-shadow:
@@ -706,7 +746,7 @@ All colors MUST be HSL.
       0 0 0 4px hsla(var(--la-accent-to) / 0.48) !important;
   }
 
-  html:not(.dark) .urgencia-focus button:focus-visible,
+  html:not(.dark) .urgencia-focus button:not(.urgencia-chip):focus-visible,
   html:not(.dark) .urgencia-focus summary:focus-visible {
     box-shadow:
       0 0 0 2px rgb(255 255 255),
@@ -1052,6 +1092,12 @@ All colors MUST be HSL.
     }
   }
 
+  /* Well cuadrado para iconos de campo (misma base blanca / vidrio que círculos del grid en claro) */
+  .urgencia-icon-well {
+    flex-shrink: 0;
+    border-radius: 0.75rem;
+  }
+
   .urgencia-chip {
     border-radius: 1.125rem;
     padding: 0.75rem 0.75rem;
@@ -1071,6 +1117,33 @@ All colors MUST be HSL.
       0 10px 28px -20px rgba(0, 0, 0, 0.55),
       inset 0 1px 0 hsla(var(--la-outline-warm) / 0.14);
     transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, color 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+    accent-color: transparent;
+    outline: none;
+  }
+
+  .urgencia-chip:focus:not(:focus-visible) {
+    outline: none;
+    box-shadow:
+      0 10px 28px -20px rgba(0, 0, 0, 0.55),
+      inset 0 1px 0 hsla(var(--la-outline-warm) / 0.14);
+  }
+
+  .urgencia-chip:focus-visible {
+    outline: none;
+    box-shadow:
+      0 0 0 2px hsl(218 52% 7%),
+      0 0 0 4px hsla(var(--la-accent-to) / 0.42),
+      0 10px 28px -20px rgba(0, 0, 0, 0.55),
+      inset 0 1px 0 hsla(var(--la-outline-warm) / 0.14);
+  }
+
+  html:not(.dark) .urgencia-focus .urgencia-chip:focus-visible {
+    box-shadow:
+      0 0 0 2px rgb(255 255 255),
+      0 0 0 4px hsla(217 91% 48% / 0.35),
+      0 10px 28px -20px rgba(0, 0, 0, 0.55),
+      inset 0 1px 0 hsla(var(--la-outline-warm) / 0.14);
   }
 
   .urgencia-chip:hover {
@@ -1105,10 +1178,27 @@ All colors MUST be HSL.
     color: hsl(350 45% 78%);
   }
 
+  html.dark .urgencia-focus .urgencia-icon-well,
+  html.dark .urgencia-focus .urgencia-chip__icon {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: hsl(350 52% 82%);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  }
+
   .urgencia-chip--active .urgencia-chip__icon {
     background: hsla(350 42% 28% / 0.45);
     border-color: hsla(350 48% 55% / 0.28);
     color: hsl(350 40% 94%);
+  }
+
+  html.dark .urgencia-focus .urgencia-chip--active .urgencia-chip__icon {
+    background: hsla(350 42% 28% / 0.45);
+    border-color: hsla(350 48% 55% / 0.28);
+    color: hsl(350 40% 94%);
+    box-shadow:
+      inset 0 1px 0 hsla(350 50% 50% / 0.12),
+      0 0 0 1px hsla(350 45% 40% / 0.15);
   }
 
   /* Rejilla tipo launcher Apple Watch: todas las opciones visibles sin scroll horizontal */
@@ -1124,6 +1214,57 @@ All colors MUST be HSL.
       grid-template-columns: repeat(5, minmax(0, 1fr));
       gap: 0.625rem 0.5rem;
     }
+  }
+
+  /* “Otro delito grave” alineado abajo a la derecha, mismo ancho que una celda */
+  .urgencia-situacion-grave-row {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .urgencia-situacion-grave-row .urgencia-chip--otro-grave {
+    width: calc((100% - 2 * 0.375rem) / 3);
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  @media (min-width: 640px) {
+    .urgencia-situacion-grave-row .urgencia-chip--otro-grave {
+      width: calc((100% - 4 * 0.5rem) / 5);
+    }
+  }
+
+  /* Luce roja ambiental a la altura del grid de motivos (patrón orbes del sitio) */
+  .urgencia-situacion-glow {
+    position: absolute;
+    border-radius: 9999px;
+    pointer-events: none;
+    z-index: 0;
+    filter: blur(44px);
+    mix-blend-mode: normal;
+    opacity: 0.42;
+  }
+
+  html.dark .urgencia-focus .urgencia-situacion-glow {
+    mix-blend-mode: screen;
+    opacity: 0.38;
+  }
+
+  .urgencia-situacion-glow--left {
+    width: 11.5rem;
+    height: 11.5rem;
+    left: -2.25rem;
+    top: 18%;
+    background: radial-gradient(circle at 40% 40%, rgba(244, 63, 94, 0.42) 0%, transparent 68%);
+  }
+
+  .urgencia-situacion-glow--right {
+    width: 10rem;
+    height: 10rem;
+    right: -2rem;
+    top: 42%;
+    background: radial-gradient(circle at 55% 45%, rgba(190, 24, 60, 0.36) 0%, transparent 70%);
   }
 
   .urgencia-chip--watch {
@@ -1656,6 +1797,11 @@ All colors MUST be HSL.
   }
 
   /* Cluster laboral / pills desktop — mismo vidrio teal que móvil */
+  .landing-canvas #servicios .service-cluster-pill {
+    -webkit-tap-highlight-color: transparent;
+    accent-color: transparent;
+    outline: none;
+  }
   html:not(.dark) .landing-canvas #servicios .service-cluster-pill {
     color: rgb(15 118 110);
     border: 1px solid rgba(255, 255, 255, 0.72);
@@ -1877,6 +2023,20 @@ All colors MUST be HSL.
       inset 0 1px 0 rgba(255, 255, 255, 0.20);
     border: 1px solid rgba(255, 255, 255, 0.14);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+    accent-color: transparent;
+    outline: none;
+  }
+  .service-card-cta:focus:not(:focus-visible) {
+    outline: none;
+  }
+  .service-card-cta:focus-visible {
+    outline: none;
+    box-shadow:
+      0 14px 32px -10px rgba(var(--card-accent), 0.65),
+      inset 0 1px 0 rgba(255, 255, 255, 0.20),
+      0 0 0 2px rgba(255, 255, 255, 0.55),
+      0 0 0 4px rgba(var(--card-accent), 0.38);
   }
   .service-card-cta:hover {
     transform: translateY(-1px);
@@ -2204,15 +2364,48 @@ All colors MUST be HSL.
   .mobile-service-card__row {
     width: 100%;
     display: flex;
+    align-items: stretch;
+    gap: 0;
+  }
+
+  .mobile-service-card__row-main {
+    flex: 1;
+    min-width: 0;
+    display: flex;
     align-items: flex-start;
     gap: 0.75rem;
-    padding: 0.85rem 0.95rem;
+    padding: 0.85rem 0.35rem 0.85rem 0.95rem;
     background: transparent;
     border: none;
     color: inherit;
     text-align: left;
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
+  }
+
+  .mobile-service-card__row-chevron {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    min-height: 44px;
+    margin: 0.35rem 0.35rem 0.35rem 0;
+    padding: 0;
+    background: transparent;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    border-radius: 12px;
+  }
+
+  .mobile-service-card__row-chevron:hover {
+    background: rgba(255, 255, 255, 0.06);
+  }
+
+  html:not(.dark) .landing-canvas .mobile-service-card__row-chevron:hover {
+    background: rgba(15, 23, 42, 0.06);
   }
 
   .mobile-service-card__tile {
@@ -2568,6 +2761,19 @@ All colors MUST be HSL.
     overflow: hidden;
     position: relative;
     -webkit-tap-highlight-color: transparent;
+    accent-color: transparent;
+    outline: none;
+  }
+  .trending-spotlight__cta:focus:not(:focus-visible) {
+    outline: none;
+  }
+  .trending-spotlight__cta:focus-visible {
+    outline: none;
+    box-shadow:
+      0 14px 32px -10px rgba(var(--spotlight-accent), 0.38),
+      inset 0 1px 0 rgba(255, 255, 255, 0.20),
+      0 0 0 2px rgba(255, 255, 255, 0.55),
+      0 0 0 4px rgba(var(--spotlight-accent), 0.35);
   }
   .trending-spotlight__cta:hover {
     transform: translateY(-1px);

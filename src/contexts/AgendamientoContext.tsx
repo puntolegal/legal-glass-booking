@@ -97,7 +97,7 @@ const AgendamientoProviderInner: React.FC<{ children: ReactNode; initialService?
   
   // Calcular precio
   const priceCalculation = calculatePrice(service, formData);
-  const serviceColors = getServiceColors(service.category);
+  const serviceColors = getServiceColors(service.category, plan);
   
   // Actualizar campo específico del formulario (compatible con react-hook-form)
   const updateFormField = useCallback((field: keyof FormData, value: string) => {

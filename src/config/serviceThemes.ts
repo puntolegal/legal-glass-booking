@@ -2,14 +2,12 @@
  * serviceThemes.ts
  * Fuente de verdad de paletas cromáticas para el flujo agendamiento + pago.
  *
- * SINCRONIZADO con `internalServices` en `ServicesSection.tsx`:
- * el accent de cada plan en la tarjeta del landing es exactamente
- * el mismo color que aparece en el header del agendamiento, en los
- * pills "Plan PDF", en el badge de descuento y en el ConversionSidebar.
+ * SINCRONIZADO con `internalServices[].accent` en `ServicesSection.tsx`
+ * (RGB → degradados hex aquí): CAE wine, Laboral teal, Familia indigo,
+ * pizarra slate, tinta blue-900 (ink), slate-700 (depth).
  *
- * Paleta sobria y masculina — sin tonos fluorescentes (rosados,
- * naranjas saturados o rojos brillantes) que rompían la consistencia
- * con la estética dark-navy + glassmorphism iOS del landing.
+ * `getServiceTheme(plan)` alimenta auroras en AgendamientoLayout, CTAs en
+ * Step1, ConversionSidebar y `getServiceColors(..., plan)` para acentos UI.
  */
 
 import {
@@ -59,19 +57,18 @@ const makeTheme = (
 });
 
 export const serviceThemes: Record<string, ServiceTheme> = {
-  // ===== Personas =====
+  // ===== Personas (tarjetas landing — ver ACCENT_* en ServicesSection) =====
   'tutela-laboral': makeTheme(
-    '#0d9488', // teal-600 — acento apagado (vertical laboral)
-    '#2dd4bf', // teal-400
-    '#0f766e', // teal-700
+    '#2dd4bf',
+    '#14b8a6',
+    '#0f766e',
     Scale,
     'Laboral — Diagnóstico gratis',
     'tutela-laboral',
   ),
-  /** En página laboral, el CTA global del header apunta al diagnóstico gratis. */
   laboral: makeTheme(
-    '#0d9488',
     '#2dd4bf',
+    '#14b8a6',
     '#0f766e',
     Briefcase,
     'Laboral — Consulta',
@@ -79,49 +76,50 @@ export const serviceThemes: Record<string, ServiceTheme> = {
     'tutela-laboral',
   ),
   familia: makeTheme(
-    '#818CF8', // indigo-400 — confianza, sin rosado
-    '#A5B4FC', // indigo-300
-    '#6366F1', // indigo-500
+    '#818cf8',
+    '#a5b4fc',
+    '#6366f1',
     Heart,
     'Derecho de Familia',
     'familia',
   ),
   'consulta-estrategica-familia': makeTheme(
-    '#818CF8',
-    '#A5B4FC',
-    '#6366F1',
+    '#818cf8',
+    '#a5b4fc',
+    '#6366f1',
     Heart,
     'Consulta Estratégica Familia',
     'consulta-estrategica-familia',
   ),
   sucesorio: makeTheme(
-    '#64748B', // slate-500 — sobriedad institucional
-    '#94A3B8', // slate-400
-    '#475569', // slate-600
+    '#94a3b8',
+    '#64748b',
+    '#475569',
     Stamp,
     'Derecho Sucesorio',
     'sucesorio',
   ),
+  /** Landing: misma tinta institucional (blue-900) que Empresarial / Contratos */
   migratorio: makeTheme(
-    '#06B6D4', // cyan-500
-    '#22D3EE', // cyan-400
-    '#0891B2', // cyan-600
+    '#3b82f6',
+    '#2563eb',
+    '#1e3a8a',
     Plane,
     'Derecho Migratorio',
     'migratorio',
   ),
   penal: makeTheme(
-    '#BE123C', // rose-700 — gravedad judicial (sin rojo neón)
-    '#E11D48', // rose-600
-    '#9F1239', // rose-800
+    '#be123c',
+    '#e11d48',
+    '#9f1239',
     Gavel,
     'Derecho Penal',
     'penal',
   ),
   'penal-economico': makeTheme(
-    '#BE123C',
-    '#E11D48',
-    '#9F1239',
+    '#be123c',
+    '#e11d48',
+    '#9f1239',
     Gavel,
     'Derecho Penal Económico',
     'penal-economico',
@@ -129,139 +127,150 @@ export const serviceThemes: Record<string, ServiceTheme> = {
 
   // ===== Empresas =====
   empresarial: makeTheme(
-    '#8B5CF6', // violet-500 — autoridad
-    '#A78BFA', // violet-400
-    '#7C3AED', // violet-600
+    '#3b82f6',
+    '#2563eb',
+    '#1e3a8a',
     Building2,
     'Derecho Empresarial',
     'empresarial',
   ),
   corporativo: makeTheme(
-    '#8B5CF6',
-    '#A78BFA',
-    '#7C3AED',
+    '#3b82f6',
+    '#2563eb',
+    '#1e3a8a',
     Building2,
     'Derecho Corporativo',
     'corporativo',
   ),
   tributario: makeTheme(
-    '#0891B2', // cyan-700 — precisión técnica
-    '#06B6D4', // cyan-500
-    '#0E7490', // cyan-800
+    '#0891b2',
+    '#06b6d4',
+    '#0e7490',
     Calculator,
     'Derecho Tributario',
     'tributario',
   ),
   contratos: makeTheme(
-    '#3B82F6', // blue-500 — claridad contractual
-    '#60A5FA', // blue-400
-    '#2563EB', // blue-600
+    '#3b82f6',
+    '#2563eb',
+    '#1e3a8a',
     FileSignature,
     'Contratos',
     'contratos',
   ),
   comparendos: makeTheme(
-    '#A855F7', // purple-500
-    '#C084FC', // purple-400
-    '#9333EA', // purple-600
+    '#94a3b8',
+    '#64748b',
+    '#475569',
     Gavel,
     'Comparendos DT',
     'comparendos',
   ),
   'fiscalizaciones-dt': makeTheme(
-    '#7C3AED', // violet-600 (en vez de pink que era fluor)
-    '#8B5CF6', // violet-500
-    '#6D28D9', // violet-700
+    '#94a3b8',
+    '#64748b',
+    '#475569',
     ShieldAlert,
     'Fiscalizaciones DT',
     'fiscalizaciones-dt',
   ),
   'defensa-laboral-empresarial': makeTheme(
-    '#4338CA', // indigo-700 — sobriedad corporativa
-    '#6366F1', // indigo-500
-    '#3730A3', // indigo-800
+    '#64748b',
+    '#475569',
+    '#334155',
     Briefcase,
     'Defensa Laboral Empresarial',
     'defensa-laboral-empresarial',
   ),
   'ley-karin': makeTheme(
-    '#7C3AED', // violet-600
-    '#8B5CF6', // violet-500
-    '#6D28D9', // violet-700
+    '#3b82f6',
+    '#2563eb',
+    '#1e3a8a',
     ShieldCheck,
     'Ley Karin',
     'ley-karin',
   ),
+  /** Misma familia cromática que la tarjeta Laboral del landing */
   'defensa-karin-trabajador': makeTheme(
-    '#7C3AED',
-    '#8B5CF6',
-    '#6D28D9',
+    '#2dd4bf',
+    '#14b8a6',
+    '#0f766e',
     ShieldCheck,
     'Defensa Ley Karin (trabajador)',
     'defensa-karin-trabajador',
   ),
   'comparendo-rm': makeTheme(
-    '#A855F7',
-    '#C084FC',
-    '#9333EA',
+    '#2dd4bf',
+    '#14b8a6',
+    '#0f766e',
     Gavel,
     'Comparendo DT RM',
     'comparendo-rm',
   ),
   cumplimiento: makeTheme(
-    '#9333EA', // purple-600
-    '#A855F7', // purple-500
-    '#7E22CE', // purple-700
+    '#3b82f6',
+    '#2563eb',
+    '#1e3a8a',
     ShieldCheck,
     'Cumplimiento',
     'cumplimiento',
   ),
   compliance: makeTheme(
-    '#9333EA',
-    '#A855F7',
-    '#7E22CE',
+    '#3b82f6',
+    '#2563eb',
+    '#1e3a8a',
     ShieldCheck,
     'Cumplimiento',
     'compliance',
   ),
   marcas: makeTheme(
-    '#0EA5E9', // sky-500 (en vez de pink fluor)
-    '#38BDF8', // sky-400
-    '#0284C7', // sky-600
+    '#94a3b8',
+    '#64748b',
+    '#475569',
     Award,
     'Marcas — INAPI',
     'marcas',
   ),
   'propiedad-intelectual': makeTheme(
-    '#0EA5E9',
-    '#38BDF8',
-    '#0284C7',
+    '#94a3b8',
+    '#64748b',
+    '#475569',
     Award,
     'Propiedad Intelectual',
     'propiedad-intelectual',
   ),
 
   // ===== Patrimonio =====
+  /** Landing: ACCENT_SLATE — mismo tono que Sucesorio / Marcas */
   inmobiliario: makeTheme(
-    '#14B8A6', // teal-500 — patrimonio estable
-    '#2DD4BF', // teal-400
-    '#0D9488', // teal-600
+    '#94a3b8',
+    '#64748b',
+    '#475569',
     Landmark,
     'Derecho Inmobiliario',
     'inmobiliario',
   ),
+  'inmobiliario-eval': makeTheme(
+    '#34d399',
+    '#10b981',
+    '#047857',
+    Landmark,
+    'Evaluación inmobiliaria',
+    'inmobiliario-eval',
+  ),
   cobranza: makeTheme(
-    '#22C55E', // green-500
-    '#4ADE80', // green-400
-    '#16A34A', // green-600
+    '#3b82f6',
+    '#2563eb',
+    '#1e3a8a',
     Banknote,
     'Cobranza',
     'cobranza',
   ),
+  /** Landing: ACCENT_WINE rgb(127,29,29) — ancla red-900 */
   'cae-tesoreria': makeTheme(
-    '#DC2626', // red-600 — urgencia (más oscuro que red-500, menos fluor)
-    '#EF4444', // red-500
-    '#B91C1C', // red-700
+    '#dc2626',
+    '#b91c1c',
+    '#7f1d1d',
     Receipt,
     'Defensa CAE — TGR',
     'cae-tesoreria',
@@ -269,41 +278,41 @@ export const serviceThemes: Record<string, ServiceTheme> = {
 
   // ===== Empresariales de alto ticket =====
   'constitucion-empresarial': makeTheme(
-    '#7C3AED', // violet-600
-    '#8B5CF6', // violet-500
-    '#6D28D9', // violet-700
+    '#64748b',
+    '#475569',
+    '#334155',
     Building2,
     'Constitución Empresarial',
     'constitucion-empresarial',
   ),
-  'reestructuracion': makeTheme(
-    '#4F46E5', // indigo-600
-    '#6366F1', // indigo-500
-    '#4338CA', // indigo-700
+  reestructuracion: makeTheme(
+    '#3b82f6',
+    '#2563eb',
+    '#1e3a8a',
     Landmark,
     'Reestructuración Societaria',
     'reestructuracion',
   ),
   'holding-patrimonial': makeTheme(
-    '#1E3A8A', // blue-900 — institucional patrimonial
-    '#1D4ED8', // blue-700
-    '#172554', // blue-950
+    '#3b82f6',
+    '#2563eb',
+    '#1e3a8a',
     Landmark,
     'Holding Patrimonial',
     'holding-patrimonial',
   ),
   'gestion-patrimonial': makeTheme(
-    '#4338CA', // indigo-700
-    '#6366F1', // indigo-500
-    '#3730A3', // indigo-800
+    '#64748b',
+    '#475569',
+    '#334155',
     Briefcase,
     'Gestión Patrimonial',
     'gestion-patrimonial',
   ),
   'despido-empresa': makeTheme(
-    '#9333EA', // purple-600
-    '#A855F7', // purple-500
-    '#7E22CE', // purple-700
+    '#3b82f6',
+    '#2563eb',
+    '#1e3a8a',
     Briefcase,
     'Despido Empresarial',
     'despido-empresa',
@@ -311,9 +320,9 @@ export const serviceThemes: Record<string, ServiceTheme> = {
 
   // ===== Penal económico (Ley 21.595) =====
   'delitos-economicos': makeTheme(
-    '#991B1B', // red-800 — gravedad corporativa
-    '#B91C1C', // red-700
-    '#7F1D1D', // red-900
+    '#991b1b',
+    '#b91c1c',
+    '#7f1d1d',
     Briefcase,
     'Delitos Económicos',
     'delitos-economicos',
@@ -321,43 +330,52 @@ export const serviceThemes: Record<string, ServiceTheme> = {
 
   // ===== Otros / legacy =====
   civil: makeTheme(
-    '#0EA5E9', // sky-500
-    '#38BDF8', // sky-400
-    '#0284C7', // sky-600
+    '#3b82f6',
+    '#2563eb',
+    '#1e3a8a',
     Scale,
     'Derecho Civil',
     'civil',
   ),
   'administracion-publica': makeTheme(
-    '#0EA5E9',
-    '#38BDF8',
-    '#0284C7',
+    '#3b82f6',
+    '#2563eb',
+    '#1e3a8a',
     HomeIcon,
     'Derecho Administrativo',
     'administracion-publica',
   ),
   consumidor: makeTheme(
-    '#3B82F6',
-    '#60A5FA',
-    '#2563EB',
+    '#3b82f6',
+    '#2563eb',
+    '#1e3a8a',
     Globe,
     'Derecho del Consumidor',
     'consumidor',
   ),
   digital: makeTheme(
-    '#8B5CF6',
-    '#A78BFA',
-    '#7C3AED',
+    '#8b5cf6',
+    '#a78bfa',
+    '#7c3aed',
     Globe,
     'Derecho Digital',
     'digital',
   ),
 
   // ===== General / Marca =====
+  /** Plan de prueba / lead */
+  gratis: makeTheme(
+    '#22d3ee',
+    '#67e8f9',
+    '#0891b2',
+    BarChart3,
+    'Consulta gratis (prueba)',
+    'gratis',
+  ),
   general: makeTheme(
-    '#22D3EE', // cyan-400 — color de marca Punto Legal (sin orange)
-    '#67E8F9', // cyan-300
-    '#0891B2', // cyan-600
+    '#22d3ee',
+    '#67e8f9',
+    '#0891b2',
     BarChart3,
     'Punto Legal',
     'general',
