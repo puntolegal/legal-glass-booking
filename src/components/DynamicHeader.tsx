@@ -18,11 +18,7 @@ const DynamicHeader: React.FC<DynamicHeaderProps> = ({ onAgendarClick, serviceNa
     if (pathname.includes('/servicios/laboral')) return serviceThemes.laboral;
     if (pathname.includes('/servicios/familia')) return serviceThemes.familia;
     if (pathname.includes('/servicios/inmobiliario')) return serviceThemes.inmobiliario;
-    if (pathname.includes('/servicios/civil')) return serviceThemes.civil;
-    if (pathname.includes('/servicios/penal-economico')) return serviceThemes['penal-economico'];
-    if (pathname.includes('/servicios/penal')) return serviceThemes.penal;
-    if (pathname.includes('/servicios/tributario')) return serviceThemes.tributario;
-    if (pathname.includes('/servicios/digital')) return serviceThemes.digital;
+    if (pathname.includes('/urgencia')) return serviceThemes.penal;
     
     // Páginas principales
     if (pathname === '/' || pathname === '/servicios') return serviceThemes.general;

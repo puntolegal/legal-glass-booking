@@ -1,14 +1,21 @@
 import { useEffect, useState } from 'react'
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { cn } from '@/lib/utils'
+import { Check } from 'lucide-react'
 
 const MESSAGES = [
-  'Revisando la referencia de su propiedad en el sector…',
-  'Comparando valores de mercado en Las Condes, Vitacura, Lo Barnechea y La Reina…',
-  'Incorporando antecedentes registrales orientativos…',
-  'Evaluando un rango de precio defendible frente al mercado…',
-  'Revisando checklist legal preventivo (dominio y cargas)…',
-  'Afinando la proyección orientativa para la firma en notaría…',
+  'Calculando el valor comercial en Chile…',
+  'Estimando las características declaradas de su propiedad…',
+  'Contrastando referencias del mercado en Las Condes, Vitacura, Lo Barnechea y La Reina…',
+  'Ordenando antecedentes orientativos para su perfil de reunión…',
+  'Preparando su caso para el equipo legal y comercial…',
+] as const
+
+const DONE_LABELS = [
+  'Rango de mercado (orientativo)',
+  'Características del activo',
+  'Contexto comunal',
+  'Checklist legal preliminar',
 ] as const
 
 type InmobiliarioProcessingTerminalProps = {
@@ -16,21 +23,22 @@ type InmobiliarioProcessingTerminalProps = {
   variant?: 'light' | 'dark'
   /** Intervalo entre mensajes (ms). */
   messageIntervalMs?: number
-  /** Frecuencia de actualización del contador UF (ms). */
-  ufTickMs?: number
+  /** Duración estimada del bloque (barra determinística). */
+  durationMs?: number
 }
 
 /**
- * Ilusión de trabajo antes del éxito. Textos en español formal (Chile), sin jerga anglosajona.
+ * Ilusión de trabajo antes del éxito: texto de esfuerzo + checklist (sin radar ni cifras inventadas).
  */
 export function InmobiliarioProcessingTerminal({
   variant = 'dark',
-  messageIntervalMs = 1250,
-  ufTickMs = 155,
+  messageIntervalMs = 720,
+  durationMs = 3500,
 }: InmobiliarioProcessingTerminalProps) {
   const light = variant === 'light'
+  const reduce = useReducedMotion()
   const [msgIndex, setMsgIndex] = useState(0)
-  const [ufDisplay, setUfDisplay] = useState(9_850)
+  const [barPct, setBarPct] = useState(0)
 
   useEffect(() => {
     const id = window.setInterval(() => {
@@ -40,85 +48,61 @@ export function InmobiliarioProcessingTerminal({
   }, [messageIntervalMs])
 
   useEffect(() => {
-    const id = window.setInterval(() => {
-      setUfDisplay((n) => {
-        const bump = Math.floor(95 + Math.random() * 420)
-        const next = n + bump
-        return next > 24_800 ? 9_200 + Math.floor(Math.random() * 2200) : next
-      })
-    }, ufTickMs)
-    return () => window.clearInterval(id)
-  }, [ufTickMs])
+    if (reduce) {
+      setBarPct(100)
+      return
+    }
+    const started = performance.now()
+    let frame = 0
+    const tick = (now: number) => {
+      const t = Math.min(1, (now - started) / durationMs)
+      setBarPct(Math.round(t * 100))
+      if (t < 1) frame = requestAnimationFrame(tick)
+    }
+    frame = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(frame)
+  }, [durationMs, reduce])
+
+  const visibleChecks = reduce ? DONE_LABELS.length : Math.min(DONE_LABELS.length, Math.ceil((barPct / 100) * DONE_LABELS.length))
 
   return (
     <div className="flex flex-col items-center px-2 py-4 text-center">
-      <div className="relative mb-10 flex h-40 w-40 items-center justify-center">
-        <motion.div
-          className={cn(
-            'absolute inset-0 rounded-full border',
-            light ? 'border-emerald-500/25' : 'border-emerald-400/20',
-          )}
-          animate={{ rotate: 360 }}
-          transition={{ duration: 14, repeat: Infinity, ease: 'linear' }}
-        />
-        <motion.div
-          className={cn('absolute inset-4 rounded-full border', light ? 'border-slate-200/90' : 'border-white/10')}
-          animate={{ rotate: -360 }}
-          transition={{ duration: 9, repeat: Infinity, ease: 'linear' }}
-        />
-        <motion.div
-          className={cn(
-            'absolute inset-8 rounded-full border',
-            light ? 'border-emerald-400/35' : 'border-sky-400/18',
-          )}
-          animate={{ rotate: 360 }}
-          transition={{ duration: 5.5, repeat: Infinity, ease: 'linear' }}
-        />
-        <div
-          className="absolute inset-0 rounded-full opacity-35"
-          style={{
-            background:
-              'conic-gradient(from 0deg, transparent 0deg, rgba(5,150,105,0.12) 70deg, transparent 130deg, rgba(16,185,129,0.08) 210deg, transparent 300deg)',
-          }}
-        />
-        <motion.div
-          className={cn(
-            'absolute h-[48%] w-[1.5px] origin-bottom rounded-full bg-gradient-to-t from-transparent',
-            light
-              ? 'via-emerald-600/40 to-emerald-800/50'
-              : 'via-emerald-400/55 to-emerald-100/80',
-          )}
-          style={{ bottom: '50%', left: 'calc(50% - 0.75px)' }}
-          animate={{ rotate: [0, 360] }}
-          transition={{ duration: 3.8, repeat: Infinity, ease: 'linear' }}
-        />
+      <div className="mb-6 w-full max-w-md">
         <div
           className={cn(
-            'relative z-10 flex h-16 w-16 items-center justify-center rounded-2xl border backdrop-blur-md',
-            light
-              ? 'border-emerald-200/80 bg-white/90 shadow-sm'
-              : 'border-white/10 bg-black/35',
+            'h-1.5 w-full overflow-hidden rounded-full',
+            light ? 'bg-slate-200/90' : 'bg-white/10',
+          )}
+          role="progressbar"
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={barPct}
+        >
+          <motion.div
+            className={cn('h-full rounded-full', light ? 'bg-emerald-600' : 'bg-emerald-400')}
+            initial={false}
+            animate={{ width: `${barPct}%` }}
+            transition={{ duration: reduce ? 0 : 0.12, ease: 'linear' }}
+          />
+        </div>
+        <p
+          className={cn(
+            'mt-2 text-[10px] font-medium uppercase tracking-[0.16em]',
+            light ? 'text-slate-500' : 'text-slate-500',
           )}
         >
-          <span
-            className={cn(
-              'text-[11px] font-semibold tracking-[0.2em]',
-              light ? 'text-emerald-800' : 'text-emerald-200/90',
-            )}
-          >
-            UF
-          </span>
-        </div>
+          Análisis orientativo en curso
+        </p>
       </div>
 
-      <div className="min-h-[3.25rem] max-w-md px-1">
+      <div className="min-h-[3.5rem] max-w-md px-1">
         <AnimatePresence mode="wait">
           <motion.p
             key={msgIndex}
-            initial={{ opacity: 0, y: 5 }}
+            initial={reduce ? false : { opacity: 0, y: 5 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -5 }}
-            transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
+            exit={reduce ? undefined : { opacity: 0, y: -5 }}
+            transition={{ duration: reduce ? 0 : 0.28, ease: [0.22, 1, 0.36, 1] }}
             className={cn(
               'text-[13px] font-medium leading-relaxed sm:text-sm',
               light ? 'text-slate-800' : 'text-slate-200',
@@ -129,34 +113,52 @@ export function InmobiliarioProcessingTerminal({
         </AnimatePresence>
       </div>
 
-      <div
+      <ul className="mt-8 w-full max-w-sm space-y-2.5 text-left">
+        {DONE_LABELS.map((label, i) => {
+          const done = i < visibleChecks
+          return (
+            <li
+              key={label}
+              className={cn(
+                'flex items-center gap-3 rounded-xl border px-3 py-2.5 text-[12px] font-medium transition-colors',
+                light
+                  ? done
+                    ? 'border-emerald-200/90 bg-emerald-50/80 text-emerald-950'
+                    : 'border-slate-200/70 bg-white/70 text-slate-500'
+                  : done
+                    ? 'border-emerald-500/25 bg-emerald-500/10 text-emerald-50'
+                    : 'border-white/10 bg-black/20 text-slate-500',
+              )}
+            >
+              <span
+                className={cn(
+                  'flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border',
+                  done
+                    ? light
+                      ? 'border-emerald-600/40 bg-emerald-600 text-white'
+                      : 'border-emerald-400/40 bg-emerald-500/90 text-white'
+                    : light
+                      ? 'border-slate-200 bg-white'
+                      : 'border-white/10 bg-white/5',
+                )}
+                aria-hidden
+              >
+                {done ? <Check className="h-3.5 w-3.5" strokeWidth={2.5} /> : null}
+              </span>
+              {label}
+            </li>
+          )
+        })}
+      </ul>
+
+      <p
         className={cn(
-          'mt-8 rounded-2xl border px-6 py-4 backdrop-blur-sm',
-          light ? 'border-slate-200/70 bg-white/90 shadow-sm' : 'border-white/10 bg-black/25',
+          'mt-8 max-w-md text-[10px] font-medium leading-relaxed',
+          light ? 'text-slate-600' : 'text-slate-500',
         )}
       >
-        <p
-          className={cn(
-            'font-mono text-3xl font-semibold tabular-nums tracking-tight sm:text-[2.1rem]',
-            light ? 'text-emerald-900' : 'text-emerald-50',
-          )}
-        >
-          {ufDisplay.toLocaleString('es-CL')}
-          <span
-            className={cn('ml-2 text-lg font-medium sm:text-xl', light ? 'text-slate-600' : 'text-slate-500')}
-          >
-            UF
-          </span>
-        </p>
-        <p
-          className={cn(
-            'mt-2 text-[10px] font-medium uppercase tracking-[0.18em]',
-            light ? 'text-slate-600' : 'text-slate-500',
-          )}
-        >
-          Proyección orientativa · no vinculante
-        </p>
-      </div>
+        Resultado no vinculante: la reunión permite afinar precio, cargas y estrategia con su equipo.
+      </p>
     </div>
   )
 }

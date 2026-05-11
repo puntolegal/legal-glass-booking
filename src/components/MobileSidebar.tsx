@@ -1,7 +1,6 @@
 import { useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
-  Phone, 
   Mail, 
   MessageCircle, 
   X, 
@@ -10,10 +9,7 @@ import {
   Users,
   Building2,
   Home as HomeIcon,
-  FileText,
   Shield,
-  Calculator,
-  Globe,
   Scroll,
   BookOpen,
   MessageSquare,
@@ -57,28 +53,10 @@ const menuItems = [
     color: "from-emerald-600 to-green-600"
   },
   { 
-    name: "Derecho Civil", 
-    href: "/servicios/civil",
-    icon: FileText,
-    color: "from-purple-500 to-purple-600"
-  },
-  { 
-    name: "Derecho Penal", 
-    href: "/servicios/penal",
+    name: "Urgencia penal", 
+    href: "/urgencia",
     icon: Shield,
     color: "from-red-500 to-red-600"
-  },
-  { 
-    name: "Derecho Tributario", 
-    href: "/servicios/tributario",
-    icon: Calculator,
-    color: "from-teal-500 to-teal-600"
-  },
-  { 
-    name: "Derecho Digital", 
-    href: "/servicios/digital",
-    icon: Globe,
-    color: "from-indigo-500 to-indigo-600"
   },
   {
     name: "Herencias",

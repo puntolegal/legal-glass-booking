@@ -12,8 +12,9 @@ export const validationRules = {
       message: 'El nombre debe tener al menos 3 caracteres'
     },
     pattern: {
-      value: /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/,
-      message: 'El nombre solo puede contener letras'
+      // Letras (incl. ü), espacios y separadores habituales en nombres compuestos
+      value: /^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s\-'.]+$/,
+      message: 'Usa solo letras, espacios o guión en el nombre'
     }
   },
   

@@ -379,10 +379,10 @@ export default function BlogPost9() {
                       Agendar Consulta
                     </Link>
                     <Link
-                      to="/servicios/digital"
+                      to="/"
                       className="px-6 py-3 bg-white/10 backdrop-blur-sm rounded-lg font-semibold hover:bg-white/20 transition-colors"
                     >
-                      Ver Servicios Digitales
+                      Volver al inicio
                     </Link>
                   </div>
                 </div>

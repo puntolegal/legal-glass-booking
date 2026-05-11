@@ -215,9 +215,7 @@ All colors MUST be HSL.
   body[data-route="/"]::before,
   body[data-route="/"]::after,
   body[data-route="/servicios/inmobiliario"]::before,
-  body[data-route="/servicios/inmobiliario"]::after,
-  body[data-route="/inmobiliario"]::before,
-  body[data-route="/inmobiliario"]::after {
+  body[data-route="/servicios/inmobiliario"]::after {
     opacity: 0;
     animation: none;
   }
@@ -535,6 +533,816 @@ All colors MUST be HSL.
     }
   }
 
+  /* === Urgencia penal (/urgencia) — glass iOS refinado, agrupación tipo Settings === */
+  html.dark .urgencia-focus.landing-canvas {
+    background:
+      radial-gradient(ellipse 90% 52% at 50% -18%, rgba(244, 63, 94, 0.07), transparent 62%),
+      radial-gradient(ellipse 70% 46% at 100% 0%, rgba(190, 18, 60, 0.07), transparent 56%),
+      radial-gradient(ellipse 62% 48% at 0% 100%, rgba(30, 41, 59, 0.45), transparent 60%),
+      hsl(218 52% 9%);
+    background-attachment: fixed;
+  }
+
+  /* Urgencia penal — modo claro (default): tokens --la-* legibles + base fría con tinte rosa */
+  html:not(.dark) .urgencia-focus.landing-canvas {
+    --la-bg: 210 40% 98%;
+    --la-bg-2: 210 36% 96%;
+    --la-surface: 0 0% 100%;
+    --la-surface-low: 210 40% 97%;
+    --la-surface-mid: 214 32% 95%;
+    --la-surface-high: 214 28% 92%;
+    --la-surface-highest: 214 24% 88%;
+    --la-fg: 222 47% 11%;
+    --la-fg-muted: 215 16% 38%;
+    --la-fg-soft: 215 14% 46%;
+    --la-outline: 215 25% 18%;
+    --la-outline-warm: 220 20% 45%;
+
+    background:
+      radial-gradient(ellipse 88% 50% at 50% -20%, rgba(244, 63, 94, 0.09), transparent 58%),
+      radial-gradient(ellipse 72% 46% at 100% 0%, rgba(190, 18, 60, 0.06), transparent 56%),
+      radial-gradient(ellipse 62% 48% at 0% 100%, rgba(148, 163, 184, 0.14), transparent 62%),
+      linear-gradient(180deg, rgb(252 252 253) 0%, rgb(244 246 250) 48%, rgb(236 239 245) 100%);
+    background-attachment: fixed;
+    color: hsl(var(--la-fg));
+    -webkit-font-smoothing: antialiased;
+  }
+
+  html:not(.dark) .urgencia-focus .glass-ios-panel-dark {
+    background: rgba(255, 255, 255, 0.82);
+    border: 1px solid rgba(226, 232, 240, 0.95);
+    box-shadow:
+      0 16px 40px rgba(15, 23, 42, 0.06),
+      0 1px 0 rgba(255, 255, 255, 0.9) inset;
+    -webkit-backdrop-filter: blur(28px) saturate(160%);
+    backdrop-filter: blur(28px) saturate(160%);
+  }
+
+  html:not(.dark) .urgencia-focus .urgencia-terminal-body {
+    background: rgba(248, 250, 252, 0.96);
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85);
+  }
+
+  html:not(.dark) .urgencia-focus .urgencia-mono-dim {
+    color: rgba(71, 85, 105, 0.92);
+  }
+
+  html:not(.dark) .urgencia-focus .urgencia-mono-warn {
+    color: rgb(194 65 12);
+  }
+
+  html:not(.dark) .urgencia-focus .urgencia-mono-accent {
+    color: rgb(190 24 60);
+  }
+
+  html:not(.dark) .urgencia-focus .urgencia-chip--active {
+    border-color: hsla(350 55% 45% / 0.38);
+    background: linear-gradient(
+      145deg,
+      hsla(350 70% 97% / 0.98) 0%,
+      hsla(214 32% 96% / 0.95) 100%
+    );
+    box-shadow:
+      0 0 0 1px hsla(350 50% 70% / 0.25),
+      0 14px 36px -24px hsla(350 45% 40% / 0.12),
+      inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    color: hsl(var(--la-fg));
+  }
+
+  html:not(.dark) .urgencia-focus .urgencia-chip__icon {
+    background: hsla(350 45% 94% / 0.95);
+    border: 1px solid hsla(350 35% 88% / 0.9);
+    color: hsl(350 45% 38%);
+  }
+
+  html:not(.dark) .urgencia-focus .urgencia-chip--active .urgencia-chip__icon {
+    background: hsla(350 55% 92% / 0.98);
+    border-color: hsla(350 48% 72% / 0.55);
+    color: hsl(350 42% 32%);
+  }
+
+  html:not(.dark) .urgencia-focus .urgencia-seg-btn--on-warn {
+    border-color: hsla(350 48% 58% / 0.42);
+    background: linear-gradient(
+      152deg,
+      hsla(350 80% 96% / 0.98) 0%,
+      hsla(214 32% 96% / 0.92) 100%
+    );
+    color: hsl(350 32% 22%);
+    box-shadow:
+      0 0 0 1px hsla(350 42% 70% / 0.22),
+      inset 0 1px 0 rgba(255, 255, 255, 0.85),
+      0 12px 32px -22px hsla(350 36% 40% / 0.12);
+  }
+
+  html:not(.dark) .urgencia-focus .urgencia-seg-btn--on-warn svg,
+  html:not(.dark) .urgencia-focus .urgencia-seg-btn--on-warn .urgencia-seg-lead {
+    color: hsl(350 42% 38%);
+  }
+
+  html:not(.dark) .urgencia-focus .urgencia-overlay-scrim {
+    background: rgba(248, 250, 252, 0.82);
+  }
+
+  html:not(.dark) .urgencia-focus .urgencia-kicker-pill {
+    border-color: hsla(var(--la-outline) / 0.14);
+    box-shadow:
+      0 12px 32px -22px rgba(15, 23, 42, 0.08),
+      inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  }
+
+  html:not(.dark) .urgencia-focus .urgencia-input:-webkit-autofill,
+  html:not(.dark) .urgencia-focus .urgencia-input:-webkit-autofill:hover,
+  html:not(.dark) .urgencia-focus .urgencia-input:-webkit-autofill:focus {
+    -webkit-text-fill-color: hsl(var(--la-fg));
+    box-shadow: 0 0 0 1000px hsla(210 40% 98% / 0.95) inset !important;
+  }
+
+  /* Barra superior: vidrio iOS legible (blur + borde ghost + trazo interior) */
+  .urgencia-header-glass {
+    border-radius: 1.35rem;
+    background: hsla(var(--la-surface-mid) / 0.44);
+    border: 1px solid hsla(var(--la-outline) / 0.13);
+    box-shadow:
+      0 20px 56px -24px rgba(0, 0, 0, 0.58),
+      inset 0 1px 0 hsla(var(--la-outline-warm) / 0.22);
+    -webkit-backdrop-filter: blur(40px) saturate(145%);
+    backdrop-filter: blur(40px) saturate(145%);
+  }
+
+  /* Toggle tema dentro de la barra: misma receta que urgencia-header-glass */
+  .urgencia-header-theme-toggle {
+    background: hsla(var(--la-surface-mid) / 0.44) !important;
+    border: 1px solid hsla(var(--la-outline) / 0.13) !important;
+    box-shadow:
+      0 12px 36px -20px rgba(0, 0, 0, 0.45),
+      inset 0 1px 0 hsla(var(--la-outline-warm) / 0.22) !important;
+    -webkit-backdrop-filter: blur(40px) saturate(145%);
+    backdrop-filter: blur(40px) saturate(145%);
+    color: hsl(var(--la-fg)) !important;
+  }
+
+  .urgencia-header-theme-toggle:hover {
+    background: hsla(var(--la-surface-high) / 0.52) !important;
+  }
+
+  html.dark .urgencia-focus .urgencia-header-theme-toggle {
+    color: rgb(255 255 255) !important;
+  }
+
+  html:not(.dark) .urgencia-focus .urgencia-header-theme-toggle {
+    box-shadow:
+      0 10px 28px -16px rgba(15, 23, 42, 0.12),
+      inset 0 1px 0 rgba(255, 255, 255, 0.65) !important;
+  }
+
+  /* Campos: mismo lenguaje que glass-ios-* (blur + ghost border + trazo interior) */
+  .urgencia-input {
+    min-height: 3.375rem;
+    width: 100%;
+    border-radius: 1.125rem;
+    padding: 0.8125rem 1rem;
+    background: hsla(var(--la-surface-mid) / 0.34);
+    -webkit-backdrop-filter: blur(22px) saturate(138%);
+    backdrop-filter: blur(22px) saturate(138%);
+    border: 1px solid hsla(var(--la-outline) / 0.11);
+    color: hsl(var(--la-fg));
+    font-size: 1rem;
+    line-height: 1.45;
+    letter-spacing: -0.01em;
+    caret-color: hsl(var(--la-accent-to));
+    transition: border-color 0.22s ease, box-shadow 0.22s ease, background 0.22s ease;
+    box-shadow:
+      0 12px 32px -22px rgba(0, 0, 0, 0.65),
+      inset 0 1px 0 hsla(var(--la-outline-warm) / 0.18);
+  }
+
+  .urgencia-input::placeholder {
+    color: hsla(var(--la-fg-soft) / 0.68);
+  }
+
+  .urgencia-input::selection {
+    background: hsla(var(--la-accent-from) / 0.28);
+    color: hsl(var(--la-fg));
+  }
+
+  .urgencia-input:focus {
+    outline: none;
+    border-color: hsla(var(--la-accent-from) / 0.48);
+    box-shadow:
+      0 0 0 3px hsla(var(--la-accent-to) / 0.14),
+      0 16px 40px -24px hsla(var(--la-accent-from) / 0.22),
+      inset 0 1px 0 hsla(var(--la-outline-warm) / 0.22);
+    background: hsla(var(--la-surface-high) / 0.42);
+  }
+
+  .urgencia-input--valid {
+    border-color: hsla(var(--la-trust-from) / 0.38);
+  }
+
+  .urgencia-input--valid:focus {
+    border-color: hsla(var(--la-trust-from) / 0.52);
+    box-shadow:
+      0 0 0 3px hsla(var(--la-trust-from) / 0.12),
+      0 14px 36px -22px hsla(var(--la-trust-from) / 0.18),
+      inset 0 1px 0 hsla(var(--la-outline-warm) / 0.22);
+  }
+
+  .urgencia-input-icon {
+    color: hsla(var(--la-fg-soft) / 0.88);
+  }
+
+  .urgencia-input-check {
+    pointer-events: none;
+    display: flex;
+    height: 1.5rem;
+    width: 1.5rem;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9999px;
+    background: hsla(var(--la-trust-from) / 0.16);
+    border: 1px solid hsla(var(--la-accent-to) / 0.28);
+    color: hsl(var(--la-fg));
+    box-shadow: inset 0 1px 0 hsla(var(--la-outline-warm) / 0.15);
+  }
+
+  .urgencia-inline-link {
+    color: hsla(var(--la-accent-from) / 0.92);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    transition: color 0.2s ease;
+  }
+
+  .urgencia-inline-link:hover {
+    color: hsl(var(--la-fg));
+  }
+
+  /* Kicker hero: acento landing (azul/cyan), sin bloque rosa plano */
+  .urgencia-kicker-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    border-radius: 9999px;
+    padding: 0.25rem 0.75rem;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: hsla(var(--la-fg) / 0.94);
+    border: 1px solid hsla(var(--la-outline) / 0.12);
+    background: linear-gradient(
+      125deg,
+      hsla(var(--la-accent-from) / 0.14) 0%,
+      hsla(var(--la-surface-mid) / 0.38) 52%,
+      hsla(var(--la-accent-to) / 0.1) 100%
+    );
+    -webkit-backdrop-filter: blur(20px) saturate(135%);
+    backdrop-filter: blur(20px) saturate(135%);
+    box-shadow:
+      0 12px 32px -22px rgba(0, 0, 0, 0.5),
+      inset 0 1px 0 hsla(var(--la-outline-warm) / 0.16);
+  }
+
+  /* Evita el amarillo de autofill en tema oscuro (sensación “barata”) */
+  .urgencia-input:-webkit-autofill,
+  .urgencia-input:-webkit-autofill:hover,
+  .urgencia-input:-webkit-autofill:focus {
+    -webkit-text-fill-color: hsl(var(--la-fg));
+    caret-color: hsl(var(--la-accent-to));
+    transition: background-color 600000s ease-out;
+    box-shadow: 0 0 0 1000px hsla(var(--la-surface-mid) / 0.72) inset !important;
+  }
+
+  .urgencia-primary-cta {
+    position: relative;
+    min-height: 3.5rem;
+    width: 100%;
+    border-radius: 1.125rem;
+    padding: 0.75rem 1.125rem;
+    font-weight: 700;
+    font-size: 0.9375rem;
+    letter-spacing: -0.02em;
+    line-height: 1.25;
+    color: hsl(222 47% 12%);
+    background: linear-gradient(
+      180deg,
+      hsl(0 0% 100%) 0%,
+      hsl(210 35% 97%) 42%,
+      hsl(215 28% 92%) 100%
+    );
+    border: 1px solid hsla(var(--la-outline) / 0.42);
+    box-shadow:
+      0 1px 0 hsl(0 0% 100%) inset,
+      0 0 0 1px hsla(222 47% 12% / 0.06),
+      0 18px 44px -16px hsla(var(--la-accent-from) / 0.2),
+      0 14px 36px -18px rgba(0, 0, 0, 0.45);
+    transition: transform 0.2s cubic-bezier(0.32, 0.72, 0, 1), filter 0.2s ease, box-shadow 0.2s ease,
+      background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  }
+
+  .urgencia-primary-cta:hover:not(:disabled) {
+    filter: brightness(1.03);
+    box-shadow:
+      0 1px 0 hsl(0 0% 100%) inset,
+      0 0 0 1px hsla(222 47% 12% / 0.07),
+      0 22px 50px -14px hsla(var(--la-accent-from) / 0.24),
+      0 16px 40px -16px rgba(0, 0, 0, 0.48);
+  }
+
+  .urgencia-primary-cta:active:not(:disabled) {
+    transform: scale(0.985);
+  }
+
+  /* Bloqueado por formulario: vidrio oscuro legible (no aplastar todo con opacity) */
+  .urgencia-primary-cta:disabled {
+    cursor: not-allowed;
+    filter: none;
+    color: hsla(var(--la-fg-muted) / 0.88);
+    background: hsla(var(--la-surface-mid) / 0.42);
+    border-color: hsla(var(--la-outline) / 0.12);
+    box-shadow:
+      inset 0 1px 0 hsla(var(--la-outline-warm) / 0.12),
+      0 10px 28px -20px rgba(0, 0, 0, 0.4);
+    -webkit-backdrop-filter: blur(24px) saturate(130%);
+    backdrop-filter: blur(24px) saturate(130%);
+  }
+
+  /* Mientras conecta a MP: sigue viéndose como CTA activo */
+  .urgencia-primary-cta:disabled.urgencia-primary-cta--pending {
+    color: hsl(222 47% 12%);
+    background: linear-gradient(
+      180deg,
+      hsl(0 0% 100%) 0%,
+      hsl(210 35% 97%) 42%,
+      hsl(215 28% 92%) 100%
+    );
+    border-color: hsla(var(--la-outline) / 0.42);
+    box-shadow:
+      0 1px 0 hsl(0 0% 100%) inset,
+      0 0 0 1px hsla(222 47% 12% / 0.06),
+      0 18px 44px -16px hsla(var(--la-accent-from) / 0.18),
+      0 14px 36px -18px rgba(0, 0, 0, 0.45);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    cursor: wait;
+    opacity: 0.92;
+  }
+
+  .urgencia-primary-cta__label {
+    text-align: center;
+    min-width: 0;
+  }
+
+  .urgencia-primary-cta:not(:disabled) .urgencia-primary-cta__sub {
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: hsl(215 16% 38%);
+    opacity: 0.92;
+  }
+
+  @media (min-width: 640px) {
+    .urgencia-primary-cta:not(:disabled) .urgencia-primary-cta__sub {
+      display: none;
+    }
+  }
+
+  .urgencia-chip {
+    border-radius: 1.125rem;
+    padding: 0.75rem 0.75rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.625rem;
+    text-align: left;
+    font-weight: 500;
+    font-size: 0.8125rem;
+    line-height: 1.35;
+    color: hsl(var(--la-fg-muted));
+    background: hsla(var(--la-surface-low) / 0.34);
+    -webkit-backdrop-filter: blur(28px) saturate(138%);
+    backdrop-filter: blur(28px) saturate(138%);
+    border: 1px solid hsla(var(--la-outline) / 0.1);
+    box-shadow:
+      0 10px 28px -20px rgba(0, 0, 0, 0.55),
+      inset 0 1px 0 hsla(var(--la-outline-warm) / 0.14);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, color 0.2s ease;
+  }
+
+  .urgencia-chip:hover {
+    background: hsla(var(--la-surface-mid) / 0.38);
+    border-color: hsla(var(--la-outline) / 0.14);
+  }
+
+  .urgencia-chip--active {
+    border-color: hsla(350 55% 62% / 0.42);
+    background: linear-gradient(
+      145deg,
+      hsla(350 40% 22% / 0.42) 0%,
+      hsla(var(--la-surface-mid) / 0.36) 100%
+    );
+    box-shadow:
+      0 0 0 1px hsla(350 50% 50% / 0.12),
+      0 14px 36px -24px hsla(350 45% 30% / 0.35),
+      inset 0 1px 0 hsla(var(--la-outline-warm) / 0.2);
+    color: hsl(var(--la-fg));
+  }
+
+  .urgencia-chip__icon {
+    flex-shrink: 0;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: hsla(var(--la-surface-mid) / 0.45);
+    border: 1px solid hsla(var(--la-outline) / 0.11);
+    color: hsl(350 45% 78%);
+  }
+
+  .urgencia-chip--active .urgencia-chip__icon {
+    background: hsla(350 42% 28% / 0.45);
+    border-color: hsla(350 48% 55% / 0.28);
+    color: hsl(350 40% 94%);
+  }
+
+  /* Rejilla tipo launcher Apple Watch: todas las opciones visibles sin scroll horizontal */
+  .urgencia-situacion-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.5rem 0.375rem;
+    width: 100%;
+  }
+
+  @media (min-width: 640px) {
+    .urgencia-situacion-grid {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 0.625rem 0.5rem;
+    }
+  }
+
+  .urgencia-chip--watch {
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    text-align: center;
+    gap: 0.375rem;
+    min-width: 0;
+    width: 100%;
+    min-height: 5.25rem;
+    padding: 0.5rem 0.25rem 0.625rem;
+    border-radius: 1.35rem;
+  }
+
+  .urgencia-chip--watch .urgencia-chip__icon {
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 9999px;
+  }
+
+  .urgencia-chip--watch .urgencia-chip-watch-label {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    font-size: 0.625rem;
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    word-break: break-word;
+    hyphens: auto;
+    max-width: 100%;
+  }
+
+  @media (min-width: 640px) {
+    .urgencia-chip--watch {
+      min-height: 5.5rem;
+      padding: 0.625rem 0.375rem 0.75rem;
+    }
+
+    .urgencia-chip--watch .urgencia-chip__icon {
+      width: 3rem;
+      height: 3rem;
+    }
+
+    .urgencia-chip--watch .urgencia-chip-watch-label {
+      font-size: 0.6875rem;
+    }
+  }
+
+  .urgencia-faq details {
+    border-radius: 1.125rem;
+    overflow: hidden;
+    background: hsla(var(--la-surface-low) / 0.38);
+    -webkit-backdrop-filter: blur(26px) saturate(135%);
+    backdrop-filter: blur(26px) saturate(135%);
+    border: 1px solid hsla(var(--la-outline) / 0.09);
+    box-shadow: inset 0 1px 0 hsla(255, 255, 255, 0.05);
+  }
+
+  .urgencia-faq details[open] {
+    border-color: hsla(var(--la-outline) / 0.15);
+  }
+
+  .urgencia-faq summary {
+    padding: 0.875rem 1rem;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    line-height: 1.4;
+    list-style: none;
+  }
+
+  .urgencia-faq summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .urgencia-faq details p {
+    padding: 0 1rem 0.875rem;
+    margin: 0;
+    font-size: 0.75rem;
+    line-height: 1.55;
+    color: rgb(148 163 184);
+    border-top: 1px solid hsla(var(--la-outline) / 0.08);
+  }
+
+  .urgencia-glass-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.5rem 0.875rem 0.5rem 0.625rem;
+    border-radius: 9999px;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: rgb(203 213 225);
+    background: hsla(var(--la-surface-mid) / 0.35);
+    border: 1px solid hsla(var(--la-outline) / 0.1);
+    -webkit-backdrop-filter: blur(20px) saturate(130%);
+    backdrop-filter: blur(20px) saturate(130%);
+    transition: background 0.2s ease, color 0.2s ease;
+  }
+
+  .urgencia-glass-back:hover {
+    background: hsla(var(--la-surface-mid) / 0.5);
+    color: rgb(255 255 255);
+  }
+
+  /* Segmentos (antecedentes, escala, tiempo): dos estados + idle, todo en --la-* + vidrio */
+  .urgencia-seg-btn {
+    position: relative;
+    border-radius: 1rem;
+    font-weight: 600;
+    font-size: 0.875rem;
+    line-height: 1.25;
+    border: 1px solid transparent;
+    transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+    -webkit-backdrop-filter: blur(22px) saturate(138%);
+    backdrop-filter: blur(22px) saturate(138%);
+  }
+
+  .urgencia-seg-btn--idle {
+    background: hsla(var(--la-surface-mid) / 0.26);
+    border-color: hsla(var(--la-outline) / 0.1);
+    color: hsla(var(--la-fg-muted) / 0.96);
+    box-shadow:
+      0 8px 24px -18px rgba(0, 0, 0, 0.45),
+      inset 0 1px 0 hsla(var(--la-outline-warm) / 0.11);
+  }
+
+  /* Selección estándar (landing: azul → cyan) */
+  .urgencia-seg-btn--on {
+    border-color: hsla(var(--la-accent-from) / 0.45);
+    background: linear-gradient(
+      152deg,
+      hsla(var(--la-accent-from) / 0.2) 0%,
+      hsla(var(--la-surface-mid) / 0.38) 55%,
+      hsla(var(--la-accent-to) / 0.08) 100%
+    );
+    color: hsl(var(--la-fg));
+    box-shadow:
+      0 0 0 1px hsla(var(--la-accent-to) / 0.14),
+      inset 0 1px 0 hsla(var(--la-outline-warm) / 0.2),
+      0 12px 32px -22px hsla(var(--la-accent-from) / 0.22);
+  }
+
+  /* Selección con énfasis penal (sí antecedentes, franjas de tiempo sensibles) */
+  .urgencia-seg-btn--on-warn {
+    border-color: hsla(350 48% 58% / 0.36);
+    background: linear-gradient(
+      152deg,
+      hsla(350 38% 28% / 0.38) 0%,
+      hsla(var(--la-surface-mid) / 0.34) 100%
+    );
+    color: hsl(350 25% 97%);
+    box-shadow:
+      0 0 0 1px hsla(350 42% 48% / 0.14),
+      inset 0 1px 0 hsla(var(--la-outline-warm) / 0.14),
+      0 14px 36px -22px hsla(350 36% 18% / 0.38);
+  }
+
+  .urgencia-seg-btn--idle svg,
+  .urgencia-seg-btn--idle .urgencia-seg-lead {
+    color: hsla(var(--la-fg-soft) / 0.82);
+  }
+
+  .urgencia-seg-btn--on svg,
+  .urgencia-seg-btn--on .urgencia-seg-lead {
+    color: hsl(var(--la-accent-to));
+    opacity: 0.95;
+  }
+
+  .urgencia-seg-btn--on-warn svg,
+  .urgencia-seg-btn--on-warn .urgencia-seg-lead {
+    color: hsl(350 42% 82%);
+    opacity: 0.95;
+  }
+
+  /* Terminal simulación — marco tipo ventana iOS */
+  .urgencia-terminal-chrome {
+    border-radius: 1.35rem;
+    padding: 0.75rem;
+    background: hsla(var(--la-surface-mid) / 0.4);
+    border: 1px solid hsla(var(--la-outline) / 0.12);
+    box-shadow:
+      0 24px 56px -28px rgba(0, 0, 0, 0.58),
+      inset 0 1px 0 hsla(var(--la-outline-warm) / 0.14);
+    -webkit-backdrop-filter: blur(36px) saturate(140%);
+    backdrop-filter: blur(36px) saturate(140%);
+  }
+
+  .urgencia-terminal-body {
+    border-radius: 1rem;
+    background: rgba(2, 6, 23, 0.82);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    padding: 1rem;
+    box-shadow: inset 0 2px 20px rgba(0, 0, 0, 0.45);
+  }
+
+  .urgencia-mono-dim {
+    color: rgba(148, 163, 184, 0.9);
+  }
+
+  .urgencia-mono-warn {
+    color: rgb(253 186 116);
+  }
+
+  .urgencia-mono-accent {
+    color: rgb(251 164 176);
+  }
+
+  .urgencia-disclaimer-card {
+    border-radius: 1.125rem;
+    padding: 0.875rem 1rem;
+    background: hsla(var(--la-surface-low) / 0.35);
+    border: 1px solid hsla(var(--la-outline) / 0.1);
+    -webkit-backdrop-filter: blur(24px) saturate(130%);
+    backdrop-filter: blur(24px) saturate(130%);
+  }
+
+  .urgencia-alert-soft {
+    border-radius: 1.125rem;
+    padding: 1rem 1.125rem;
+    border: 1px solid hsla(var(--la-outline) / 0.12);
+    -webkit-backdrop-filter: blur(20px) saturate(125%);
+    backdrop-filter: blur(20px) saturate(125%);
+  }
+
+  .urgencia-alert-soft--rose {
+    background: rgba(190, 18, 60, 0.12);
+    border-color: rgba(251, 113, 133, 0.22);
+  }
+
+  .urgencia-alert-soft--amber {
+    background: rgba(245, 158, 11, 0.1);
+    border-color: rgba(251, 191, 36, 0.28);
+  }
+
+  .urgencia-overlay-scrim {
+    background: rgba(2, 6, 23, 0.72);
+    -webkit-backdrop-filter: blur(20px) saturate(120%);
+    backdrop-filter: blur(20px) saturate(120%);
+  }
+
+  .urgencia-overlay-check {
+    width: 5.5rem;
+    height: 5.5rem;
+    border-radius: 9999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(155deg, rgb(251 113 133) 0%, rgb(190 18 60) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    box-shadow:
+      0 28px 56px -16px rgba(190, 18, 60, 0.55),
+      inset 0 2px 0 rgba(255, 255, 255, 0.22);
+  }
+
+  .urgencia-wa-cta {
+    min-height: 3.5rem;
+    width: 100%;
+    border-radius: 1.125rem;
+    font-weight: 700;
+    font-size: 0.9375rem;
+    letter-spacing: -0.02em;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    color: rgb(255 255 255);
+    background: linear-gradient(
+      180deg,
+      hsl(160 38% 44%) 0%,
+      hsl(158 45% 34%) 48%,
+      hsl(155 42% 26%) 100%
+    );
+    border: 1px solid hsla(var(--la-outline) / 0.22);
+    box-shadow:
+      0 1px 0 hsla(var(--la-outline-warm) / 0.22) inset,
+      0 18px 44px -16px rgba(0, 0, 0, 0.55);
+    transition: transform 0.2s cubic-bezier(0.32, 0.72, 0, 1), filter 0.2s ease;
+  }
+
+  .urgencia-wa-cta:hover {
+    filter: brightness(1.06);
+  }
+
+  .urgencia-wa-cta:active {
+    transform: scale(0.985);
+  }
+
+  .urgencia-ghost-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.375rem;
+    width: 100%;
+    min-height: 3rem;
+    border-radius: 1rem;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: rgb(203 213 225);
+    border: 1px solid hsla(var(--la-outline) / 0.12);
+    background: hsla(var(--la-surface-low) / 0.3);
+    -webkit-backdrop-filter: blur(18px);
+    backdrop-filter: blur(18px);
+    transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+  }
+
+  .urgencia-ghost-link:hover {
+    background: hsla(var(--la-surface-mid) / 0.4);
+    border-color: hsla(var(--la-outline) / 0.18);
+    color: rgb(255 255 255);
+  }
+
+  @media (prefers-reduced-transparency: reduce) {
+    .urgencia-header-glass {
+      -webkit-backdrop-filter: blur(12px) saturate(110%);
+      backdrop-filter: blur(12px) saturate(110%);
+      background: hsla(var(--la-surface-mid) / 0.92);
+    }
+
+    .urgencia-chip,
+    .urgencia-faq details,
+    .urgencia-glass-back {
+      -webkit-backdrop-filter: blur(10px) saturate(110%);
+      backdrop-filter: blur(10px) saturate(110%);
+    }
+
+    .urgencia-input {
+      -webkit-backdrop-filter: blur(10px) saturate(110%);
+      backdrop-filter: blur(10px) saturate(110%);
+      background: hsla(var(--la-surface-mid) / 0.88);
+    }
+
+    .urgencia-seg-btn {
+      -webkit-backdrop-filter: blur(10px) saturate(110%);
+      backdrop-filter: blur(10px) saturate(110%);
+    }
+
+    .urgencia-seg-btn--idle {
+      background: hsla(var(--la-surface-mid) / 0.82);
+    }
+
+    .urgencia-primary-cta:disabled:not(.urgencia-primary-cta--pending) {
+      -webkit-backdrop-filter: blur(10px) saturate(110%);
+      backdrop-filter: blur(10px) saturate(110%);
+      background: hsla(var(--la-surface-mid) / 0.88);
+    }
+
+    .urgencia-terminal-chrome,
+    .urgencia-disclaimer-card,
+    .urgencia-alert-soft {
+      -webkit-backdrop-filter: blur(10px) saturate(110%);
+      backdrop-filter: blur(10px) saturate(110%);
+    }
+
+    .urgencia-overlay-scrim {
+      -webkit-backdrop-filter: blur(12px) saturate(110%);
+      backdrop-filter: blur(12px) saturate(110%);
+    }
+  }
+
   /* Glass iOS — superficie clara (laboral orgánico, menos contraste fatigante) */
   .glass-ios-panel-light {
     background: rgba(255, 255, 255, 0.78);
@@ -685,16 +1493,24 @@ All colors MUST be HSL.
     color: rgb(45 212 191);
   }
 
-  /* Cluster laboral / pills — en claro el vidrio oscuro desaparece el texto */
+  /* Cluster laboral / pills desktop — mismo vidrio teal que móvil */
   html:not(.dark) .landing-canvas #servicios .service-cluster-pill {
-    color: rgb(51 65 85);
-    border-color: rgba(15, 23, 42, 0.12);
-    background: rgba(255, 255, 255, 0.72);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.92);
+    color: rgb(15 118 110);
+    border: 1px solid rgba(255, 255, 255, 0.72);
+    background: rgba(255, 255, 255, 0.38);
+    -webkit-backdrop-filter: blur(18px) saturate(175%);
+    backdrop-filter: blur(18px) saturate(175%);
+    box-shadow:
+      0 4px 14px rgba(13, 148, 136, 0.09),
+      inset 0 1px 0 rgba(255, 255, 255, 0.88),
+      inset 0 -1px 0 rgba(13, 148, 136, 0.06);
   }
   html:not(.dark) .landing-canvas #servicios .service-cluster-pill:hover {
-    border-color: rgba(15, 23, 42, 0.14);
-    background: rgba(255, 255, 255, 0.94);
+    border-color: rgba(13, 148, 136, 0.28);
+    background: rgba(240, 253, 250, 0.55);
+    box-shadow:
+      0 6px 18px rgba(13, 148, 136, 0.1),
+      inset 0 1px 0 rgba(255, 255, 255, 0.92);
   }
 
   /* Testimonial featured — quote y autor legibles sobre vidrio claro */
@@ -1216,16 +2032,6 @@ All colors MUST be HSL.
     color: rgb(45 212 191);
   }
 
-  html:not(.dark) .landing-canvas .mobile-service-card__pill {
-    color: rgb(51 65 85);
-    border-color: rgba(15, 23, 42, 0.12);
-    background: rgba(255, 255, 255, 0.78);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.95);
-  }
-  html:not(.dark) .landing-canvas .mobile-service-card__pill:active {
-    background: rgba(241, 245, 249, 0.98);
-  }
-
   html:not(.dark) .landing-canvas .mobile-service-card__panel {
     border-top-color: rgba(15, 23, 42, 0.08);
   }
@@ -1318,7 +2124,7 @@ All colors MUST be HSL.
     background: rgba(255, 255, 255, 0.055);
     border-bottom-color: rgba(255, 255, 255, 0.1);
   }
-  /* Sólo producto estrella (p. ej. CAE): acento por --card-accent */
+  /* Sólo badge destacado CAE (“contingencia nacional”): acento por --card-accent */
   .mobile-service-card__badge-bar--accent {
     color: rgb(var(--card-accent));
     background: linear-gradient(
@@ -1341,130 +2147,6 @@ All colors MUST be HSL.
   .mobile-service-card__badge-bar--accent .mobile-service-card__badge-dot:not(.mobile-service-card__badge-dot--muted) {
     background: rgb(var(--card-accent));
     box-shadow: 0 0 6px rgba(var(--card-accent), 0.55);
-  }
-
-  /* Cluster Laboral: badge + pills en un solo bloque (teal sobrio, sin parche gris) */
-  .mobile-service-card__cluster-sheet {
-    border-bottom: 1px solid rgba(13, 148, 136, 0.12);
-    background: linear-gradient(
-      180deg,
-      rgba(13, 148, 136, 0.07) 0%,
-      rgba(13, 148, 136, 0.02) 100%
-    );
-  }
-  html.dark .landing-canvas .mobile-service-card__cluster-sheet {
-    border-bottom-color: rgba(45, 212, 191, 0.14);
-    background: linear-gradient(
-      180deg,
-      rgba(45, 212, 191, 0.09) 0%,
-      rgba(15, 23, 42, 0.2) 100%
-    );
-  }
-  .mobile-service-card__cluster-label {
-    display: flex;
-    align-items: center;
-    gap: 0.45rem;
-    padding: 0.5rem 0.95rem 0.35rem;
-    font-family: 'Inter', sans-serif;
-    font-size: 9.5px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.14em;
-    line-height: 1.2;
-    color: rgb(15 118 110);
-  }
-  html.dark .landing-canvas .mobile-service-card__cluster-label {
-    color: rgb(94 234 212);
-  }
-  .mobile-service-card__cluster-label-dot {
-    width: 5px;
-    height: 5px;
-    border-radius: 9999px;
-    flex-shrink: 0;
-    background: rgb(13 148 136);
-    box-shadow: 0 0 8px rgba(13, 148, 136, 0.45);
-  }
-  html.dark .landing-canvas .mobile-service-card__cluster-label-dot {
-    background: rgb(45 212 191);
-    box-shadow: 0 0 8px rgba(45, 212, 191, 0.35);
-  }
-  .mobile-service-card__pills-scroll--in-cluster {
-    padding-top: 0 !important;
-    padding-bottom: 0.65rem;
-    padding-left: 0.65rem;
-    padding-right: 0.65rem;
-  }
-  .mobile-service-card__pill--cluster {
-    border-color: rgba(13, 148, 136, 0.35);
-    background: rgba(255, 255, 255, 0.82);
-    color: rgb(17 94 89);
-    font-weight: 650;
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.95),
-      0 1px 2px rgba(13, 148, 136, 0.06);
-  }
-  html.dark .landing-canvas .mobile-service-card__pill--cluster {
-    border-color: rgba(45, 212, 191, 0.35);
-    background: rgba(255, 255, 255, 0.07);
-    color: rgb(204 251 241);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
-  }
-  .mobile-service-card__pill--cluster:active {
-    background: rgba(13, 148, 136, 0.12);
-  }
-  html.dark .landing-canvas .mobile-service-card__pill--cluster:active {
-    background: rgba(45, 212, 191, 0.14);
-  }
-  html:not(.dark) .landing-canvas .mobile-service-card__pill--cluster {
-    color: rgb(17 94 89);
-    border-color: rgba(13, 148, 136, 0.38);
-    background: rgba(255, 255, 255, 0.9);
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.98),
-      0 1px 2px rgba(13, 148, 136, 0.08);
-  }
-  html.dark .landing-canvas .mobile-service-card__pill--cluster {
-    border-color: rgba(45, 212, 191, 0.38);
-    background: rgba(255, 255, 255, 0.08);
-    color: rgb(204 251 241);
-  }
-
-  /* Pastillas de plan (p. ej. cluster laboral): scroll horizontal en lugar de wrap incómodo */
-  .mobile-service-card__pills-scroll {
-    -webkit-overflow-scrolling: touch;
-    overflow-x: auto;
-    overscroll-behavior-x: contain;
-    scrollbar-width: none;
-    mask-image: linear-gradient(90deg, transparent 0, #000 10px, #000 calc(100% - 10px), transparent 100%);
-  }
-  .mobile-service-card__pills-scroll::-webkit-scrollbar {
-    display: none;
-  }
-  .mobile-service-card__pills-track {
-    display: inline-flex;
-    flex-wrap: nowrap;
-    gap: 0.45rem;
-    padding: 0.125rem 0.5rem 0.35rem;
-    min-height: 2rem;
-    align-items: center;
-  }
-  .mobile-service-card__pill {
-    flex-shrink: 0;
-    border-radius: 9999px;
-    border: 1px solid rgba(255, 255, 255, 0.14);
-    background: rgba(255, 255, 255, 0.06);
-    padding: 0.32rem 0.65rem;
-    font-family: 'Inter', sans-serif;
-    font-size: 10px;
-    font-weight: 600;
-    color: rgb(226 232 240);
-    -webkit-backdrop-filter: blur(8px);
-    backdrop-filter: blur(8px);
-    white-space: nowrap;
-    -webkit-tap-highlight-color: transparent;
-  }
-  .mobile-service-card__pill:active {
-    background: rgba(255, 255, 255, 0.1);
   }
 
   .mobile-service-card__hook {
@@ -1882,6 +2564,7 @@ All colors MUST be HSL.
     line-height: 1;
   }
 
+  /* Modo claro global: wordmark oscuro en flujos claros */
   html:not(.dark) .agendamiento-wordmark__name {
     color: rgb(15 23 42);
   }
@@ -1889,6 +2572,16 @@ All colors MUST be HSL.
     color: rgb(71 85 105);
     background: rgba(15, 23, 42, 0.05);
     border-color: rgba(15, 23, 42, 0.1);
+  }
+
+  /* /urgencia en modo claro: wordmark usa tokens --la-* del canvas (texto oscuro). */
+  html:not(.dark) .urgencia-focus .agendamiento-wordmark__name {
+    color: hsl(var(--la-fg));
+  }
+  html:not(.dark) .urgencia-focus .agendamiento-wordmark__country {
+    color: hsl(var(--la-fg-muted));
+    background: hsla(var(--la-surface-mid) / 0.45);
+    border-color: hsla(var(--la-outline) / 0.14);
   }
 
   /* ============================================================ */

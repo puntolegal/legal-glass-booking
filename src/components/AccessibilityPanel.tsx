@@ -1,300 +1,225 @@
 import React, { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Accessibility, Move, Type, X } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { 
-  Accessibility, 
-  Eye, 
-  Type, 
-  Move, 
-  Keyboard, 
-  X,
-  Settings,
-  Moon,
-  Sun
-} from 'lucide-react';
+import { useTheme } from '@/hooks/useTheme';
+import { useAccessibility } from '@/contexts/AccessibilityContext';
+import {
+  A11Y_FOCUS_RING,
+  accessibilityControlChrome,
+  accessibilityPanelSurface,
+  accessibilityPanelRow,
+} from '@/lib/accessibilityGlassClasses';
+import { cn } from '@/lib/utils';
+
+const SWITCH_TEAL =
+  'data-[state=checked]:bg-teal-600 data-[state=unchecked]:bg-slate-300 dark:data-[state=unchecked]:bg-slate-600';
 
 const AccessibilityPanel: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [highContrast, setHighContrast] = useState(false);
-  const [fontSize, setFontSize] = useState<'small' | 'medium' | 'large'>('medium');
-  const [reducedMotion, setReducedMotion] = useState(false);
-  const [focusVisible, setFocusVisible] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('theme');
-      if (saved === 'light') return false;
-      if (saved === 'dark') return true;
-      return true;
-    }
-    return true;
-  });
-
-  const fontSizeOptions = [
-    { value: 'small', label: 'Pequeña' },
-    { value: 'medium', label: 'Mediana' },
-    { value: 'large', label: 'Grande' },
-  ] as const;
-
-  const toggleHighContrast = () => {
-    setHighContrast(!highContrast);
-    const root = document.documentElement;
-    if (!highContrast) {
-      root.classList.add('high-contrast');
-    } else {
-      root.classList.remove('high-contrast');
-    }
-  };
-
-  const handleFontSizeChange = (size: 'small' | 'medium' | 'large') => {
-    setFontSize(size);
-    const root = document.documentElement;
-    root.classList.remove('font-size-small', 'font-size-medium', 'font-size-large');
-    root.classList.add(`font-size-${size}`);
-  };
-
-  const toggleReducedMotion = () => {
-    setReducedMotion(!reducedMotion);
-    const root = document.documentElement;
-    if (!reducedMotion) {
-      root.classList.add('reduced-motion');
-    } else {
-      root.classList.remove('reduced-motion');
-    }
-  };
-
-  const toggleFocusVisible = () => {
-    setFocusVisible(!focusVisible);
-    const root = document.documentElement;
-    if (!focusVisible) {
-      root.classList.add('focus-visible');
-    } else {
-      root.classList.remove('focus-visible');
-    }
-  };
-
-  const toggleDarkMode = () => {
-    const newDarkMode = !isDarkMode;
-    setIsDarkMode(newDarkMode);
-    
-    // Aplicar inmediatamente
-    if (newDarkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-    
-    // Guardar preferencia
-    localStorage.setItem('theme', newDarkMode ? 'dark' : 'light');
-  };
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
+  const { state, toggleEnlargedText, toggleReducedMotion, resetToDefaults } = useAccessibility();
 
   useEffect(() => {
-    const handleAccessibilityToggle = () => {
-      setIsOpen(true);
-    };
-    
+    const handleAccessibilityToggle = () => setIsOpen(true);
     window.addEventListener('accessibility-toggle', handleAccessibilityToggle);
     return () => window.removeEventListener('accessibility-toggle', handleAccessibilityToggle);
   }, []);
 
-  if (!isOpen) {
-    return (
-      <button
-        type="button"
-        onClick={() => setIsOpen(true)}
-        className="fixed bottom-4 left-4 z-[70] flex h-11 w-11 items-center justify-center rounded-2xl border border-slate-200/90 bg-white/85 text-slate-700 shadow-lg backdrop-blur-xl transition hover:bg-white dark:border-white/10 dark:bg-slate-900/75 dark:text-slate-200 dark:hover:bg-slate-900/90"
-        aria-label="Abrir panel de accesibilidad"
-        title="Accesibilidad"
-      >
-        <Accessibility className="h-5 w-5" aria-hidden />
-      </button>
-    );
-  }
+  useEffect(() => {
+    if (!isOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setIsOpen(false);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [isOpen]);
+
+  const fabPosition =
+    'max-lg:bottom-[calc(5.85rem+env(safe-area-inset-bottom,0px))] max-lg:left-[max(0.75rem,env(safe-area-inset-left,0px))] lg:bottom-8 lg:left-10';
+
+  const panelPosition =
+    'max-lg:left-4 max-lg:right-4 max-lg:bottom-[max(1rem,env(safe-area-inset-bottom,0px))] lg:left-10 lg:right-auto lg:bottom-10';
 
   return (
-    <div className="fixed bottom-20 right-4 z-50 w-80 max-w-[calc(100vw-2rem)] sm:bottom-6 sm:right-6" data-accessibility-panel>
-      <Card className="shadow-2xl border-primary/20 dark:border-primary/30 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-3xl overflow-hidden">
-        <CardHeader className="pb-4 px-6 pt-6">
-          <div className="flex items-center justify-between">
-            <CardTitle className="flex items-center gap-3 text-lg font-semibold text-primary">
-              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                <Accessibility className="w-4 h-4" />
-              </div>
-              Accesibilidad
-            </CardTitle>
-            <Button
-              onClick={() => setIsOpen(false)}
-              variant="ghost"
-              size="icon"
-              className="h-9 w-9 rounded-full hover:bg-primary/10 transition-colors"
-              aria-label="Cerrar panel de accesibilidad"
-            >
-              <X className="w-4 h-4" />
-            </Button>
-          </div>
-        </CardHeader>
-        
-        <CardContent className="px-6 pb-6 space-y-3">
-          {/* Modo Oscuro */}
-          <div className="flex items-center justify-between p-4 rounded-2xl bg-gray-50 dark:bg-gray-800/50 hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors">
-            <div className="flex items-center gap-4">
-              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                {isDarkMode ? (
-                  <Moon className="w-5 h-5 text-primary" />
-                ) : (
-                  <Sun className="w-5 h-5 text-primary" />
-                )}
-              </div>
-              <div>
-                <Label htmlFor="dark-mode" className="text-base font-semibold text-gray-900 dark:text-gray-100">
-                  Modo {isDarkMode ? 'Oscuro' : 'Claro'}
-                </Label>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                  Cambiar tema de la interfaz
-                </p>
-              </div>
-            </div>
-            <Switch
-              id="dark-mode"
-              checked={isDarkMode}
-              onCheckedChange={toggleDarkMode}
-              aria-label={`Cambiar a modo ${isDarkMode ? 'claro' : 'oscuro'}`}
-              className="data-[state=checked]:bg-blue-600 data-[state=unchecked]:bg-gray-300 dark:data-[state=unchecked]:bg-gray-600"
-            />
-          </div>
+    <>
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            role="presentation"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 z-[140] bg-slate-950/35 backdrop-blur-[2px] dark:bg-black/55"
+            onClick={() => setIsOpen(false)}
+            aria-hidden
+          />
+        )}
+      </AnimatePresence>
 
-          {/* Alto Contraste */}
-          <div className="flex items-center justify-between p-4 rounded-2xl bg-gray-50 dark:bg-gray-800/50 hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors">
-            <div className="flex items-center gap-4">
-              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                <Eye className="w-5 h-5 text-primary" />
-              </div>
-              <div>
-                <Label htmlFor="high-contrast" className="text-base font-semibold text-gray-900 dark:text-gray-100">
-                  Alto Contraste
-                </Label>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                  Mejorar legibilidad del texto
-                </p>
-              </div>
-            </div>
-            <Switch
-              id="high-contrast"
-              checked={highContrast}
-              onCheckedChange={toggleHighContrast}
-              aria-label="Activar alto contraste"
-              className="data-[state=checked]:bg-blue-600 data-[state=unchecked]:bg-gray-300 dark:data-[state=unchecked]:bg-gray-600"
-            />
-          </div>
-
-          {/* Tamaño de Fuente */}
-          <div className="p-4 rounded-2xl bg-gray-50 dark:bg-gray-800/50 hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors">
-            <div className="flex items-center gap-4 mb-4">
-              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                <Type className="w-5 h-5 text-primary" />
-              </div>
-              <div>
-                <Label className="text-base font-semibold text-gray-900 dark:text-gray-100">Tamaño de Fuente</Label>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Ajustar tamaño del texto</p>
-              </div>
-            </div>
-            <div className="grid grid-cols-3 gap-2">
-              {fontSizeOptions.map((option) => (
-                <Button
-                  key={option.value}
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handleFontSizeChange(option.value)}
-                  className={`h-11 rounded-lg font-medium transition-all duration-200 ${
-                    fontSize === option.value
-                      ? 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white border-blue-600 shadow-lg shadow-blue-500/25 scale-105'
-                      : 'border-gray-200 dark:border-gray-600 bg-white/50 dark:bg-gray-800/50 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:border-gray-300 dark:hover:border-gray-500'
-                  }`}
+      {!isOpen ? (
+        <motion.button
+          type="button"
+          onClick={() => setIsOpen(true)}
+          className={cn(
+            'fixed z-[155] flex h-10 w-10 items-center justify-center rounded-2xl transition-all touch-manipulation',
+            A11Y_FOCUS_RING,
+            accessibilityControlChrome(isDark),
+            fabPosition,
+          )}
+          whileTap={{ scale: 0.94 }}
+          aria-label="Abrir preferencias de accesibilidad"
+          title="Accesibilidad"
+        >
+          <Accessibility className="h-[18px] w-[18px]" strokeWidth={2} aria-hidden />
+        </motion.button>
+      ) : (
+        <div
+          className={cn(
+            'fixed z-[150] w-[min(100%,20rem)] max-h-[min(72vh,calc(100dvh-6rem))] overflow-y-auto rounded-3xl',
+            panelPosition,
+          )}
+          data-accessibility-panel
+        >
+          <div className={cn('flex flex-col gap-4 p-5', accessibilityPanelSurface(isDark))}>
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex items-center gap-3 min-w-0">
+                <div
+                  className={cn(
+                    'flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border',
+                    isDark
+                      ? 'border-white/[0.1] bg-white/[0.06]'
+                      : 'border-slate-200/90 bg-white/90',
+                  )}
                 >
-                  {option.label}
-                </Button>
-              ))}
-            </div>
-          </div>
-
-          {/* Movimiento Reducido */}
-          <div className="flex items-center justify-between p-4 rounded-2xl bg-gray-50 dark:bg-gray-800/50 hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors">
-            <div className="flex items-center gap-4">
-              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                <Move className="w-5 h-5 text-primary" />
-              </div>
-              <div>
-                <Label htmlFor="reduced-motion" className="text-base font-semibold text-gray-900 dark:text-gray-100">
-                  Movimiento Reducido
-                </Label>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                  Reducir animaciones y transiciones
-                </p>
-              </div>
-            </div>
-            <Switch
-              id="reduced-motion"
-              checked={reducedMotion}
-              onCheckedChange={toggleReducedMotion}
-              aria-label="Activar movimiento reducido"
-              className="data-[state=checked]:bg-blue-600 data-[state=unchecked]:bg-gray-300 dark:data-[state=unchecked]:bg-gray-600"
-            />
-          </div>
-
-          {/* Focus Visible */}
-          <div className="flex items-center justify-between p-4 rounded-2xl bg-gray-50 dark:bg-gray-800/50 hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors">
-            <div className="flex items-center gap-4">
-              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                <Keyboard className="w-5 h-5 text-primary" />
-              </div>
-              <div>
-                <Label htmlFor="focus-visible" className="text-base font-semibold text-gray-900 dark:text-gray-100">
-                  Indicador de Foco
-                </Label>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                  Mostrar indicadores de navegación
-                </p>
-              </div>
-            </div>
-            <Switch
-              id="focus-visible"
-              checked={focusVisible}
-              onCheckedChange={toggleFocusVisible}
-              aria-label="Activar focus visible"
-              className="data-[state=checked]:bg-blue-600 data-[state=unchecked]:bg-gray-300 dark:data-[state=unchecked]:bg-gray-600"
-            />
-          </div>
-
-          {/* Botón de Reset */}
-          <div className="p-4 rounded-2xl bg-gray-50 dark:bg-gray-800/50 hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors">
-            <Button
-              onClick={() => {
-                setHighContrast(false);
-                setFontSize('medium');
-                setReducedMotion(false);
-                setFocusVisible(false);
-                setIsDarkMode(false);
-                const root = document.documentElement;
-                root.classList.remove('high-contrast', 'reduced-motion', 'focus-visible', 'font-size-small', 'font-size-medium', 'font-size-large', 'dark');
-                root.classList.add('font-size-medium');
-                localStorage.setItem('theme', 'light');
-              }}
-              variant="outline"
-              className="w-full h-14 rounded-xl border-gray-200 dark:border-gray-600 bg-white/50 dark:bg-gray-800/50 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:border-gray-300 dark:hover:border-gray-500 font-semibold text-base transition-all duration-200 hover:shadow-lg"
-            >
-              <div className="flex items-center justify-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
-                  <Settings className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+                  <Accessibility className="h-[18px] w-[18px]" strokeWidth={2} aria-hidden />
                 </div>
-                Restablecer Configuración
+                <div className="min-w-0">
+                  <h2
+                    className={cn(
+                      'text-base font-semibold leading-tight',
+                      isDark ? 'text-white' : 'text-slate-900',
+                    )}
+                  >
+                    Accesibilidad
+                  </h2>
+                  <p
+                    className={cn(
+                      'mt-0.5 text-xs leading-snug',
+                      isDark ? 'text-slate-400' : 'text-slate-600',
+                    )}
+                  >
+                    Texto y movimiento. El tema claro/oscuro está en el botón sol/luna.
+                  </p>
+                </div>
               </div>
-            </Button>
+              <button
+                type="button"
+                onClick={() => setIsOpen(false)}
+                className={cn(
+                  'flex h-9 w-9 shrink-0 items-center justify-center rounded-xl transition touch-manipulation',
+                  A11Y_FOCUS_RING,
+                  isDark
+                    ? 'text-slate-300 hover:bg-white/[0.08]'
+                    : 'text-slate-600 hover:bg-slate-100/90',
+                )}
+                aria-label="Cerrar"
+              >
+                <X className="h-4 w-4" strokeWidth={2} aria-hidden />
+              </button>
+            </div>
+
+            <div className={cn('space-y-3', accessibilityPanelRow(isDark))}>
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex min-w-0 items-center gap-3">
+                  <div
+                    className={cn(
+                      'flex h-9 w-9 shrink-0 items-center justify-center rounded-xl',
+                      isDark ? 'bg-teal-500/15 text-teal-300' : 'bg-teal-500/10 text-teal-700',
+                    )}
+                  >
+                    <Type className="h-4 w-4" strokeWidth={2} aria-hidden />
+                  </div>
+                  <div className="min-w-0">
+                    <Label htmlFor="a11y-text" className="text-sm font-medium text-inherit">
+                      Texto más grande
+                    </Label>
+                    <p
+                      className={cn(
+                        'text-xs',
+                        isDark ? 'text-slate-400' : 'text-slate-600',
+                      )}
+                    >
+                      Aumenta el tamaño base de la interfaz.
+                    </p>
+                  </div>
+                </div>
+                <Switch
+                  id="a11y-text"
+                  checked={state.enlargedText}
+                  onCheckedChange={toggleEnlargedText}
+                  aria-label="Activar texto más grande"
+                  className={SWITCH_TEAL}
+                />
+              </div>
+
+              <div className="flex items-center justify-between gap-3 border-t border-slate-200/60 pt-3 dark:border-white/[0.08]">
+                <div className="flex min-w-0 items-center gap-3">
+                  <div
+                    className={cn(
+                      'flex h-9 w-9 shrink-0 items-center justify-center rounded-xl',
+                      isDark ? 'bg-teal-500/15 text-teal-300' : 'bg-teal-500/10 text-teal-700',
+                    )}
+                  >
+                    <Move className="h-4 w-4" strokeWidth={2} aria-hidden />
+                  </div>
+                  <div className="min-w-0">
+                    <Label htmlFor="a11y-motion" className="text-sm font-medium text-inherit">
+                      Menos animaciones
+                    </Label>
+                    <p
+                      className={cn(
+                        'text-xs',
+                        isDark ? 'text-slate-400' : 'text-slate-600',
+                      )}
+                    >
+                      Atenúa transiciones y efectos de movimiento.
+                    </p>
+                  </div>
+                </div>
+                <Switch
+                  id="a11y-motion"
+                  checked={state.reducedMotion}
+                  onCheckedChange={toggleReducedMotion}
+                  aria-label="Reducir animaciones"
+                  className={SWITCH_TEAL}
+                />
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => {
+                resetToDefaults();
+              }}
+              className={cn(
+                'w-full rounded-2xl border py-3 text-sm font-medium transition touch-manipulation',
+                A11Y_FOCUS_RING,
+                isDark
+                  ? 'border-teal-400/25 text-teal-200 hover:bg-teal-400/10'
+                  : 'border-teal-600/25 text-teal-800 hover:bg-teal-500/10',
+              )}
+            >
+              Restablecer ajustes
+            </button>
           </div>
-        </CardContent>
-      </Card>
-    </div>
+        </div>
+      )}
+    </>
   );
 };
 
-export default AccessibilityPanel; 
+export default AccessibilityPanel;

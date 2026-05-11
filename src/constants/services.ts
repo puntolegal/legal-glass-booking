@@ -151,7 +151,7 @@ export const serviceCatalog: Record<string, Service> = {
   },
   /** Evaluación orientativa Sector Oriente — agenda sin pago; cola Zapier + Meet vía Edge Function */
   'inmobiliario-eval': {
-    name: 'Punto Legal Inmobiliario — Evaluación estratégica (Sector Oriente)',
+    name: 'Evaluación inmobiliaria — Sector Oriente',
     price: '0',
     category: 'Inmobiliario',
     note: 'Sesión orientativa sin costo · calendario Google Meet',

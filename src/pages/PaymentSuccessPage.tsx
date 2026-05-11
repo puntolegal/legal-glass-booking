@@ -17,6 +17,7 @@ import {
   XCircle,
 } from 'lucide-react';
 import SEO from '../components/SEO';
+import { UrgenciaPenalFocusLayout } from '@/components/urgencia/UrgenciaPenalFocusLayout';
 import { sendRealBookingEmails, type BookingEmailData, type EmailResult } from '@/services/realEmailService';
 import { findReservaByCriteria, getReservaById, updatePaymentStatus, syncIntakeCitaFromReserva, type Reserva } from '../services/supabaseBooking';
 import { supabase } from '@/integrations/supabase/client';
@@ -802,55 +803,69 @@ export default function PaymentSuccessPage() {
 
   // Vista específica para urgencia penal (post-pago)
   if (paymentData?.source === 'urgencia') {
-    const whatsappUrgencia = `https://wa.me/56962321883?text=${encodeURIComponent('Hola, acabo de activar la defensa de urgencia. Necesito hablar con el director.')}`;
+    const whatsappUrgencia = `https://wa.me/56962321883?text=${encodeURIComponent('Hola, acabo de completar el pago de urgencia penal. Necesito coordinar el siguiente paso con el equipo.')}`;
     return (
       <>
-        <SEO title="Pago Confirmado - Urgencia Penal | Punto Legal" description="El equipo legal ha sido activado. Un abogado se dirige a la unidad." />
-        <div className="min-h-screen bg-black text-white font-sans antialiased">
-          <header className="sticky top-0 z-50 bg-black/95 backdrop-blur border-b border-white/10">
-            <div
-              className="max-w-lg mx-auto px-4 py-3.5 flex items-center justify-center"
-              style={{ paddingTop: 'max(0.75rem, env(safe-area-inset-top, 0px))' }}
-            >
-              <Link
-                to="/"
-                className="agendamiento-wordmark inline-flex min-h-[44px] items-center -mx-1 px-1 py-1 rounded-lg hover:bg-white/[0.06] transition-colors"
-                aria-label="Punto Legal Chile — volver al inicio"
-              >
-                <span className="agendamiento-wordmark__name">Punto Legal</span>
-                <span className="agendamiento-wordmark__country">Chile</span>
-              </Link>
-            </div>
-          </header>
-          <main className="max-w-lg mx-auto px-4 py-8">
+        <SEO
+          title="Pago confirmado — Urgencia penal | Punto Legal"
+          description="Pago recibido. El equipo te contactará para coordinar la actuación según tu caso y la disponibilidad."
+        />
+        <UrgenciaPenalFocusLayout headerLinkTo="/" headerAriaLabel="Punto Legal Chile — volver al inicio">
+          <main className="relative z-10 max-w-lg mx-auto px-4 sm:px-5 py-10 pb-[max(2.5rem,env(safe-area-inset-bottom,0px))]">
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 22 }}
               animate={{ opacity: 1, y: 0 }}
-              className="text-center space-y-6"
+              transition={{ type: 'spring', stiffness: 280, damping: 32 }}
+              className="text-center space-y-8"
             >
-              <div className="w-20 h-20 rounded-2xl bg-emerald-500/20 flex items-center justify-center mx-auto border border-emerald-500/30">
-                <CheckCircle className="w-10 h-10 text-emerald-400" />
+              <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/25 bg-emerald-500/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-emerald-200/95">
+                <span className="relative flex h-1.5 w-1.5">
+                  <span className="absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-70 animate-pulse" />
+                  <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-400" />
+                </span>
+                Pago recibido
               </div>
-              <h1 className="text-2xl font-bold text-white">PAGO CONFIRMADO</h1>
-              <p className="text-slate-400">El equipo legal ha sido activado.</p>
-              <div className="rounded-2xl border border-white/10 bg-white/5 p-6 text-left space-y-4">
-                <p className="text-white font-medium">Instrucción:</p>
-                <p className="text-slate-300 text-sm leading-relaxed">
-                  Indique al funcionario policial que su defensa está a cargo de <strong className="text-white">Punto Legal</strong>. Un abogado se dirige a la unidad ahora mismo.
+
+              <div className="mx-auto flex h-[5.25rem] w-[5.25rem] items-center justify-center rounded-[1.35rem] border border-rose-500/30 bg-gradient-to-br from-rose-500/25 to-transparent shadow-[0_24px_48px_-20px_rgba(190,18,60,0.45)] backdrop-blur-xl">
+                <CheckCircle className="w-11 h-11 text-rose-100" strokeWidth={1.75} />
+              </div>
+
+              <div className="space-y-2 px-1">
+                <h1 className="font-display text-[1.65rem] sm:text-[1.85rem] font-bold tracking-[-0.03em] text-white leading-tight">
+                  Todo listo por tu lado
+                </h1>
+                <p className="text-slate-400 text-[0.9375rem] leading-relaxed max-w-md mx-auto">
+                  Recibimos tu pago. El equipo priorizará tu contacto para coordinar la actuación según los antecedentes que
+                  dejaste.
                 </p>
               </div>
-              <a
-                href={whatsappUrgencia}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2 w-full py-4 rounded-xl font-semibold bg-[#25D366] text-white hover:bg-[#20bd5a] transition-colors"
-              >
-                <MessageCircle className="w-5 h-5" />
-                HABLAR CON DIRECTOR
-              </a>
+
+              <div className="glass-ios-panel-dark p-6 sm:p-7 text-left space-y-4">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Próximo paso</p>
+                <p className="text-slate-200 text-[0.9375rem] leading-relaxed">
+                  Indica al funcionario policial que tu defensa está a cargo de{' '}
+                  <strong className="text-white font-semibold">Punto Legal</strong>. Coordinaremos contigo por WhatsApp la
+                  actuación concreta (presencial u otra modalidad) según disponibilidad y lo que permita el procedimiento.
+                </p>
+              </div>
+
+              <div className="space-y-3">
+                <a
+                  href={whatsappUrgencia}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="urgencia-wa-cta"
+                >
+                  <MessageCircle className="w-5 h-5 shrink-0 opacity-95" />
+                  Hablar con el equipo por WhatsApp
+                </a>
+                <Link to="/urgencia" className="urgencia-ghost-link">
+                  Volver a urgencia penal
+                </Link>
+              </div>
             </motion.div>
           </main>
-        </div>
+        </UrgenciaPenalFocusLayout>
       </>
     );
   }

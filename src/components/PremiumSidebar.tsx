@@ -9,8 +9,6 @@ import {
   Briefcase,
   Heart,
   Scale,
-  Shield,
-  Globe,
   Calculator,
   FileText,
   MessageCircle,
@@ -94,29 +92,11 @@ const menuItems: MenuItem[] = [
         href: '/servicios/familia'
       },
       {
-        id: 'civil',
-        label: 'Civil',
-        icon: FileText,
-        href: '/servicios/civil'
-      },
-      {
-        id: 'criminal',
-        label: 'Penal',
-        icon: Shield,
-        href: '/servicios/penal'
-      },
-      {
-        id: 'tax',
-        label: 'Tributario',
-        icon: Calculator,
-        href: '/servicios/tributario'
-      },
-      {
-        id: 'digital',
-        label: 'Digital',
-        icon: Globe,
-        href: '/servicios/digital',
-        isNew: true
+        id: 'urgencia',
+        label: 'Urgencia penal',
+        icon: AlertTriangle,
+        href: '/urgencia',
+        badge: '24/7'
       }
     ]
   },

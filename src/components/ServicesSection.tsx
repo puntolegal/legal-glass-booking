@@ -89,7 +89,7 @@ interface InternalService {
 
 /** Catálogo web/móvil: al cambiar títulos, sincronizar `supabase/functions/_shared/landingServiceTitles.ts` (correos / WhatsApp). */
 const internalServices: InternalService[] = [
-  // ========== PRODUCTO ESTRELLA ==========
+  // ========== CONTINGENCIA NACIONAL (CAE destacado) ==========
   // Defensa CAE — máxima urgencia financiera + alta intención de búsqueda.
   // Colocado como PRIMERO + FEATURED para máxima visibilidad.
   {
@@ -111,7 +111,7 @@ const internalServices: InternalService[] = [
     ],
     audience: "patrimonio",
     accent: ACCENT_WINE,
-    badge: "Producto estrella",
+    badge: "Contingencia nacional",
     featured: true,
     testimonial: {
       quote:
@@ -201,45 +201,6 @@ const internalServices: InternalService[] = [
     ],
     audience: "personas",
     accent: ACCENT_INK,
-  },
-  {
-    title: "Punto Legal Penal",
-    shortName: "Penal",
-    hook: "Defensa penal con un abogado litigante en juicio oral, querellas y salidas alternativas.",
-    descriptionHtml:
-      "Asumimos <strong>defensas en delitos contra las personas y la propiedad</strong>. Negociamos suspensión condicional y acuerdos reparatorios, y vamos a juicio oral cuando corresponde.",
-    ctaLabel: "Defender mi caso",
-    price: "$169.000",
-    plan: "penal",
-    icon: Gavel,
-    features: [
-      "Defensa en juicio oral",
-      "Querellas y representación de víctimas",
-      "Suspensión condicional y acuerdos",
-    ],
-    audience: "personas",
-    accent: ACCENT_WINE,
-    badge: "Atención inmediata",
-  },
-  {
-    title: "Punto Legal Delitos Económicos",
-    shortName: "Delitos Económicos",
-    hook: "Defensa especializada en la Ley de Delitos Económicos (Ley 21.595): fraude, lavado de activos, administración desleal y corrupción entre particulares.",
-    descriptionHtml:
-      "Defensa penal de ejecutivos, directores y socios frente a investigaciones de la Fiscalía, UAF o SII. Cubrimos <strong>Ley 21.595 de Delitos Económicos</strong>: administración desleal, fraude al Fisco, lavado de activos, delitos tributarios y ambientales. Estrategia desde la primera audiencia y coordinación con peritos contables.",
-    ctaLabel: "Pedir defensa especializada",
-    price: "$290.000",
-    plan: "delitos-economicos",
-    icon: BriefcaseBusiness,
-    features: [
-      "Ley 21.595 — delitos económicos y tributarios",
-      "Defensa en investigación y juicio oral",
-      "Coordinación con peritos contables y compliance",
-      "Procedimiento abreviado y suspensión condicional",
-    ],
-    audience: "personas",
-    accent: ACCENT_WINE,
-    badge: "Alta complejidad",
   },
 
   // ========== EMPRESAS ==========
@@ -355,24 +316,6 @@ const internalServices: InternalService[] = [
       "Cálculo real de finiquito",
       "Redacción de carta de despido",
       "Evaluación de riesgo de litigio",
-    ],
-    audience: "empresas",
-    accent: ACCENT_INK,
-  },
-  {
-    title: "Punto Legal Tributario",
-    shortName: "Tributario",
-    hook: "Pagas los impuestos justos y respondes al SII con un abogado tributarista a tu lado.",
-    descriptionHtml:
-      "Planificación tributaria personal y para PYME, recursos administrativos y representación frente al SII. <strong>Pagas lo justo, ni un peso más.</strong>",
-    ctaLabel: "Optimizar mis impuestos",
-    price: "$99.000",
-    plan: "tributario",
-    icon: Calculator,
-    features: [
-      "Planificación tributaria personal y PYME",
-      "Recursos y reposiciones ante el SII",
-      "Defensa frente a fiscalizaciones",
     ],
     audience: "empresas",
     accent: ACCENT_INK,
@@ -1052,66 +995,27 @@ const MobileServiceCard = ({
       className="mobile-service-card"
       style={{ ["--card-accent" as string]: service.accent }}
     >
-      {/* Badge SUPERIOR — banda full-width arriba del row.
-          Antes: estaba en línea con el título y truncaba "Tutela Laboral".
-          Ahora: banda independiente arriba (cuando existe) y el título tiene
-          todo el espacio horizontal disponible. */}
-      {service.clusterPills && service.clusterPills.length > 0 ? (
-        <div className="mobile-service-card__cluster-sheet">
-          {service.badge && (
-            <div className="mobile-service-card__cluster-label" aria-hidden>
-              <span className="mobile-service-card__cluster-label-dot" />
-              {service.badge}
-            </div>
-          )}
-          <div className="mobile-service-card__pills-scroll mobile-service-card__pills-scroll--in-cluster">
-            <div className="mobile-service-card__pills-track">
-              {service.clusterPills.map((pill) => (
-                <button
-                  key={`${pill.label}-${pill.plan}`}
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    void trackMetaEvent({
-                      event_name: "InitiateCheckout",
-                      custom_data: {
-                        content_type: "service_plan",
-                        content_category: "Landing Page",
-                        content_ids: [pill.plan],
-                        content_name: `${service.shortName} — ${pill.label}`,
-                        source: "services_section_cluster_pill_mobile",
-                        value: laborClusterMetaValueClp(pill.plan),
-                        currency: "CLP",
-                      },
-                    });
-                    window.location.href = `/agendamiento?plan=${pill.plan}`;
-                  }}
-                  className="mobile-service-card__pill mobile-service-card__pill--cluster shrink-0"
-                >
-                  {pill.label}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-      ) : (
-        service.badge && (
-          <div
-            className={`mobile-service-card__badge-bar ${
-              service.featured
-                ? "mobile-service-card__badge-bar--accent"
-                : "mobile-service-card__badge-bar--muted"
+      {/* Badge SUPERIOR — banda full-width (sin pills cluster en móvil; congruente con desktop). */}
+      {service.badge && (
+        <div
+          className={`mobile-service-card__badge-bar ${
+            service.featured ||
+            (service.clusterPills && service.clusterPills.length > 0)
+              ? "mobile-service-card__badge-bar--accent"
+              : "mobile-service-card__badge-bar--muted"
+          }`}
+          aria-hidden
+        >
+          <span
+            className={`mobile-service-card__badge-dot ${
+              service.featured ||
+              (service.clusterPills && service.clusterPills.length > 0)
+                ? ""
+                : "mobile-service-card__badge-dot--muted"
             }`}
-            aria-hidden
-          >
-            <span
-              className={`mobile-service-card__badge-dot ${
-                service.featured ? "" : "mobile-service-card__badge-dot--muted"
-              }`}
-            />
-            {service.badge}
-          </div>
-        )
+          />
+          {service.badge}
+        </div>
       )}
 
       {/* Fila principal — tap para expandir features */}
@@ -1406,7 +1310,7 @@ const ServiceCard = ({
                   });
                   window.location.href = `/agendamiento?plan=${pill.plan}`;
                 }}
-                className="service-cluster-pill rounded-full border border-white/15 bg-white/[0.06] px-3 py-1.5 text-[11px] font-medium text-slate-200 backdrop-blur-sm transition hover:border-white/25 hover:bg-white/10"
+                className="service-cluster-pill rounded-full px-3 py-1.5 text-[11px] font-medium transition touch-manipulation dark:border-white/15 dark:bg-white/[0.06] dark:text-slate-200 dark:backdrop-blur-sm dark:hover:border-white/25 dark:hover:bg-white/10"
               >
                 {pill.label}
               </button>

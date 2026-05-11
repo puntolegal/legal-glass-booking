@@ -23,7 +23,6 @@
   import { Link, useNavigate } from 'react-router-dom';
   import SEO from '../components/SEO';
   import DecisionHelperModal from '../components/DecisionHelperModal';
-  import Header from '../components/Header';
   import QuizModal from '../components/QuizModal';
   import PremiumHeroCard from '@/components/PremiumHeroCard';
   import SecondaryOfferCard from '@/components/SecondaryOfferCard';
@@ -421,9 +420,6 @@ export default function ServicioFamiliaPage() {
             <div className="absolute top-[-20rem] left-[-20rem] w-[50rem] h-[50rem] bg-gradient-radial from-pink-500/10 via-slate-900/0 to-transparent blur-3xl"></div>
             <div className="absolute bottom-[-20rem] right-[-20rem] w-[50rem] h-[50rem] bg-gradient-radial from-sky-500/10 via-slate-900/0 to-transparent blur-3xl"></div>
           </div>
-
-          <Header />
-          <div className="h-20" />
 
           {/* HERO - Estilo iOS Glassmorphism */}
           <section className="relative pt-8 md:pt-16 pb-10 md:pb-20 overflow-hidden">

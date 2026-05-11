@@ -121,10 +121,7 @@ const HeaderService: React.FC<HeaderServiceProps> = ({ theme, transparentOnTop =
     { label: 'Derecho Laboral', href: '/servicios/laboral', icon: '💼', slug: 'laboral' },
     { label: 'Derecho de Familia', href: '/servicios/familia', icon: '❤️', slug: 'familia' },
     { label: 'Derecho Inmobiliario', href: '/servicios/inmobiliario', icon: '🏠', slug: 'inmobiliario' },
-    { label: 'Derecho Civil', href: '/servicios/civil', icon: '📄', slug: 'civil' },
-    { label: 'Derecho Penal', href: '/servicios/penal', icon: '⚖️', slug: 'penal' },
-    { label: 'Derecho Tributario', href: '/servicios/tributario', icon: '🧮', slug: 'tributario' },
-    { label: 'Derecho Digital', href: '/servicios/digital', icon: '💻', slug: 'digital' },
+    { label: 'Urgencia penal', href: '/urgencia', icon: '🚨', slug: 'urgencia' },
     { label: 'Ver todos', href: '/servicios', icon: '👁️', slug: '' }
   ];
 

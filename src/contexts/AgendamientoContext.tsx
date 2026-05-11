@@ -201,7 +201,7 @@ const AgendamientoProviderInner: React.FC<{ children: ReactNode; initialService?
           : '';
       const qualSummary =
         qualificationMeta != null
-          ? ` [inmobiliario-eval] tipo=${qualificationMeta.tipo_propiedad} ubicacion=${qualificationMeta.ubicacion}${qualDir ? ` dir=${qualDir}` : ''} momento=${qualificationMeta.momento_venta} m2=${qualificationMeta.metros_cuadrados} uf=${qualificationMeta.precio_esperado}`
+          ? ` [inmobiliario-eval] tipo=${qualificationMeta.tipo_propiedad} ubicacion=${qualificationMeta.ubicacion}${qualDir ? ` dir=${qualDir}` : ''} momento=${qualificationMeta.momento_venta} m2=${qualificationMeta.metros_cuadrados} uf=${qualificationMeta.precio_esperado}${typeof qualificationMeta.tiene_piscina === 'string' ? ` pisc=${qualificationMeta.tiene_piscina} quin=${qualificationMeta.tiene_quincho} can=${qualificationMeta.tiene_cancha}${typeof qualificationMeta.tipo_cancha === 'string' && qualificationMeta.tipo_cancha !== 'no_aplica' ? ` cancha=${qualificationMeta.tipo_cancha}` : ''} bal=${qualificationMeta.balcon_terraza} tit=${qualificationMeta.titularidad_compra} hip=${qualificationMeta.carga_hipoteca} uh=${qualificationMeta.carga_uso_habitacion} usu=${qualificationMeta.carga_usufructo} grav=${qualificationMeta.carga_otros_gravamen}` : ''}`
           : '';
 
       if (isFreeBooking) {

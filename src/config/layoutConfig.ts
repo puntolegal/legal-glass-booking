@@ -195,36 +195,21 @@ export const layoutConfigs: RouteLayoutRule[] = [
       footerVariant: 'none',
       useMobileLayout: false,
       seoConfig: {
-        titleSuffix: 'Inmobiliario Sector Oriente',
+        titleSuffix: 'Venta de propiedades Sector Oriente',
         defaultDescription:
-          'Liquidez y gestión de activos inmobiliarios en Santiago Oriente con enfoque legal preventivo.',
+          '¿Vas a vender tu propiedad en Santiago Oriente? En Punto Legal ordenamos dominio y gravámenes antes de publicar, encaramos saneamiento de cargas que frenan la compraventa y trabajamos la venta con compradores que muestran capacidad de pago. Promesa y escritura con abogado.',
       },
     },
   },
+
+  // 5. ServicioFamiliaPage — sin header/footer globales (landing propio, como laboral/inmobiliario)
   {
-    path: '/inmobiliario',
+    path: '/servicios/familia',
     config: {
       type: 'default',
       showHeader: false,
       showFooter: false,
       headerVariant: 'none',
-      footerVariant: 'none',
-      useMobileLayout: false,
-      seoConfig: {
-        titleSuffix: 'Inmobiliario',
-        defaultDescription: 'Evaluación y agenda orientada a operaciones inmobiliarias en Chile.',
-      },
-    },
-  },
-
-  // 5. ServicioFamiliaPage (sin footer, tiene el propio)
-  {
-    path: '/servicios/familia',
-    config: {
-      type: 'default',
-      showHeader: true,
-      showFooter: false,
-      headerVariant: 'default',
       footerVariant: 'none',
       useMobileLayout: false,
       seoConfig: {
@@ -266,7 +251,7 @@ export const layoutConfigs: RouteLayoutRule[] = [
     }
   },
   
-  // 3e. Layout de foco - Urgencia Penal (Escudo Negro, cero distracciones)
+  // 3e. Layout de foco - Urgencia penal (glass iOS, tema penal)
   {
     pathPrefix: '/urgencia',
     config: {
@@ -277,10 +262,11 @@ export const layoutConfigs: RouteLayoutRule[] = [
       footerVariant: 'none',
       useMobileLayout: false,
       seoConfig: {
-        titleSuffix: 'Urgencia Penal',
-        defaultDescription: 'Defensa legal inmediata en situaciones de detención. Intervención en comisaría.'
-      }
-    }
+        titleSuffix: 'Urgencia penal Santiago oriente',
+        defaultDescription:
+          'Orientación en detención y control de detención en RM: Las Condes, Providencia, Ñuñoa, Vitacura, Lo Barnechea, La Florida. Primera respuesta priorizada según disponibilidad.',
+      },
+    },
   },
   
   // 5a. Calculadora de Pensión - Squeeze Page (sin header ni footer para máxima conversión)

@@ -10,6 +10,7 @@ import { getServiceTheme } from '@/config/serviceThemes';
 import { buildWhatsAppUrl } from '@/lib/whatsapp';
 import { saveAgendamientoIntake } from '@/services/agendamientoIntakeService';
 import { useTheme } from '@/hooks/useTheme';
+import { toast } from 'sonner';
 import type { FormData } from '@/types/agendamiento';
 
 const Step1_ClientInfo: React.FC = () => {
@@ -70,8 +71,6 @@ const Step1_ClientInfo: React.FC = () => {
 
   const watchedValues = watch();
   const { isConvenioValido, isAdminValido } = priceCalculation;
-  const [fieldValidationState, setFieldValidationState] = useState<Record<string, boolean>>({});
-  const [intakeSaveError, setIntakeSaveError] = useState<string | null>(null);
   const [isSavingIntake, setIsSavingIntake] = useState(false);
   
   type FieldKey = keyof FormData;
@@ -186,33 +185,28 @@ const Step1_ClientInfo: React.FC = () => {
     }
     
     if (allValid) {
-      setIntakeSaveError(null);
       const vals = form.getValues();
       setIsSavingIntake(true);
       try {
-        let saved = await saveAgendamientoIntake({
+        const saved = await saveAgendamientoIntake({
           form: vals,
           planSlug: plan || 'general',
           serviceName: service.name,
           category: service.category,
           precioIndicativo: priceCalculation.precioFinal,
         });
-        if (!saved.success) {
-          saved = await saveAgendamientoIntake({
-            form: vals,
-            planSlug: plan || 'general',
-            serviceName: service.name,
-            category: service.category,
-            precioIndicativo: priceCalculation.precioFinal,
-          });
-        }
         if (saved.success && saved.id) {
           setAgendamientoIntakeId(saved.id);
           setStep(2);
         } else {
-          setIntakeSaveError(
-            'No pudimos guardar tu información. Revisa tu conexión e inténtalo de nuevo. Si el problema continúa, escríbenos por WhatsApp.',
+          // No bloquear el embudo: el comentario del servicio indica degradación si Supabase falla
+          console.warn('[Step1] agendamiento_intakes insert falló:', saved.error);
+          toast.warning(
+            'No pudimos guardar tus datos ahora. Puedes seguir con la reserva; si esto se repite, escríbenos por WhatsApp.',
+            { duration: 6500 },
           );
+          setAgendamientoIntakeId(null);
+          setStep(2);
         }
       } finally {
         setIsSavingIntake(false);
@@ -265,10 +259,27 @@ const Step1_ClientInfo: React.FC = () => {
             <User className="w-5 h-5 md:w-6 md:h-6 text-white" />
           </div>
           <div className="min-w-0 flex-1">
-            <h3 className="text-base md:text-xl font-bold text-slate-900 dark:text-white">Asistente de Bienvenida</h3>
-            <p className="text-xs md:text-sm text-slate-600 dark:text-slate-400 hidden md:block">
-              Te guiamos paso a paso para preparar tu consulta estratégica
-            </p>
+            {plan === 'inmobiliario-eval' ? (
+              <>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-emerald-700 dark:text-emerald-400">
+                  Asesoría de cortesía · orientación previa
+                </p>
+                <h3 className="text-base font-bold text-slate-900 dark:text-white md:text-xl">
+                  Completa tus datos para agendar por Google Meet
+                </h3>
+                <p className="mt-1 text-[11px] leading-relaxed text-slate-600 dark:text-slate-400 md:text-xs md:text-sm">
+                  Evaluación inmobiliaria Sector Oriente — sin costo en esta primera sesión orientativa. No reemplaza estudio
+                  de títulos completo.
+                </p>
+              </>
+            ) : (
+              <>
+                <h3 className="text-base md:text-xl font-bold text-slate-900 dark:text-white">Asistente de Bienvenida</h3>
+                <p className="text-xs md:text-sm text-slate-600 dark:text-slate-400 hidden md:block">
+                  Te guiamos paso a paso para preparar tu consulta estratégica
+                </p>
+              </>
+            )}
           </div>
         </div>
         
@@ -417,15 +428,6 @@ const Step1_ClientInfo: React.FC = () => {
             </div>
 
             {/* Botón Continuar - Optimizado para móvil */}
-            {intakeSaveError && (
-              <p
-                className="mt-3 rounded-xl border border-rose-400/40 bg-rose-500/[0.08] px-4 py-3 text-sm text-rose-700 dark:border-rose-500/30 dark:bg-rose-500/10 dark:text-rose-200"
-                role="alert"
-              >
-                {intakeSaveError}
-              </p>
-            )}
-
             <motion.button
               type="submit"
               disabled={!requiredFieldsComplete || isSavingIntake}

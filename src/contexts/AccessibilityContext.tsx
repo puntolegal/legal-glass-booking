@@ -1,101 +1,78 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
-interface AccessibilityState {
-  highContrast: boolean;
-  fontSize: 'small' | 'medium' | 'large';
+export interface AccessibilityState {
+  enlargedText: boolean;
   reducedMotion: boolean;
-  focusVisible: boolean;
 }
 
 interface AccessibilityContextType {
   state: AccessibilityState;
-  toggleHighContrast: () => void;
-  setFontSize: (size: 'small' | 'medium' | 'large') => void;
+  toggleEnlargedText: () => void;
   toggleReducedMotion: () => void;
-  toggleFocusVisible: () => void;
   resetToDefaults: () => void;
 }
 
+const DEFAULTS: AccessibilityState = {
+  enlargedText: false,
+  reducedMotion: false,
+};
+
 const AccessibilityContext = createContext<AccessibilityContextType | undefined>(undefined);
 
-export const AccessibilityProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [state, setState] = useState<AccessibilityState>(() => {
-    const saved = localStorage.getItem('accessibility-settings');
-    if (saved) {
-      return JSON.parse(saved);
+function migrate(raw: string | null): AccessibilityState {
+  if (!raw) return DEFAULTS;
+  try {
+    const parsed = JSON.parse(raw) as Record<string, unknown>;
+    if (
+      typeof parsed.enlargedText === 'boolean' &&
+      typeof parsed.reducedMotion === 'boolean'
+    ) {
+      return {
+        enlargedText: parsed.enlargedText,
+        reducedMotion: parsed.reducedMotion,
+      };
     }
-    return {
-      highContrast: false,
-      fontSize: 'medium' as const,
-      reducedMotion: false,
-      focusVisible: false
-    };
-  });
+    const fontSize = parsed.fontSize;
+    const enlargedText = fontSize === 'large';
+    const reducedMotion = Boolean(parsed.reducedMotion);
+    return { enlargedText, reducedMotion };
+  } catch {
+    return DEFAULTS;
+  }
+}
+
+export const AccessibilityProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [state, setState] = useState<AccessibilityState>(() =>
+    migrate(typeof window !== 'undefined' ? localStorage.getItem('accessibility-settings') : null)
+  );
 
   useEffect(() => {
-    localStorage.setItem('accessibility-settings', JSON.stringify(state));
-    
-    // Aplicar estilos al documento
     const root = document.documentElement;
-    
-    if (state.highContrast) {
-      root.classList.add('high-contrast');
-    } else {
-      root.classList.remove('high-contrast');
-    }
-    
-    if (state.reducedMotion) {
-      root.classList.add('reduced-motion');
-    } else {
-      root.classList.remove('reduced-motion');
-    }
-    
-    if (state.focusVisible) {
-      root.classList.add('focus-visible');
-    } else {
-      root.classList.remove('focus-visible');
-    }
-    
-    // Aplicar tamaño de fuente
     root.classList.remove('font-size-small', 'font-size-medium', 'font-size-large');
-    root.classList.add(`font-size-${state.fontSize}`);
-    
+    root.classList.add(state.enlargedText ? 'font-size-large' : 'font-size-medium');
+    root.classList.remove('high-contrast', 'focus-visible');
+    if (state.reducedMotion) root.classList.add('reduced-motion');
+    else root.classList.remove('reduced-motion');
+    localStorage.setItem('accessibility-settings', JSON.stringify(state));
   }, [state]);
 
-  const toggleHighContrast = () => {
-    setState(prev => ({ ...prev, highContrast: !prev.highContrast }));
-  };
+  const toggleEnlargedText = () =>
+    setState((prev) => ({ ...prev, enlargedText: !prev.enlargedText }));
 
-  const setFontSize = (size: 'small' | 'medium' | 'large') => {
-    setState(prev => ({ ...prev, fontSize: size }));
-  };
+  const toggleReducedMotion = () =>
+    setState((prev) => ({ ...prev, reducedMotion: !prev.reducedMotion }));
 
-  const toggleReducedMotion = () => {
-    setState(prev => ({ ...prev, reducedMotion: !prev.reducedMotion }));
-  };
-
-  const toggleFocusVisible = () => {
-    setState(prev => ({ ...prev, focusVisible: !prev.focusVisible }));
-  };
-
-  const resetToDefaults = () => {
-    setState({
-      highContrast: false,
-      fontSize: 'medium',
-      reducedMotion: false,
-      focusVisible: false
-    });
-  };
+  const resetToDefaults = () => setState(DEFAULTS);
 
   return (
-    <AccessibilityContext.Provider value={{
-      state,
-      toggleHighContrast,
-      setFontSize,
-      toggleReducedMotion,
-      toggleFocusVisible,
-      resetToDefaults
-    }}>
+    <AccessibilityContext.Provider
+      value={{
+        state,
+        toggleEnlargedText,
+        toggleReducedMotion,
+        resetToDefaults,
+      }}
+    >
       {children}
     </AccessibilityContext.Provider>
   );
@@ -107,4 +84,4 @@ export const useAccessibility = () => {
     throw new Error('useAccessibility must be used within an AccessibilityProvider');
   }
   return context;
-}; 
+};

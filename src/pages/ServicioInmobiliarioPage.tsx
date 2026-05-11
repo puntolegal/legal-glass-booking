@@ -10,6 +10,7 @@ import {
   Shield,
   X,
   Check,
+  ArrowLeft,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useNavigate } from 'react-router-dom'
@@ -22,6 +23,7 @@ import type { MockOrienteAddress } from '@/constants/inmobiliarioMockAddresses'
 import {
   inmobiliarioQualificationSchema,
   INMOB_QUAL_STORAGE_KEY,
+  normalizeInmobiliarioQualificationInput,
   type InmobiliarioQualification,
 } from '@/constants/inmobiliarioQualification'
 
@@ -32,8 +34,35 @@ type HeroFormState = {
   direccion_referencia: string
   momento_venta: string
   metros_cuadrados: string
+  tiene_piscina: string
+  tiene_quincho: string
+  tiene_cancha: string
+  tipo_cancha: string
+  balcon_terraza: string
+  titularidad_compra: string
+  carga_hipoteca: string
+  carga_uso_habitacion: string
+  carga_usufructo: string
+  carga_otros_gravamen: string
   precio_esperado: string
 }
+
+type InmobiliarioStepId =
+  | 'tipo_propiedad'
+  | 'ubicacion'
+  | 'momento_venta'
+  | 'metros_cuadrados'
+  | 'amenidad_piscina'
+  | 'amenidad_quincho'
+  | 'amenidad_cancha'
+  | 'tipo_cancha'
+  | 'balcon_terraza'
+  | 'titularidad_compra'
+  | 'carga_hipoteca'
+  | 'carga_uso_habitacion'
+  | 'carga_usufructo'
+  | 'carga_otros_gravamen'
+  | 'precio_esperado'
 
 const initialForm: HeroFormState = {
   tipo_propiedad: '',
@@ -41,10 +70,41 @@ const initialForm: HeroFormState = {
   direccion_referencia: '',
   momento_venta: '',
   metros_cuadrados: '',
+  tiene_piscina: '',
+  tiene_quincho: '',
+  tiene_cancha: '',
+  tipo_cancha: '',
+  balcon_terraza: '',
+  titularidad_compra: '',
+  carga_hipoteca: '',
+  carga_uso_habitacion: '',
+  carga_usufructo: '',
+  carga_otros_gravamen: '',
   precio_esperado: '',
 }
 
-const TOTAL_STEPS = 5
+function getStepSequence(d: HeroFormState): InmobiliarioStepId[] {
+  const seq: InmobiliarioStepId[] = [
+    'tipo_propiedad',
+    'ubicacion',
+    'momento_venta',
+    'metros_cuadrados',
+    'amenidad_piscina',
+    'amenidad_quincho',
+    'amenidad_cancha',
+  ]
+  if (d.tiene_cancha === 'si') seq.push('tipo_cancha')
+  if (d.tipo_propiedad === 'departamento') seq.push('balcon_terraza')
+  seq.push(
+    'titularidad_compra',
+    'carga_hipoteca',
+    'carga_uso_habitacion',
+    'carga_usufructo',
+    'carga_otros_gravamen',
+    'precio_esperado',
+  )
+  return seq
+}
 
 const TRANSITION_MS = 280
 const SUCCESS_NAV_MS = 2200
@@ -53,60 +113,70 @@ const PROCESSING_MS = 3500
 const ADDRESS_LABOR_MS = 720
 
 function mapHeroToQualification(d: HeroFormState): InmobiliarioQualification | null {
-  const parsed = inmobiliarioQualificationSchema.safeParse({
+  const raw: Record<string, unknown> = {
     tipo_propiedad: d.tipo_propiedad,
     ubicacion: d.ubicacion,
-    ...(d.direccion_referencia.trim()
-      ? { direccion_referencia: d.direccion_referencia.trim() }
-      : {}),
     momento_venta: d.momento_venta,
     metros_cuadrados: d.metros_cuadrados,
+    tiene_piscina: d.tiene_piscina,
+    tiene_quincho: d.tiene_quincho,
+    tiene_cancha: d.tiene_cancha,
+    tipo_cancha: d.tipo_cancha,
+    balcon_terraza: d.balcon_terraza,
+    titularidad_compra: d.titularidad_compra,
+    carga_hipoteca: d.carga_hipoteca,
+    carga_uso_habitacion: d.carga_uso_habitacion,
+    carga_usufructo: d.carga_usufructo,
+    carga_otros_gravamen: d.carga_otros_gravamen,
     precio_esperado: d.precio_esperado,
-  })
+  }
+  if (d.direccion_referencia.trim()) raw.direccion_referencia = d.direccion_referencia.trim()
+  const normalized = normalizeInmobiliarioQualificationInput(raw)
+  const parsed = inmobiliarioQualificationSchema.safeParse(normalized)
   return parsed.success ? parsed.data : null
 }
 
 const TRADITIONAL_PAINS = [
-  'Turismo inmobiliario: visitas de curiosos sin pre-aprobación hipotecaria.',
-  'Ventas caídas a última hora por reparos del abogado del banco del comprador.',
-  'Propiedades “quemadas” por meses de exposición pública bajando de precio.',
+  'Sales al mercado sin chequear bien dominio y cargas: después aparece la hipoteca mal entendida, el usufructo o el uso y habitación —y la escritura se empantana cuando ya tenías comprador.',
+  'La compraventa se cae o se enfría frente al notario o al banco del comprador: meses perdidos, estrés y la sensación de haber “fallado” con tu propio patrimonio.',
+  'Visitas tras visitas con gente sin crédito claro: cansancio en casa, precio en UF que baja en el portal y la frustración de que nadie cierre de verdad.',
 ]
 
 const MARSHALL_WINS = [
-  'Exclusividad y filtro financiero estricto antes de cada visita.',
-  'Estudio de títulos preventivo para asegurar la viabilidad de la firma.',
-  'Gestión comercial privada para proteger la percepción de valor.',
+  'En Punto Legal revisamos contigo si la venta es viable según tu realidad (matrimonio, sociedad conyugal, empresa): menos dudas de golpe, más claridad desde el inicio.',
+  'Antes de mostrar el inmueble, ordenamos con abogado dominio y gravámenes —y encaramos el saneamiento de vicios o cargas que suelan frenar la compraventa.',
+  'Filtramos interesados con señal seria de capacidad hipotecaria para que cada visita te acerque a una oferta concreta, no a perder otro sábado.',
 ]
 
 const TIMELINE_PHASES = [
   {
     key: 'p1',
     days: 'Días 1–3',
-    title: 'Reunión Estratégica y Mandato Legal',
-    body: 'Fijamos condiciones claras y exclusividad para proteger su propiedad, su tiempo y la percepción de valor.',
+    title: 'Plan de venta que te devuelve control',
+    body: 'Reunión para bajar la ansiedad a un plan: vemos si tu bien puede transferirse según tu patrimonio, qué cargas hay y cómo encarar precio en UF sin improvisar.',
   },
   {
     key: 'p2',
     days: 'Días 4–15',
-    title: 'Saneamiento y Venta Silenciosa',
-    body: 'Abogados ordenan el camino registral; el comercial identifica al comprador idóneo en modalidad reservada, sin portales abiertos.',
+    title: 'Dominio ordenado y venta con cabeza fría',
+    body: 'Abogados ordenan Conservador y gravámenes; el equipo comercial trabaja la salida al mercado sin sobreexponerte ni quemar el relato de tu propiedad.',
   },
   {
     key: 'p3',
     days: 'Días 16–30',
-    title: 'Cierre Notarial y Liquidación',
-    body: 'Firma segura de la promesa y traspaso de fondos con acompañamiento hasta el instrumento en notaría.',
+    title: 'Promesa y escritura sin quedarte solo frente al trámite',
+    body: 'Te acompañamos en promesa de compraventa, coordinación con el banco del comprador y traspaso hasta escritura y cobro —con menos sorpresas de último minuto.',
   },
 ] as const
 
 const PATRIMONIO_SCANNER_MESSAGES = [
-  'Cruzando datos del Conservador…',
-  'Verificando roles ante el SII…',
-  'Proyectando plusvalía de la zona…',
-  'Buscando coincidencias en cartera privada…',
+  'Detectando gravámenes y cargas que muchos descubren tarde…',
+  'Pasando de la duda a un mapa claro: dominio, titularidad y qué falta ordenar…',
+  'Contrastando tu referencia en UF con lo que realmente está pasando en el barrio…',
+  'Preparando tu reunión con abogado y comercial: próximos pasos concretos para vender…',
 ] as const
 
-/** Labor illusion en el hero: plano + rayo de escaneo + mensajes en bucle. */
+/** Bloque hero: contexto de trabajo + mensajes (sin animación tipo radar). */
 function InmobiliarioPatrimonioScanner() {
   const reduce = useReducedMotion()
   const [msgIndex, setMsgIndex] = useState(0)
@@ -124,7 +194,7 @@ function InmobiliarioPatrimonioScanner() {
   return (
     <div className="mb-2 rounded-2xl border border-slate-200 bg-white/80 p-4 shadow-sm backdrop-blur-sm sm:p-5">
       <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-emerald-800">
-        Escáner patrimonial
+        Tu venta empieza acá · dominio y papeles antes de publicar
       </p>
       <div className="flex flex-col gap-4 sm:flex-row sm:items-stretch">
         <div className="relative h-44 min-h-[11rem] flex-1 overflow-hidden rounded-xl border border-slate-200/80 bg-slate-50/95 sm:max-w-[260px]">
@@ -150,15 +220,6 @@ function InmobiliarioPatrimonioScanner() {
             <line x1="48" y1="8" x2="48" y2="60" stroke="currentColor" strokeWidth="0.4" />
             <rect x="28" y="68" width="44" height="22" fill="none" stroke="currentColor" strokeWidth="0.55" />
           </svg>
-          {!reduce && (
-            <motion.div
-              className="absolute left-[10%] right-[10%] z-[1] h-[2px] rounded-full bg-emerald-500 shadow-[0_0_8px_#10b981]"
-              initial={false}
-              animate={{ top: ['6%', '92%', '6%'] }}
-              transition={{ duration: 3.8, repeat: Infinity, ease: 'easeInOut' }}
-              style={{ top: '6%' }}
-            />
-          )}
         </div>
         <div className="flex min-h-[11rem] flex-1 items-center sm:pl-1">
           <AnimatePresence mode="wait">
@@ -228,8 +289,8 @@ function MacGlassWindow({
 export default function ServicioInmobiliarioPage() {
   const navigate = useNavigate()
   const prefersReducedMotion = useReducedMotion()
-  const [step, setStep] = useState(1)
-  const [, setFormData] = useState<HeroFormState>(initialForm)
+  const [currentStepId, setCurrentStepId] = useState<InmobiliarioStepId>('tipo_propiedad')
+  const [formData, setFormData] = useState<HeroFormState>(initialForm)
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [isTransitioning, setIsTransitioning] = useState(false)
   const [showStickyCta, setShowStickyCta] = useState(false)
@@ -242,6 +303,18 @@ export default function ServicioInmobiliarioPage() {
   const processingTimerRef = useRef<ReturnType<typeof window.setTimeout> | null>(null)
   const addressLaborTimerRef = useRef<ReturnType<typeof window.setTimeout> | null>(null)
 
+  const stepSequence = getStepSequence(formData)
+  const stepIndexInSeq = stepSequence.indexOf(currentStepId)
+  const stepDisplayIdx = stepIndexInSeq >= 0 ? stepIndexInSeq + 1 : 1
+  const stepDisplayTotal = stepSequence.length
+
+  const applyFormPatch = useCallback((patch: Partial<HeroFormState>) => {
+    const next = { ...formDataRef.current, ...patch }
+    formDataRef.current = next
+    setFormData(next)
+  }, [])
+
+
   useEffect(() => {
     return () => {
       if (navigateTimerRef.current != null) window.clearTimeout(navigateTimerRef.current)
@@ -249,6 +322,16 @@ export default function ServicioInmobiliarioPage() {
       if (addressLaborTimerRef.current != null) window.clearTimeout(addressLaborTimerRef.current)
     }
   }, [])
+
+  useEffect(() => {
+    if (phase !== 'questions') return
+    const seq = getStepSequence(formDataRef.current)
+    if (!seq.includes(currentStepId)) {
+      const k = seq.indexOf('amenidad_cancha')
+      const fallback = k >= 0 ? seq[k + 1] ?? 'tipo_propiedad' : 'tipo_propiedad'
+      setCurrentStepId(fallback)
+    }
+  }, [formData, phase, currentStepId])
 
   useEffect(() => {
     const el = heroRef.current
@@ -276,9 +359,9 @@ export default function ServicioInmobiliarioPage() {
       setSubmitError(null)
       const qual = mapHeroToQualification(data)
       if (!qual) {
-        setSubmitError('No pudimos validar los datos. Complete los cinco pasos.')
+        setSubmitError('No pudimos validar los datos. Revise las respuestas e intente nuevamente.')
         setPhase('questions')
-        setStep(1)
+        setCurrentStepId('tipo_propiedad')
         return
       }
       try {
@@ -286,7 +369,7 @@ export default function ServicioInmobiliarioPage() {
       } catch {
         setSubmitError('Active el almacenamiento del navegador para continuar.')
         setPhase('questions')
-        setStep(5)
+        setCurrentStepId('precio_esperado')
         return
       }
       navigate('/agendamiento?plan=inmobiliario-eval')
@@ -294,9 +377,19 @@ export default function ServicioInmobiliarioPage() {
     [navigate],
   )
 
+  const advanceToStepAfter = useCallback(
+    (completedStepId: InmobiliarioStepId, nextForm: HeroFormState) => {
+      const seq = getStepSequence(nextForm)
+      const i = seq.indexOf(completedStepId)
+      const nextId = i >= 0 ? seq[i + 1] : null
+      if (nextId) setCurrentStepId(nextId)
+    },
+    [],
+  )
+
   const handleAddressPick = useCallback(
     (row: MockOrienteAddress) => {
-      if (isTransitioning || phase !== 'questions' || step !== 2) return
+      if (isTransitioning || phase !== 'questions' || currentStepId !== 'ubicacion') return
       setSubmitError(null)
       setIsTransitioning(true)
       const prev = formDataRef.current
@@ -312,12 +405,27 @@ export default function ServicioInmobiliarioPage() {
       addressLaborTimerRef.current = window.setTimeout(() => {
         addressLaborTimerRef.current = null
         setAddressPreview(null)
-        setStep(3)
+        advanceToStepAfter('ubicacion', next)
         setIsTransitioning(false)
       }, ADDRESS_LABOR_MS)
     },
-    [isTransitioning, phase, step],
+    [isTransitioning, phase, currentStepId, advanceToStepAfter],
   )
+
+  const runProcessingThenSuccess = useCallback(() => {
+    setPhase('processing')
+    if (navigateTimerRef.current != null) window.clearTimeout(navigateTimerRef.current)
+    if (processingTimerRef.current != null) window.clearTimeout(processingTimerRef.current)
+    processingTimerRef.current = window.setTimeout(() => {
+      processingTimerRef.current = null
+      setPhase('success')
+      if (navigateTimerRef.current != null) window.clearTimeout(navigateTimerRef.current)
+      navigateTimerRef.current = window.setTimeout(() => {
+        navigateTimerRef.current = null
+        persistAndNavigate(formDataRef.current)
+      }, SUCCESS_NAV_MS)
+    }, PROCESSING_MS)
+  }, [persistAndNavigate])
 
   const handleOptionSelect = useCallback(
     (field: keyof HeroFormState, value: string) => {
@@ -325,60 +433,101 @@ export default function ServicioInmobiliarioPage() {
       setSubmitError(null)
       setIsTransitioning(true)
 
-      setFormData((prev) => {
-        const next = { ...prev, [field]: value }
-        formDataRef.current = next
-        window.setTimeout(() => {
-          if (field !== 'precio_esperado') {
-            setStep((s) => Math.min(TOTAL_STEPS, s + 1))
-            setIsTransitioning(false)
-          } else {
-            setIsTransitioning(false)
-            setPhase('processing')
-            if (navigateTimerRef.current != null) window.clearTimeout(navigateTimerRef.current)
-            if (processingTimerRef.current != null) window.clearTimeout(processingTimerRef.current)
-            processingTimerRef.current = window.setTimeout(() => {
-              processingTimerRef.current = null
-              setPhase('success')
-              if (navigateTimerRef.current != null) window.clearTimeout(navigateTimerRef.current)
-              navigateTimerRef.current = window.setTimeout(() => {
-                navigateTimerRef.current = null
-                persistAndNavigate(formDataRef.current)
-              }, SUCCESS_NAV_MS)
-            }, PROCESSING_MS)
-          }
-        }, TRANSITION_MS)
-        return next
-      })
+      const stepBefore = currentStepId
+      applyFormPatch({ [field]: value })
+      const nextForm = formDataRef.current
+
+      window.setTimeout(() => {
+        if (field === 'precio_esperado') {
+          setIsTransitioning(false)
+          runProcessingThenSuccess()
+          return
+        }
+        advanceToStepAfter(stepBefore, nextForm)
+        setIsTransitioning(false)
+      }, TRANSITION_MS)
     },
-    [isTransitioning, phase, persistAndNavigate],
+    [isTransitioning, phase, currentStepId, applyFormPatch, advanceToStepAfter, runProcessingThenSuccess],
   )
 
-  const progressPct = phase === 'success' || phase === 'processing' ? 100 : (step / TOTAL_STEPS) * 100
+  const handleBack = useCallback(() => {
+    if (isTransitioning || phase !== 'questions') return
+    const seq = getStepSequence(formDataRef.current)
+    const i = seq.indexOf(currentStepId)
+    if (i <= 0) return
+    setSubmitError(null)
+    setCurrentStepId(seq[i - 1])
+  }, [isTransitioning, phase, currentStepId])
+
+  const progressPct =
+    phase === 'success' || phase === 'processing'
+      ? 100
+      : stepSequence.length > 0
+        ? (stepDisplayIdx / stepSequence.length) * 100
+        : 0
+
+  const stepHeading = (() => {
+    switch (currentStepId) {
+      case 'tipo_propiedad':
+        return '¿Qué tipo de inmueble desea vender?'
+      case 'ubicacion':
+        return 'Dirección referencial en Sector Oriente'
+      case 'momento_venta':
+        return '¿Qué prioriza en las próximas semanas?'
+      case 'metros_cuadrados':
+        return 'Superficie útil aproximada'
+      case 'amenidad_piscina':
+        return '¿La propiedad cuenta con piscina?'
+      case 'amenidad_quincho':
+        return '¿Cuenta con quincho o espacio cubierto para asados?'
+      case 'amenidad_cancha':
+        return '¿Cuenta con cancha deportiva (tenis, fútbol, golf u otra)?'
+      case 'tipo_cancha':
+        return 'Indique el tipo de cancha'
+      case 'balcon_terraza':
+        return 'Balcón, terraza o loggia'
+      case 'titularidad_compra':
+        return 'Titularidad al momento de la compra'
+      case 'carga_hipoteca':
+        return '¿Registra hipoteca o mutuo con garantía hipotecaria?'
+      case 'carga_uso_habitacion':
+        return '¿Registra derecho de uso y habitación?'
+      case 'carga_usufructo':
+        return '¿Registra usufructo u otro derecho real de uso relevante?'
+      case 'carga_otros_gravamen':
+        return '¿Otros gravámenes o prohibiciones (embargo, segunda clase, etc.)?'
+      case 'precio_esperado':
+        return 'Rango de precio referencial en UF'
+      default:
+        return ''
+    }
+  })()
+
+  const stickyBottomStyle = { bottom: 'max(1.5rem, env(safe-area-inset-bottom, 0px))' } as const
 
   return (
     <>
       <SEO
-        title="Venta inmueble Las Condes, Vitacura, Lo Barnechea, La Reina | Equipo legal y comercial — Punto Legal"
-        description="Venta de inmueble en Las Condes, Vitacura, Lo Barnechea y La Reina: comercialización selectiva, filtro de interesados y saneamiento registral preventivo con equipo legal y comercial. Evaluación confidencial. Agende su reunión con Punto Legal."
+        title="Vender casa o departamento Las Condes, Vitacura, Lo Barnechea, La Reina | Venta inmobiliaria — Punto Legal"
+        description="Servicio de venta de propiedades en Santiago Oriente: revisamos si puede vender sin trabas (patrimonio, matrimonio, empresa), gravámenes e hipotecas antes de publicar, y acercamos compradores con capacidad de pago. Promesa y escritura en notaría con abogado. Evaluación confidencial."
         url={siteUrl('/servicios/inmobiliario')}
-        keywords="vender departamento Las Condes, vender casa Vitacura, venta inmueble Lo Barnechea, La Reina, abogado inmobiliario Santiago Oriente, gestión venta alto patrimonio, tasación orientativa UF, corretaje privado, promesa compraventa Chile, cierre notarial, Punto Legal"
+        keywords="vender casa Santiago Oriente, venta departamento Las Condes, vender propiedad Vitacura Lo Barnechea, gravámenes venta casa Chile, hipoteca venta inmueble, estudio de títulos orientativo, compraventa inmueble Chile, uso y habitación venta, sociedad conyugal venta casa, abogado venta propiedad Santiago, precio UF venta casa, Punto Legal"
       />
       <Helmet>
         <script type="application/ld+json">
           {JSON.stringify({
             '@context': 'https://schema.org',
             '@type': 'ProfessionalService',
-            name: 'Punto Legal — Venta inmobiliaria Sector Oriente (equipo legal y comercial)',
+            name: 'Punto Legal — Venta de inmuebles Sector Oriente (legal y comercial)',
             description:
-              'Orientación comercial y legal para venta de inmuebles en Las Condes, Vitacura, Lo Barnechea y La Reina: estudio de mercado riguroso, filtro de capacidad de pago y revisión orientativa de dominio y cargas, con criterio de abogados y corredor.',
+              'Venta de casas y departamentos en Santiago Oriente (Las Condes, Vitacura, Lo Barnechea, La Reina): revisión orientativa de dominio y gravámenes, encaramiento de saneamiento de cargas que traban la compraventa, y apoyo legal y comercial hasta promesa y escritura en notaría.',
             url: siteUrl('/servicios/inmobiliario'),
             provider: { '@type': 'Organization', name: 'Punto Legal', url: 'https://puntolegal.online' },
             areaServed: {
               '@type': 'AdministrativeArea',
               name: 'Santiago Oriente, Chile',
             },
-            serviceType: 'Asesoría inmobiliaria y legal orientada a venta de propiedades',
+            serviceType: 'Venta de inmuebles con asesoría legal y comercial',
           })}
         </script>
       </Helmet>
@@ -409,18 +558,25 @@ export default function ServicioInmobiliarioPage() {
                 <div className="mb-4 inline-flex max-w-xl items-start gap-2.5 rounded-2xl border border-slate-200/50 bg-white/80 px-3.5 py-2.5 shadow-[0_8px_32px_rgba(15,23,42,0.06)] backdrop-blur-xl ring-1 ring-white/90 sm:items-center">
                   <Shield className="mt-0.5 h-4 w-4 shrink-0 text-emerald-700 sm:mt-0" aria-hidden />
                   <p className="text-[11px] font-semibold leading-snug tracking-wide text-slate-800 sm:text-[12px]">
-                    Atención exclusiva: operamos con un máximo de 4 propiedades para garantizar una gestión impecable.
+                    Sector Oriente (Las Condes, Vitacura, Lo Barnechea, La Reina): equipo legal + comercial para que no te
+                    agarre el susto frente al notario ni pierdas meses con compradores que no tienen crédito.
                   </p>
                 </div>
 
                 <h1 className="mb-5 text-4xl font-bold leading-[1.06] tracking-[-0.02em] text-slate-900 sm:text-5xl lg:text-[3.05rem]">
-                  Protegemos el valor de su propiedad. Comercialización selectiva y blindaje jurídico desde el día uno.
+                  ¿Vas a vender tu casa o departamento?
+                  <span className="mt-3 block text-[0.72em] font-bold leading-snug text-slate-700 sm:text-[0.68em]">
+                    ¿Seguro que tienes todos los papeles para cerrar sin que la venta se caiga?
+                  </span>
                 </h1>
 
                 <p className="mb-6 max-w-xl text-base leading-relaxed text-slate-600 sm:text-lg">
-                  Evite la sobreexposición en portales y a los turistas inmobiliarios. Filtramos a los interesados por
-                  su capacidad real de pago y anticipamos cualquier reparo legal del banco, con miras a un cierre
-                  ordenado y al mejor precio de mercado defendible.
+                  Esa incertidumbre es más común de lo que parece: hipotecas olvidadas, usufructos, uso y habitación o la
+                  forma en que está tu matrimonio o sociedad pueden aparecer cuando ya hay oferta —y ahí duele. En{' '}
+                  <span className="font-semibold text-slate-800">Punto Legal</span> nos ocupamos de ordenar dominio y de
+                  encarar el saneamiento de vicios o cargas que traben la compraventa; después trabajamos la venta de tu
+                  bien raíz con interesados que muestran capacidad hipotecaria real. Menos noches en vela, menos tiempo
+                  perdido en visitas que no cierran.
                 </p>
 
                 <InmobiliarioPatrimonioScanner />
@@ -428,11 +584,17 @@ export default function ServicioInmobiliarioPage() {
                 <div className="mt-8 flex max-w-xl flex-col gap-3 text-sm text-slate-800 sm:gap-3.5">
                   <div className="flex items-start gap-2.5">
                     <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-700" strokeWidth={2} />
-                    <span>Exposición controlada: solo visitas con perfil financiero validado.</span>
+                    <span>
+                      Priorizamos visitas con señal seria de crédito: menos curiosos en tu living, más pasos hacia una oferta
+                      real.
+                    </span>
                   </div>
                   <div className="flex items-start gap-2.5">
                     <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-700" strokeWidth={2} />
-                    <span>Saneamiento registral: evitamos que la venta se caiga en notaría.</span>
+                    <span>
+                      Precio en UF y estrategia cuando ya viste dominio, hipotecas y cargas en Conservador —sin improvisar
+                      frente al comprador.
+                    </span>
                   </div>
                 </div>
               </motion.div>
@@ -442,13 +604,16 @@ export default function ServicioInmobiliarioPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
-                className="order-1 lg:order-2 w-full max-w-md mx-auto lg:mx-0 lg:ml-auto scroll-mt-24"
+                className="order-1 lg:order-2 w-full max-w-md mx-auto lg:mx-0 lg:ml-auto scroll-mt-28 pb-28 sm:pb-24"
               >
                 <MacGlassWindow
-                  title="Evaluación confidencial"
-                  subtitle="Punto Legal · Las Condes, Vitacura, Lo Barnechea, La Reina"
+                  title="Tu evaluación para vender (confidencial)"
+                  subtitle="Las Condes · Vitacura · Lo Barnechea · La Reina"
                   progressPct={progressPct}
-                  bodyClassName="px-6 py-6 sm:px-8 sm:py-8"
+                  bodyClassName={cn(
+                    'px-6 py-6 sm:px-8 sm:py-8',
+                    'pb-[max(1.75rem,env(safe-area-inset-bottom,0px))]',
+                  )}
                 >
                   <AnimatePresence mode="wait">
                     {phase === 'questions' && (
@@ -460,117 +625,380 @@ export default function ServicioInmobiliarioPage() {
                         transition={{ duration: 0.25 }}
                       >
                         <div className="mb-6 mt-1">
-                          <span className="mb-1 block text-[10px] font-semibold uppercase tracking-[0.2em] text-emerald-800">
-                            Paso {step} de {TOTAL_STEPS}
-                          </span>
+                          <div className="mb-2 flex flex-wrap items-center gap-2">
+                            <span className="block text-[10px] font-semibold uppercase tracking-[0.2em] text-emerald-800">
+                              Paso {stepDisplayIdx} de {stepDisplayTotal}
+                            </span>
+                            {currentStepId === 'precio_esperado' ? (
+                              <span className="inline-flex items-center gap-1 rounded-full border border-emerald-200/90 bg-emerald-50/90 px-2.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-emerald-900">
+                                <Lock className="h-3 w-3" aria-hidden />
+                                100% confidencial
+                              </span>
+                            ) : null}
+                          </div>
                           <p className="mb-2 text-[11px] font-medium tracking-wide text-slate-600">
-                            Cuestionario confidencial
+                            Unos datos rápidos antes de agendar: te ayudan a ordenar ideas y tiempos (orientativo; no reemplaza
+                            tasación ni estudio de títulos completo).
                           </p>
                           <h2 className="text-lg font-semibold tracking-tight text-slate-900 sm:text-xl">
-                            {step === 1 && '¿Qué tipo de inmueble quiere vender?'}
-                            {step === 2 && 'Dirección del activo (búsqueda asistida · Sector Oriente)'}
-                            {step === 3 && '¿Qué es lo más importante para usted en las próximas semanas?'}
-                            {step === 4 && '¿Cuál es la superficie útil aproximada?'}
-                            {step === 5 && 'Rango de precio en UF (referencia, se puede afinar después)'}
+                            {stepHeading}
                           </h2>
                         </div>
 
+                        {stepIndexInSeq > 0 ? (
+                          <button
+                            type="button"
+                            onClick={handleBack}
+                            disabled={isTransitioning}
+                            className="mb-4 inline-flex items-center gap-1.5 text-[12px] font-medium text-slate-600 transition hover:text-slate-900 disabled:opacity-40"
+                          >
+                            <ArrowLeft className="h-3.5 w-3.5" aria-hidden />
+                            Volver
+                          </button>
+                        ) : null}
+
                         <AnimatePresence mode="wait">
                           <motion.div
-                            key={step}
+                            key={currentStepId}
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: -10 }}
                             transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
                             className="space-y-2.5"
                           >
-                            {step === 1 && (
+                            {currentStepId === 'tipo_propiedad' && (
                               <>
-                                <FormButton variant="panel"
+                                <FormButton
+                                  variant="panel"
                                   disabled={isTransitioning}
                                   onClick={() => handleOptionSelect('tipo_propiedad', 'casa')}
                                   label="Casa"
                                 />
-                                <FormButton variant="panel"
+                                <FormButton
+                                  variant="panel"
                                   disabled={isTransitioning}
                                   onClick={() => handleOptionSelect('tipo_propiedad', 'departamento')}
                                   label="Departamento"
                                 />
-                                <FormButton variant="panel"
+                                <FormButton
+                                  variant="panel"
                                   disabled={isTransitioning}
                                   onClick={() => handleOptionSelect('tipo_propiedad', 'sitio_terreno')}
-                                  label="Sitio / terreno"
+                                  label="Sitio o terreno"
                                 />
                               </>
                             )}
-                            {step === 2 && (
+                            {currentStepId === 'ubicacion' && (
                               <InmobiliarioAddressStep
                                 disabled={isTransitioning}
                                 onConfirm={handleAddressPick}
                                 previewRow={addressPreview}
                               />
                             )}
-                            {step === 3 && (
+                            {currentStepId === 'momento_venta' && (
                               <>
-                                <FormButton variant="panel"
+                                <FormButton
+                                  variant="panel"
                                   disabled={isTransitioning}
                                   onClick={() => handleOptionSelect('momento_venta', 'visitas_pronto')}
-                                  label="Empezar con visitas serias (solo interesados filtrados)"
+                                  label="Agendar visitas con compradores precalificados"
                                 />
-                                <FormButton variant="panel"
+                                <FormButton
+                                  variant="panel"
                                   disabled={isTransitioning}
                                   onClick={() => handleOptionSelect('momento_venta', 'reunion_equipo')}
-                                  label="Reunión con su equipo antes de exponer el inmueble"
+                                  label="Reunión con el equipo antes de exponer el inmueble"
                                 />
-                                <FormButton variant="panel"
+                                <FormButton
+                                  variant="panel"
                                   disabled={isTransitioning}
                                   onClick={() => handleOptionSelect('momento_venta', 'ordenar_documentacion')}
-                                  label="Ordenar títulos o cargas antes de salir al mercado"
+                                  label="Revisar dominio y cargas antes de salir al mercado"
                                 />
-                                <FormButton variant="panel"
+                                <FormButton
+                                  variant="panel"
                                   disabled={isTransitioning}
                                   onClick={() => handleOptionSelect('momento_venta', 'explorando')}
-                                  label="Aún evalúo si vendo / sin apuro"
+                                  label="Aún evalúo vender / sin urgencia de calendario"
                                 />
                               </>
                             )}
-                            {step === 4 && (
+                            {currentStepId === 'metros_cuadrados' && (
                               <>
-                                <FormButton variant="panel"
+                                <FormButton
+                                  variant="panel"
                                   disabled={isTransitioning}
                                   onClick={() => handleOptionSelect('metros_cuadrados', 'menos_100')}
                                   label="Menos de 100 m²"
                                 />
-                                <FormButton variant="panel"
+                                <FormButton
+                                  variant="panel"
                                   disabled={isTransitioning}
                                   onClick={() => handleOptionSelect('metros_cuadrados', 'entre_100_200')}
                                   label="Entre 100 y 200 m²"
                                 />
-                                <FormButton variant="panel"
+                                <FormButton
+                                  variant="panel"
                                   disabled={isTransitioning}
                                   onClick={() => handleOptionSelect('metros_cuadrados', 'mas_200')}
                                   label="Más de 200 m²"
                                 />
                               </>
                             )}
-                            {step === 5 && (
+                            {currentStepId === 'amenidad_piscina' && (
                               <>
-                                <FormButton variant="panel"
+                                <FormButton
+                                  variant="panel"
+                                  disabled={isTransitioning}
+                                  onClick={() => handleOptionSelect('tiene_piscina', 'si')}
+                                  label="Sí"
+                                />
+                                <FormButton
+                                  variant="panel"
+                                  disabled={isTransitioning}
+                                  onClick={() => handleOptionSelect('tiene_piscina', 'no')}
+                                  label="No"
+                                />
+                              </>
+                            )}
+                            {currentStepId === 'amenidad_quincho' && (
+                              <>
+                                <FormButton
+                                  variant="panel"
+                                  disabled={isTransitioning}
+                                  onClick={() => handleOptionSelect('tiene_quincho', 'si')}
+                                  label="Sí"
+                                />
+                                <FormButton
+                                  variant="panel"
+                                  disabled={isTransitioning}
+                                  onClick={() => handleOptionSelect('tiene_quincho', 'no')}
+                                  label="No"
+                                />
+                              </>
+                            )}
+                            {currentStepId === 'amenidad_cancha' && (
+                              <>
+                                <FormButton
+                                  variant="panel"
+                                  disabled={isTransitioning}
+                                  onClick={() => handleOptionSelect('tiene_cancha', 'si')}
+                                  label="Sí"
+                                />
+                                <FormButton
+                                  variant="panel"
+                                  disabled={isTransitioning}
+                                  onClick={() => handleOptionSelect('tiene_cancha', 'no')}
+                                  label="No"
+                                />
+                              </>
+                            )}
+                            {currentStepId === 'tipo_cancha' && (
+                              <>
+                                <FormButton
+                                  variant="panel"
+                                  disabled={isTransitioning}
+                                  onClick={() => handleOptionSelect('tipo_cancha', 'tenis')}
+                                  label="Cancha de tenis"
+                                />
+                                <FormButton
+                                  variant="panel"
+                                  disabled={isTransitioning}
+                                  onClick={() => handleOptionSelect('tipo_cancha', 'futbol')}
+                                  label="Cancha de fútbol"
+                                />
+                                <FormButton
+                                  variant="panel"
+                                  disabled={isTransitioning}
+                                  onClick={() => handleOptionSelect('tipo_cancha', 'golf')}
+                                  label="Práctica de golf / putting"
+                                />
+                                <FormButton
+                                  variant="panel"
+                                  disabled={isTransitioning}
+                                  onClick={() => handleOptionSelect('tipo_cancha', 'varias')}
+                                  label="Varias / combinación"
+                                />
+                              </>
+                            )}
+                            {currentStepId === 'balcon_terraza' && (
+                              <>
+                                <FormButton
+                                  variant="panel"
+                                  disabled={isTransitioning}
+                                  onClick={() => handleOptionSelect('balcon_terraza', 'no')}
+                                  label="Sin balcón ni terraza de relevancia"
+                                />
+                                <FormButton
+                                  variant="panel"
+                                  disabled={isTransitioning}
+                                  onClick={() => handleOptionSelect('balcon_terraza', 'balcon')}
+                                  label="Balcón"
+                                />
+                                <FormButton
+                                  variant="panel"
+                                  disabled={isTransitioning}
+                                  onClick={() => handleOptionSelect('balcon_terraza', 'terraza_loggia')}
+                                  label="Terraza o loggia"
+                                />
+                                <FormButton
+                                  variant="panel"
+                                  disabled={isTransitioning}
+                                  onClick={() => handleOptionSelect('balcon_terraza', 'prefiero_reunion')}
+                                  label="Prefiero detallarlo en la reunión"
+                                />
+                              </>
+                            )}
+                            {currentStepId === 'titularidad_compra' && (
+                              <>
+                                <FormButton
+                                  variant="panel"
+                                  disabled={isTransitioning}
+                                  onClick={() => handleOptionSelect('titularidad_compra', 'personal')}
+                                  label="A título personal"
+                                />
+                                <FormButton
+                                  variant="panel"
+                                  disabled={isTransitioning}
+                                  onClick={() => handleOptionSelect('titularidad_compra', 'sociedad_conyugal')}
+                                  label="Comprada en matrimonio con sociedad conyugal"
+                                />
+                                <FormButton
+                                  variant="panel"
+                                  disabled={isTransitioning}
+                                  onClick={() =>
+                                    handleOptionSelect('titularidad_compra', 'separacion_o_fuera_patrimonio')
+                                  }
+                                  label="Separación de bienes, fuera de patrimonio reservado u otro régimen"
+                                />
+                                <FormButton
+                                  variant="panel"
+                                  disabled={isTransitioning}
+                                  onClick={() => handleOptionSelect('titularidad_compra', 'sociedad_empresa')}
+                                  label="Titularidad en persona jurídica"
+                                />
+                                <FormButton
+                                  variant="panel"
+                                  disabled={isTransitioning}
+                                  onClick={() => handleOptionSelect('titularidad_compra', 'prefiero_reunion')}
+                                  label="Prefiero explicarlo en la reunión"
+                                />
+                              </>
+                            )}
+                            {currentStepId === 'carga_hipoteca' && (
+                              <>
+                                <p className="mb-1 text-[12px] leading-relaxed text-slate-600">
+                                  Respuesta orientativa; la revisión registral definitiva es en la reunión y en el
+                                  estudio de títulos.
+                                </p>
+                                <FormButton
+                                  variant="panel"
+                                  disabled={isTransitioning}
+                                  onClick={() => handleOptionSelect('carga_hipoteca', 'si')}
+                                  label="Sí"
+                                />
+                                <FormButton
+                                  variant="panel"
+                                  disabled={isTransitioning}
+                                  onClick={() => handleOptionSelect('carga_hipoteca', 'no')}
+                                  label="No"
+                                />
+                                <FormButton
+                                  variant="panel"
+                                  disabled={isTransitioning}
+                                  onClick={() => handleOptionSelect('carga_hipoteca', 'no_seguro')}
+                                  label="No estoy seguro"
+                                />
+                              </>
+                            )}
+                            {currentStepId === 'carga_uso_habitacion' && (
+                              <>
+                                <FormButton
+                                  variant="panel"
+                                  disabled={isTransitioning}
+                                  onClick={() => handleOptionSelect('carga_uso_habitacion', 'si')}
+                                  label="Sí"
+                                />
+                                <FormButton
+                                  variant="panel"
+                                  disabled={isTransitioning}
+                                  onClick={() => handleOptionSelect('carga_uso_habitacion', 'no')}
+                                  label="No"
+                                />
+                                <FormButton
+                                  variant="panel"
+                                  disabled={isTransitioning}
+                                  onClick={() => handleOptionSelect('carga_uso_habitacion', 'no_seguro')}
+                                  label="No estoy seguro"
+                                />
+                              </>
+                            )}
+                            {currentStepId === 'carga_usufructo' && (
+                              <>
+                                <FormButton
+                                  variant="panel"
+                                  disabled={isTransitioning}
+                                  onClick={() => handleOptionSelect('carga_usufructo', 'si')}
+                                  label="Sí"
+                                />
+                                <FormButton
+                                  variant="panel"
+                                  disabled={isTransitioning}
+                                  onClick={() => handleOptionSelect('carga_usufructo', 'no')}
+                                  label="No"
+                                />
+                                <FormButton
+                                  variant="panel"
+                                  disabled={isTransitioning}
+                                  onClick={() => handleOptionSelect('carga_usufructo', 'no_seguro')}
+                                  label="No estoy seguro"
+                                />
+                              </>
+                            )}
+                            {currentStepId === 'carga_otros_gravamen' && (
+                              <>
+                                <FormButton
+                                  variant="panel"
+                                  disabled={isTransitioning}
+                                  onClick={() => handleOptionSelect('carga_otros_gravamen', 'si')}
+                                  label="Sí"
+                                />
+                                <FormButton
+                                  variant="panel"
+                                  disabled={isTransitioning}
+                                  onClick={() => handleOptionSelect('carga_otros_gravamen', 'no')}
+                                  label="No"
+                                />
+                                <FormButton
+                                  variant="panel"
+                                  disabled={isTransitioning}
+                                  onClick={() => handleOptionSelect('carga_otros_gravamen', 'no_seguro')}
+                                  label="No estoy seguro"
+                                />
+                              </>
+                            )}
+                            {currentStepId === 'precio_esperado' && (
+                              <>
+                                <FormButton
+                                  variant="panel"
                                   disabled={isTransitioning}
                                   onClick={() => handleOptionSelect('precio_esperado', 'por_definir_menos_8000')}
                                   label="Menos de 8.000 UF"
                                 />
-                                <FormButton variant="panel"
+                                <FormButton
+                                  variant="panel"
                                   disabled={isTransitioning}
                                   onClick={() => handleOptionSelect('precio_esperado', '8000_15000')}
                                   label="8.000 – 15.000 UF"
                                 />
-                                <FormButton variant="panel"
+                                <FormButton
+                                  variant="panel"
                                   disabled={isTransitioning}
                                   onClick={() => handleOptionSelect('precio_esperado', '15000_30000')}
                                   label="15.000 – 30.000 UF"
                                 />
-                                <FormButton variant="panel"
+                                <FormButton
+                                  variant="panel"
                                   disabled={isTransitioning}
                                   onClick={() => handleOptionSelect('precio_esperado', 'over_30000')}
                                   label="Más de 30.000 UF"
@@ -593,7 +1021,7 @@ export default function ServicioInmobiliarioPage() {
                           </span>
                           <span className="inline-flex items-center gap-1.5">
                             <Users className="w-3.5 h-3.5 text-slate-500" aria-hidden />
-                            Visitas filtradas
+                            Visitas con precalificación previa
                           </span>
                           <span className="inline-flex items-center gap-1.5">
                             <FileSearch className="w-3.5 h-3.5 text-slate-500" aria-hidden />
@@ -619,7 +1047,11 @@ export default function ServicioInmobiliarioPage() {
                         <p className="text-center text-[11px] font-semibold tracking-wide text-emerald-800">
                           Analizando antecedentes de la zona…
                         </p>
-                        <InmobiliarioProcessingTerminal variant="light" messageIntervalMs={560} ufTickMs={120} />
+                        <InmobiliarioProcessingTerminal
+                          variant="light"
+                          messageIntervalMs={560}
+                          durationMs={PROCESSING_MS}
+                        />
                       </motion.div>
                     )}
                     {phase === 'success' && (
@@ -642,11 +1074,11 @@ export default function ServicioInmobiliarioPage() {
                           <CheckCircle2 className="h-7 w-7 text-emerald-700" aria-hidden />
                         </motion.div>
                         <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.2em] text-emerald-800">
-                          Antecedentes revisados
+                          Ya dimos el primer paso
                         </p>
                         <p className="text-base font-medium leading-snug tracking-tight text-slate-900 sm:text-lg">
-                          Hemos registrado su perfil. Lo invitamos a agendar una reunión con nuestro equipo legal y
-                          comercial para afinar precio, tiempos y próximos pasos con rigor profesional.
+                          Respira: agenda con abogado y comercial para traducir esto en un plan de venta con plazos realistas
+                          y saber qué falta revisar en dominio y gravámenes antes de firmar promesa.
                         </p>
                         <motion.div
                           className="mt-6 flex justify-center gap-1"
@@ -693,15 +1125,18 @@ export default function ServicioInmobiliarioPage() {
               className="mb-12 text-center md:mb-16"
             >
               <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-500">
-                Comercialización selectiva
+                Cuando la venta te quita el sueño
               </p>
               <h2 className="mx-auto max-w-3xl text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl lg:text-4xl">
-                El costo del mercado masivo vs.{' '}
-                <span className="text-emerald-800">nuestro criterio en Oriente</span>
+                No es solo cuánto pidas en UF:{' '}
+                <span className="text-emerald-800">
+                  es la angustia de no saber si mañana la escritura firma o todo se cae
+                </span>
               </h2>
               <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-slate-600 sm:text-base">
-                Mismo barrio, distinta disciplina: menos exposición ruidosa y más certeza frente al banco del
-                comprador.
+                En Vitacura, Las Condes, Lo Barnechea y La Reina hay demanda, sí —pero una hipoteca mal contada, un
+                usufructo o el matrimonio mal entendido pueden dejarte con el comprador enfrente y el corazón en la mano.
+                Nosotros ponemos el foco en ordenar dominio primero y en compradores que pueden pagar de verdad.
               </p>
             </motion.div>
 
@@ -715,7 +1150,7 @@ export default function ServicioInmobiliarioPage() {
               >
                 <div className="mb-6 flex items-center gap-2">
                   <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-rose-700">
-                    Corretaje tradicional
+                    Lo que más duele al vender solo
                   </span>
                 </div>
                 <ul className="space-y-4">
@@ -746,7 +1181,7 @@ export default function ServicioInmobiliarioPage() {
               >
                 <div className="mb-6 flex items-center gap-2">
                   <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-emerald-900">
-                    Nuestro enfoque (legal + comercial)
+                    Cómo te ayudamos en Punto Legal a vender con respaldo
                   </span>
                 </div>
                 <ul className="space-y-4">
@@ -782,14 +1217,14 @@ export default function ServicioInmobiliarioPage() {
               className="mb-14 text-center md:mb-16"
             >
               <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.2em] text-emerald-700">
-                Cómo trabajamos
+                Del estrés al plan
               </p>
               <h2 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl lg:text-4xl">
-                Tres fases con su equipo Legal y Comercial
+                Tres etapas para pasar del mandato a la escritura —sin sentirte solo en el trámite
               </h2>
               <p className="mx-auto mt-4 max-w-xl text-sm text-slate-600 sm:text-base">
-                Mandato y exclusividad, saneamiento y venta silenciosa, cierre notarial y liquidación: una escalera
-                clara de valor hasta el instrumento.
+                Un mismo equipo legal y comercial recorre la venta contigo: primero dominio y cargas, después mercado con
+                cabeza fría, y cierre en notaría con menos sustos para ti y para quien compra con banco.
               </p>
             </motion.div>
 
@@ -871,8 +1306,7 @@ export default function ServicioInmobiliarioPage() {
               </p>
               <h2 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">Liquidación exitosa</h2>
               <p className="mx-auto mt-3 max-w-lg text-sm text-slate-600">
-                No vendemos “paneles”: mostramos el destino — cifras de referencia que anclan el estándar que
-                buscamos para su activo.
+                Referencia ilustrativa de cierre; cada caso se documenta según su propio expediente.
               </p>
             </motion.div>
 
@@ -897,9 +1331,9 @@ export default function ServicioInmobiliarioPage() {
                   </p>
                   <div className="mx-auto mt-8 flex max-w-xl flex-wrap justify-center gap-2 sm:gap-3">
                     {[
-                      'Cierre Notarial Blindado',
-                      'Reserva de Identidad Mantenida',
-                      'Mandato de Exclusividad Cumplido',
+                      'Cierre notarial coordinado',
+                      'Identidad reservada en la gestión',
+                      'Mandato de venta cumplido',
                     ].map((pill) => (
                       <span
                         key={pill}
@@ -911,8 +1345,8 @@ export default function ServicioInmobiliarioPage() {
                     ))}
                   </div>
                   <p className="mx-auto mt-10 max-w-2xl text-sm leading-relaxed text-slate-700 sm:text-[15px]">
-                    Gracias al modelo de Punto Legal Inmobiliario, este activo se liquidó al mejor valor de mercado
-                    defendible, sin exposición innecesaria.
+                    Caso referencial: operación cerrada en torno a un precio acorde al mercado y defendible frente a
+                    comprador y banco, limitando exposición innecesaria.
                   </p>
                   <p className="mt-6 text-[10px] font-medium uppercase tracking-wider text-slate-500">
                     Referencia ilustrativa · cada operación es distinta
@@ -933,12 +1367,13 @@ export default function ServicioInmobiliarioPage() {
             pointerEvents: showStickyCta && phase === 'questions' ? 'auto' : 'none',
           }}
           transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-          className="fixed bottom-6 left-1/2 z-50 flex -translate-x-1/2 items-center gap-2 rounded-full border border-emerald-800/25 bg-emerald-800 px-5 py-3 text-sm font-semibold text-white shadow-[0_16px_40px_rgba(6,78,59,0.22)] backdrop-blur-xl transition-all hover:bg-emerald-900 active:scale-[0.98] sm:left-auto sm:right-6 sm:translate-x-0"
+          className="fixed left-1/2 z-50 flex -translate-x-1/2 items-center gap-2 rounded-full border border-emerald-800/25 bg-emerald-800 px-5 py-3 text-sm font-semibold text-white shadow-[0_16px_40px_rgba(6,78,59,0.22)] backdrop-blur-xl transition-all hover:bg-emerald-900 active:scale-[0.98] sm:left-auto sm:right-6 sm:translate-x-0"
+          style={stickyBottomStyle}
           aria-hidden={!showStickyCta || phase !== 'questions'}
           tabIndex={showStickyCta && phase === 'questions' ? 0 : -1}
         >
           <ArrowUp className="h-4 w-4 text-white/90" aria-hidden />
-          Iniciar evaluación de mi propiedad
+          Revisar mis papeles antes de vender
         </motion.button>
         </div>
       </div>

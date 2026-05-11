@@ -43,12 +43,12 @@ Flujo tras pago aprobado en Mercado Pago: la Edge Function `mercadopago-webhook`
 
 ### Payload enriquecido (Notion / Gmail interno)
 
-El JSON del Catch Hook incluye además, cuando existan en `reservas`: `risk_level`, `qualification_data` (objeto JSON de la micro-cualificación de `/inmobiliario`). Puedes mapearlos en Zapier a **Notion** o a un correo **Gmail solo al equipo** (evita duplicar el correo al cliente si ya envía Resend vía `clever-action`).
+El JSON del Catch Hook incluye además, cuando existan en `reservas`: `risk_level`, `qualification_data` (objeto JSON de la micro-cualificación de `/servicios/inmobiliario`). Puedes mapearlos en Zapier a **Notion** o a un correo **Gmail solo al equipo** (evita duplicar el correo al cliente si ya envía Resend vía `clever-action`).
 
 ## Reservas sin pago (`pago_estado = waived_inmobiliario`)
 
 1. **Migración:** `supabase/migrations/20260428120000_reservas_qualification_inmobiliario.sql` añade `qualification_data` (jsonb) y `risk_level` en `public.reservas`.
-2. **Landing:** `puntolegal.online/inmobiliario` guarda la cualificación en `sessionStorage` y envía a `/agendamiento?plan=inmobiliario-eval`.
+2. **Landing:** `puntolegal.online/servicios/inmobiliario` guarda la cualificación en `sessionStorage` y envía a `/agendamiento?plan=inmobiliario-eval`. La ruta `/inmobiliario` redirige a `/servicios/inmobiliario`.
 3. **Al confirmar cita (precio 0):** el cliente invoca `enqueue-booking-calendar` con `{ "booking_id": "<uuid>" }`. La función valida:
    - `pago_estado === 'waived_inmobiliario'`
    - `servicio` contiene `inmobiliario` o `evaluación`
@@ -59,9 +59,9 @@ El JSON del Catch Hook incluye además, cuando existan en `reservas`: `risk_leve
 ## Prompt maestro (copiar a Notion o Agent)
 
 ```
-Objetivo: embudo inmobiliario Sector Oriente en puntolegal.online/inmobiliario → cualificación 4 pasos (Zod) → sessionStorage → /agendamiento?plan=inmobiliario-eval → reserva con pago_estado waived_inmobiliario + qualification_data → Edge enqueue-booking-calendar → ZAPIER_BOOKING_HOOK_URL (mismo Zap que MP) → Google Calendar + Meet → POST booking-calendar-callback (x-zapier-secret) → clever-action Resend.
+Objetivo: embudo inmobiliario Sector Oriente en puntolegal.online/servicios/inmobiliario → cualificación (Zod) → sessionStorage → /agendamiento?plan=inmobiliario-eval → reserva con pago_estado waived_inmobiliario + qualification_data → Edge enqueue-booking-calendar → ZAPIER_BOOKING_HOOK_URL (mismo Zap que MP) → Google Calendar + Meet → POST booking-calendar-callback (x-zapier-secret) → clever-action Resend.
 
-Archivos clave: src/pages/InmobiliarioLandingPage.tsx, src/constants/inmobiliarioQualification.ts, src/contexts/AgendamientoContext.tsx (rama inmobiliario-eval), src/services/enqueueBookingCalendar.ts, supabase/functions/enqueue-booking-calendar/index.ts, supabase/functions/_shared/zapierBookingPayload.ts, mercadopago-webhook (payload unificado), clever-action (asunto/descripcion waived), docs/zapier-booking-calendar-setup.md.
+Archivos clave: src/pages/ServicioInmobiliarioPage.tsx, src/constants/inmobiliarioQualification.ts, src/contexts/AgendamientoContext.tsx (rama inmobiliario-eval), src/services/enqueueBookingCalendar.ts, supabase/functions/enqueue-booking-calendar/index.ts, supabase/functions/_shared/zapierBookingPayload.ts, mercadopago-webhook (payload unificado), clever-action (asunto/descripcion waived), docs/zapier-booking-calendar-setup.md.
 
 Gmail en Zapier: solo notificación interna; cliente = Resend. Notion: mapear qualification_data y risk_level desde el Catch Hook. Pruebas: reserva eval + polling en /payment-success; reserva pagada inmobiliario + MP sandbox sin regresión.
 ```

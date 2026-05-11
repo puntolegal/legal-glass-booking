@@ -48,12 +48,9 @@ const Index = () => {
         "Punto Legal Familia": "familia",
         "Punto Legal Sucesorio": "sucesorio",
         "Punto Legal Migratorio": "migratorio",
-        "Punto Legal Penal": "penal",
-        "Punto Legal Penal Económico": "penal-economico",
 
         // ===== Empresas =====
         "Punto Legal Empresarial": "empresarial",
-        "Punto Legal Tributario": "tributario",
         "Punto Legal Contratos": "contratos",
         "Punto Legal Comparendos": "comparendos",
         "Punto Legal Fiscalizaciones DT": "fiscalizaciones-dt",
@@ -69,8 +66,6 @@ const Index = () => {
         "Punto Legal Holding Patrimonial": "holding-patrimonial",
         "Punto Legal Gestión Patrimonial": "gestion-patrimonial",
         "Punto Legal Despido Empresas": "despido-empresa",
-        // Penal económico
-        "Punto Legal Delitos Económicos": "delitos-economicos",
 
         // ===== Patrimonio =====
         "Punto Legal Inmobiliario": "inmobiliario",
@@ -154,7 +149,7 @@ const Index = () => {
         </p>
         <h2>Precios de consultas legales (CLP, sesión 45 min)</h2>
         <ul>
-          <li>Defensa CAE frente a Tesorería: $109.000 (antes $169.000 — producto estrella).</li>
+          <li>Defensa CAE frente a Tesorería: $109.000 (antes $169.000 — contingencia nacional).</li>
           <li>Laboral (trabajadores): diagnóstico inicial sin costo cuando aplica; evaluación despido y finiquito sin costo cuando aplica; defensa Ley Karin (trabajador) $79.000; comparendo RM desde $35.000 según plan (honorarios a porcentaje sólo con acuerdo escrito si asumimos el caso).</li>
           <li>Familia: $89.000 (divorcio, pensión de alimentos, cuidado personal).</li>
           <li>Sucesorio: $89.000 (posesión efectiva, herencias, testamentos).</li>
@@ -198,7 +193,7 @@ const Index = () => {
             {landingSections}
           </MobileLayout>
         </div>
-        {/* Último en el canvas: queda por encima del contenido móvil (z-100) — claro/oscuro en todos los breakpoints */}
+        {/* Fixed top-right en móvil / bottom-right en desktop — z alto sobre el hero */}
         <LandingThemeToggle mode={theme} onToggle={toggleTheme} />
       </div>
     </>

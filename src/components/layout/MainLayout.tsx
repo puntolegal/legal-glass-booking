@@ -34,10 +34,7 @@ const MainLayout: React.FC = () => {
   // En el landing (`/`) delegamos el fondo al canvas slate de Index;
   // el resto de rutas conserva el fondo crema/oscuro tradicional.
   const isLanding = location.pathname === '/'
-  const isChromelessGlass =
-    isLanding ||
-    location.pathname === '/servicios/inmobiliario' ||
-    location.pathname === '/inmobiliario'
+  const isChromelessGlass = isLanding || location.pathname === '/servicios/inmobiliario'
   const landingLight = isLanding && theme === 'light'
   const baseBackgroundClass = isChromelessGlass
     ? `relative min-h-screen bg-transparent overflow-hidden ${

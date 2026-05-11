@@ -31,18 +31,28 @@ const AgendamientoLayout: React.FC<AgendamientoLayoutProps> = ({ children }) => 
   );
 
   const laborAgenda = isLaborAgendamientoPlan(plan);
-  const wordmarkHref = laborAgenda ? '/servicios/laboral' : '/';
+  const inmobiliarioEvalAgenda = plan === 'inmobiliario-eval';
+  const wordmarkHref = laborAgenda
+    ? '/servicios/laboral'
+    : inmobiliarioEvalAgenda
+      ? '/servicios/inmobiliario'
+      : '/';
   const wordmarkAria = laborAgenda
     ? 'Punto Legal Chile — volver a servicio laboral'
-    : 'Punto Legal Chile — volver al inicio';
+    : inmobiliarioEvalAgenda
+      ? 'Punto Legal Chile — volver a venta inmobiliaria Sector Oriente'
+      : 'Punto Legal Chile — volver al inicio';
 
   const seoDescription = useMemo(() => {
+    if (plan === 'inmobiliario-eval') {
+      return 'Asesoría de cortesía: orientación jurídica y comercial previa para evaluación inmobiliaria en Sector Oriente (Las Condes, Vitacura, Lo Barnechea, La Reina). Sesión orientativa sin costo por Google Meet tras completar el formulario. Equipo alineado a transacciones patrimoniales complejas. Si contratas honorarios, el valor de esta consulta puede reconocerse según condiciones vigentes.';
+    }
     const priceLine =
       service.price === '0'
         ? 'Sin costo de consulta cuando aplica al plan seleccionado.'
         : `Precio indicativo: $${service.price}.`;
     return `Agenda ${service.name} con abogados especialistas. ${priceLine} Respuesta ágil y condiciones según el servicio contratado.`;
-  }, [service.name, service.price]);
+  }, [plan, service.name, service.price]);
   
   const hexToRgba = (hex: string, alpha: number) => {
     const r = parseInt(hex.slice(1, 3), 16);
@@ -62,7 +72,11 @@ const AgendamientoLayout: React.FC<AgendamientoLayoutProps> = ({ children }) => 
   return (
     <>
       <SEO 
-        title={`Agendar ${service.name} - Punto Legal`}
+        title={
+          plan === 'inmobiliario-eval'
+            ? 'Evaluación inmobiliaria Sector Oriente — orientación jurídica y comercial previa (Gratis) | Punto Legal'
+            : `Agendar ${service.name} - Punto Legal`
+        }
         description={seoDescription}
       />
       

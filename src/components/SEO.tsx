@@ -14,6 +14,8 @@ interface SEOProps {
   modifiedTime?: string;
   section?: string;
   tags?: string[];
+  /** JSON-LD adicional (p. ej. FAQPage) sin reemplazar el bloque LegalService. */
+  additionalJsonLd?: Record<string, unknown>[];
 }
 
 const SEO: React.FC<SEOProps> = ({
@@ -27,7 +29,8 @@ const SEO: React.FC<SEOProps> = ({
   publishedTime,
   modifiedTime,
   section,
-  tags = []
+  tags = [],
+  additionalJsonLd,
 }) => {
   const siteName = 'Punto Legal';
   const fullTitle = title === siteName ? title : `${title} | ${siteName}`;
@@ -113,6 +116,11 @@ const SEO: React.FC<SEOProps> = ({
           "openingHours": "Mo-Fr 09:00-18:00"
         })}
       </script>
+      {additionalJsonLd?.map((obj, index) => (
+        <script key={index} type="application/ld+json">
+          {JSON.stringify(obj)}
+        </script>
+      ))}
     </Helmet>
   );
 };

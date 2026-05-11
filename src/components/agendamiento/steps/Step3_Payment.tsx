@@ -2,7 +2,8 @@
 
 import React, { useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { CreditCard, Shield, Lock, CheckCircle, Loader2, ArrowLeft } from 'lucide-react';
+import { CreditCard, Lock, CheckCircle, Loader2, ArrowLeft } from 'lucide-react';
+import { useSearchParams } from 'react-router-dom';
 import { useAgendamiento } from '@/contexts/AgendamientoContext';
 import { serviceThemes } from '@/config/serviceThemes';
 import { trackMetaEvent } from '@/services/metaConversionsService';
@@ -10,6 +11,8 @@ import { useTheme } from '@/hooks/useTheme';
 
 const Step3_Payment: React.FC = () => {
   const { theme } = useTheme();
+  const [searchParams] = useSearchParams();
+  const plan = searchParams.get('plan');
   const {
     service,
     serviceColor,
@@ -114,13 +117,24 @@ const Step3_Payment: React.FC = () => {
         <div className="space-y-4">
           {/* Resumen compacto */}
           <div className="space-y-3">
-            <div className="flex justify-between items-center">
-              <span className="text-sm text-slate-600 dark:text-slate-400">{service.name}</span>
-              <span 
-                className="text-xl font-bold text-transparent bg-clip-text"
-                style={{ backgroundImage: primaryGradient }}
+            <div className="flex justify-between items-start gap-3">
+              <div className="min-w-0">
+                <span className="text-sm text-slate-600 dark:text-slate-400">{service.name}</span>
+                {plan === 'inmobiliario-eval' ? (
+                  <p className="mt-1 text-[11px] leading-relaxed text-slate-500 dark:text-slate-400">
+                    Orientación jurídica y comercial previa · videollamada Google Meet · sin costo en esta sesión
+                  </p>
+                ) : null}
+              </div>
+              <span
+                className={`shrink-0 text-xl font-bold ${
+                  isFree
+                    ? 'text-emerald-700 dark:text-emerald-400'
+                    : 'text-transparent bg-clip-text'
+                }`}
+                style={isFree ? undefined : { backgroundImage: primaryGradient }}
               >
-                ${precioFinal}
+                {isFree ? 'Gratis' : `$${precioFinal}`}
               </span>
             </div>
             <div className="text-sm text-slate-600 dark:text-slate-400">

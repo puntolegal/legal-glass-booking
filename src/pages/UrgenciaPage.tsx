@@ -176,8 +176,8 @@ function terminalLineClass(line: string): string {
   if (!t) return 'urgencia-mono-dim';
   if (t.includes('Indicador resumido')) return 'urgencia-mono-warn font-medium';
   if (t.includes('Complejidad aparente')) return 'urgencia-mono-accent font-medium';
-  if (t.includes('RECOMENDACIÓN')) return 'text-rose-200/95 font-medium';
-  if (t.includes('MODO SIMULACIÓN')) return 'text-slate-300';
+  if (t.includes('RECOMENDACIÓN')) return 'text-rose-700 dark:text-rose-200/95 font-medium';
+  if (t.includes('MODO SIMULACIÓN')) return 'text-slate-600 dark:text-slate-300';
   return 'urgencia-mono-dim';
 }
 
@@ -275,7 +275,7 @@ const TerminalLines: React.FC<{
         </p>
       ))}
       {lineIndex < lines.length && (
-        <p className="text-[11px] text-slate-300 leading-relaxed font-mono tracking-tight">
+        <p className="text-[11px] text-slate-600 dark:text-slate-300 leading-relaxed font-mono tracking-tight">
           {currentText}
           <motion.span
             className="inline-block w-[2px] h-3.5 rounded-[1px] bg-rose-400 ml-1 align-middle"
@@ -776,17 +776,17 @@ export default function UrgenciaPage() {
                   <p className="urgencia-kicker-pill">
                     <span className="relative flex h-1.5 w-1.5 shrink-0">
                       <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[hsl(var(--la-accent-from))] opacity-40" />
-                      <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[hsl(var(--la-accent-to))] ring-1 ring-white/15" />
+                      <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[hsl(var(--la-accent-to))] ring-1 ring-slate-900/12 dark:ring-white/15" />
                     </span>
                     Punto Legal Chile · Urgencia penal
                   </p>
-                  <h1 className="font-display text-[1.65rem] sm:text-[1.85rem] font-bold tracking-[-0.03em] text-white leading-[1.15]">
+                  <h1 className="font-display text-[1.65rem] sm:text-[1.85rem] font-bold tracking-[-0.03em] text-slate-900 dark:text-white leading-[1.15]">
                     ¿Tu familiar está detenido?
                   </h1>
-                  <p className="text-slate-400 text-[0.9375rem] leading-relaxed">
+                  <p className="text-slate-600 dark:text-slate-400 text-[0.9375rem] leading-relaxed">
                     Coordinación prioritaria con abogado penal para{' '}
-                    <strong className="text-slate-200 font-medium">detención y control de detención</strong> en la Región
-                    Metropolitana, con foco en el <strong className="text-slate-200 font-medium">sector oriente</strong> (Las
+                    <strong className="text-slate-800 dark:text-slate-200 font-medium">detención y control de detención</strong> en la Región
+                    Metropolitana, con foco en el <strong className="text-slate-800 dark:text-slate-200 font-medium">sector oriente</strong> (Las
                     Condes, Providencia, Ñuñoa, Vitacura, Lo Barnechea, La Florida y comunas cercanas). En pocos pasos dejas tus
                     datos y la unidad; la presencia en comisaría o el formato de atención dependen del caso y de la disponibilidad
                     del equipo.
@@ -795,13 +795,13 @@ export default function UrgenciaPage() {
 
                 <div className="glass-ios-panel-dark p-4 sm:p-5 space-y-3">
                   <div className="flex items-center gap-2">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-white/[0.06] border border-white/[0.08]">
-                      <MapPin className="w-4 h-4 text-rose-300/90" />
+                    <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-slate-100/90 border border-slate-200/90 dark:bg-white/[0.06] dark:border-white/[0.08]">
+                      <MapPin className="w-4 h-4 text-rose-600/90 dark:text-rose-300/90" />
                     </div>
                     <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
                       {geolocStatus === 'detecting' ? (
                         <span className="inline-flex items-center gap-2">
-                          <span className="w-24 h-3 bg-white/10 rounded animate-pulse" />
+                          <span className="w-24 h-3 bg-slate-200/80 dark:bg-white/10 rounded animate-pulse" />
                         </span>
                       ) : geolocStatus === 'detected' ? (
                         'Ubicación aproximada'
@@ -814,7 +814,7 @@ export default function UrgenciaPage() {
                     <motion.p
                       initial={{ opacity: 0, y: -4 }}
                       animate={{ opacity: 1, y: 0 }}
-                      className="text-xs text-slate-300 mb-3 leading-relaxed"
+                      className="text-xs text-slate-600 dark:text-slate-300 mb-3 leading-relaxed"
                     >
                       {geolocStatus === 'detected'
                         ? 'Según tu ubicación aproximada, sugerimos la comisaría de Carabineros del sector oriente más cercana. Comprueba que sea la unidad donde podría estar la persona; si no, corrígelo.'
@@ -877,7 +877,7 @@ export default function UrgenciaPage() {
                 <div className="space-y-2">
                   {!canAdvanceCaptura && (
                     <p
-                      className="text-center text-[11px] font-medium leading-snug text-slate-400 px-1"
+                      className="text-center text-[11px] font-medium leading-snug text-slate-600 dark:text-slate-400 px-1"
                       role="status"
                     >
                       {!nombre.trim()
@@ -911,7 +911,7 @@ export default function UrgenciaPage() {
                   <div className="space-y-2">
                     {URGENCIA_FAQ_ITEMS.map((item, idx) => (
                       <details key={`urgencia-faq-${idx}`} className="group">
-                        <summary className="cursor-pointer text-slate-100 pr-10 relative">
+                        <summary className="cursor-pointer text-slate-800 dark:text-slate-100 pr-10 relative">
                           {item.question}
                           <ChevronRight className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 transition-transform duration-200 group-open:rotate-90" />
                         </summary>
@@ -942,10 +942,10 @@ export default function UrgenciaPage() {
                   Volver
                 </button>
                 <div className="space-y-2">
-                  <h1 className="font-display text-xl sm:text-[1.35rem] font-bold tracking-[-0.03em] text-white leading-tight">
+                  <h1 className="font-display text-xl sm:text-[1.35rem] font-bold tracking-[-0.03em] text-slate-900 dark:text-white leading-tight">
                     Necesitamos 3 datos más
                   </h1>
-                  <p className="text-slate-400 text-[0.9375rem] leading-relaxed">
+                  <p className="text-slate-600 dark:text-slate-400 text-[0.9375rem] leading-relaxed">
                     Para orientar la asignación y mostrarte un indicador resumido (simulación, no predicción judicial).
                   </p>
                 </div>
@@ -1041,7 +1041,7 @@ export default function UrgenciaPage() {
                     <motion.p
                       initial={{ opacity: 0, y: -4 }}
                       animate={{ opacity: 1, y: 0 }}
-                      className="text-[10px] text-amber-200/90 mt-3 font-medium leading-relaxed"
+                      className="text-[10px] text-amber-800/95 dark:text-amber-200/90 mt-3 font-medium leading-relaxed"
                     >
                       En detenciones prolongadas suele ser más urgente contar con asesoría temprana; el curso del proceso lo
                       define el tribunal y la Fiscalía.
@@ -1176,7 +1176,7 @@ export default function UrgenciaPage() {
                 </button>
 
                 <div className="space-y-1.5">
-                  <h1 className="font-display text-xl sm:text-[1.4rem] font-bold tracking-[-0.03em] text-white leading-tight">
+                  <h1 className="font-display text-xl sm:text-[1.4rem] font-bold tracking-[-0.03em] text-slate-900 dark:text-white leading-tight">
                     Resumen y pago
                   </h1>
                   <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
@@ -1186,7 +1186,7 @@ export default function UrgenciaPage() {
 
                 <div className="urgencia-terminal-chrome">
                   <div className="urgencia-terminal-body">
-                    <div className="flex items-center gap-2 mb-3 pb-3 border-b border-white/[0.07]">
+                    <div className="flex items-center gap-2 mb-3 pb-3 border-b border-slate-200/80 dark:border-white/[0.07]">
                       <div className="flex gap-1.5">
                         <div className="w-2.5 h-2.5 rounded-full bg-rose-500/75 ring-1 ring-black/20" />
                         <div className="w-2.5 h-2.5 rounded-full bg-amber-400/75 ring-1 ring-black/20" />
@@ -1210,12 +1210,12 @@ export default function UrgenciaPage() {
                   </div>
                 </div>
 
-                <p className="urgencia-disclaimer-card text-[11px] text-slate-400 leading-relaxed">
-                  Lo anterior es una <strong className="text-slate-300 font-medium">simulación orientativa</strong> con los
+                <p className="urgencia-disclaimer-card text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed">
+                  Lo anterior es una <strong className="text-slate-800 dark:text-slate-300 font-medium">simulación orientativa</strong> con los
                   datos que ingresaste. No reemplaza la valoración de un abogado ni anticipa lo que resolverá el tribunal.
                 </p>
 
-                <div className="glass-ios-panel-dark relative overflow-hidden rounded-[1.35rem] border border-white/[0.09] p-4 sm:p-5 shadow-[0_20px_60px_-36px_rgba(0,0,0,0.65)]">
+                <div className="glass-ios-panel-dark relative overflow-hidden rounded-[1.35rem] border border-slate-200/90 dark:border-white/[0.09] p-4 sm:p-5 shadow-[0_20px_60px_-36px_rgba(15,23,42,0.12)] dark:shadow-[0_20px_60px_-36px_rgba(0,0,0,0.65)]">
                   <div
                     className="pointer-events-none absolute inset-0 opacity-100"
                     aria-hidden
@@ -1228,23 +1228,23 @@ export default function UrgenciaPage() {
                     <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">
                       Por qué coordinar abogado ahora
                     </p>
-                    <p className="text-sm text-slate-100/95 leading-relaxed font-medium">
-                      La defensa técnica te permite <strong className="text-white font-semibold">contrastar</strong> el relato
+                    <p className="text-sm text-slate-800 dark:text-slate-100/95 leading-relaxed font-medium">
+                      La defensa técnica te permite <strong className="text-slate-900 dark:text-white font-semibold">contrastar</strong> el relato
                       policial y fiscal con rigor procesal y estándar constitucional. La diferencia suele ser esta:{' '}
-                      <strong className="text-white font-semibold">quien no contrata abogado queda a la suerte</strong>, sin orden
+                      <strong className="text-slate-900 dark:text-white font-semibold">quien no contrata abogado queda a la suerte</strong>, sin orden
                       ni contradicción técnica frente a lo que ocurra en la unidad; en cambio,{' '}
-                      <strong className="text-white font-semibold">
+                      <strong className="text-slate-900 dark:text-white font-semibold">
                         al pagar y activar el servicio puedes comenzar tu defensa ya en comisaría
                       </strong>, con coordinación profesional hacia el control de detención.
                     </p>
-                    <p className="text-[0.8125rem] text-slate-400 leading-relaxed">
+                    <p className="text-[0.8125rem] text-slate-600 dark:text-slate-400 leading-relaxed">
                       Nadie puede prometer libertad ni un resultado: esas decisiones las adoptan el juez y la Fiscalía. Sí puedes
                       priorizar el contacto, reducir declaraciones improvisadas y alinear tu actuación con garantías reales.
                     </p>
                   </div>
                 </div>
 
-                <div className="glass-ios-panel-dark relative overflow-hidden rounded-[1.35rem] border border-white/[0.08] p-5 sm:p-6 ring-1 ring-white/[0.05]">
+                <div className="glass-ios-panel-dark relative overflow-hidden rounded-[1.35rem] border border-slate-200/90 dark:border-white/[0.08] p-5 sm:p-6 ring-1 ring-slate-900/[0.04] dark:ring-white/[0.05]">
                   <div
                     className="pointer-events-none absolute -right-8 -top-12 h-36 w-36 rounded-full opacity-[0.14] blur-3xl bg-rose-500"
                     aria-hidden
@@ -1252,24 +1252,24 @@ export default function UrgenciaPage() {
                   <p className="relative text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500 mb-2">
                     Indicador orientativo
                   </p>
-                  <p className="relative font-display text-4xl sm:text-[2.75rem] font-bold tracking-tighter text-white tabular-nums">
+                  <p className="relative font-display text-4xl sm:text-[2.75rem] font-bold tracking-tighter text-slate-900 dark:text-white tabular-nums">
                     {riesgoPorcentaje}
-                    <span className="text-2xl text-slate-400 font-semibold ml-0.5">%</span>
+                    <span className="text-2xl text-slate-500 dark:text-slate-400 font-semibold ml-0.5">%</span>
                   </p>
-                  <p className="relative text-[0.8125rem] text-slate-400 mt-3 leading-relaxed">{painMessage}</p>
+                  <p className="relative text-[0.8125rem] text-slate-600 dark:text-slate-400 mt-3 leading-relaxed">{painMessage}</p>
                 </div>
 
                 {!isTerminalComplete && (
-                  <div className="glass-ios-panel-dark rounded-[1.25rem] border border-dashed border-white/[0.12] p-6 sm:p-7">
-                    <p className="text-center text-[0.8125rem] text-slate-400 leading-relaxed">
+                  <div className="glass-ios-panel-dark rounded-[1.25rem] border border-dashed border-slate-300/90 dark:border-white/[0.12] p-6 sm:p-7">
+                    <p className="text-center text-[0.8125rem] text-slate-600 dark:text-slate-400 leading-relaxed">
                       Estamos cerrando el resumen en pantalla. Al terminar la animación verás el{' '}
-                      <strong className="text-slate-200 font-semibold">monto</strong> y el acceso a{' '}
-                      <strong className="text-slate-200 font-semibold">Mercado Pago</strong> fijo abajo.
+                      <strong className="text-slate-800 dark:text-slate-200 font-semibold">monto</strong> y el acceso a{' '}
+                      <strong className="text-slate-800 dark:text-slate-200 font-semibold">Mercado Pago</strong> fijo abajo.
                     </p>
                     <div className="mt-5 space-y-2.5" aria-hidden>
-                      <div className="h-3 rounded-lg bg-white/[0.07] animate-pulse" />
-                      <div className="mx-auto h-3 w-[88%] rounded-lg bg-white/[0.05] animate-pulse" />
-                      <div className="mx-auto h-10 max-w-[12rem] rounded-xl bg-white/[0.06] animate-pulse mt-4" />
+                      <div className="h-3 rounded-lg bg-slate-200/80 dark:bg-white/[0.07] animate-pulse" />
+                      <div className="mx-auto h-3 w-[88%] rounded-lg bg-slate-200/60 dark:bg-white/[0.05] animate-pulse" />
+                      <div className="mx-auto h-10 max-w-[12rem] rounded-xl bg-slate-200/70 dark:bg-white/[0.06] animate-pulse mt-4" />
                     </div>
                   </div>
                 )}
@@ -1282,31 +1282,31 @@ export default function UrgenciaPage() {
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: 8 }}
                       transition={{ type: 'spring', stiffness: 300, damping: 34 }}
-                      className="glass-ios-panel-dark rounded-[1.35rem] border border-white/[0.09] overflow-hidden shadow-[0_24px_80px_-44px_rgba(0,0,0,0.7)]"
+                      className="glass-ios-panel-dark rounded-[1.35rem] border border-slate-200/90 dark:border-white/[0.09] overflow-hidden shadow-[0_24px_80px_-44px_rgba(15,23,42,0.1)] dark:shadow-[0_24px_80px_-44px_rgba(0,0,0,0.7)]"
                     >
-                      <div className="px-4 py-3.5 sm:px-5 border-b border-white/[0.07] bg-white/[0.025] backdrop-blur-sm">
+                      <div className="px-4 py-3.5 sm:px-5 border-b border-slate-200/80 dark:border-white/[0.07] bg-slate-50/80 dark:bg-white/[0.025] backdrop-blur-sm">
                         <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
                           Listo para activar
                         </p>
-                        <p className="text-sm text-slate-200 mt-1 leading-snug">
-                          Un pago seguro con <strong className="text-white font-semibold">Mercado Pago</strong> prioriza tu
+                        <p className="text-sm text-slate-800 dark:text-slate-200 mt-1 leading-snug">
+                          Un pago seguro con <strong className="text-slate-900 dark:text-white font-semibold">Mercado Pago</strong> prioriza tu
                           alerta al equipo. Revisa estos puntos; el botón de pago queda fijo abajo.
                         </p>
                       </div>
 
-                      <div className="divide-y divide-white/[0.06]">
+                      <div className="divide-y divide-slate-200/70 dark:divide-white/[0.06]">
                         <div className="px-4 py-4 sm:px-5 flex gap-3">
-                          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-white/[0.06] border border-white/[0.1] backdrop-blur-md">
-                            <Shield className="h-5 w-5 text-rose-200/95" strokeWidth={2} aria-hidden />
+                          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-slate-100/90 border border-slate-200/90 dark:bg-white/[0.06] dark:border-white/[0.1] backdrop-blur-md">
+                            <Shield className="h-5 w-5 text-rose-600/90 dark:text-rose-200/95" strokeWidth={2} aria-hidden />
                           </div>
                           <div className="min-w-0 space-y-1.5">
                             <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">
                               Derecho al silencio
                             </p>
-                            <p className="text-[0.8125rem] sm:text-sm text-slate-200/95 leading-relaxed">
-                              Tienes <strong className="text-white font-semibold">derecho a guardar silencio</strong> y no estás
+                            <p className="text-[0.8125rem] sm:text-sm text-slate-800 dark:text-slate-200/95 leading-relaxed">
+                              Tienes <strong className="text-slate-900 dark:text-white font-semibold">derecho a guardar silencio</strong> y no estás
                               obligado a declarar contra ti mismo. Evita hablar de los hechos sin asesoría:{' '}
-                              <strong className="text-white font-semibold">cualquier dicho puede ser usado en tu contra</strong>.
+                              <strong className="text-slate-900 dark:text-white font-semibold">cualquier dicho puede ser usado en tu contra</strong>.
                               Lo prudente es esperar defensa antes de rendir versión.
                             </p>
                           </div>
@@ -1314,14 +1314,14 @@ export default function UrgenciaPage() {
 
                         <div className="px-4 py-4 sm:px-5 flex gap-3">
                           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[#009EE3]/12 border border-[#009EE3]/28 backdrop-blur-md">
-                            <Lock className="h-5 w-5 text-sky-200" strokeWidth={2} aria-hidden />
+                            <Lock className="h-5 w-5 text-sky-700 dark:text-sky-200" strokeWidth={2} aria-hidden />
                           </div>
                           <div className="min-w-0 space-y-1.5">
                             <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">
                               Checkout oficial
                             </p>
-                            <p className="text-[0.8125rem] sm:text-sm text-slate-300 leading-relaxed">
-                              El botón fijo abre el <strong className="text-slate-100 font-semibold">Checkout Pro</strong> de
+                            <p className="text-[0.8125rem] sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
+                              El botón fijo abre el <strong className="text-slate-900 dark:text-slate-100 font-semibold">Checkout Pro</strong> de
                               Mercado Pago (mercadopago.cl). Verás el mismo total que aquí, medios habilitados y comprobante.
                               Punto Legal no guarda datos de tarjeta.
                             </p>
@@ -1329,36 +1329,36 @@ export default function UrgenciaPage() {
                         </div>
 
                         <div className="px-4 py-4 sm:px-5 flex gap-3">
-                          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-white/[0.06] border border-white/[0.1] backdrop-blur-md">
-                            <Scale className="h-5 w-5 text-slate-200" strokeWidth={2} aria-hidden />
+                          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-slate-100/90 border border-slate-200/90 dark:bg-white/[0.06] dark:border-white/[0.1] backdrop-blur-md">
+                            <Scale className="h-5 w-5 text-slate-700 dark:text-slate-200" strokeWidth={2} aria-hidden />
                           </div>
                           <div className="min-w-0 space-y-1.5">
                             <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">
                               Tras confirmar el pago
                             </p>
-                            <p className="text-[0.8125rem] sm:text-sm text-slate-300 leading-relaxed">
-                              El equipo recibe la <strong className="text-slate-100 font-semibold">alerta de urgencia</strong> con
+                            <p className="text-[0.8125rem] sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
+                              El equipo recibe la <strong className="text-slate-900 dark:text-slate-100 font-semibold">alerta de urgencia</strong> con
                               tus datos y la unidad indicada. Un abogado se coordinará contigo para{' '}
-                              <strong className="text-slate-100 font-semibold">comisaría o unidad</strong> y la{' '}
-                              <strong className="text-slate-100 font-semibold">audiencia de control de detención</strong>, según
+                              <strong className="text-slate-900 dark:text-slate-100 font-semibold">comisaría o unidad</strong> y la{' '}
+                              <strong className="text-slate-900 dark:text-slate-100 font-semibold">audiencia de control de detención</strong>, según
                               disponibilidad y el encargo contratado.
                             </p>
                           </div>
                         </div>
 
-                        <div className="px-4 py-4 sm:px-5 flex gap-3 bg-white/[0.02]">
+                        <div className="px-4 py-4 sm:px-5 flex gap-3 bg-slate-50/50 dark:bg-white/[0.02]">
                           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-rose-500/12 border border-rose-400/22 backdrop-blur-md">
-                            <AlertTriangle className="h-5 w-5 text-rose-200/90" strokeWidth={2} aria-hidden />
+                            <AlertTriangle className="h-5 w-5 text-rose-600/90 dark:text-rose-200/90" strokeWidth={2} aria-hidden />
                           </div>
                           <div className="min-w-0 space-y-1.5">
                             <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">
                               Sin patrocinio, más exposición
                             </p>
-                            <p className="text-[0.8125rem] sm:text-sm text-slate-300 leading-relaxed">
+                            <p className="text-[0.8125rem] sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
                               Actuar solo en detención suele implicar{' '}
-                              <strong className="text-slate-100 font-semibold">más riesgo de declarar sin contradicción técnica</strong>{' '}
+                              <strong className="text-slate-900 dark:text-slate-100 font-semibold">más riesgo de declarar sin contradicción técnica</strong>{' '}
                               y de no revisar a tiempo el procedimiento. Contratar defensa{' '}
-                              <strong className="text-slate-100 font-semibold">no garantiza</strong> resultado judicial, pero
+                              <strong className="text-slate-900 dark:text-slate-100 font-semibold">no garantiza</strong> resultado judicial, pero
                               acerca la actuación a estándar constitucional y procesal — y te deja enfocado en garantías, no en
                               improvisar bajo presión.
                             </p>
@@ -1366,19 +1366,19 @@ export default function UrgenciaPage() {
                         </div>
                       </div>
 
-                      <div className="px-4 py-4 sm:px-5 border-t border-white/[0.07] bg-white/[0.02]">
+                      <div className="px-4 py-4 sm:px-5 border-t border-slate-200/80 dark:border-white/[0.07] bg-slate-50/40 dark:bg-white/[0.02]">
                         <div className="flex flex-wrap items-start justify-between gap-3">
                           <div>
                             <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500 mb-1">
                               Servicio · CLP
                             </p>
-                            <p className="text-slate-200 text-sm font-medium leading-snug">{servicioNombre}</p>
-                            <p className="text-slate-400 text-xs mt-1 leading-relaxed max-w-md">{servicioDesc}</p>
+                            <p className="text-slate-800 dark:text-slate-200 text-sm font-medium leading-snug">{servicioNombre}</p>
+                            <p className="text-slate-600 dark:text-slate-400 text-xs mt-1 leading-relaxed max-w-md">{servicioDesc}</p>
                           </div>
                           <div className="text-right">
                             <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500">Total</p>
-                            <p className="font-display text-2xl font-bold text-white tabular-nums mt-0.5">${precioFmt}</p>
-                            <span className="inline-flex mt-1 text-[9px] font-bold uppercase tracking-wider text-rose-200/95 bg-rose-500/18 px-2 py-0.5 rounded-md border border-rose-500/25">
+                            <p className="font-display text-2xl font-bold text-slate-900 dark:text-white tabular-nums mt-0.5">${precioFmt}</p>
+                            <span className="inline-flex mt-1 text-[9px] font-bold uppercase tracking-wider text-rose-800/95 dark:text-rose-200/95 bg-rose-100/90 dark:bg-rose-500/18 px-2 py-0.5 rounded-md border border-rose-300/50 dark:border-rose-500/25">
                               Urgencia
                             </span>
                           </div>
@@ -1389,15 +1389,15 @@ export default function UrgenciaPage() {
                             <div className="flex gap-3">
                               <AlertTriangle className="w-5 h-5 text-rose-300 shrink-0" />
                               <div className="min-w-0 flex-1 space-y-2">
-                                <p className="text-sm font-semibold text-rose-100 leading-snug">{error}</p>
-                                <p className="text-xs text-slate-400 leading-relaxed">
+                                <p className="text-sm font-semibold text-rose-900 dark:text-rose-100 leading-snug">{error}</p>
+                                <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
                                   En local hace falta backend o función Supabase; en producción el enlace es el checkout oficial.
                                 </p>
                                 <a
                                   href={whatsappUrl}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/[0.07] px-3.5 py-2.5 text-xs font-semibold text-white hover:bg-white/[0.11] transition-colors"
+                                  className="inline-flex items-center gap-2 rounded-xl border border-slate-300/90 bg-slate-100/90 px-3.5 py-2.5 text-xs font-semibold text-slate-900 hover:bg-slate-200/80 dark:border-white/15 dark:bg-white/[0.07] dark:text-white dark:hover:bg-white/[0.11] transition-colors"
                                 >
                                   <MessageCircle className="w-3.5 h-3.5" />
                                   WhatsApp al equipo
@@ -1421,9 +1421,9 @@ export default function UrgenciaPage() {
                       transition={{ type: 'spring', stiffness: 380, damping: 38, delay: 0.05 }}
                       className="urgencia-checkout-dock fixed inset-x-0 bottom-0 z-[46] px-3 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pointer-events-none"
                     >
-                      <div className="pointer-events-auto max-w-lg mx-auto rounded-[1.25rem] border border-white/[0.12] bg-slate-950/72 backdrop-blur-2xl backdrop-saturate-150 shadow-[0_-12px_48px_-12px_rgba(0,0,0,0.55)] ring-1 ring-white/[0.06] px-3.5 py-3 sm:px-4 sm:py-3.5">
+                      <div className="pointer-events-auto max-w-lg mx-auto rounded-[1.25rem] border border-slate-200/90 bg-white/92 dark:border-white/[0.12] dark:bg-slate-950/72 backdrop-blur-2xl backdrop-saturate-150 shadow-[0_-12px_48px_-12px_rgba(15,23,42,0.12)] dark:shadow-[0_-12px_48px_-12px_rgba(0,0,0,0.55)] ring-1 ring-slate-900/[0.05] dark:ring-white/[0.06] px-3.5 py-3 sm:px-4 sm:py-3.5">
                         {error ? (
-                          <p className="text-[11px] text-rose-200/95 text-center mb-2 font-medium leading-snug">{error}</p>
+                          <p className="text-[11px] text-rose-800 dark:text-rose-200/95 text-center mb-2 font-medium leading-snug">{error}</p>
                         ) : null}
                         <div className="flex flex-col sm:flex-row sm:items-center gap-2.5 sm:gap-3">
                           <div className="flex sm:flex-col sm:items-start sm:justify-center gap-2 sm:gap-0 sm:min-w-[7rem] items-center justify-between">
@@ -1434,7 +1434,7 @@ export default function UrgenciaPage() {
                               <p className="hidden sm:block text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-500 mb-0.5">
                                 Total
                               </p>
-                              <p className="font-display text-xl sm:text-2xl font-bold text-white tabular-nums leading-none">
+                              <p className="font-display text-xl sm:text-2xl font-bold text-slate-900 dark:text-white tabular-nums leading-none">
                                 ${precioFmt}
                               </p>
                             </div>

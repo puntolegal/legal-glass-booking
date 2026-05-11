@@ -15,12 +15,19 @@ import {
   ArrowUp
 } from 'lucide-react';
 import { useSidebar } from '@/contexts/SidebarContext';
+import { useTheme } from '@/hooks/useTheme';
+import {
+  A11Y_FOCUS_RING,
+  accessibilityControlChrome,
+} from '@/lib/accessibilityGlassClasses';
 
 interface PremiumMobileDockProps {
   className?: string;
 }
 
 export const PremiumMobileDock: React.FC<PremiumMobileDockProps> = ({ className = "" }) => {
+  const { theme } = useTheme();
+  const isDarkChrome = theme === 'dark';
   const { isOpen, toggleSidebar } = useSidebar();
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
@@ -179,10 +186,11 @@ export const PremiumMobileDock: React.FC<PremiumMobileDockProps> = ({ className 
                       whileHover={{ scale: 1.05, y: -1 }}
                       whileTap={{ scale: 0.95 }}
                       onClick={handleAccessibilityClick}
-                      className="relative flex flex-col items-center justify-center w-12 h-12 rounded-2xl transition-all duration-300 text-gray-600 dark:text-gray-300 hover:bg-gray-100/60 dark:hover:bg-gray-800/60"
-                      aria-label="Accesibilidad"
+                      className={`relative flex flex-col items-center justify-center min-w-[3rem] px-1.5 py-1 rounded-2xl transition-all duration-300 touch-manipulation ${A11Y_FOCUS_RING} ${accessibilityControlChrome(isDarkChrome)}`}
+                      aria-label="Abrir preferencias de accesibilidad"
+                      title="Accesibilidad"
                     >
-                      <Accessibility className="w-4 h-4 mb-0.5" />
+                      <Accessibility className="w-4 h-4 mb-0.5" strokeWidth={2} aria-hidden />
                       <span className="text-[10px] font-medium leading-none">Acceso</span>
                     </motion.button>
 

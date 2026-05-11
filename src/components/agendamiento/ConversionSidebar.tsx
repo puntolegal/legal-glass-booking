@@ -2,7 +2,7 @@
 
 import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Sparkles, CheckCircle } from 'lucide-react';
+import { Gift, Sparkles, CheckCircle } from 'lucide-react';
 import { useAgendamiento } from '@/contexts/AgendamientoContext';
 import { useSearchParams } from 'react-router-dom';
 import { getServiceInfo } from '@/config/serviceInfo';
@@ -60,9 +60,9 @@ const ConversionSidebar: React.FC<ConversionSidebarProps> = ({ compact = false }
         animate={{ opacity: 1, y: 0 }}
         className={`rounded-[1.75rem] shadow-xl ${shellGlass} ${compact ? 'p-4 space-y-4' : 'p-6 space-y-6'}`}
       >
-        <header className="flex items-center gap-3">
+        <header className="flex items-start gap-3">
           <div 
-            className="flex h-12 w-12 items-center justify-center rounded-xl"
+            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl"
             style={{
               background: serviceTheme.gradient,
               boxShadow: `0 4px 12px ${hexToRgba(serviceTheme.accent, 0.25)}`,
@@ -70,9 +70,28 @@ const ConversionSidebar: React.FC<ConversionSidebarProps> = ({ compact = false }
           >
             <ServiceIcon className="w-6 h-6 text-white" />
           </div>
-          <div>
-            <p className="text-xs uppercase tracking-[0.35em] text-slate-500 dark:text-slate-400 leading-tight">{serviceInfo.subtitle}</p>
-            <h3 className="text-lg font-semibold text-slate-900 dark:text-white">{serviceInfo.title}</h3>
+          <div className="min-w-0 flex-1 space-y-2">
+            {isInmobiliarioEval ? (
+              <>
+                <div className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/25 bg-emerald-500/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-emerald-800 dark:border-emerald-400/30 dark:bg-emerald-500/15 dark:text-emerald-200">
+                  <Gift className="h-3 w-3" aria-hidden />
+                  Asesoría de cortesía
+                </div>
+                <p className="text-[13px] font-medium leading-snug text-slate-600 dark:text-slate-300">
+                  Orientación jurídica y comercial previa
+                </p>
+                <h3 className="text-lg font-semibold leading-tight text-slate-900 dark:text-white">
+                  {serviceInfo.title}
+                </h3>
+              </>
+            ) : (
+              <>
+                <p className="text-xs uppercase tracking-[0.35em] text-slate-500 dark:text-slate-400 leading-tight">
+                  {serviceInfo.subtitle}
+                </p>
+                <h3 className="text-lg font-semibold text-slate-900 dark:text-white">{serviceInfo.title}</h3>
+              </>
+            )}
           </div>
         </header>
         

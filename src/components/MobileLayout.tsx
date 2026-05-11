@@ -23,10 +23,7 @@ export const MobileLayout: React.FC<MobileLayoutProps> = ({
   const { isOpen, closeSidebar } = useSidebar();
   const location = useLocation();
   const isLanding = location.pathname === '/';
-  const isGlassCanvasRoute =
-    isLanding ||
-    location.pathname === '/servicios/inmobiliario' ||
-    location.pathname === '/inmobiliario';
+  const isGlassCanvasRoute = isLanding || location.pathname === '/servicios/inmobiliario';
   const { theme } = useTheme();
   const landingLight = isLanding && theme === 'light';
 

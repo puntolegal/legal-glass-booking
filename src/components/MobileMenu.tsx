@@ -44,11 +44,7 @@ const MobileMenu = ({ onAgendarClick }: MobileMenuProps) => {
     { name: "👨‍👩‍👧‍👦 Derecho Familia", href: "/servicios/familia" },
     { name: "📜 Herencias", href: "/herencias" },
     { name: "🏠 Derecho Inmobiliario", href: "/servicios/inmobiliario" },
-    { name: "📄 Derecho Civil", href: "/servicios/civil" },
-    { name: "🛡️ Derecho Penal", href: "/servicios/penal" },
-    { name: "💰 Derecho Tributario", href: "/servicios/tributario" },
-    { name: "⚠️ Derecho Penal Económico", href: "/servicios/penal-economico" },
-    { name: "💻 Derecho Digital", href: "/servicios/digital" },
+    { name: "🚨 Urgencia penal", href: "/urgencia" },
     { name: "🔒 Protección Datos", href: "/proteccion-datos" },
     { name: "🛒 E-Commerce", href: "/ecommerce-compliance" },
   ];

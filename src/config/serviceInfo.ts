@@ -536,7 +536,7 @@ export const serviceInfoMap: Record<string, ServiceInfo> = {
     title: 'Evaluación inmobiliaria — Sector Oriente',
     subtitle: 'Orientación jurídica y comercial previa',
     description:
-      'Primera sesión orientativa sin costo para propiedades en Las Condes, Vitacura, Lo Barnechea o La Reina. Revisión de enfoque y próximos pasos; no constituye estudio de títulos completo ni promesa de resultado.',
+      'Asesoría de cortesía: primera sesión orientativa sin costo para propiedades en Las Condes, Vitacura, Lo Barnechea o La Reina (Google Meet). Enfoque jurídico y comercial previo a la venta; no constituye estudio de títulos completo ni resultado garantizado.',
     benefits: [
       'Agenda con videollamada (Google Meet) tras completar el formulario.',
       'Equipo alineado a transacciones de mayor complejidad patrimonial.',
