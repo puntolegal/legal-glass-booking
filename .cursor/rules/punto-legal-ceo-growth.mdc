@@ -1,0 +1,13 @@
+---
+description: Copy y pauta Punto Legal alineados a compliance, marca glass iOS y slugs de agendamiento
+globs: docs/**/*.md, src/components/ServicesSection.tsx, src/pages/Index.tsx, META_CONVERSIONS_SETUP.md
+alwaysApply: false
+---
+
+# CEO growth — reglas al editar copy o docs de pauta
+
+- **Jurídico-prudencia:** Aplicar `docs/conversion-copia-juridica-mejoras.md`: sin garantías de resultado, sin “100%”, sin promesas de cobro/recuperación sin matiz; CAE/TGR con lenguaje de evaluación y vías según caso.
+- **Marca:** Anuncios y referencias visuales coherentes con `docs/brand-system-glass-ios.md` (navy, glass, acentos por vertical; laboral teal contenido).
+- **CTA y URLs:** Destinos reales `https://puntolegal.online/agendamiento?plan=<slug>` usando slugs existentes en `src/constants/services.ts` / catálogo en `ServicesSection`.
+- **Meta:** Si se tocan eventos o nombres de contenido, mantener coherencia con `META_CONVERSIONS_SETUP.md` y `content_ids` = slug de plan.
+- **Datos:** No sugerir volcar PII innecesaria en Notion u hojas públicas; preferir agregados o minimización.
