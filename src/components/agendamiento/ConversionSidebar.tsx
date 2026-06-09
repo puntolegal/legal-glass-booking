@@ -19,6 +19,7 @@ const ConversionSidebar: React.FC<ConversionSidebarProps> = ({ compact = false }
   const { precioFinal, isConvenioValido, isAdminValido } = priceCalculation;
   const [searchParams] = useSearchParams();
   const plan = searchParams.get('plan') || 'general';
+  const isInmobiliarioEval = plan === 'inmobiliario-eval';
   
   // Información contextual + tema dinámico (slug → categoría → general)
   const serviceInfo = useMemo(() => getServiceInfo(plan), [plan]);
