@@ -5,7 +5,6 @@ import { useSearchParams } from 'react-router-dom';
 import { useForm, UseFormReturn } from 'react-hook-form';
 import { createBookingWithRealEmail, type BookingData } from '@/services/supabaseBooking';
 import { sendRealBookingEmails } from '@/services/realEmailService';
-import { supabase } from '@/integrations/supabase/client';
 import { createOfflineBookingWithEmail, type OfflineBookingData } from '@/services/offlineBooking';
 import { checkSupabaseConnection } from '@/integrations/supabase/client';
 import type { PendingPaymentData } from '@/types/payments';
@@ -230,6 +229,7 @@ const AgendamientoProviderInner: React.FC<{ children: ReactNode; initialService?
           notas: `Tipo de reunión: ${selectedMeetingType}${isAdminValido ? ` | Código admin aplicado: ${formData.codigoConvenio} (Precio especial $1.000)` : isConvenioValido ? ` | Código de convenio aplicado: ${formData.codigoConvenio} (80% descuento)` : ''}`,
           agendamiento_intake_id: agendamientoIntakeId || undefined,
           qualificationData: qualificationMeta,
+          externalReference,
         };
         
         const isSupabaseAvailable = await checkSupabaseConnection();
@@ -237,11 +237,6 @@ const AgendamientoProviderInner: React.FC<{ children: ReactNode; initialService?
         if (isSupabaseAvailable) {
           const result = await createBookingWithRealEmail(bookingData);
           if (result.success && result.reserva) {
-            await supabase
-              .from('reservas')
-              .update({ external_reference: externalReference })
-              .eq('id', result.reserva.id);
-
             const r = result.reserva;
 
             if (isInmobiliarioEvalPlan) {
@@ -389,16 +384,12 @@ const AgendamientoProviderInner: React.FC<{ children: ReactNode; initialService?
             descripcion: formData.descripcion
           },
           agendamiento_intake_id: agendamientoIntakeId || undefined,
+          externalReference,
         };
         
         const result = await createBookingWithRealEmail(bookingData);
         
         if (result.success && result.reserva) {
-          await supabase
-            .from('reservas')
-            .update({ external_reference: externalReference })
-            .eq('id', result.reserva.id);
-
           const backendUrl = 'https://qrgelocijmwnxcckxbdg.supabase.co/functions/v1';
 
           const response = await fetch(`${backendUrl}/create-mercadopago-preference`, {

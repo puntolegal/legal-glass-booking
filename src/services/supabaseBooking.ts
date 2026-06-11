@@ -60,6 +60,8 @@ export interface BookingData {
   /** Micro-cualificación inmobiliaria (JSON en columna qualification_data) */
   qualificationData?: Record<string, unknown> | null;
   riskLevel?: string | null;
+  /** Referencia externa para MercadoPago; debe ir en el INSERT porque RLS bloquea UPDATE anon */
+  externalReference?: string | null;
 }
 
 export interface Reserva {
@@ -204,7 +206,15 @@ export const crearReserva = async (bookingData: BookingData): Promise<{
         ? ('confirmada' as const)
         : ('pendiente' as const);
 
+    // RLS: anon solo puede INSERT en reservas (SELECT/UPDATE denegados).
+    // Por eso el id y external_reference se generan en el cliente y van en el
+    // mismo INSERT, sin .select() (INSERT..RETURNING fallaría con 42501).
+    const reservaId = crypto.randomUUID();
+    const externalReference = bookingData.externalReference || reservaId;
+
     const reservaData: Record<string, unknown> = {
+      id: reservaId,
+      external_reference: externalReference,
       nombre: bookingData.cliente.nombre,
       email: bookingData.cliente.email,
       telefono: telefonoValidado.substring(0, 50), // Limitar a 50 caracteres
@@ -232,11 +242,9 @@ export const crearReserva = async (bookingData: BookingData): Promise<{
       ...(bookingData.riskLevel ? { risk_level: bookingData.riskLevel } : {}),
     };
 
-    const { data: reserva, error } = await supabase
+    const { error } = await supabase
       .from('reservas')
-      .insert(reservaData)
-      .select()
-      .single();
+      .insert(reservaData);
 
     if (error) {
       console.error('❌ Error insertando reserva:', error);
@@ -246,36 +254,19 @@ export const crearReserva = async (bookingData: BookingData): Promise<{
       };
     }
 
-    if (!reserva) {
-      return {
-        success: false,
-        error: 'No se pudo crear la reserva'
-      };
-    }
+    console.log('✅ Reserva creada exitosamente:', reservaId);
 
-    console.log('✅ Reserva creada exitosamente:', reserva.id);
+    await syncIntakeCitaFromReserva(reservaId);
 
-    await syncIntakeCitaFromReserva(reserva.id);
-
-    // CRÍTICO: Actualizar external_reference = id para que siempre esté disponible
-    const { error: updateError } = await supabase
-      .from('reservas')
-      .update({ external_reference: reserva.id })
-      .eq('id', reserva.id);
-
-    if (updateError) {
-      console.warn('⚠️ Error actualizando external_reference:', updateError);
-      // No fallar la operación por esto, solo loguearlo
-    } else {
-      console.log('✅ external_reference actualizado:', reserva.id);
-    }
-
+    // RLS impide leer la fila como anon: reconstruimos la reserva localmente
+    const nowIso = new Date().toISOString();
     return {
       success: true,
-      reserva: {
-        ...mapDatabaseToReserva(reserva),
-        external_reference: reserva.id // Asegurar que el campo esté en el objeto retornado
-      }
+      reserva: mapDatabaseToReserva({
+        ...reservaData,
+        created_at: nowIso,
+        updated_at: nowIso,
+      })
     };
 
   } catch (error) {

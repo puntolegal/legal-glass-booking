@@ -52,7 +52,7 @@ const Step3_Payment: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   
-  const { precioFinal, precioConConvenio } = priceCalculation;
+  const { precioFinal } = priceCalculation;
   
   // Obtener tema del servicio para colores dinámicos
   const serviceTheme = useMemo(() => {
@@ -95,7 +95,10 @@ const Step3_Payment: React.FC = () => {
     }
   };
   
-  const isFree = precioFinal === '0' || precioConConvenio === 0;
+  // Solo es gratis si el precio final es 0 (p. ej. diagnóstico laboral).
+  // OJO: precioConConvenio queda en 0 cuando NO hay convenio, por eso no
+  // sirve para detectar gratuidad (mostraba "Gratis" en todos los planes).
+  const isFree = precioFinal === '0';
   
   return (
     <motion.div
