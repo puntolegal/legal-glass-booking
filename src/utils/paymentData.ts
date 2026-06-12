@@ -116,6 +116,7 @@ export const parsePendingPaymentData = (rawData: string): PendingPaymentData => 
     method: toStringValue(parsed.method) ?? null,
     preferenceId: parsed.preferenceId ? String(parsed.preferenceId) : null,
     timestamp: typeof parsed.timestamp === 'number' ? parsed.timestamp : Date.now(),
+    source: parsed.source ? String(parsed.source) : undefined,
     isVip: typeof parsed.isVip === 'boolean' ? parsed.isVip : undefined,
     isVulnerable: typeof parsed.isVulnerable === 'boolean' ? parsed.isVulnerable : undefined
   };
