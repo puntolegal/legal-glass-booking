@@ -154,8 +154,8 @@ const internalServices: InternalService[] = [
     descriptionHtml:
       "Calculamos tu <strong>pensión de alimentos según Ley 14.908</strong>, evaluamos tu causa de divorcio o cuidado personal, y te entregamos un plan de acción por escrito.",
     ctaLabel: "Agendar mi consulta",
-    price: "$89.000",
-    priceBefore: "$149.000",
+    price: "$20.000",
+    priceBefore: "$89.000",
     plan: "familia",
     icon: Heart,
     features: [

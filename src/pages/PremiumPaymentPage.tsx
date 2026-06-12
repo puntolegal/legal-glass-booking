@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { CreditCard, ArrowLeft, Lock } from 'lucide-react';
 import SEO from '../components/SEO';
-import { createReservationDirect } from '@/services/supabaseBooking';
+import { crearReserva } from '@/services/supabaseBooking';
 
 export default function PremiumPaymentPage() {
   const [paymentData, setPaymentData] = useState<any>(null);
@@ -24,21 +24,36 @@ export default function PremiumPaymentPage() {
       let finalData = { ...paymentData };
 
       // Fase 3: Si viene de calculadora (CALC-*), crear reserva antes de ir a MercadoPago
-      // para que clever-action pueda enviar los emails correctamente
+      // para que el webhook MP y clever-action encuentren la fila por external_reference
       const reservaId = paymentData.reservaId || paymentData.reservationId || paymentData.external_reference;
       if (reservaId && String(reservaId).startsWith('CALC-')) {
         try {
-          const result = await createReservationDirect({
-            nombre: paymentData.nombre || paymentData.name || 'Cliente',
-            email: paymentData.email || '',
-            telefono: paymentData.telefono || paymentData.whatsapp || '',
-            rut: 'No especificado',
-            servicio: paymentData.service || 'Consulta Estratégica',
-            precio: String(paymentData.price || paymentData.originalPrice || 35000),
-            fecha: paymentData.fecha || paymentData.date || new Date().toISOString().split('T')[0],
-            hora: paymentData.hora || paymentData.time || 'A coordinar',
-            tipo_reunion: paymentData.tipo_reunion || 'videollamada',
-            descripcion: paymentData.descripcion || `Pago desde calculadora - ${paymentData.service || 'Consulta'}`
+          // Normalizar fecha a ISO yyyy-mm-dd (versiones previas guardaban dd-mm-yyyy)
+          const rawFecha: string = paymentData.fecha || paymentData.date || '';
+          const fechaISO = /^\d{4}-\d{2}-\d{2}$/.test(rawFecha)
+            ? rawFecha
+            : new Date().toISOString().split('T')[0];
+          // reservas.hora es tipo time NOT NULL: usar hora placeholder válida
+          const rawHora: string = paymentData.hora || paymentData.time || '';
+          const horaValida = /^\d{1,2}:\d{2}/.test(rawHora) ? rawHora : '12:00';
+
+          const result = await crearReserva({
+            cliente: {
+              nombre: paymentData.nombre || paymentData.name || 'Cliente',
+              email: paymentData.email || '',
+              telefono: paymentData.telefono || paymentData.whatsapp || '',
+              rut: 'No especificado'
+            },
+            servicio: {
+              tipo: paymentData.service || 'Consulta Estratégica',
+              precio: String(paymentData.price || paymentData.originalPrice || 35000),
+              fecha: fechaISO,
+              hora: horaValida,
+              tipoReunion: paymentData.tipo_reunion || 'videollamada'
+            },
+            descripcion:
+              paymentData.descripcion ||
+              `Pago desde calculadora - ${paymentData.service || 'Consulta'} · Horario a coordinar por WhatsApp`
           });
 
           if (result.success && result.reserva) {
@@ -47,11 +62,13 @@ export default function PremiumPaymentPage() {
               id: result.reserva.id,
               reservaId: result.reserva.id,
               reservationId: result.reserva.id,
-              external_reference: result.reserva.id
+              external_reference: result.reserva.external_reference || result.reserva.id
             };
             localStorage.setItem('paymentData', JSON.stringify(finalData));
             localStorage.setItem('pendingPayment', JSON.stringify(finalData));
             console.log('✅ Reserva creada para flujo calculadora:', result.reserva.id);
+          } else {
+            console.warn('⚠️ No se pudo crear reserva para calculadora:', result.error);
           }
         } catch (err) {
           console.warn('⚠️ No se pudo crear reserva para calculadora:', err);

@@ -559,6 +559,19 @@ export type Database = {
         Args: { p_reserva_id: string }
         Returns: undefined
       }
+      calculadora_track_lead: {
+        Args: {
+          p_email: string
+          p_status: string
+          p_name?: string | null
+          p_quiz_answers?: Json | null
+          p_income_value?: number | null
+          p_children_count?: number | null
+          p_calculated_min?: string | null
+          p_calculated_max?: string | null
+        }
+        Returns: undefined
+      }
       get_note_audit_status: {
         Args: { note_id_param: string }
         Returns: {

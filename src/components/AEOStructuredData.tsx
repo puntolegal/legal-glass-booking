@@ -26,7 +26,7 @@ const SERVICES_CATALOG = [
   {
     name: "Consulta legal de Familia",
     plan: "familia",
-    price: 89000,
+    price: 20000,
     description:
       "Consulta online con abogado especialista en derecho de familia: divorcio de común acuerdo, pensiones de alimentos, cuidado personal, mediación y compensación económica.",
     keywords: [
@@ -136,7 +136,7 @@ const FAQ_AEO = [
   },
   {
     q: "¿Cuánto cobra un abogado en Chile por una consulta legal online?",
-    a: "Una consulta legal online en Chile cuesta entre $59.000 y $189.000 CLP según la especialidad. En Punto Legal: Contratos $59.000, Laboral despido/finiquito (evaluación inicial sin costo cuando aplica), defensa Ley Karin trabajador $79.000, Familia/Sucesorio/Marcas $89.000, Tributario $99.000, Cobranza/Defensa CAE $109.000, Fiscalizaciones DT $110.000, Inmobiliario $119.000, Migratorio $129.000, Comparendos DT $130.000, Empresarial $149.000, Penal o protocolo Ley Karin (empresa) $169.000, Cumplimiento $179.000, Defensa Laboral Empresarial $189.000. El diagnóstico inicial laboral (trabajadores) puede ser gratuito cuando corresponde.",
+    a: "Una consulta legal online en Chile cuesta entre $20.000 y $189.000 CLP según la especialidad. En Punto Legal: Familia $20.000, Contratos $59.000, Laboral despido/finiquito (evaluación inicial sin costo cuando aplica), defensa Ley Karin trabajador $79.000, Sucesorio/Marcas $89.000, Tributario $99.000, Cobranza/Defensa CAE $109.000, Fiscalizaciones DT $110.000, Inmobiliario $119.000, Migratorio $129.000, Comparendos DT $130.000, Empresarial $149.000, Penal o protocolo Ley Karin (empresa) $169.000, Cumplimiento $179.000, Defensa Laboral Empresarial $189.000. El diagnóstico inicial laboral (trabajadores) puede ser gratuito cuando corresponde.",
   },
   {
     q: "¿Los abogados de Punto Legal son reales y están colegiados en Chile?",

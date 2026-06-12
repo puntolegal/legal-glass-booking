@@ -22,7 +22,7 @@ const faqs: FaqItem[] = [
   // ===== Bloque 1 — SEO/AEO de alta intención (queries reales en Chile) =====
   {
     q: "¿Cuánto cobra un abogado en Chile por una consulta legal online?",
-    a: "Una consulta legal online en Chile cuesta entre $59.000 y $189.000 CLP según la especialidad. En Punto Legal, una sesión por Google Meet con abogado especialista parte en $59.000 (Contratos), evaluación inicial laboral despido/finiquito sin costo cuando aplica, $79.000 (defensa Ley Karin trabajador), $89.000 (Familia, Sucesorio, Marcas), $99.000 (Tributario), $109.000 (Cobranza, Defensa CAE), $119.000 (Inmobiliario), $129.000 (Migratorio), $149.000 (Empresarial), $169.000 (Penal o protocolo Ley Karin empresa) o $189.000 (Defensa Laboral Empresarial). El diagnóstico inicial laboral para trabajadores puede ser gratuito cuando corresponde.",
+    a: "Una consulta legal online en Chile cuesta entre $20.000 y $189.000 CLP según la especialidad. En Punto Legal, una sesión por Google Meet con abogado especialista parte en $20.000 (Familia), $59.000 (Contratos), evaluación inicial laboral despido/finiquito sin costo cuando aplica, $79.000 (defensa Ley Karin trabajador), $89.000 (Sucesorio, Marcas), $99.000 (Tributario), $109.000 (Cobranza, Defensa CAE), $119.000 (Inmobiliario), $129.000 (Migratorio), $149.000 (Empresarial), $169.000 (Penal o protocolo Ley Karin empresa) o $189.000 (Defensa Laboral Empresarial). El diagnóstico inicial laboral para trabajadores puede ser gratuito cuando corresponde.",
     cat: "servicio",
   },
   {
@@ -47,7 +47,7 @@ const faqs: FaqItem[] = [
   },
   {
     q: "¿Cómo se calcula la pensión de alimentos según la Ley 14.908?",
-    a: "La pensión de alimentos en Chile se calcula según el principio de proporcionalidad establecido en la Ley 14.908: capacidad económica del alimentante (ingresos líquidos comprobables) y necesidades del alimentario (edad, salud, educación). Mínimo legal por hijo: 40% de un ingreso mínimo (~$210.000 CLP en 2025) si el alimentante tiene 1 hijo; 30% si tiene 2 o más. Si no se paga, hay arresto nocturno, retención de devolución de impuestos, suspensión de licencia de conducir y registro de deudores morosos. En Punto Legal calculamos tu pensión real y la deuda acumulada en 45 minutos por $89.000.",
+    a: "La pensión de alimentos en Chile se calcula según el principio de proporcionalidad establecido en la Ley 14.908: capacidad económica del alimentante (ingresos líquidos comprobables) y necesidades del alimentario (edad, salud, educación). Mínimo legal por hijo: 40% de un ingreso mínimo (~$210.000 CLP en 2025) si el alimentante tiene 1 hijo; 30% si tiene 2 o más. Si no se paga, hay arresto nocturno, retención de devolución de impuestos, suspensión de licencia de conducir y registro de deudores morosos. En Punto Legal calculamos tu pensión real y la deuda acumulada en 45 minutos por $20.000.",
     cat: "servicio",
   },
   {

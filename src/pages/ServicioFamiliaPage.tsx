@@ -352,7 +352,7 @@ export default function ServicioFamiliaPage() {
           content_ids: ['familia'],
           content_name: 'Punto Legal Familia',
           content_category: 'Servicios Legales',
-          value: 89000, // precio base de la consulta Familia (CLP)
+          value: 20000, // precio base de la consulta Familia (CLP)
           currency: 'CLP',
           source: 'servicios_familia',
         },

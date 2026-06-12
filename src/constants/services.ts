@@ -24,17 +24,17 @@ export const serviceCatalog: Record<string, Service> = {
   // ===== Personas =====
   'familia': {
     name: 'Punto Legal Familia',
-    price: '89.000',
+    price: '20.000',
     category: 'Familia',
-    originalPrice: '149.000',
-    discount: '40% OFF',
+    originalPrice: '89.000',
+    discount: '78% OFF',
   },
   'consulta-estrategica-familia': {
     name: 'Consulta Estratégica Familia',
-    price: '89.000',
+    price: '20.000',
     category: 'Familia',
-    originalPrice: '149.000',
-    discount: '40% OFF',
+    originalPrice: '89.000',
+    discount: '78% OFF',
     note: 'Primera consulta con abogado especialista',
   },
   'laboral': {

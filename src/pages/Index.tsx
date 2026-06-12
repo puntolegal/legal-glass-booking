@@ -151,7 +151,7 @@ const Index = () => {
         <ul>
           <li>Defensa CAE frente a Tesorería: $109.000 (antes $169.000 — contingencia nacional).</li>
           <li>Laboral (trabajadores): diagnóstico inicial sin costo cuando aplica; evaluación despido y finiquito sin costo cuando aplica; defensa Ley Karin (trabajador) $79.000; comparendo RM desde $35.000 según plan (honorarios a porcentaje sólo con acuerdo escrito si asumimos el caso).</li>
-          <li>Familia: $89.000 (divorcio, pensión de alimentos, cuidado personal).</li>
+          <li>Familia: $20.000 (divorcio, pensión de alimentos, cuidado personal).</li>
           <li>Sucesorio: $89.000 (posesión efectiva, herencias, testamentos).</li>
           <li>Migratorio: $129.000 (visa, residencia definitiva, nacionalización).</li>
           <li>Penal: $169.000 (defensa penal general, querellas, juicio oral).</li>

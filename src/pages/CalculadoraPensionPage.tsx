@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import { MessageCircle, DollarSign, Users, Baby, Sparkles, Mail, Shield, ShieldCheck, Scale, Zap, Landmark, AlertTriangle, User, Phone, Lock, Gavel, TrendingDown, CheckCircle, ArrowRight, Heart, PiggyBank, FileText } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
+import { trackCalculadoraLead } from '@/services/calculadoraLeads';
 import { trackMetaEvent } from '@/services/metaConversionsService';
 import { toast } from 'sonner';
 import { Helmet } from 'react-helmet-async';
@@ -260,72 +261,53 @@ const CalculadoraPensionPage: React.FC = () => {
       isVulnerable:  isVulnerableProfile,
       protectionType,
       category:      'Derecho de Familia',
-      fecha:         new Date().toLocaleDateString('es-CL'),
-      hora:          'A coordinar con el equipo',
+      source:        'calculadora_pension',
+      // Fecha ISO (yyyy-mm-dd): la columna reservas.fecha es tipo date y el
+      // formato es-CL (dd-mm-yyyy) es ambiguo para Postgres
+      fecha:         new Date().toISOString().split('T')[0],
+      hora:          '12:00',
+      horaTexto:     'A coordinar con el equipo',
       reservaId:     calcReservaId
     };
 
     localStorage.setItem('pendingPayment', JSON.stringify(paymentData));
     localStorage.setItem('paymentData',    JSON.stringify(paymentData));
 
-    supabase
-      .from('leads_quiz')
-      .update({
-        status: 'checkout_iniciado',
-        quiz_answers: {
-          source:              'calculadora_pension',
-          nombre:              name.trim(),
-          whatsapp:            whatsapp.replace(/\s/g, ''),
-          email,
-          materia_legal:       legalMatter,
-          ingreso_demandado:   selectedIncome,
-          cantidad_hijos:      selectedChildren,
-          pension_actual:      currentPension,
-          oculta_ingresos:     hidesIncome,
-          tiene_deuda:         hasDebt,
-          meses_deuda:         monthsOwed,
-          proteccion:          protectionType,
-          patrimonio_complejo: hasComplexAssets,
-          is_alta_complejidad: isVipProfile,
-          is_vulnerable:       isVulnerableProfile,
-          lead_score:          isVipProfile
-            ? 'HOT_ALTA_COMPLEJIDAD'
-            : (hasDebt && monthsOwed && monthsOwed > 3)
-            ? 'WARM_DEBT'
-            : 'STANDARD',
-          consulta_precio:          consultPrice,
-          consulta_precio_original: consultOriginalPrice,
-          consulta_servicio:        paymentData.service,
-          reserva_id:               paymentData.reservaId,
-          checkout_timestamp:       new Date().toISOString()
-        } as any
-      })
-      .eq('email', email)
-      .then(({ error }) => {
-        if (error) {
-          console.warn('⚠️ Supabase checkout update:', error.message);
-          supabase.from('leads_quiz').insert([{
-            email,
-            name: name.trim(),
-            status: 'checkout_iniciado',
-            quiz_answers: {
-              source:    'calculadora_pension',
-              nombre:    name.trim(),
-              whatsapp:  whatsapp.replace(/\s/g, ''),
-              email,
-              materia_legal:    legalMatter,
-              consulta_precio:  consultPrice,
-              reserva_id:       paymentData.reservaId,
-              checkout_timestamp: new Date().toISOString()
-            } as any
-          }]).then(({ error: insertErr }) => {
-            if (insertErr) console.error('❌ Insert fallback:', insertErr.message);
-            else console.log('✅ Lead creado en checkout (fallback)');
-          });
-        } else {
-          console.log('✅ Checkout registrado en Supabase');
-        }
-      });
+    // RPC con upsert interno: anon no puede hacer UPDATE directo en leads_quiz
+    trackCalculadoraLead({
+      email,
+      status: 'checkout_iniciado',
+      name: name.trim(),
+      quizAnswers: {
+        source:              'calculadora_pension',
+        nombre:              name.trim(),
+        whatsapp:            whatsapp.replace(/\s/g, ''),
+        email,
+        materia_legal:       legalMatter,
+        ingreso_demandado:   selectedIncome,
+        cantidad_hijos:      selectedChildren,
+        pension_actual:      currentPension,
+        oculta_ingresos:     hidesIncome,
+        tiene_deuda:         hasDebt,
+        meses_deuda:         monthsOwed,
+        proteccion:          protectionType,
+        patrimonio_complejo: hasComplexAssets,
+        is_alta_complejidad: isVipProfile,
+        is_vulnerable:       isVulnerableProfile,
+        lead_score:          isVipProfile
+          ? 'HOT_ALTA_COMPLEJIDAD'
+          : (hasDebt && monthsOwed && monthsOwed > 3)
+          ? 'WARM_DEBT'
+          : 'STANDARD',
+        consulta_precio:          consultPrice,
+        consulta_precio_original: consultOriginalPrice,
+        consulta_servicio:        paymentData.service,
+        reserva_id:               paymentData.reservaId,
+        checkout_timestamp:       new Date().toISOString()
+      }
+    }).then(({ success }) => {
+      if (success) console.log('✅ Checkout registrado en Supabase');
+    });
 
     navigate('/pago');
   };
@@ -376,14 +358,15 @@ const CalculadoraPensionPage: React.FC = () => {
             status: 'calculadora_iniciada'
           };
           
-          const { data, error } = await supabase
+          // IMPORTANTE: sin .select() — anon tiene INSERT pero no SELECT en
+          // leads_quiz, y el RETURNING implícito haría fallar todo el insert (42501).
+          const { error } = await supabase
             .from('leads_quiz')
-            .insert([quizData])
-            .select();
+            .insert([quizData]);
           
           if (!error) {
             setEmailSaved(true);
-            console.log('✅ Lead guardado silenciosamente:', { email, name, whatsapp }, data);
+            console.log('✅ Lead guardado silenciosamente:', { email, name, whatsapp });
             
             // Tracking Meta - Lead event
             trackMetaEvent({
@@ -403,14 +386,13 @@ const CalculadoraPensionPage: React.FC = () => {
             
             // Retry una vez después de 2 segundos
             setTimeout(async () => {
-              const { data: retryData, error: retryError } = await supabase
+              const { error: retryError } = await supabase
                 .from('leads_quiz')
-                .insert([quizData])
-                .select();
+                .insert([quizData]);
               
               if (!retryError) {
                 setEmailSaved(true);
-                console.log('✅ Lead guardado en retry:', retryData);
+                console.log('✅ Lead guardado en retry');
               }
             }, 2000);
           }
@@ -606,51 +588,24 @@ const CalculadoraPensionPage: React.FC = () => {
             lead_score: leadScore
           };
           
-          const { data, error, status } = await supabase
-            .from('leads_quiz')
-            .update({
-              quiz_answers: quizAnswers as any, // Type assertion para JSONB
-              income_value: selectedIncome,
-              children_count: selectedChildren,
-              calculated_min: calculatedRange.min,
-              calculated_max: calculatedRange.max,
-              status: 'calculo_completado'
-            })
-            .eq('email', email)
-            .in('status', ['calculadora_iniciada', 'calculo_completado']) // Permite sobreescribir si el usuario recalcula
-            .select();
-          
-          if (!error && data && data.length > 0) {
-            console.log('✅ Lead actualizado con datos del cálculo:', data);
-          } else if (!error && (!data || data.length === 0)) {
-            // Fallback: insertar si no existía (ej. insert inicial aún no completó)
-            const { data: insertData, error: insertErr } = await supabase
-              .from('leads_quiz')
-              .insert([{
-                email,
-                name: name.trim(),
-                quiz_answers: quizAnswers as any,
-                status: 'calculo_completado',
-                income_value: selectedIncome,
-                children_count: selectedChildren,
-                calculated_min: calculatedRange.min,
-                calculated_max: calculatedRange.max
-              }])
-              .select();
-            if (!insertErr) {
-              console.log('✅ Lead creado con cálculo (fallback):', insertData);
-              setEmailSaved(true);
-            } else {
-              console.warn('⚠️ Fallback insert falló:', insertErr.message);
-            }
+          // RPC con upsert interno: anon no puede hacer UPDATE directo en leads_quiz
+          const result = await trackCalculadoraLead({
+            email,
+            status: 'calculo_completado',
+            name: name.trim(),
+            quizAnswers,
+            incomeValue: selectedIncome,
+            childrenCount: selectedChildren,
+            calculatedMin: String(calculatedRange.min),
+            calculatedMax: String(calculatedRange.max)
+          });
+
+          if (result.success) {
+            console.log('✅ Lead actualizado con datos del cálculo');
+            setEmailSaved(true);
           } else {
             console.error('❌ Error actualizando los datos del lead:', {
-              error,
-              status,
-              code: error?.code,
-              message: error?.message,
-              details: error?.details,
-              hint: error?.hint,
+              error: result.error,
               email,
               selectedIncome,
               selectedChildren

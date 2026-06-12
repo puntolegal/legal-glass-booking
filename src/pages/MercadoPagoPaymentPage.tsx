@@ -7,7 +7,7 @@ import MercadoPagoOfficialButton from '../components/MercadoPagoOfficialButton';
 import MobileMercadoPagoButton from '../components/MobileMercadoPagoButton';
 import type { PendingPaymentData } from '@/types/payments';
 import { ensurePriceFormatted, parsePendingPaymentData } from '@/utils/paymentData';
-import { supabase } from '@/integrations/supabase/client';
+import { trackCalculadoraLead } from '@/services/calculadoraLeads';
 
 export default function MercadoPagoPaymentPage() {
   const [paymentData, setPaymentData] = useState<PendingPaymentData | null>(null);
@@ -30,14 +30,11 @@ export default function MercadoPagoPaymentPage() {
         const parsedData = parsePendingPaymentData(data);
         setPaymentData(parsedData);
 
-        if (parsedData?.email) {
-          supabase
-            .from('leads_quiz')
-            .update({ status: 'en_pago' })
-            .eq('email', parsedData.email)
-            .eq('status', 'checkout_iniciado')
-            .then(({ error }) => {
-              if (!error) console.log('✅ Estado en_pago registrado');
+        // Solo el embudo de la calculadora trackea estados en leads_quiz
+        if (parsedData?.email && parsedData?.source === 'calculadora_pension') {
+          trackCalculadoraLead({ email: parsedData.email, status: 'en_pago' })
+            .then(({ success }) => {
+              if (success) console.log('✅ Estado en_pago registrado');
             });
         }
       } catch (error) {
@@ -70,24 +67,21 @@ export default function MercadoPagoPaymentPage() {
       };
       localStorage.setItem('paymentSuccess', JSON.stringify(paymentInfo));
 
-      if (paymentData?.email) {
-        await supabase
-          .from('leads_quiz')
-          .update({
-            status: 'pago_completado',
-            quiz_answers: {
-              pago_id:     paymentInfo.paymentId,
-              pago_status: paymentInfo.paymentStatus,
-              pago_monto:  paymentInfo.transactionAmount,
-              pago_fecha:  paymentInfo.paymentDate,
-              pago_metodo: 'mercadopago'
-            } as any
-          })
-          .eq('email', paymentData.email)
-          .then(({ error }) => {
-            if (error) console.warn('⚠️ No se actualizó pago_completado:', error.message);
-            else console.log('✅ Pago completado en Supabase');
-          });
+      if (paymentData?.email && (paymentData as any)?.source === 'calculadora_pension') {
+        const { success, error } = await trackCalculadoraLead({
+          email: paymentData.email,
+          status: 'pago_completado',
+          quizAnswers: {
+            source:      'calculadora_pension',
+            pago_id:     paymentInfo.paymentId,
+            pago_status: paymentInfo.paymentStatus,
+            pago_monto:  paymentInfo.transactionAmount,
+            pago_fecha:  paymentInfo.paymentDate,
+            pago_metodo: 'mercadopago'
+          }
+        });
+        if (!success) console.warn('⚠️ No se actualizó pago_completado:', error);
+        else console.log('✅ Pago completado en Supabase');
       }
 
       window.location.href = '/payment-success';
