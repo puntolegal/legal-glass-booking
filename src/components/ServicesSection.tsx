@@ -754,11 +754,11 @@ const ServicesSection = ({
         {/* === Trending callout — "Lo más buscado esta semana" ===
             Posicionado estratégicamente entre las categorías y el catálogo.
             Capta atención del usuario justo cuando está decidiendo, con un
-            servicio de alta urgencia financiera (Defensa CAE). */}
+            servicio de alta demanda (Asesoría en Familia). */}
         <TrendingSpotlight
           onAgendarClick={() => {
-            const cae = list.find((s) => s.plan === "cae-tesoreria");
-            if (cae) handleClick(cae);
+            const familia = list.find((s) => s.plan === "familia");
+            if (familia) handleClick(familia);
           }}
         />
 
@@ -866,11 +866,11 @@ interface ServiceCardProps {
  * TrendingSpotlight — banner-card de "Lo más buscado esta semana".
  *
  * Posición estratégica: entre las cat-bubbles y el catálogo de cards.
- * Captura tráfico orgánico de alta intención (CAE = embargo TGR es una
- * consulta en alza por el aumento de morosidad de créditos universitarios).
+ * Captura tráfico orgánico de alta intención (Familia = pensión de
+ * alimentos y divorcio son consultas de alta demanda recurrente).
  *
- * Diseño: card horizontal con accent rojo del CAE, ícono Flame (trending)
- * + Receipt (CAE), métrica social proof, CTA prominente.
+ * Diseño: card horizontal con accent indigo de Familia, ícono Flame
+ * (trending) + Heart (Familia), métrica social proof, CTA prominente.
  */
 const TrendingSpotlight = ({
   onAgendarClick,
@@ -885,7 +885,7 @@ const TrendingSpotlight = ({
       viewport={{ once: true, margin: "-50px" }}
       transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
       className="trending-spotlight relative z-10 mb-8 lg:mb-10"
-      aria-label="Servicio más buscado esta semana — Defensa CAE"
+      aria-label="Servicio más buscado esta semana — Asesoría en Familia"
     >
       {/* Glow ambient sutil del color del servicio */}
       <span className="trending-spotlight__glow" aria-hidden />
@@ -898,18 +898,18 @@ const TrendingSpotlight = ({
         </div>
 
         <div className="trending-spotlight__row">
-          {/* Icon tile rojo CAE */}
+          {/* Icon tile indigo Familia */}
           <span className="trending-spotlight__tile" aria-hidden>
-            <Receipt className="h-6 w-6" strokeWidth={2.2} />
+            <Heart className="h-6 w-6" strokeWidth={2.2} />
           </span>
 
           <div className="trending-spotlight__body">
             <h3 className="trending-spotlight__title">
-              Defensa CAE frente a Tesorería
+              Asesoría en Familia
             </h3>
             <p className="trending-spotlight__hook">
-              ¿Te embargó la TGR por tu CAE moroso? Frenamos el embargo y
-              repactamos la deuda contigo. <strong>Casos reales este mes.</strong>
+              Calculamos tu pensión de alimentos, ordenamos tu divorcio y te
+              decimos qué hacer en cada paso. <strong>Con plan por escrito.</strong>
             </p>
 
             {/* Social proof microcopy */}
@@ -920,7 +920,7 @@ const TrendingSpotlight = ({
               </span>
               <span className="trending-spotlight__stat-sep" aria-hidden />
               <span className="trending-spotlight__stat">
-                <span className="trending-spotlight__stat-value">$109.000</span>
+                <span className="trending-spotlight__stat-value">$20.000</span>
                 tarifa cerrada
               </span>
             </div>
@@ -931,9 +931,9 @@ const TrendingSpotlight = ({
             type="button"
             onClick={onAgendarClick}
             className="trending-spotlight__cta cta-shimmer"
-            aria-label="Frenar mi embargo CAE — agendar consulta con Punto Legal"
+            aria-label="Agendar mi consulta de Familia con Punto Legal"
           >
-            <span>Frenar mi embargo</span>
+            <span>Agendar mi consulta</span>
             <ArrowUpRight className="h-4 w-4" aria-hidden />
           </button>
         </div>
