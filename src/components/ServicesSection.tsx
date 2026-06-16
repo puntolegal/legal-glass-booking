@@ -89,36 +89,6 @@ interface InternalService {
 
 /** Catálogo web/móvil: al cambiar títulos, sincronizar `supabase/functions/_shared/landingServiceTitles.ts` (correos / WhatsApp). */
 const internalServices: InternalService[] = [
-  // ========== CONTINGENCIA NACIONAL (CAE destacado) ==========
-  // Defensa CAE — máxima urgencia financiera + alta intención de búsqueda.
-  // Colocado como PRIMERO + FEATURED para máxima visibilidad.
-  {
-    title: "Punto Legal Defensa CAE",
-    shortName: "Defensa CAE",
-    hook: "¿La Tesorería te está reteniendo tu sueldo o tu devolución de impuestos por tu CAE moroso? Frenamos el embargo, repactamos la deuda y, cuando corresponde, solicitamos rebaja o condonación.",
-    descriptionHtml:
-      "Defensa integral de deudores morosos del <strong>Crédito con Aval del Estado (CAE) frente a la Tesorería General de la República</strong>. Presentamos recurso para suspender la retención judicial, evaluamos tu capacidad de pago y negociamos un convenio que se ajuste a tu realidad. Si calificas por insolvencia o error administrativo, impulsamos rebaja o condonación parcial.",
-    ctaLabel: "Frenar mi embargo TGR",
-    price: "$109.000",
-    priceBefore: "$169.000",
-    plan: "cae-tesoreria",
-    icon: Receipt,
-    features: [
-      "Suspensión de retención de sueldo o devolución de impuestos",
-      "Convenio de pago contributivo (% según renta)",
-      "Solicitud de rebaja o condonación parcial",
-      "Defensa administrativa y judicial ante la TGR",
-    ],
-    audience: "patrimonio",
-    accent: ACCENT_WINE,
-    badge: "Contingencia nacional",
-    featured: true,
-    testimonial: {
-      quote:
-        "“Me estaban reteniendo el sueldo hacía 8 meses. En 3 semanas frenaron el embargo y cerramos un plan mensual razonable. Recomendadísimos.”",
-      author: "Camilo V.",
-    },
-  },
   // ========== PERSONAS ==========
   {
     title: "Punto Legal Laboral",
@@ -165,6 +135,32 @@ const internalServices: InternalService[] = [
     ],
     audience: "personas",
     accent: ACCENT_FAMILIA,
+  },
+  {
+    title: "Punto Legal Defensa CAE",
+    shortName: "Defensa CAE",
+    hook: "¿La Tesorería te está reteniendo tu sueldo o tu devolución de impuestos por tu CAE moroso? Frenamos el embargo, repactamos la deuda y, cuando corresponde, solicitamos rebaja o condonación.",
+    descriptionHtml:
+      "Defensa integral de deudores morosos del <strong>Crédito con Aval del Estado (CAE) frente a la Tesorería General de la República</strong>. Presentamos recurso para suspender la retención judicial, evaluamos tu capacidad de pago y negociamos un convenio que se ajuste a tu realidad. Si calificas por insolvencia o error administrativo, impulsamos rebaja o condonación parcial.",
+    ctaLabel: "Frenar mi embargo TGR",
+    price: "$109.000",
+    priceBefore: "$169.000",
+    plan: "cae-tesoreria",
+    icon: Receipt,
+    features: [
+      "Suspensión de retención de sueldo o devolución de impuestos",
+      "Convenio de pago contributivo (% según renta)",
+      "Solicitud de rebaja o condonación parcial",
+      "Defensa administrativa y judicial ante la TGR",
+    ],
+    audience: "patrimonio",
+    accent: ACCENT_WINE,
+    badge: "Contingencia nacional",
+    testimonial: {
+      quote:
+        "“Me estaban reteniendo el sueldo hacía 8 meses. En 3 semanas frenaron el embargo y cerramos un plan mensual razonable. Recomendadísimos.”",
+      author: "Camilo V.",
+    },
   },
   {
     title: "Punto Legal Sucesorio",
