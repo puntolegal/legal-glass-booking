@@ -15,7 +15,7 @@ export function isLaborAgendamientoPlan(plan: string | null | undefined): boolea
 
 /** Valor CLP aproximado para InitiateCheckout en pills del cluster laboral. */
 export function laborClusterMetaValueClp(plan: string): number {
-  if (plan === 'tutela-laboral' || plan === 'laboral') return 0
+  if (plan === 'tutela-laboral' || plan === 'laboral') return 20000
   if (plan === 'defensa-karin-trabajador') return 79000
   if (plan === 'comparendo-rm') return 35000
   return 0

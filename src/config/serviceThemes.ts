@@ -65,7 +65,7 @@ export const serviceThemes: Record<string, ServiceTheme> = {
     '#2dd4bf', // teal-400
     '#0f766e', // teal-700
     Scale,
-    'Laboral — Diagnóstico gratis',
+    'Laboral',
     'tutela-laboral',
   ),
   /** En página laboral, el CTA global del header apunta al diagnóstico gratis. */

@@ -64,13 +64,13 @@ export const serviceInfoMap: Record<string, ServiceInfo> = {
     deliverable: 'PDF + asesoría'
   },
 
-  // ===== Tutela Laboral GRATIS (lead magnet) =====
+  // ===== Tutela Laboral =====
   'tutela-laboral': {
-    title: 'Punto Legal Laboral — Diagnóstico gratis',
-    subtitle: 'Trabajadores · primera sesión sin costo',
-    description: 'Si te despidieron sin justificación, sufriste acoso laboral o creemos que te calcularon mal el finiquito, evaluamos tu caso gratis. Si tiene mérito, lo tomamos a porcentaje: pagas sólo si recuperamos.',
+    title: 'Punto Legal Laboral',
+    subtitle: 'Trabajadores · consulta estratégica 45 min',
+    description: 'Si te despidieron sin justificación, sufriste acoso laboral o creemos que te calcularon mal el finiquito, evaluamos tu caso en sesión por Google Meet. Si tiene mérito, lo tomamos a porcentaje: pagas sólo si recuperamos.',
     benefits: [
-      'Diagnóstico gratuito de tu caso por Google Meet.',
+      'Consulta estratégica por Google Meet (45 min).',
       'Cálculo real de tu indemnización por despido.',
       'Evaluación de tutela laboral, Ley Karin y nulidad del despido.',
       'Honorarios sólo si recuperas (cobro a porcentaje).'
