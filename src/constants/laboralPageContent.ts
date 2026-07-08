@@ -12,7 +12,7 @@ export const LABORAL_FAQ_ITEMS: LaboralFaqItem[] = [
   {
     question: '¿Cuánto cuesta iniciar el caso?',
     answer:
-      'La consulta estratégica inicial tiene un valor fijo, 100% acreditable al plan completo si decides avanzar con nosotros. Sin costos ocultos.',
+      'El diagnóstico laboral inicial (despido, finiquito y tutela de derechos) es gratuito: primera sesión sin costo cuando corresponde, y si asumimos el caso a porcentaje pagas honorarios solo si recuperas. Otras vías tienen tarifa publicada: defensa Ley Karin (Ley 21.643) desde $79.000 y comparendo de conciliación en la Región Metropolitana desde $35.000. Todas las tarifas se muestran antes de pagar en la sección de planes.',
   },
   {
     question: '¿La consulta es online o presencial?',

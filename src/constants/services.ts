@@ -13,14 +13,12 @@ export const serviceCatalog: Record<string, Service> = {
     note: 'Solo para probar la automatización',
   },
 
-  // ===== Tutela Laboral (consulta trabajadores) =====
+  // ===== Tutela Laboral GRATIS (lead magnet a porcentaje) =====
   'tutela-laboral': {
-    name: 'Punto Legal Laboral',
-    price: '20.000',
+    name: 'Punto Legal Laboral — Diagnóstico gratis',
+    price: '0',
     category: 'Laboral',
-    originalPrice: '89.000',
-    discount: '78% OFF',
-    note: 'Consulta 45 min · plan por escrito',
+    note: 'Diagnóstico gratuito · Honorarios sólo si recuperamos',
   },
 
   // ===== Personas =====

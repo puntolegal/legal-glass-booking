@@ -3,7 +3,6 @@ import type { LucideIcon } from 'lucide-react'
 import {
   Scale,
   FileText,
-  Users,
   TrendingUp,
   Shield,
   Globe,
@@ -17,10 +16,8 @@ import {
   Award,
   Clock,
   ListOrdered,
-  Sparkles,
   Receipt,
   Timer,
-  Map,
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useState, useEffect } from 'react'
@@ -179,71 +176,6 @@ const laboralPlazosCards: { icon: LucideIcon; title: string; body: string }[] = 
     title: 'Ley Karin: investigación en la empresa',
     body:
       'La ley fija plazos máximos para la investigación interna (30 días hábiles, con ampliaciones calificadas). Si el protocolo no se respetó, puede ser relevante en la estrategia; tu abogado aplica al expediente.',
-  },
-]
-
-const laboralDecisionMap = [
-  {
-    title: 'Despido, finiquito o carta de término',
-    body:
-      'Revisión de causal, plazo hacia el Juzgado de Letras del Trabajo y alternativas (negociación, mediación, demanda).',
-    to: '/agendamiento?plan=laboral',
-    cta: 'Ir a despido y finiquito',
-    priceHint: 'Evaluación sin costo cuando aplica',
-  },
-  {
-    title: 'Acoso, hostigamiento o vulneración de derechos',
-    body: 'Tutela de derechos fundamentales: documentación, plazos y siguientes pasos con lenguaje claro.',
-    to: '/agendamiento?plan=tutela-laboral',
-    cta: 'Diagnóstico gratis',
-    priceHint: 'Sin costo cuando corresponde',
-  },
-  {
-    title: 'Ley 21.643 — defensa del trabajador',
-    body: 'Sesión de defensa con análisis de protocolo, investigación interna y posición ante la DT.',
-    to: '/agendamiento?plan=defensa-karin-trabajador',
-    cta: 'Agendar defensa Ley Karin',
-    priceHint: '$79.000',
-  },
-  {
-    title: 'Comparendo de conciliación (RM)',
-    body: 'Instancia ante la Dirección del Trabajo; no reemplaza una demanda laboral si no hay acuerdo.',
-    to: '/agendamiento?plan=comparendo-rm',
-    cta: 'Agendar comparendo RM',
-    priceHint: '$35.000',
-  },
-] as const
-
-const differentiators = [
-  {
-    icon: Sparkles,
-    title: 'Información que equilibra la mesa',
-    description:
-      'Traducimos la jerga a decisiones concretas: plazos, riesgos y opciones. El objetivo es que negocies o litigues con el panorama claro, no a ciegas.',
-  },
-  {
-    icon: Clock,
-    title: 'Contacto en horario hábil',
-    description:
-      'Gestionamos agendamientos y consultas según disponibilidad. Los plazos judiciales y administrativos los explica tu abogado según tu caso.',
-  },
-  {
-    icon: Award,
-    title: 'Honorarios informados',
-    description:
-      'Antes de contratar, conoces la tarifa publicada del servicio (o el acuerdo escrito si aplica patrocinio a porcentaje).',
-  },
-  {
-    icon: Shield,
-    title: 'Secreto profesional',
-    description:
-      'La información se maneja conforme al deber de secreto del abogado (Código Orgánico de Tribunales).',
-  },
-  {
-    icon: Users,
-    title: 'Enfoque laboral',
-    description:
-      'Orientación en derecho del trabajo chileno: despidos, tutela, Ley 21.643 y procedimientos ante la Dirección del Trabajo.',
   },
 ]
 
@@ -530,7 +462,7 @@ function ServicioLaboralInner({
                     <span>Despido y finiquito</span>
                   </span>
                   <span className={`text-xs font-medium ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-                    $0 en catálogo cuando aplica
+                    Revisión de causal y finiquito
                   </span>
                 </Link>
               </div>
@@ -542,7 +474,7 @@ function ServicioLaboralInner({
               >
                 <p className="mb-1.5">
                   <Clock className="mr-1 inline h-3.5 w-3.5 align-text-bottom" aria-hidden />
-                  Cupos limitados de diagnóstico semanal según capacidad de agenda.
+                  Agenda según disponibilidad; te confirmamos la reunión en horario hábil.
                 </p>
                 <p>
                   Consultas pagadas con tarifa publicada: defensa Ley Karin $79.000 · comparendo RM $35.000 (CLP, sin
@@ -611,7 +543,7 @@ function ServicioLaboralInner({
                 >
                   <span className={`text-sm font-semibold ${ui.viasCardTitle}`}>Despido y finiquito</span>
                   <span className={`mt-1 text-[11px] leading-snug ${ui.viasCardMuted}`}>
-                    Evaluación sin costo cuando aplica
+                    Revisión de causal y finiquito
                   </span>
                 </Link>
                 <Link
@@ -700,52 +632,18 @@ function ServicioLaboralInner({
               <p className={`mt-6 text-xs leading-relaxed ${ui.textCaption}`}>
                 Orientación informativa; cada caso tiene matices de cómputo, feriados y excepciones legales.
               </p>
-            </div>
-          </div>
-        </section>
-
-        {/* Mapa de decisiones internas */}
-        <section className={`relative border-b py-10 md:py-12 ${ui.borderSection}`}>
-          <div className="container mx-auto max-w-6xl px-4">
-            <div className={`${ui.glassPanel} p-6 md:p-8`}>
-              <div className="mb-4 flex items-start gap-3">
-                <span
-                  className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${
-                    isDark
-                      ? 'border border-white/[0.08] bg-white/[0.06]'
-                      : 'border border-slate-200/80 bg-white/80'
-                  }`}
+              <div className="mt-6 flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <p className={`text-sm font-medium ${ui.textStrong}`}>
+                  ¿Tu plazo corre? No lo dejes vencer: evaluamos tu caso sin costo.
+                </p>
+                <Link
+                  to="/agendamiento?plan=tutela-laboral"
+                  className={`inline-flex min-h-[44px] shrink-0 items-center gap-2 rounded-xl px-6 py-3 font-semibold touch-manipulation active:scale-[0.98] ${t.btnPrimary} ${t.btnPrimaryHover}`}
                 >
-                  <Map className={`h-5 w-5 ${isDark ? 'text-slate-400' : 'text-slate-600'}`} aria-hidden />
-                </span>
-                <div>
-                  <h2 className={`text-xl md:text-2xl font-bold ${ui.textTitle}`}>Mapa de decisiones</h2>
-                  <p className={`mt-1 text-sm leading-relaxed ${ui.textBody}`}>
-                    Elige la puerta de entrada al agendador según tu situación; las tarifas publicadas se confirman al
-                    reservar.
-                  </p>
-                </div>
+                  <Calendar className="h-4 w-4 shrink-0" aria-hidden />
+                  Pedir mi diagnóstico gratis
+                </Link>
               </div>
-              <ul className="grid gap-3 md:grid-cols-2">
-                {laboralDecisionMap.map((row) => (
-                  <li key={row.title}>
-                    <Link
-                      to={row.to}
-                      className={`group flex min-h-[44px] flex-col rounded-2xl p-4 transition touch-manipulation active:scale-[0.99] ${ui.glassCard} ${isDark ? 'hover:bg-white/[0.07]' : 'hover:bg-white/[0.85]'}`}
-                    >
-                      <span className={`text-sm font-semibold ${ui.textTitle}`}>{row.title}</span>
-                      <span className={`mt-1 text-xs leading-relaxed ${ui.textBody}`}>{row.body}</span>
-                      <span className={`mt-3 flex items-center justify-between gap-2 text-xs font-medium ${ui.textStrong}`}>
-                        <span className="inline-flex items-center gap-1">
-                          {row.cta}
-                          <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
-                        </span>
-                        <span className={`font-normal ${ui.textCaption}`}>{row.priceHint}</span>
-                      </span>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
             </div>
           </div>
         </section>
@@ -793,7 +691,7 @@ function ServicioLaboralInner({
                       to="/agendamiento?plan=laboral"
                       className={`inline-flex min-h-[44px] items-center gap-2 px-6 py-3 rounded-xl font-semibold touch-manipulation active:scale-[0.98] ${t.btnOutline} ${t.btnOutlineHover}`}
                     >
-                      Despido y finiquito · gratis
+                      Despido y finiquito
                     </Link>
                   </div>
                 </div>
@@ -802,49 +700,9 @@ function ServicioLaboralInner({
           </div>
         </section>
 
-        {/* DIFERENCIADORES */}
-        <section className="py-14 md:py-20">
-          <div className="container mx-auto px-4 max-w-6xl">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
-              className="text-center mb-10 md:mb-14"
-            >
-              <h2 className={`text-3xl md:text-4xl font-bold mb-3 ${ui.textTitle}`}>
-                ¿Por qué elegir <span className={ui.headlineAccent}>Punto Legal Laboral</span>?
-              </h2>
-              <p className={`max-w-2xl mx-auto ${ui.textBody}`}>
-                Equipo con foco en derecho del trabajo chileno: rigor en plazos y causales, comunicación sin humo y
-                alcance definido en cada servicio.
-              </p>
-            </motion.div>
-
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 md:gap-5">
-              {differentiators.map((d, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 16 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.45, delay: index * 0.07 }}
-                  className={`${ui.glassCard} p-5 md:p-6 transition-colors duration-300 ${t.cardHover}`}
-                >
-                  <div className={`mb-4 flex h-11 w-11 items-center justify-center rounded-2xl ${t.iconBox}`}>
-                    <d.icon className={`h-5 w-5 ${ui.serviceIcon}`} />
-                  </div>
-                  <h3 className={`text-base md:text-lg font-semibold mb-2 ${ui.textTitle}`}>{d.title}</h3>
-                  <p className={`text-sm leading-relaxed ${ui.textBody}`}>{d.description}</p>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* SERVICIOS */}
+        {/* SERVICIOS + POR QUÉ ELEGIRNOS (bloque unificado) */}
         <section className={`py-16 md:py-20 ${t.sectionWash}`}>
-          <div className="container mx-auto px-4">
+          <div className="container mx-auto px-4 max-w-6xl">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -856,7 +714,8 @@ function ServicioLaboralInner({
                 Servicios de <span className={ui.headlineAccent}>derecho laboral</span>
               </h2>
               <p className={`text-lg max-w-2xl mx-auto ${ui.textBody}`}>
-                Evaluamos viabilidad según tus antecedentes; sin promesas de resultado.
+                Foco en derecho del trabajo chileno: rigor en plazos y causales, comunicación sin humo y alcance
+                definido. Evaluamos viabilidad según tus antecedentes, sin promesas de resultado.
               </p>
             </motion.div>
 
@@ -889,6 +748,27 @@ function ServicioLaboralInner({
                   </ul>
                 </motion.div>
               ))}
+            </div>
+
+            <div className="mt-10 flex flex-col items-center gap-3 text-center">
+              <div className="flex flex-wrap justify-center gap-2">
+                {trustChips.map(({ icon: Icon, label }) => (
+                  <span
+                    key={label}
+                    className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium ${ui.glassCard} ${ui.textBody}`}
+                  >
+                    <Icon className={`h-3.5 w-3.5 shrink-0 ${ui.serviceIcon}`} aria-hidden />
+                    {label}
+                  </span>
+                ))}
+              </div>
+              <Link
+                to="/agendamiento?plan=tutela-laboral"
+                className={`mt-2 inline-flex min-h-[48px] items-center gap-2 rounded-xl px-7 py-3 font-semibold touch-manipulation active:scale-[0.98] ${t.btnPrimary} ${t.btnPrimaryHover}`}
+              >
+                <Calendar className="h-4 w-4 shrink-0" aria-hidden />
+                Pedir mi diagnóstico gratis
+              </Link>
             </div>
           </div>
         </section>
@@ -1036,6 +916,10 @@ function ServicioLaboralInner({
                 />
               ))}
             </div>
+            <p className={`mt-8 text-center text-xs leading-relaxed ${ui.textCaption}`}>
+              Experiencias de clientes reales; los nombres pueden estar modificados por confidencialidad. Cada caso
+              depende de sus hechos y prueba: resultados pasados no garantizan resultados futuros.
+            </p>
           </div>
         </section>
 
@@ -1053,6 +937,13 @@ function ServicioLaboralInner({
                 <LaboralFaqItem key={i} item={item} accentClass={ui.faqAccent} isDark={isDark} />
               ))}
             </div>
+            <p className={`mt-8 text-center text-sm ${ui.textBody}`}>
+              ¿Quieres ver las tarifas de cada vía?{' '}
+              <a href="#entrada-laboral" className={`font-semibold underline underline-offset-4 ${ui.textStrong}`}>
+                Revisa los planes y precios
+              </a>
+              .
+            </p>
           </div>
         </section>
 
@@ -1092,7 +983,7 @@ function ServicioLaboralInner({
                     to="/agendamiento?plan=laboral"
                     className={`inline-flex min-h-[44px] items-center justify-center gap-2 px-8 py-4 rounded-2xl font-semibold touch-manipulation active:scale-[0.98] ${t.btnOutline} ${t.btnOutlineHover}`}
                   >
-                    Despido y finiquito · gratis
+                    Despido y finiquito
                   </Link>
                 </div>
               </div>
@@ -1132,7 +1023,7 @@ function ServicioLaboralInner({
                   : 'text-teal-800 hover:bg-slate-100/80'
               }`}
             >
-              Despido y finiquito · $0 en catálogo si aplica
+              Despido y finiquito
             </Link>
             <a
               href="#entrada-laboral"
