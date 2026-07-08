@@ -186,6 +186,17 @@ const trustChips: { icon: LucideIcon; label: string }[] = [
   { icon: Shield, label: 'Plazos y causales explicados en claro' },
 ]
 
+/** Materias laborales de alta búsqueda (SEO on-page + reconocimiento del problema). */
+const laboralMateriasChips: string[] = [
+  'Despido injustificado',
+  'Nulidad del despido',
+  'Finiquito mal calculado',
+  'Tutela de derechos fundamentales',
+  'Autodespido (Art. 171)',
+  'Ley Karin (Ley 21.643)',
+  'Horas extra impagas',
+]
+
 /** Planes mostrados en la página (sincronizar slugs con `constants/services.ts`). */
 const laboralPlanes = [
   {
@@ -392,17 +403,35 @@ function ServicioLaboralInner({
                 id="laboral-hero-title"
                 className={`text-4xl md:text-5xl lg:text-6xl font-extrabold mb-6 leading-[1.05] tracking-tight font-[family-name:Manrope] ${ui.textTitle}`}
               >
-                Asesoría laboral
+                Abogado laboral en Chile
                 <br />
-                <span className={ui.headlineAccent}>para personas y trabajadores</span>
+                <span className={ui.headlineAccent}>despido, finiquito y tutela</span>
               </h1>
 
               <p
                 id="laboral-hero-lead"
                 className={`text-lg md:text-xl mb-4 leading-relaxed max-w-2xl mx-auto ${ui.textBody}`}
               >
-                Traducimos la ley a decisiones posibles. Sin jerga incomprensible.
+                Agenda tu consulta con un{' '}
+                <strong className={ui.textStrong}>abogado laboral especializado</strong> para revisar tu{' '}
+                <strong className={ui.textStrong}>despido, finiquito o tutela de derechos fundamentales</strong>.
+                Evaluamos despido injustificado, nulidad del despido y Ley Karin, y traducimos la ley a decisiones
+                posibles, sin jerga.
               </p>
+
+              <ul
+                className="mx-auto mb-6 flex max-w-2xl flex-wrap justify-center gap-2"
+                aria-label="Materias laborales que revisamos"
+              >
+                {laboralMateriasChips.map((materia) => (
+                  <li
+                    key={materia}
+                    className={`inline-flex items-center rounded-full px-3 py-1.5 text-xs font-medium ${ui.glassCard} ${ui.textBody}`}
+                  >
+                    {materia}
+                  </li>
+                ))}
+              </ul>
               <ul
                 className={`mx-auto mb-6 flex max-w-lg flex-col gap-2.5 text-left text-sm md:text-base ${ui.textBody}`}
               >
@@ -714,8 +743,8 @@ function ServicioLaboralInner({
                 Servicios de <span className={ui.headlineAccent}>derecho laboral</span>
               </h2>
               <p className={`text-lg max-w-2xl mx-auto ${ui.textBody}`}>
-                Foco en derecho del trabajo chileno: rigor en plazos y causales, comunicación sin humo y alcance
-                definido. Evaluamos viabilidad según tus antecedentes, sin promesas de resultado.
+                Despido injustificado, nulidad del despido, finiquito, tutela de derechos fundamentales y Ley Karin:
+                evaluamos viabilidad según tus antecedentes, con rigor en plazos y causales y sin promesas de resultado.
               </p>
             </motion.div>
 
@@ -965,11 +994,12 @@ function ServicioLaboralInner({
 
               <div className="relative z-10">
                 <h2 className={`text-3xl lg:text-4xl font-bold mb-4 leading-tight ${ui.textTitle}`}>
-                  ¿Necesitas asesoría laboral <span className={ui.headlineAccent}>ahora</span>?
+                  Agenda tu consulta con un <span className={ui.headlineAccent}>abogado laboral</span>
                 </h2>
                 <p className={`mb-8 max-w-xl mx-auto ${ui.textBody}`}>
-                  Agenda una sesión: en la reunión revisamos hechos, documentos y alternativas. Los honorarios del
-                  servicio que contrates se informan antes de pagar; no prometemos resultados en juicio.
+                  En la reunión revisamos tu despido, finiquito, tutela de derechos fundamentales o Ley Karin: hechos,
+                  documentos, plazos y alternativas. Los honorarios del servicio que contrates se informan antes de
+                  pagar; no prometemos resultados en juicio.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-3 justify-center">
                   <Link
