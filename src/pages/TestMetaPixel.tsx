@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { META_PIXEL_ID } from '@/lib/metaPixel';
 import { trackMetaEvent } from '@/services/metaConversionsService';
 
 /**
@@ -62,7 +63,7 @@ const TestMetaPixel: React.FC = () => {
                 )}
               </p>
               <p className="text-xs text-slate-400">
-                <strong>Pixel ID:</strong> 1101807351995991 | <strong>Dataset ID:</strong> 930048081990153
+                <strong>Pixel ID:</strong> {META_PIXEL_ID} | <strong>Dataset ID:</strong> 930048081990153
               </p>
             </div>
           </div>

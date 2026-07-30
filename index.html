@@ -55,14 +55,22 @@
     <!-- Canonical URL -->
     <link rel="canonical" href="https://puntolegal.online" />
     
-    <!-- Preconnect to external domains -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-
-    <!-- Luminescent Authority typography: Manrope (display) + Inter (body) -->
+    <!-- Tipografía self-hosted (Manrope display + Inter body): los @font-face
+         viven en el CSS del bundle; aquí solo precargamos los dos archivos
+         que pintan el primer render (cuerpo 400 y titulares 800). -->
     <link
-      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap"
-      rel="stylesheet"
+      rel="preload"
+      href="/fonts/inter-400-latin.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      href="/fonts/manrope-800-latin.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
     />
     
     <!-- Meta Pixel Code -->

@@ -1,9 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { useLocation } from 'react-router-dom';
-import MobileSidebar from './MobileSidebar';
-import ApuntesHeader from './ApuntesHeader';
 import { useSidebar } from '@/contexts/SidebarContext';
 import { useTheme } from '@/hooks/useTheme';
+
+// Lazy: ambos usan framer-motion; cargarlos estáticos arrastraría ese chunk
+// al bundle de entrada de todas las rutas.
+const MobileSidebar = lazy(() => import('./MobileSidebar'));
+const ApuntesHeader = lazy(() => import('./ApuntesHeader'));
 
 interface MobileLayoutProps {
   children: React.ReactNode;
@@ -21,6 +24,12 @@ export const MobileLayout: React.FC<MobileLayoutProps> = ({
   const [isHeaderVisible, setIsHeaderVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   const { isOpen, closeSidebar } = useSidebar();
+  // El sidebar se monta recién en la primera apertura (evita descargar su
+  // chunk si el usuario nunca lo abre); luego queda montado para animar cierre.
+  const [sidebarMounted, setSidebarMounted] = useState(false);
+  useEffect(() => {
+    if (isOpen) setSidebarMounted(true);
+  }, [isOpen]);
   const location = useLocation();
   const isLanding = location.pathname === '/';
   const isGlassCanvasRoute = isLanding || location.pathname === '/servicios/inmobiliario';
@@ -65,7 +74,11 @@ export const MobileLayout: React.FC<MobileLayoutProps> = ({
         />
       )}
       <div className="relative z-10 min-h-screen">
-        {showHeader && headerVariant === 'apuntes' && <ApuntesHeader />}
+        {showHeader && headerVariant === 'apuntes' && (
+          <Suspense fallback={null}>
+            <ApuntesHeader />
+          </Suspense>
+        )}
 
         <main
           className={`transition-all duration-300 ${
@@ -78,7 +91,11 @@ export const MobileLayout: React.FC<MobileLayoutProps> = ({
           {children}
         </main>
 
-        <MobileSidebar open={isOpen} onClose={closeSidebar} />
+        {sidebarMounted && (
+          <Suspense fallback={null}>
+            <MobileSidebar open={isOpen} onClose={closeSidebar} />
+          </Suspense>
+        )}
       </div>
     </div>
   );

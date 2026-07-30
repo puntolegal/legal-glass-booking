@@ -48,19 +48,15 @@ export default defineConfig(({ mode }) => ({
     sourcemap: false,
     rollupOptions: {
       output: {
-        // Add timestamp to force cache busting
-        entryFileNames: `assets/[name]-[hash]-${Date.now()}.js`,
-        chunkFileNames: `assets/[name]-[hash]-${Date.now()}.js`,
-        assetFileNames: `assets/[name]-[hash]-${Date.now()}.[ext]`,
-        manualChunks: {
-          vendor: ['react', 'react-dom'],
-          router: ['react-router-dom'],
-          ui: ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu', '@radix-ui/react-select'],
-          animations: ['framer-motion'],
-          supabase: ['@supabase/supabase-js'],
-          mercadopago: ['@mercadopago/sdk-js', '@mercadopago/sdk-react'],
-          utils: ['date-fns', 'clsx', 'tailwind-merge'],
-        },
+        // El [hash] de contenido ya hace cache busting: solo cambian de nombre
+        // los chunks que realmente cambian, y el resto queda cacheado entre deploys.
+        entryFileNames: `assets/[name]-[hash].js`,
+        chunkFileNames: `assets/[name]-[hash].js`,
+        assetFileNames: `assets/[name]-[hash].[ext]`,
+        // Sin manualChunks: con el code splitting por ruta (React.lazy) Rollup
+        // calcula solo los chunks compartidos. La asignación manual anterior
+        // provocaba dependencias circulares entre chunks (página en blanco por
+        // "Object.defineProperty called on non-object" al inicializar módulos).
       },
     },
     chunkSizeWarningLimit: 1000,

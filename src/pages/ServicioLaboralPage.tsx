@@ -1,4 +1,3 @@
-import { motion, AnimatePresence } from 'framer-motion'
 import type { LucideIcon } from 'lucide-react'
 import {
   Scale,
@@ -22,6 +21,7 @@ import {
 import { Link } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import SEO from '../components/SEO'
+import LaboralAgendarLink from '@/components/servicios/LaboralAgendarLink'
 import { PUNTO_LEGAL_PUBLIC_AUTHOR } from '@/constants/brandIdentity'
 import { LABORAL_FAQ_ITEMS, type LaboralFaqItem as LaboralFaqEntry } from '@/constants/laboralPageContent'
 import { siteUrl } from '@/config/siteUrl'
@@ -31,6 +31,7 @@ import { LaboralThemeToggle } from '@/components/servicios/LaboralThemeToggle'
 import { getLaboralPageSkin } from '@/components/servicios/laboralPageSkin'
 import { useServicioTheme } from '@/components/servicios/servicioThemeContext'
 import TestimonialBubble from '@/components/servicios/TestimonialBubble'
+import Reveal from '@/components/ui/Reveal'
 import { useTheme } from '@/hooks/useTheme'
 
 const services = [
@@ -287,6 +288,10 @@ export default function ServicioLaboralPage() {
         showSiteHeader={false}
         contentName="Punto Legal — Derecho Laboral"
         contentCategory="Servicios Legales — Derecho Laboral"
+        metaContentIds={['laboral', 'tutela-laboral']}
+        metaContentType="service_category"
+        metaValue={0}
+        metaSource="servicios_laboral"
       >
         <ServicioLaboralInner colorMode={colorMode} onToggleColorMode={toggleTheme} />
       </ServicioPageShell>
@@ -311,6 +316,20 @@ function ServicioLaboralInner({
     onScroll()
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
+  // Prefetch en idle del chunk de agendamiento: todos los CTAs de esta página
+  // llevan a /agendamiento, así el clic navega sin esperar la descarga.
+  useEffect(() => {
+    const prefetch = () => {
+      import('@/pages/AgendamientoPage').catch(() => {})
+    }
+    if ('requestIdleCallback' in window) {
+      const id = window.requestIdleCallback(prefetch, { timeout: 4000 })
+      return () => window.cancelIdleCallback(id)
+    }
+    const id = window.setTimeout(prefetch, 2500)
+    return () => window.clearTimeout(id)
   }, [])
 
   return (
@@ -352,13 +371,13 @@ function ServicioLaboralInner({
                 'Punto Legal'
               )}
             </Link>
-            <Link
+            <LaboralAgendarLink
               to="/agendamiento?plan=tutela-laboral"
               className={`inline-flex min-h-[40px] shrink-0 items-center justify-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold touch-manipulation active:scale-[0.98] ${t.btnPrimary} ${t.btnPrimaryHover}`}
             >
               <Calendar className="h-4 w-4 shrink-0" aria-hidden />
               Diagnóstico gratis
-            </Link>
+            </LaboralAgendarLink>
           </div>
         </div>
       </header>
@@ -367,10 +386,10 @@ function ServicioLaboralInner({
         {/* HERO — superficie clara, menos contraste fatigante */}
         <section className="relative pt-14 md:pt-16 pb-10 md:pb-16 overflow-hidden">
           <div
-            className={`pointer-events-none absolute -top-28 -right-28 h-[22rem] w-[22rem] rounded-full blur-2xl ${ui.heroBlobTR}`}
+            className={`pointer-events-none absolute -top-28 -right-28 hidden h-[22rem] w-[22rem] rounded-full blur-2xl md:block ${ui.heroBlobTR}`}
           />
           <div
-            className={`pointer-events-none absolute -bottom-24 -left-24 h-[20rem] w-[20rem] rounded-full blur-2xl ${ui.heroBlobBL}`}
+            className={`pointer-events-none absolute -bottom-24 -left-24 hidden h-[20rem] w-[20rem] rounded-full blur-2xl md:block ${ui.heroBlobBL}`}
           />
           {/* línea decorativa suave (ritmo visual, sin competir con el CTA) */}
           <div
@@ -379,12 +398,7 @@ function ServicioLaboralInner({
           />
 
           <div className="container mx-auto px-4 sm:px-5 relative z-10">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              className="text-center max-w-4xl mx-auto"
-            >
+            <div className="text-center max-w-4xl mx-auto pl-anim-fade-up">
               <div className={`inline-flex items-center gap-2 rounded-full px-3.5 py-2 mb-6 ${ui.heroPill}`}>
                 <Shield className={`h-4 w-4 shrink-0 ${ui.heroBadgeIcon}`} aria-hidden />
                 <span className={`text-xs font-medium tracking-wide ${ui.heroBadgeText}`}>
@@ -474,15 +488,15 @@ function ServicioLaboralInner({
               </p>
 
               <div className="flex flex-col sm:flex-row flex-wrap gap-3 justify-center items-stretch sm:items-center">
-                <Link
+                <LaboralAgendarLink
                   to="/agendamiento?plan=tutela-laboral"
                   className={`group min-h-[44px] px-7 py-3.5 rounded-2xl font-semibold inline-flex items-center justify-center gap-2 transition-all duration-300 touch-manipulation active:scale-[0.98] ${t.btnPrimary} ${t.btnPrimaryHover} hover:-translate-y-0.5`}
                 >
                   <Calendar className="w-4 h-4 shrink-0" aria-hidden />
                   Agendar diagnóstico gratis
                   <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-                </Link>
-                <Link
+                </LaboralAgendarLink>
+                <LaboralAgendarLink
                   to="/agendamiento?plan=laboral"
                   className={`group min-h-[44px] px-7 py-3.5 rounded-2xl font-semibold inline-flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 transition-all duration-300 touch-manipulation active:scale-[0.98] ${t.btnOutline} ${t.btnOutlineHover}`}
                 >
@@ -493,7 +507,7 @@ function ServicioLaboralInner({
                   <span className={`text-xs font-medium ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
                     Revisión de causal y finiquito
                   </span>
-                </Link>
+                </LaboralAgendarLink>
               </div>
 
               <div
@@ -537,12 +551,12 @@ function ServicioLaboralInner({
                 ))}
                 </div>
               </div>
-            </motion.div>
+            </div>
           </div>
         </section>
 
         {/* Tres vías */}
-        <section className={`relative border-b py-10 md:py-12 ${ui.borderSection}`}>
+        <section className={`cv-auto relative border-b py-10 md:py-12 ${ui.borderSection}`}>
           <div className="container mx-auto max-w-4xl px-4">
             <div className={`${ui.glassPanel} p-6 md:p-8`}>
               <h2 className={`text-center text-lg font-semibold md:text-xl ${ui.textTitle}`}>
@@ -554,7 +568,7 @@ function ServicioLaboralInner({
                 Karin y comparendo RM tienen tarifa publicada al agendar.
               </p>
               <div className="mt-6 grid gap-3 sm:grid-cols-3">
-                <Link
+                <LaboralAgendarLink
                   to="/agendamiento?plan=tutela-laboral"
                   className={`relative flex min-h-[44px] flex-col justify-center rounded-2xl px-4 py-4 text-center transition touch-manipulation active:scale-[0.98] ${t.cardPopularRing} ${ui.viasPrimaryBg}`}
                 >
@@ -565,8 +579,8 @@ function ServicioLaboralInner({
                   <span className={`mt-1 text-[11px] leading-snug ${ui.viasCardMuted}`}>
                     Primera evaluación sin costo si aplica
                   </span>
-                </Link>
-                <Link
+                </LaboralAgendarLink>
+                <LaboralAgendarLink
                   to="/agendamiento?plan=laboral"
                   className={`flex min-h-[44px] flex-col justify-center rounded-2xl px-4 py-4 text-center transition touch-manipulation active:scale-[0.98] ${ui.viasSecondary}`}
                 >
@@ -574,8 +588,8 @@ function ServicioLaboralInner({
                   <span className={`mt-1 text-[11px] leading-snug ${ui.viasCardMuted}`}>
                     Revisión de causal y finiquito
                   </span>
-                </Link>
-                <Link
+                </LaboralAgendarLink>
+                <LaboralAgendarLink
                   to="/agendamiento?plan=defensa-karin-trabajador"
                   className={`flex min-h-[44px] flex-col justify-center rounded-2xl px-4 py-4 text-center transition touch-manipulation active:scale-[0.98] ${ui.viasSecondary}`}
                 >
@@ -583,14 +597,14 @@ function ServicioLaboralInner({
                   <span className={`mt-1 text-[11px] leading-snug ${ui.viasCardMuted}`}>
                     Consulta $79.000 · sesión y plan por escrito
                   </span>
-                </Link>
+                </LaboralAgendarLink>
               </div>
             </div>
           </div>
         </section>
 
         {/* Cuatro pasos */}
-        <section className={`relative border-b py-10 md:py-14 ${ui.borderSection}`}>
+        <section className={`cv-auto relative border-b py-10 md:py-14 ${ui.borderSection}`}>
           <div className="container mx-auto max-w-6xl px-4">
             <div className={`${ui.glassPanel} p-6 md:p-8`}>
               <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4 mb-6">
@@ -607,13 +621,13 @@ function ServicioLaboralInner({
                     fin.
                   </p>
                 </div>
-                <Link
+                <LaboralAgendarLink
                   to="/agendamiento?plan=tutela-laboral"
                   className={`shrink-0 inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold touch-manipulation active:scale-[0.98] ${t.btnOutline} ${t.btnOutlineHover}`}
                 >
                   <Calendar className="h-4 w-4" aria-hidden />
                   Empezar por agendar
-                </Link>
+                </LaboralAgendarLink>
               </div>
               <ol className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
                 {procesoMicroPasos.map((s) => (
@@ -631,7 +645,7 @@ function ServicioLaboralInner({
         </section>
 
         {/* Plazos frecuentes (SEO + CRO) */}
-        <section className={`relative border-b py-10 md:py-14 ${ui.borderSection}`}>
+        <section className={`cv-auto relative border-b py-10 md:py-14 ${ui.borderSection}`}>
           <div className="container mx-auto max-w-6xl px-4">
             <div className={`${ui.glassPanel} p-6 md:p-8`}>
               <h2 className={`text-xl md:text-2xl font-bold ${ui.textTitle}`}>
@@ -665,29 +679,24 @@ function ServicioLaboralInner({
                 <p className={`text-sm font-medium ${ui.textStrong}`}>
                   ¿Tu plazo corre? No lo dejes vencer: evaluamos tu caso sin costo.
                 </p>
-                <Link
+                <LaboralAgendarLink
                   to="/agendamiento?plan=tutela-laboral"
                   className={`inline-flex min-h-[44px] shrink-0 items-center gap-2 rounded-xl px-6 py-3 font-semibold touch-manipulation active:scale-[0.98] ${t.btnPrimary} ${t.btnPrimaryHover}`}
                 >
                   <Calendar className="h-4 w-4 shrink-0" aria-hidden />
                   Pedir mi diagnóstico gratis
-                </Link>
+                </LaboralAgendarLink>
               </div>
             </div>
           </div>
         </section>
 
         {/* LEY KARIN — prioridad emocional tras el proceso (leads urgentes) */}
-        <section className="py-12 md:py-16">
+        <section className="cv-auto py-12 md:py-16">
           <div className="container mx-auto max-w-6xl px-4">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className={`${ui.glassPanel} p-6 md:p-10 relative overflow-hidden`}
-            >
+            <Reveal className={`${ui.glassPanel} p-6 md:p-10 relative overflow-hidden`}>
               <div
-                className={`pointer-events-none absolute -top-24 -right-24 h-72 w-72 rounded-full blur-2xl ${ui.karinBlob}`}
+                className={`pointer-events-none absolute -top-24 -right-24 hidden h-72 w-72 rounded-full blur-2xl md:block ${ui.karinBlob}`}
               />
               <div className="relative z-10 flex flex-col md:flex-row gap-6 md:gap-10 items-start">
                 <div
@@ -709,36 +718,30 @@ function ServicioLaboralInner({
                     Priorizamos la revisión inicial según urgencia y disponibilidad.
                   </p>
                   <div className="flex flex-wrap gap-3">
-                    <Link
+                    <LaboralAgendarLink
                       to="/agendamiento?plan=tutela-laboral"
                       className={`inline-flex min-h-[44px] items-center gap-2 px-6 py-3 rounded-xl font-semibold touch-manipulation active:scale-[0.98] ${t.btnPrimary} ${t.btnPrimaryHover}`}
                     >
                       <Calendar className="h-4 w-4 shrink-0" aria-hidden />
                       Agendar diagnóstico gratis
-                    </Link>
-                    <Link
+                    </LaboralAgendarLink>
+                    <LaboralAgendarLink
                       to="/agendamiento?plan=laboral"
                       className={`inline-flex min-h-[44px] items-center gap-2 px-6 py-3 rounded-xl font-semibold touch-manipulation active:scale-[0.98] ${t.btnOutline} ${t.btnOutlineHover}`}
                     >
                       Despido y finiquito
-                    </Link>
+                    </LaboralAgendarLink>
                   </div>
                 </div>
               </div>
-            </motion.div>
+            </Reveal>
           </div>
         </section>
 
         {/* SERVICIOS + POR QUÉ ELEGIRNOS (bloque unificado) */}
-        <section className={`py-16 md:py-20 ${t.sectionWash}`}>
+        <section className={`cv-auto py-16 md:py-20 ${t.sectionWash}`}>
           <div className="container mx-auto px-4 max-w-6xl">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
-              className="text-center mb-12"
-            >
+            <Reveal className="text-center mb-12">
               <h2 className={`text-3xl md:text-4xl font-bold mb-4 ${ui.textTitle}`}>
                 Servicios de <span className={ui.headlineAccent}>derecho laboral</span>
               </h2>
@@ -746,36 +749,31 @@ function ServicioLaboralInner({
                 Despido injustificado, nulidad del despido, finiquito, tutela de derechos fundamentales y Ley Karin:
                 evaluamos viabilidad según tus antecedentes, con rigor en plazos y causales y sin promesas de resultado.
               </p>
-            </motion.div>
+            </Reveal>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6">
               {services.map((service, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: index * 0.06 }}
-                  className={`${ui.glassCard} p-6 transition-all duration-300 group ${t.cardHover}`}
-                >
-                  <div
-                    className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-5 group-hover:scale-105 transition-transform duration-300 ${t.iconBox}`}
-                  >
-                    <service.icon className={`w-6 h-6 ${ui.serviceIcon}`} />
+                <Reveal key={index} delayMs={index * 60}>
+                  <div className={`${ui.glassCard} p-6 h-full transition-all duration-300 group ${t.cardHover}`}>
+                    <div
+                      className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-5 group-hover:scale-105 transition-transform duration-300 ${t.iconBox}`}
+                    >
+                      <service.icon className={`w-6 h-6 ${ui.serviceIcon}`} />
+                    </div>
+
+                    <h3 className={`text-lg font-bold mb-2.5 ${ui.textTitle}`}>{service.title}</h3>
+                    <p className={`text-sm mb-5 leading-relaxed ${ui.textBody}`}>{service.description}</p>
+
+                    <ul className="space-y-2">
+                      {service.features.map((feature, fi) => (
+                        <li key={fi} className={`flex items-center gap-2 text-sm ${ui.textList}`}>
+                          <CheckCircle className={`w-4 h-4 shrink-0 ${ui.serviceIcon}`} />
+                          {feature}
+                        </li>
+                      ))}
+                    </ul>
                   </div>
-
-                  <h3 className={`text-lg font-bold mb-2.5 ${ui.textTitle}`}>{service.title}</h3>
-                  <p className={`text-sm mb-5 leading-relaxed ${ui.textBody}`}>{service.description}</p>
-
-                  <ul className="space-y-2">
-                    {service.features.map((feature, fi) => (
-                      <li key={fi} className={`flex items-center gap-2 text-sm ${ui.textList}`}>
-                        <CheckCircle className={`w-4 h-4 shrink-0 ${ui.serviceIcon}`} />
-                        {feature}
-                      </li>
-                    ))}
-                  </ul>
-                </motion.div>
+                </Reveal>
               ))}
             </div>
 
@@ -791,27 +789,21 @@ function ServicioLaboralInner({
                   </span>
                 ))}
               </div>
-              <Link
+              <LaboralAgendarLink
                 to="/agendamiento?plan=tutela-laboral"
                 className={`mt-2 inline-flex min-h-[48px] items-center gap-2 rounded-xl px-7 py-3 font-semibold touch-manipulation active:scale-[0.98] ${t.btnPrimary} ${t.btnPrimaryHover}`}
               >
                 <Calendar className="h-4 w-4 shrink-0" aria-hidden />
                 Pedir mi diagnóstico gratis
-              </Link>
+              </LaboralAgendarLink>
             </div>
           </div>
         </section>
 
         {/* PAQUETES */}
-        <section className="py-16 md:py-20" id="entrada-laboral">
+        <section className="cv-auto py-16 md:py-20 scroll-mt-16 md:scroll-mt-20" id="entrada-laboral">
           <div className="container mx-auto px-4">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
-              className="text-center mb-12"
-            >
+            <Reveal className="text-center mb-12">
               <h2 className={`text-3xl md:text-4xl font-bold mb-3 ${ui.textTitle}`}>
                 Elige tu <span className={ui.headlineAccent}>entrada</span>
               </h2>
@@ -819,20 +811,16 @@ function ServicioLaboralInner({
                 Lo primero es el <strong className={ui.textStrong}>diagnóstico gratis</strong> cuando aplica. Las
                 otras opciones son consultas pagadas con tarifa publicada en el agendamiento.
               </p>
-            </motion.div>
+            </Reveal>
 
             <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
               {laboralPlanes.map((pkg, i) => (
-                <motion.div
-                  key={pkg.plan}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.1 }}
-                  className={`relative ${ui.glassCard} p-7 md:p-8 transition-all duration-300 ${
-                    pkg.popular ? t.cardPopularRing : t.cardHover
-                  }`}
-                >
+                <Reveal key={pkg.plan} delayMs={i * 100}>
+                  <div
+                    className={`relative ${ui.glassCard} p-7 md:p-8 h-full transition-all duration-300 ${
+                      pkg.popular ? t.cardPopularRing : t.cardHover
+                    }`}
+                  >
                   {pkg.popular && pkg.badge && (
                     <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
                       <div className={ui.pkgPopularBadge}>
@@ -875,7 +863,7 @@ function ServicioLaboralInner({
                     ))}
                   </ul>
 
-                  <Link
+                  <LaboralAgendarLink
                     to={`/agendamiento?plan=${pkg.plan}`}
                     className={`group/cta min-h-[44px] w-full rounded-2xl py-3 px-6 font-semibold transition-all duration-300 text-center inline-flex items-center justify-center gap-2 touch-manipulation active:scale-[0.98] ${
                       pkg.popular
@@ -885,15 +873,16 @@ function ServicioLaboralInner({
                   >
                     {pkg.cta}
                     <ArrowRight className="w-4 h-4 transition-transform group-hover/cta:translate-x-1" />
-                  </Link>
-                </motion.div>
+                  </LaboralAgendarLink>
+                  </div>
+                </Reveal>
               ))}
             </div>
           </div>
         </section>
 
         {/* CASOS */}
-        <section className={`py-12 md:py-16 ${t.sectionWash}`}>
+        <section className={`cv-auto py-12 md:py-16 ${t.sectionWash}`}>
           <div className="container mx-auto px-4 max-w-5xl">
             <h2 className={`text-2xl md:text-3xl font-bold text-center mb-3 ${ui.textTitle}`}>
               Ejemplos orientativos
@@ -903,13 +892,7 @@ function ServicioLaboralInner({
             </p>
             <div className="grid md:grid-cols-3 gap-4 md:gap-6">
               {successCases.map((c, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.08 }}
-                >
+                <Reveal key={index} delayMs={index * 80}>
                   <div className={`${ui.glassCard} p-5 h-full text-left`}>
                     <c.icon className={`w-8 h-8 mb-3 ${ui.serviceIcon}`} />
                     <div className={`text-lg md:text-xl font-bold mb-1 ${ui.caseAmount}`}>{c.amount}</div>
@@ -918,23 +901,20 @@ function ServicioLaboralInner({
                       {c.client} · Plan {c.plan}
                     </div>
                   </div>
-                </motion.div>
+                </Reveal>
               ))}
             </div>
           </div>
         </section>
 
         {/* TESTIMONIOS */}
-        <section className="py-14 md:py-20">
+        <section className="cv-auto py-14 md:py-20">
           <div className="container mx-auto px-4">
-            <motion.h2
-              initial={{ opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className={`text-2xl md:text-3xl font-bold text-center mb-12 ${ui.textTitle}`}
-            >
-              Experiencias de personas asesoradas
-            </motion.h2>
+            <Reveal>
+              <h2 className={`text-2xl md:text-3xl font-bold text-center mb-12 ${ui.textTitle}`}>
+                Experiencias de personas asesoradas
+              </h2>
+            </Reveal>
             <div className="grid md:grid-cols-3 gap-6 md:gap-8 max-w-6xl mx-auto">
               {testimonials.map((testimonial, index) => (
                 <TestimonialBubble
@@ -953,7 +933,7 @@ function ServicioLaboralInner({
         </section>
 
         {/* FAQ */}
-        <section id="faq-laboral" className={`py-16 md:py-20 ${t.sectionWash}`}>
+        <section id="faq-laboral" className={`cv-auto py-16 md:py-20 scroll-mt-16 md:scroll-mt-20 ${t.sectionWash}`}>
           <div className="container mx-auto px-4 max-w-3xl">
             <h2 className={`text-2xl md:text-3xl font-bold text-center mb-3 ${ui.textTitle}`}>
               Preguntas frecuentes
@@ -977,19 +957,14 @@ function ServicioLaboralInner({
         </section>
 
         {/* CTA Final */}
-        <section className="py-16 md:py-24">
+        <section className="cv-auto py-16 md:py-24">
           <div className="container mx-auto px-4">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.98 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              className={`max-w-4xl mx-auto text-center ${ui.glassPanel} p-10 md:p-14 relative overflow-hidden`}
-            >
+            <Reveal className={`max-w-4xl mx-auto text-center ${ui.glassPanel} p-10 md:p-14 relative overflow-hidden`}>
               <div
-                className={`pointer-events-none absolute -top-32 -right-32 h-72 w-72 rounded-full blur-2xl ${ui.ctaBlobTR}`}
+                className={`pointer-events-none absolute -top-32 -right-32 hidden h-72 w-72 rounded-full blur-2xl md:block ${ui.ctaBlobTR}`}
               />
               <div
-                className={`pointer-events-none absolute -bottom-32 -left-32 h-72 w-72 rounded-full blur-2xl ${ui.ctaBlobBL}`}
+                className={`pointer-events-none absolute -bottom-32 -left-32 hidden h-72 w-72 rounded-full blur-2xl md:block ${ui.ctaBlobBL}`}
               />
 
               <div className="relative z-10">
@@ -1002,50 +977,48 @@ function ServicioLaboralInner({
                   pagar; no prometemos resultados en juicio.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                  <Link
+                  <LaboralAgendarLink
                     to="/agendamiento?plan=tutela-laboral"
                     className={`inline-flex min-h-[44px] items-center justify-center gap-2 px-8 py-4 rounded-2xl font-semibold touch-manipulation active:scale-[0.98] ${t.btnPrimary} ${t.btnPrimaryHover} hover:-translate-y-0.5`}
                   >
                     <Calendar className="w-5 h-5" />
                     Diagnóstico gratis
-                  </Link>
-                  <Link
+                  </LaboralAgendarLink>
+                  <LaboralAgendarLink
                     to="/agendamiento?plan=laboral"
                     className={`inline-flex min-h-[44px] items-center justify-center gap-2 px-8 py-4 rounded-2xl font-semibold touch-manipulation active:scale-[0.98] ${t.btnOutline} ${t.btnOutlineHover}`}
                   >
                     Despido y finiquito
-                  </Link>
+                  </LaboralAgendarLink>
                 </div>
               </div>
-            </motion.div>
+            </Reveal>
           </div>
         </section>
       </div>
 
       {/* Barra inferior móvil: CTA primario + carril secundario hacia despido y ancla planes */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.5 }}
-        className={`md:hidden fixed bottom-0 left-0 right-0 z-40 ${ui.mobileDock}`}
+      <div
+        className={`md:hidden fixed bottom-0 left-0 right-0 z-40 pl-anim-fade-up ${ui.mobileDock}`}
+        style={{ animationDelay: '0.5s' }}
       >
         <div
           className="mx-auto max-w-lg"
           style={{ paddingBottom: 'max(0.25rem, env(safe-area-inset-bottom))' }}
         >
-          <Link
+          <LaboralAgendarLink
             to="/agendamiento?plan=tutela-laboral"
             className={`flex min-h-[48px] w-full items-center justify-center gap-2 px-4 py-2.5 text-center text-[15px] font-bold touch-manipulation active:brightness-95 ${t.btnPrimary}`}
           >
             <Calendar className="h-4 w-4 shrink-0" aria-hidden />
             Diagnóstico gratis
-          </Link>
+          </LaboralAgendarLink>
           <div
             className={`grid grid-cols-1 gap-0 border-t ${
               isDark ? 'border-white/[0.08]' : 'border-slate-200/85'
             } px-2 pt-1`}
           >
-            <Link
+            <LaboralAgendarLink
               to="/agendamiento?plan=laboral"
               className={`flex min-h-[40px] items-center justify-center rounded-xl px-2 py-1.5 text-center text-[13px] font-semibold touch-manipulation active:opacity-90 ${
                 isDark
@@ -1054,7 +1027,7 @@ function ServicioLaboralInner({
               }`}
             >
               Despido y finiquito
-            </Link>
+            </LaboralAgendarLink>
             <a
               href="#entrada-laboral"
               className={`min-h-[36px] flex items-center justify-center rounded-lg px-2 py-1 text-center text-[11px] font-medium ${
@@ -1065,7 +1038,7 @@ function ServicioLaboralInner({
             </a>
           </div>
         </div>
-      </motion.div>
+      </div>
     </>
   )
 }
@@ -1090,30 +1063,27 @@ function LaboralFaqItem({
         type="button"
         className="w-full flex min-h-[48px] justify-between items-center text-left py-4 touch-manipulation focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-400/30 rounded-lg"
         onClick={() => setOpen(!open)}
+        aria-expanded={open}
       >
         <h3 className={`text-base md:text-lg font-medium pr-4 transition-colors ${q}`}>{item.question}</h3>
-        <motion.div animate={{ rotate: open ? 45 : 0 }} transition={{ duration: 0.2 }}>
+        <span className={`transition-transform duration-200 ${open ? 'rotate-45' : 'rotate-0'}`}>
           {open ? (
             <Minus className={`h-5 w-5 shrink-0 ${accentClass}`} />
           ) : (
             <Plus className={`h-5 w-5 shrink-0 ${accentClass}`} />
           )}
-        </motion.div>
+        </span>
       </button>
-      <AnimatePresence initial={false}>
-        {open && (
-          <motion.div
-            key="content"
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.28, ease: [0.04, 0.62, 0.23, 0.98] }}
-            className="overflow-hidden"
-          >
-            <p className={`pb-4 pr-2 leading-relaxed ${ans}`}>{item.answer}</p>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Acordeón CSS: grid-template-rows 0fr→1fr anima la altura sin JS de animación */}
+      <div
+        className={`grid transition-[grid-template-rows,opacity] duration-300 ease-out ${
+          open ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
+        }`}
+      >
+        <div className="overflow-hidden">
+          <p className={`pb-4 pr-2 leading-relaxed ${ans}`}>{item.answer}</p>
+        </div>
+      </div>
     </div>
   )
 }

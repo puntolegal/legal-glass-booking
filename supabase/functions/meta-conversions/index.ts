@@ -126,7 +126,7 @@ serve(async (req) => {
           ...(event_id ? { event_id } : {}), // Include event_id for deduplication
           event_time: body.event_time || Math.floor(Date.now() / 1000),
           action_source: body.action_source || 'website',
-          event_source_url: event_source_url || 'https://puntolegal.cl',
+          event_source_url: event_source_url || 'https://puntolegal.online',
           user_data: hashedUserData,
           // Only include custom_data if it exists and has values
           ...(custom_data && Object.keys(custom_data).length > 0 ? { custom_data } : {}),

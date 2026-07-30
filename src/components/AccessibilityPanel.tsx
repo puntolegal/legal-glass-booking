@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { Accessibility, Move, Type, X } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
@@ -45,37 +44,30 @@ const AccessibilityPanel: React.FC = () => {
 
   return (
     <>
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            role="presentation"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-[140] bg-slate-950/35 backdrop-blur-[2px] dark:bg-black/55"
-            onClick={() => setIsOpen(false)}
-            aria-hidden
-          />
-        )}
-      </AnimatePresence>
+      {isOpen && (
+        <div
+          role="presentation"
+          className="fixed inset-0 z-[140] bg-slate-950/35 backdrop-blur-[2px] dark:bg-black/55 pl-anim-fade-in"
+          onClick={() => setIsOpen(false)}
+          aria-hidden
+        />
+      )}
 
       {!isOpen ? (
-        <motion.button
+        <button
           type="button"
           onClick={() => setIsOpen(true)}
           className={cn(
-            'fixed z-[155] flex h-10 w-10 items-center justify-center rounded-2xl transition-all touch-manipulation',
+            'fixed z-[155] flex h-10 w-10 items-center justify-center rounded-2xl transition-all touch-manipulation active:scale-[0.94]',
             A11Y_FOCUS_RING,
             accessibilityControlChrome(isDark),
             fabPosition,
           )}
-          whileTap={{ scale: 0.94 }}
           aria-label="Abrir preferencias de accesibilidad"
           title="Accesibilidad"
         >
           <Accessibility className="h-[18px] w-[18px]" strokeWidth={2} aria-hidden />
-        </motion.button>
+        </button>
       ) : (
         <div
           className={cn(

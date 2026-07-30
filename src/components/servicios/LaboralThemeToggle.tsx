@@ -1,4 +1,3 @@
-import { motion } from 'framer-motion'
 import { Moon, Sun } from 'lucide-react'
 
 type ThemeToggleVariant = 'laboral' | 'landing' | 'inline' | 'urgencia'
@@ -46,11 +45,10 @@ export function LaboralThemeToggle({
       : 'border border-slate-200/90 bg-white/[0.88] text-slate-800 shadow-[0_8px_22px_rgba(15,23,42,0.08),inset_0_1px_0_rgba(255,255,255,0.95)] ring-1 ring-slate-900/[0.06] backdrop-blur-2xl backdrop-saturate-150 hover:bg-white/[0.96]'
 
   return (
-    <motion.button
+    <button
       type="button"
       onClick={onToggle}
-      className={`${isInline || isUrgencia ? '' : 'fixed'} ${zClasses} flex ${sizeClasses} items-center justify-center rounded-2xl transition-all touch-manipulation focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-teal-500/50 focus-visible:ring-offset-transparent ${positionClasses} ${surfaceClasses}`}
-      whileTap={{ scale: 0.94 }}
+      className={`${isInline || isUrgencia ? '' : 'fixed'} ${zClasses} flex ${sizeClasses} items-center justify-center rounded-2xl transition-all touch-manipulation active:scale-[0.94] focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-teal-500/50 focus-visible:ring-offset-transparent ${positionClasses} ${surfaceClasses}`}
       aria-label={isDark ? 'Activar modo claro' : 'Activar modo oscuro'}
       title={isDark ? 'Modo claro' : 'Modo oscuro'}
     >
@@ -59,6 +57,6 @@ export function LaboralThemeToggle({
       ) : (
         <Moon className={iconSize} strokeWidth={2} aria-hidden />
       )}
-    </motion.button>
+    </button>
   )
 }

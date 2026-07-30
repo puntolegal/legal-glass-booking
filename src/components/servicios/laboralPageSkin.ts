@@ -5,20 +5,22 @@
 export function getLaboralPageSkin(isDark: boolean) {
   const d = isDark
 
+  /* Blur responsivo: en móvil backdrop-blur-md (12px) — mismo look glass con
+     mucho menos costo de GPU; el blur profundo queda para >= md. */
   const frostLightPanel =
-    'border border-white/80 bg-white/[0.78] backdrop-blur-[28px] backdrop-saturate-150 shadow-[0_16px_44px_rgba(15,23,42,0.07),inset_0_1px_0_rgba(255,255,255,0.92)]'
+    'border border-white/80 bg-white/[0.78] backdrop-blur-md md:backdrop-blur-[20px] backdrop-saturate-150 shadow-[0_16px_44px_rgba(15,23,42,0.07),inset_0_1px_0_rgba(255,255,255,0.92)]'
   const frostDarkPanel =
-    'border border-white/[0.10] bg-[hsla(218,40%,16%,0.52)] backdrop-blur-[32px] backdrop-saturate-150 shadow-[0_24px_52px_rgba(0,0,0,0.48),inset_0_1px_0_rgba(255,255,255,0.12)]'
+    'border border-white/[0.10] bg-[hsla(218,40%,16%,0.52)] backdrop-blur-md md:backdrop-blur-[20px] backdrop-saturate-150 shadow-[0_24px_52px_rgba(0,0,0,0.48),inset_0_1px_0_rgba(255,255,255,0.12)]'
 
   const frostLightCard =
-    'border border-slate-200/80 bg-white/[0.68] backdrop-blur-[22px] backdrop-saturate-150 shadow-[0_10px_30px_rgba(15,23,42,0.06),inset_0_1px_0_rgba(255,255,255,0.82)]'
+    'border border-slate-200/80 bg-white/[0.68] backdrop-blur-md md:backdrop-blur-[20px] backdrop-saturate-150 shadow-[0_10px_30px_rgba(15,23,42,0.06),inset_0_1px_0_rgba(255,255,255,0.82)]'
   const frostDarkCard =
-    'border border-white/[0.09] bg-[hsla(218,45%,13%,0.5)] backdrop-blur-[24px] backdrop-saturate-150 shadow-[0_14px_36px_rgba(0,0,0,0.34),inset_0_1px_0_rgba(255,255,255,0.1)]'
+    'border border-white/[0.09] bg-[hsla(218,45%,13%,0.5)] backdrop-blur-md md:backdrop-blur-[20px] backdrop-saturate-150 shadow-[0_14px_36px_rgba(0,0,0,0.34),inset_0_1px_0_rgba(255,255,255,0.1)]'
 
   const heroPillLight =
-    'border border-white/75 bg-white/[0.62] backdrop-blur-xl backdrop-saturate-150 shadow-[0_8px_28px_rgba(15,23,42,0.06),inset_0_1px_0_rgba(255,255,255,0.88)]'
+    'border border-white/75 bg-white/[0.62] backdrop-blur-md md:backdrop-blur-xl backdrop-saturate-150 shadow-[0_8px_28px_rgba(15,23,42,0.06),inset_0_1px_0_rgba(255,255,255,0.88)]'
   const heroPillDark =
-    'border border-white/[0.1] bg-white/[0.07] backdrop-blur-xl backdrop-saturate-150 shadow-[0_10px_32px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.1)]'
+    'border border-white/[0.1] bg-white/[0.07] backdrop-blur-md md:backdrop-blur-xl backdrop-saturate-150 shadow-[0_10px_32px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.1)]'
 
   const hoverLift =
     'transition-all duration-200 ease-out hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.99]'
@@ -71,8 +73,8 @@ export function getLaboralPageSkin(isDark: boolean) {
       ? `${frostDarkCard} ${hoverLift} hover:bg-[hsla(218,45%,15%,0.56)]`
       : `${frostLightCard} ${hoverLift} hover:bg-white/[0.82]`,
     viasSecondary: d
-      ? `border border-white/[0.08] bg-white/[0.025] backdrop-blur-[28px] backdrop-saturate-150 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] ${hoverLift} hover:bg-white/[0.055] hover:border-white/[0.11]`
-      : `border border-slate-200/70 bg-white/[0.52] backdrop-blur-xl backdrop-saturate-150 shadow-[inset_0_1px_0_rgba(255,255,255,0.85)] ${hoverLift} hover:bg-white/[0.72] hover:border-slate-200/90`,
+      ? `border border-white/[0.08] bg-white/[0.025] backdrop-blur-md md:backdrop-blur-[20px] backdrop-saturate-150 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] ${hoverLift} hover:bg-white/[0.055] hover:border-white/[0.11]`
+      : `border border-slate-200/70 bg-white/[0.52] backdrop-blur-md md:backdrop-blur-xl backdrop-saturate-150 shadow-[inset_0_1px_0_rgba(255,255,255,0.85)] ${hoverLift} hover:bg-white/[0.72] hover:border-slate-200/90`,
     viasCardTitle: d ? 'text-slate-50' : 'text-slate-900',
     viasCardMuted: d ? 'text-slate-500' : 'text-slate-600',
 
@@ -98,9 +100,11 @@ export function getLaboralPageSkin(isDark: boolean) {
     ctaBlobTR: d ? 'bg-teal-500/[0.06]' : 'bg-teal-300/[0.12]',
     ctaBlobBL: d ? 'bg-slate-800/[0.05]' : 'bg-slate-200/25',
 
+    /* El dock es solo móvil y está fijo sobre el scroll: blur-md en vez de 2xl
+       reduce mucho el repintado por frame sin perder el efecto glass. */
     mobileDock: d
-      ? 'border-t border-white/[0.08] bg-slate-950/78 backdrop-blur-2xl backdrop-saturate-150 supports-[backdrop-filter]:bg-slate-950/65 shadow-[0_-16px_48px_rgba(0,0,0,0.42),inset_0_1px_0_rgba(255,255,255,0.06)]'
-      : 'border-t border-white/70 bg-white/72 backdrop-blur-2xl backdrop-saturate-150 supports-[backdrop-filter]:bg-white/62 shadow-[0_-12px_40px_rgba(15,23,42,0.08),inset_0_1px_0_rgba(255,255,255,0.92)]',
+      ? 'border-t border-white/[0.08] bg-slate-950/78 backdrop-blur-md backdrop-saturate-150 supports-[backdrop-filter]:bg-slate-950/70 shadow-[0_-16px_48px_rgba(0,0,0,0.42),inset_0_1px_0_rgba(255,255,255,0.06)]'
+      : 'border-t border-white/70 bg-white/72 backdrop-blur-md backdrop-saturate-150 supports-[backdrop-filter]:bg-white/70 shadow-[0_-12px_40px_rgba(15,23,42,0.08),inset_0_1px_0_rgba(255,255,255,0.92)]',
 
     prioridadBadge:
       'rounded-full bg-gradient-to-r from-amber-500 to-orange-500 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white shadow-sm border border-transparent',

@@ -1,5 +1,5 @@
-import { motion } from 'framer-motion'
 import { Star } from 'lucide-react'
+import Reveal from '@/components/ui/Reveal'
 
 export interface TestimonialBubbleData {
   name: string
@@ -45,12 +45,7 @@ export default function TestimonialBubble({
   const avatarBg = AVATAR_BG[index % AVATAR_BG.length]
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ delay: index * 0.1 }}
-    >
+    <Reveal delayMs={index * 100}>
       <div className={`p-6 h-full ${isLight ? 'glass-ios-card-light' : 'glass-ios-card-dark'}`}>
         <div
           className="mb-3 flex gap-0.5"
@@ -92,6 +87,6 @@ export default function TestimonialBubble({
           </div>
         </div>
       </div>
-    </motion.div>
+    </Reveal>
   )
 }

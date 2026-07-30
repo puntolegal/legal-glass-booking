@@ -69,6 +69,12 @@ type ServicioPageShellProps = {
   contentName: string;
   /** Categoría granular por vertical, p. ej. "Servicios Legales — Derecho Civil" */
   contentCategory: string;
+  /** Slugs para content_ids en Meta (ej. ['laboral']) */
+  metaContentIds?: string[];
+  metaContentType?: string;
+  metaValue?: number;
+  /** Origen en custom_data, ej. servicios_laboral */
+  metaSource?: string;
   children: ReactNode;
 };
 
@@ -77,6 +83,10 @@ export default function ServicioPageShell({
   showSiteHeader = true,
   contentName,
   contentCategory,
+  metaContentIds,
+  metaContentType,
+  metaValue,
+  metaSource,
   children,
 }: ServicioPageShellProps) {
   const tokens = SERVICIO_THEMES[theme];
@@ -96,15 +106,21 @@ export default function ServicioPageShell({
   const radialOpacityBR =
     laboralSoftAmbient && !isLightSurface ? 'opacity-55' : isLightSurface ? 'opacity-85' : ''
 
+  const metaIdsKey = metaContentIds?.join(',') ?? '';
+
   useEffect(() => {
     trackMetaEvent({
       event_name: 'ViewContent',
       custom_data: {
+        content_type: metaContentType ?? 'service_page',
         content_name: contentName,
         content_category: contentCategory,
+        ...(metaContentIds?.length ? { content_ids: metaContentIds } : {}),
+        ...(metaValue !== undefined ? { value: metaValue, currency: 'CLP' } : {}),
+        ...(metaSource ? { source: metaSource } : {}),
       },
     });
-  }, [contentName, contentCategory]);
+  }, [contentName, contentCategory, metaContentType, metaValue, metaSource, metaIdsKey]);
 
   return (
     <ServicioThemeProvider tokens={tokens}>
@@ -117,9 +133,13 @@ export default function ServicioPageShell({
               : 'text-slate-300'
         }`}
       >
-        {/* Capas de fondo: ocupan todo el alto del documento (scroll largo) */}
+        {/* Capas de fondo: fijas al viewport (no al alto del documento).
+            Con `fixed` el navegador rasteriza estas capas (incluidos los blurs
+            caros) una sola vez al tamaño de la pantalla y solo las compone al
+            hacer scroll; con `absolute` sobre un documento de miles de px se
+            re-rasterizaban texturas gigantes y el desplazamiento se sentía lento. */}
         <div
-          className="pointer-events-none absolute inset-0 z-0 min-h-full overflow-hidden"
+          className="pointer-events-none fixed inset-0 z-0 overflow-hidden"
           aria-hidden
         >
           <div className={`absolute inset-0 ${ambient.baseGradient}`} />
@@ -151,23 +171,25 @@ export default function ServicioPageShell({
           {isLightSurface && (
             <div className="absolute inset-0 bg-[radial-gradient(ellipse_90%_70%_at_50%_0%,rgba(255,255,255,0.55),transparent_55%)]" />
           )}
+          {/* Capas con blur pesado solo en >= md: en móvil el costo de GPU al
+              hacer scroll no compensa el matiz visual (el gradiente base se mantiene). */}
           <div
-            className={`absolute left-1/2 top-0 h-full w-[min(92vw,40rem)] -translate-x-1/2 ${colBlur} ${ambient.columnGlow}`}
+            className={`hidden md:block absolute left-1/2 top-0 h-full w-[min(92vw,40rem)] -translate-x-1/2 ${colBlur} ${ambient.columnGlow}`}
           />
           <div
-            className={`absolute -left-8 top-[14%] h-[22rem] w-[22rem] rounded-full ${orbBlur} ${ambient.orbA}`}
+            className={`hidden md:block absolute -left-8 top-[14%] h-[22rem] w-[22rem] rounded-full ${orbBlur} ${ambient.orbA}`}
           />
           <div
-            className={`absolute -right-12 top-[48%] h-[26rem] w-[26rem] -translate-y-1/2 rounded-full ${orbBlurWide} ${ambient.orbB}`}
+            className={`hidden md:block absolute -right-12 top-[48%] h-[26rem] w-[26rem] -translate-y-1/2 rounded-full ${orbBlurWide} ${ambient.orbB}`}
           />
           <div
-            className={`absolute bottom-[8%] left-[18%] h-[20rem] w-[20rem] rounded-full ${orbBlurTight} ${ambient.orbC}`}
+            className={`hidden md:block absolute bottom-[8%] left-[18%] h-[20rem] w-[20rem] rounded-full ${orbBlurTight} ${ambient.orbC}`}
           />
           <div
-            className={`absolute top-[-20rem] left-[-20rem] h-[50rem] w-[50rem] bg-gradient-radial ${tokens.radialTL} ${isLightSurface ? 'via-white/0' : 'via-slate-950/0'} to-transparent ${radialBlur} ${radialOpacity}`}
+            className={`hidden md:block absolute top-[-20rem] left-[-20rem] h-[50rem] w-[50rem] bg-gradient-radial ${tokens.radialTL} ${isLightSurface ? 'via-white/0' : 'via-slate-950/0'} to-transparent ${radialBlur} ${radialOpacity}`}
           />
           <div
-            className={`absolute bottom-[-20rem] right-[-20rem] h-[50rem] w-[50rem] bg-gradient-radial ${tokens.radialBR} ${isLightSurface ? 'via-white/0' : 'via-slate-950/0'} to-transparent ${radialBlur} ${radialOpacityBR}`}
+            className={`hidden md:block absolute bottom-[-20rem] right-[-20rem] h-[50rem] w-[50rem] bg-gradient-radial ${tokens.radialBR} ${isLightSurface ? 'via-white/0' : 'via-slate-950/0'} to-transparent ${radialBlur} ${radialOpacityBR}`}
           />
         </div>
 

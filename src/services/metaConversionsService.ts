@@ -1,4 +1,6 @@
-import { supabase } from '@/integrations/supabase/client';
+// Nota: el cliente de Supabase se importa dinámicamente dentro de trackMetaEvent
+// para no arrastrar ~34 KB gzip a la carga inicial de las landings (el tracking
+// se dispara después del primer render y tolera esa latencia extra).
 
 interface MetaEventUserData {
   em?: string;  // email
@@ -166,22 +168,15 @@ export async function trackMetaEvent(options: MetaEventOptions): Promise<void> {
   // Valor / Divisa" en el Administrador de eventos de Meta.
   const normalizedCustomData = ensureValueAndCurrency(event_name, custom_data);
 
-  // Generate event_id for deduplication
-  const event_id = generateEventId();
+  // Mismo event_id en Pixel y CAPI para deduplicación (Meta Events Manager)
+  const event_id = options.event_id ?? generateEventId();
 
   // Browser-side pixel (client) - ONLY non-PII data
   try {
     if (typeof window !== 'undefined' && (window as any).fbq) {
-      // Sanitize custom_data to remove any PII before sending to browser
       const sanitizedCustomData = sanitizeCustomDataForBrowser(normalizedCustomData);
-
-      // Add event_id for deduplication
-      const browserPayload = {
-        ...sanitizedCustomData,
-        eventID: event_id, // Meta uses eventID for deduplication
-      };
-
-      (window as any).fbq('track', event_name, browserPayload);
+      // eventID va como 4º argumento, no dentro de custom_data (spec Meta)
+      (window as any).fbq('track', event_name, sanitizedCustomData, { eventID: event_id });
     }
   } catch (e) {
     console.warn('[Meta Pixel] Client-side error:', e);
@@ -205,13 +200,16 @@ export async function trackMetaEvent(options: MetaEventOptions): Promise<void> {
     // Sanitize custom_data for server (remove any PII that shouldn't be in custom_data)
     const serverCustomData = sanitizeCustomDataForBrowser(normalizedCustomData);
 
+    const { supabase } = await import('@/integrations/supabase/client');
     const { error } = await supabase.functions.invoke('meta-conversions', {
       body: {
         event_name,
         event_id, // Include event_id for deduplication
         user_data: enrichedUserData,
         custom_data: serverCustomData, // Use sanitized version (value + currency garantizados)
-        event_source_url: event_source_url || (typeof window !== 'undefined' ? window.location.href : 'https://puntolegal.online'),
+        event_source_url:
+          event_source_url ||
+          (typeof window !== 'undefined' ? window.location.href : 'https://puntolegal.online'),
         ...(resolvedTestCode ? { test_event_code: resolvedTestCode } : {}),
       },
     });

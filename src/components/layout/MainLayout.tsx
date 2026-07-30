@@ -3,7 +3,6 @@
 import React, { useEffect } from 'react';
 import { useLocation, Outlet } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { AnimatePresence } from 'framer-motion';
 import Header from '../Header';
 import Footer from '../Footer';
 import PageTransition from '../PageTransition';
@@ -88,11 +87,9 @@ const MainLayout: React.FC = () => {
             <div className="hidden lg:flex lg:flex-col lg:min-h-screen">
               {config.showHeader && <Header variant={config.headerVariant} />}
               <main className="flex-grow">
-                <AnimatePresence mode="wait">
-                  <PageTransition key={location.pathname}>
-                    <Outlet />
-                  </PageTransition>
-                </AnimatePresence>
+                <PageTransition key={location.pathname}>
+                  <Outlet />
+                </PageTransition>
               </main>
               {config.showFooter && <Footer variant={config.footerVariant} />}
             </div>
@@ -101,11 +98,9 @@ const MainLayout: React.FC = () => {
               showHeader={config.showHeader}
               headerVariant={config.headerVariant === 'apuntes' ? 'apuntes' : 'default'}
             >
-              <AnimatePresence mode="wait">
-                <PageTransition key={location.pathname}>
-                  <Outlet />
-                </PageTransition>
-              </AnimatePresence>
+              <PageTransition key={location.pathname}>
+                <Outlet />
+              </PageTransition>
               {config.showFooter && <Footer variant={config.footerVariant} />}
             </MobileLayout>
           </div>
@@ -127,11 +122,9 @@ const MainLayout: React.FC = () => {
         <div className="relative z-10 flex flex-col min-h-screen">
           {config.showHeader && <Header variant={config.headerVariant} />}
           <main className="flex-grow">
-            <AnimatePresence mode="wait">
-              <PageTransition key={location.pathname}>
-                <Outlet />
-              </PageTransition>
-            </AnimatePresence>
+            <PageTransition key={location.pathname}>
+              <Outlet />
+            </PageTransition>
           </main>
           {config.showFooter && <Footer variant={config.footerVariant} />}
         </div>

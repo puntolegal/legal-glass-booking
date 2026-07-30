@@ -55,14 +55,22 @@
     <!-- Canonical URL -->
     <link rel="canonical" href="https://puntolegal.online" />
     
-    <!-- Preconnect to external domains -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-
-    <!-- Luminescent Authority typography: Manrope (display) + Inter (body) -->
+    <!-- Tipografía self-hosted (Manrope display + Inter body): los @font-face
+         viven en el CSS del bundle; aquí solo precargamos los dos archivos
+         que pintan el primer render (cuerpo 400 y titulares 800). -->
     <link
-      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap"
-      rel="stylesheet"
+      rel="preload"
+      href="/fonts/inter-400-latin.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      href="/fonts/manrope-800-latin.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
     />
     
     <!-- Meta Pixel Code -->
@@ -113,14 +121,8 @@
   <meta name="twitter:description" content="Punto Legal (puntolegal.online): estudio jurídico con domicilio comercial en El Golf, Las Condes, Santiago. Consultas 100% online por Google Meet. Agenda en 60 segundos, 45 min con especialista. Familia, laboral, sucesorio, inmobiliario, empresarial, tributario, contratos.">
   
 
-  <script type="module" crossorigin src="/assets/index-ByWtVxC--1781472051570.js"></script>
-  <link rel="modulepreload" crossorigin href="/assets/vendor-BWCXAlAd-1781472051570.js">
-  <link rel="modulepreload" crossorigin href="/assets/supabase-6qHXhr6z-1781472051570.js">
-  <link rel="modulepreload" crossorigin href="/assets/router-DLaUE1mR-1781472051570.js">
-  <link rel="modulepreload" crossorigin href="/assets/ui-Ku8yNfpd-1781472051570.js">
-  <link rel="modulepreload" crossorigin href="/assets/animations-BE0h-rgP-1781472051570.js">
-  <link rel="modulepreload" crossorigin href="/assets/utils-C4xBKWBT-1781472051570.js">
-  <link rel="stylesheet" crossorigin href="/assets/index-DCGFHfOi-1781472051570.css">
+  <script type="module" crossorigin src="/assets/index-CfOg3EF6.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-CGZKUaZM.css">
 </head>
 
   <body>

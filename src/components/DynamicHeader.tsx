@@ -1,7 +1,10 @@
-import React from 'react';
+import React, { Suspense, lazy } from 'react';
 import { useLocation } from 'react-router-dom';
-import HeaderService from './HeaderService';
 import { serviceThemes } from '../config/serviceThemes';
+
+// Lazy: HeaderService usa framer-motion; importarlo estático arrastraría ese
+// chunk al bundle de entrada incluso en rutas que no muestran header de sitio.
+const HeaderService = lazy(() => import('./HeaderService'));
 
 interface DynamicHeaderProps {
   onAgendarClick?: () => void;
@@ -37,10 +40,12 @@ const DynamicHeader: React.FC<DynamicHeaderProps> = ({ onAgendarClick, serviceNa
   const isTransparentOnTop = transparentPages.includes(location.pathname);
   
   return (
-    <HeaderService 
-      theme={theme} 
-      transparentOnTop={isTransparentOnTop}
-    />
+    <Suspense fallback={null}>
+      <HeaderService 
+        theme={theme} 
+        transparentOnTop={isTransparentOnTop}
+      />
+    </Suspense>
   );
 };
 

@@ -1,6 +1,6 @@
 // RUTA: src/App.tsx
 
-import React from 'react';
+import React, { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import { SidebarProvider } from '@/contexts/SidebarContext';
@@ -15,56 +15,84 @@ import AccessibilityPanel from '@/components/AccessibilityPanel';
 import MainLayout from '@/components/layout/MainLayout';
 import { Toaster } from '@/components/ui/sonner';
 
-// Pages
-import Index from '@/pages/Index';
-import ServicesPage from '@/pages/ServicesPage';
-import BlogPage from '@/pages/BlogPage';
-import AgendamientoPage from '@/pages/AgendamientoPage';
-import PremiumPaymentPage from '@/pages/PremiumPaymentPage';
-import MercadoPagoPaymentPage from '@/pages/MercadoPagoPaymentPage';
-import PaymentSuccessPage from '@/pages/PaymentSuccessPage';
-import PaymentFailurePage from '@/pages/PaymentFailurePage';
-import PaymentPendingPage from '@/pages/PaymentPendingPage';
-import AdminPage from '@/pages/AdminPage';
-import AuthPage from '@/pages/AuthPage';
+// Página eager: solo el 404 (liviano). La home va lazy porque su árbol
+// usa framer-motion y mantenerla eager arrastraría ese chunk a todas las rutas.
 import NotFound from '@/pages/NotFound';
-import PrivacyPolicy from '@/pages/PrivacyPolicy';
-import TermsOfService from '@/pages/TermsOfService';
-import TestPage from '@/pages/TestPage';
-import TestMetaPixel from '@/pages/TestMetaPixel';
-import ApuntesHome from './pages/ApuntesHome';
-import AmandaLogin from '@/pages/AmandaLogin';
-import ExpressPage from '@/pages/ExpressPage';
+
+// Páginas lazy: cada una genera su propio chunk y solo se descarga al navegar a la ruta
+const Index = lazy(() => import('@/pages/Index'));
+const ServicesPage = lazy(() => import('@/pages/ServicesPage'));
+const BlogPage = lazy(() => import('@/pages/BlogPage'));
+const AgendamientoPage = lazy(() => import('@/pages/AgendamientoPage'));
+const PremiumPaymentPage = lazy(() => import('@/pages/PremiumPaymentPage'));
+const MercadoPagoPaymentPage = lazy(() => import('@/pages/MercadoPagoPaymentPage'));
+const PaymentSuccessPage = lazy(() => import('@/pages/PaymentSuccessPage'));
+const PaymentFailurePage = lazy(() => import('@/pages/PaymentFailurePage'));
+const PaymentPendingPage = lazy(() => import('@/pages/PaymentPendingPage'));
+const AdminPage = lazy(() => import('@/pages/AdminPage'));
+const AuthPage = lazy(() => import('@/pages/AuthPage'));
+const PrivacyPolicy = lazy(() => import('@/pages/PrivacyPolicy'));
+const TermsOfService = lazy(() => import('@/pages/TermsOfService'));
+const TestPage = lazy(() => import('@/pages/TestPage'));
+const TestMetaPixel = lazy(() => import('@/pages/TestMetaPixel'));
+const ApuntesHome = lazy(() => import('./pages/ApuntesHome'));
+const AmandaLogin = lazy(() => import('@/pages/AmandaLogin'));
+const ExpressPage = lazy(() => import('@/pages/ExpressPage'));
 // Service Pages
-import ServicioCorporativoPage from '@/pages/ServicioCorporativoPage';
-import ServicioLaboralPage from '@/pages/ServicioLaboralPage';
-import ServicioInmobiliarioPage from '@/pages/ServicioInmobiliarioPage';
-import ServicioFamiliaPage from '@/pages/ServicioFamiliaPage';
-import PagoDiagnosticoIA from '@/pages/PagoDiagnosticoIA';
-import DiagnosticoIniciar from '@/pages/DiagnosticoIniciar';
-import PortalReconstruccionPage from '@/pages/PortalReconstruccionPage';
-import RugbyPage from '@/pages/RugbyPage';
-import CalculadoraPensionPage from '@/pages/CalculadoraPensionPage';
-import UrgenciaPage from '@/pages/UrgenciaPage';
+const ServicioCorporativoPage = lazy(() => import('@/pages/ServicioCorporativoPage'));
+const ServicioLaboralPage = lazy(() => import('@/pages/ServicioLaboralPage'));
+const ServicioInmobiliarioPage = lazy(() => import('@/pages/ServicioInmobiliarioPage'));
+const ServicioFamiliaPage = lazy(() => import('@/pages/ServicioFamiliaPage'));
+const PagoDiagnosticoIA = lazy(() => import('@/pages/PagoDiagnosticoIA'));
+const DiagnosticoIniciar = lazy(() => import('@/pages/DiagnosticoIniciar'));
+const PortalReconstruccionPage = lazy(() => import('@/pages/PortalReconstruccionPage'));
+const RugbyPage = lazy(() => import('@/pages/RugbyPage'));
+const CalculadoraPensionPage = lazy(() => import('@/pages/CalculadoraPensionPage'));
+const UrgenciaPage = lazy(() => import('@/pages/UrgenciaPage'));
 
 // Blog Posts
-import BlogPost1 from '@/pages/BlogPost1';
-import BlogPost2 from '@/pages/BlogPost2';
-import BlogPost3 from '@/pages/BlogPost3';
-import BlogPost4 from '@/pages/BlogPost4';
-import BlogPost5 from '@/pages/BlogPost5';
-import BlogPost6 from '@/pages/BlogPost6';
-import BlogPost7 from '@/pages/BlogPost7';
-import BlogPost8 from '@/pages/BlogPost8';
-import BlogPost9 from '@/pages/BlogPost9';
-import BlogTributario1 from '@/pages/BlogTributario1';
-import BlogTributario2 from '@/pages/BlogTributario2';
-import BlogTributario3 from '@/pages/BlogTributario3';
+const BlogPost1 = lazy(() => import('@/pages/BlogPost1'));
+const BlogPost2 = lazy(() => import('@/pages/BlogPost2'));
+const BlogPost3 = lazy(() => import('@/pages/BlogPost3'));
+const BlogPost4 = lazy(() => import('@/pages/BlogPost4'));
+const BlogPost5 = lazy(() => import('@/pages/BlogPost5'));
+const BlogPost6 = lazy(() => import('@/pages/BlogPost6'));
+const BlogPost7 = lazy(() => import('@/pages/BlogPost7'));
+const BlogPost8 = lazy(() => import('@/pages/BlogPost8'));
+const BlogPost9 = lazy(() => import('@/pages/BlogPost9'));
+const BlogTributario1 = lazy(() => import('@/pages/BlogTributario1'));
+const BlogTributario2 = lazy(() => import('@/pages/BlogTributario2'));
+const BlogTributario3 = lazy(() => import('@/pages/BlogTributario3'));
 
 // Apuntes
-import ApuntesIndex from '@/pages/apuntes/index';
-import ApunteDetail from '@/pages/apuntes/ApunteDetail';
-import AuditoriaPage from '@/pages/apuntes/AuditoriaPage';
+const ApuntesIndex = lazy(() => import('@/pages/apuntes/index'));
+const ApunteDetail = lazy(() => import('@/pages/apuntes/ApunteDetail'));
+const AuditoriaPage = lazy(() => import('@/pages/apuntes/AuditoriaPage'));
+
+/**
+ * Fallback mientras se descarga el chunk de la ruta. El spinner aparece con
+ * ~300ms de retraso (pl-anim-fade-in + animationDelay): si el chunk ya está
+ * en caché o prefetcheado, el usuario no ve ningún parpadeo.
+ */
+function RouteFallback() {
+  return (
+    <div
+      className="flex min-h-[60vh] items-center justify-center"
+      role="status"
+      aria-label="Cargando página"
+    >
+      <div
+        className="flex flex-col items-center gap-3 pl-anim-fade-in"
+        style={{ animationDelay: '300ms' }}
+      >
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-slate-300 border-t-slate-600 dark:border-slate-700 dark:border-t-slate-300" />
+        <span className="text-xs font-medium tracking-wide text-slate-400 dark:text-slate-500">
+          Cargando…
+        </span>
+      </div>
+    </div>
+  );
+}
 
 function App() {
   return (
@@ -78,6 +106,7 @@ function App() {
                 <Router>
                   <ErrorBoundary>
                     <ScrollToTop />
+                    <Suspense fallback={<RouteFallback />}>
                     <Routes>
                       {/* Todas las rutas envueltas en MainLayout */}
                       <Route element={<MainLayout />}>
@@ -147,6 +176,7 @@ function App() {
                         <Route path="*" element={<NotFound />} />
                       </Route>
                     </Routes>
+                    </Suspense>
                     <AccessibilityPanel />
                     <Toaster />
                   </ErrorBoundary>
