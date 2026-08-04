@@ -328,8 +328,8 @@ function ServicioLaboralInner({
       const id = window.requestIdleCallback(prefetch, { timeout: 4000 })
       return () => window.cancelIdleCallback(id)
     }
-    const id = window.setTimeout(prefetch, 2500)
-    return () => window.clearTimeout(id)
+    const id = setTimeout(prefetch, 2500)
+    return () => clearTimeout(id)
   }, [])
 
   return (

@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useTheme } from "@/hooks/useTheme";
+import { laborClusterMetaValueClp } from "@/constants/laborAgendamientoPlans";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import {
   ArrowUpRight,
@@ -85,6 +86,8 @@ interface InternalService {
   free?: boolean;
   /** Minutos de sesión mostrados en trust pills (default 45) */
   sessionDurationMin?: number;
+  /** Pills de cluster que llevan a /agendamiento?plan=<plan> */
+  clusterPills?: { label: string; plan: string }[];
 }
 
 /** Catálogo web/móvil: al cambiar títulos, sincronizar `supabase/functions/_shared/landingServiceTitles.ts` (correos / WhatsApp). */

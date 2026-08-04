@@ -244,7 +244,7 @@ export const crearReserva = async (bookingData: BookingData): Promise<{
 
     const { error } = await supabase
       .from('reservas')
-      .insert(reservaData);
+      .insert(reservaData as never);
 
     if (error) {
       console.error('❌ Error insertando reserva:', error);
