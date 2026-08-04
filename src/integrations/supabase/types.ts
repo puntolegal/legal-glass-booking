@@ -206,81 +206,6 @@ export type Database = {
         }
         Relationships: []
       }
-      urgencias_penal: {
-        Row: {
-          id: string
-          created_at: string
-          updated_at: string
-          session_id: string
-          email: string
-          nombre: string | null
-          telefono: string | null
-          rut_detenido: string | null
-          situacion: string | null
-          unidad_policial: string | null
-          geoloc_status: string | null
-          tiene_antecedentes: boolean | null
-          gravedad_lesiones: number | null
-          horas_detenido: number | null
-          is_complejo: boolean | null
-          precio_clp: number | null
-          lead_score: string | null
-          paso: string
-          riesgo_porcentaje: number | null
-          user_agent: string | null
-          mercado_pago_iniciado: boolean
-          extra: Json
-        }
-        Insert: {
-          id?: string
-          created_at?: string
-          updated_at?: string
-          session_id: string
-          email: string
-          nombre?: string | null
-          telefono?: string | null
-          rut_detenido?: string | null
-          situacion?: string | null
-          unidad_policial?: string | null
-          geoloc_status?: string | null
-          tiene_antecedentes?: boolean | null
-          gravedad_lesiones?: number | null
-          horas_detenido?: number | null
-          is_complejo?: boolean | null
-          precio_clp?: number | null
-          lead_score?: string | null
-          paso?: string
-          riesgo_porcentaje?: number | null
-          user_agent?: string | null
-          mercado_pago_iniciado?: boolean
-          extra?: Json
-        }
-        Update: {
-          id?: string
-          created_at?: string
-          updated_at?: string
-          session_id?: string
-          email?: string
-          nombre?: string | null
-          telefono?: string | null
-          rut_detenido?: string | null
-          situacion?: string | null
-          unidad_policial?: string | null
-          geoloc_status?: string | null
-          tiene_antecedentes?: boolean | null
-          gravedad_lesiones?: number | null
-          horas_detenido?: number | null
-          is_complejo?: boolean | null
-          precio_clp?: number | null
-          lead_score?: string | null
-          paso?: string
-          riesgo_porcentaje?: number | null
-          user_agent?: string | null
-          mercado_pago_iniciado?: boolean
-          extra?: Json
-        }
-        Relationships: []
-      }
       profiles: {
         Row: {
           created_at: string
@@ -529,6 +454,81 @@ export type Database = {
         }
         Relationships: []
       }
+      urgencias_penal: {
+        Row: {
+          created_at: string
+          email: string
+          extra: Json
+          geoloc_status: string | null
+          gravedad_lesiones: number | null
+          horas_detenido: number | null
+          id: string
+          is_complejo: boolean | null
+          lead_score: string | null
+          mercado_pago_iniciado: boolean
+          nombre: string | null
+          paso: string
+          precio_clp: number | null
+          riesgo_porcentaje: number | null
+          rut_detenido: string | null
+          session_id: string
+          situacion: string | null
+          telefono: string | null
+          tiene_antecedentes: boolean | null
+          unidad_policial: string | null
+          updated_at: string
+          user_agent: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          extra?: Json
+          geoloc_status?: string | null
+          gravedad_lesiones?: number | null
+          horas_detenido?: number | null
+          id?: string
+          is_complejo?: boolean | null
+          lead_score?: string | null
+          mercado_pago_iniciado?: boolean
+          nombre?: string | null
+          paso?: string
+          precio_clp?: number | null
+          riesgo_porcentaje?: number | null
+          rut_detenido?: string | null
+          session_id: string
+          situacion?: string | null
+          telefono?: string | null
+          tiene_antecedentes?: boolean | null
+          unidad_policial?: string | null
+          updated_at?: string
+          user_agent?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          extra?: Json
+          geoloc_status?: string | null
+          gravedad_lesiones?: number | null
+          horas_detenido?: number | null
+          id?: string
+          is_complejo?: boolean | null
+          lead_score?: string | null
+          mercado_pago_iniciado?: boolean
+          nombre?: string | null
+          paso?: string
+          precio_clp?: number | null
+          riesgo_porcentaje?: number | null
+          rut_detenido?: string | null
+          session_id?: string
+          situacion?: string | null
+          telefono?: string | null
+          tiene_antecedentes?: boolean | null
+          unidad_policial?: string | null
+          updated_at?: string
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -561,14 +561,14 @@ export type Database = {
       }
       calculadora_track_lead: {
         Args: {
+          p_calculated_max?: string
+          p_calculated_min?: string
+          p_children_count?: number
           p_email: string
+          p_income_value?: number
+          p_name?: string
+          p_quiz_answers?: Json
           p_status: string
-          p_name?: string | null
-          p_quiz_answers?: Json | null
-          p_income_value?: number | null
-          p_children_count?: number | null
-          p_calculated_min?: string | null
-          p_calculated_max?: string | null
         }
         Returns: undefined
       }
@@ -589,10 +589,7 @@ export type Database = {
         Returns: boolean
       }
       merge_urgencia_penal: {
-        Args: {
-          p_row: Json
-          p_session_id: string
-        }
+        Args: { p_row: Json; p_session_id: string }
         Returns: string
       }
       save_intake_schedule: {
