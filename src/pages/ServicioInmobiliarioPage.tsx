@@ -299,9 +299,9 @@ export default function ServicioInmobiliarioPage() {
 
   const heroRef = useRef<HTMLElement>(null)
   const formDataRef = useRef<HeroFormState>({ ...initialForm })
-  const navigateTimerRef = useRef<ReturnType<typeof window.setTimeout> | null>(null)
-  const processingTimerRef = useRef<ReturnType<typeof window.setTimeout> | null>(null)
-  const addressLaborTimerRef = useRef<ReturnType<typeof window.setTimeout> | null>(null)
+  const navigateTimerRef = useRef<number | null>(null)
+  const processingTimerRef = useRef<number | null>(null)
+  const addressLaborTimerRef = useRef<number | null>(null)
 
   const stepSequence = getStepSequence(formData)
   const stepIndexInSeq = stepSequence.indexOf(currentStepId)

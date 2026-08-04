@@ -64,7 +64,7 @@ export async function mergeUrgenciaPenalRow(row: UrgenciaPenalMergeRow): Promise
 
   const { error } = await supabase.rpc('merge_urgencia_penal', {
     p_session_id: sessionId,
-    p_row: payload,
+    p_row: payload as never,
   });
 
   if (error) {
