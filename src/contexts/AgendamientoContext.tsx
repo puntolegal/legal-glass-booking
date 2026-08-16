@@ -16,6 +16,8 @@ import { validationRules } from '@/hooks/useFormValidation';
 import { enqueueBookingCalendarForWaived } from '@/services/enqueueBookingCalendar';
 import { saveIntakeSchedule } from '@/services/agendamientoIntakeService';
 import { INMOB_QUAL_STORAGE_KEY } from '@/constants/inmobiliarioQualification';
+import { sendAdminLeadAlert } from '@/services/adminLeadAlert';
+
 
 interface AgendamientoContextType extends BookingState {
   service: Service;
@@ -290,9 +292,37 @@ const AgendamientoProviderInner: React.FC<{ children: ReactNode; initialService?
                 });
                 if (!emailRes.success) {
                   console.error('❌ No se pudo enviar correo de consulta gratuita:', emailRes.error);
+                  await sendAdminLeadAlert({
+                    nombre: formData.nombre,
+                    email: formData.email,
+                    telefono: formData.telefono,
+                    servicio: service.name,
+                    categoria: service.category,
+                    precio: precioFinal === '0' ? 'Gratis' : precioFinal,
+                    fecha: selectedDate,
+                    hora: selectedTime,
+                    tipoReunion: selectedMeetingType,
+                    descripcion: formData.descripcion,
+                    referencia: externalReference,
+                    motivo: 'La confirmación automática falló; contactar al cliente manualmente.',
+                  });
                 }
               } catch (emailErr) {
                 console.error('❌ Error enviando correo tras reserva gratuita:', emailErr);
+                await sendAdminLeadAlert({
+                  nombre: formData.nombre,
+                  email: formData.email,
+                  telefono: formData.telefono,
+                  servicio: service.name,
+                  categoria: service.category,
+                  precio: precioFinal === '0' ? 'Gratis' : precioFinal,
+                  fecha: selectedDate,
+                  hora: selectedTime,
+                  tipoReunion: selectedMeetingType,
+                  descripcion: formData.descripcion,
+                  referencia: externalReference,
+                  motivo: 'Excepción al enviar la confirmación; contactar al cliente manualmente.',
+                });
               }
             }
 
@@ -308,8 +338,24 @@ const AgendamientoProviderInner: React.FC<{ children: ReactNode; initialService?
               externalReference
             )}`;
           } else {
+            // La reserva no se pudo crear: avisar al admin igualmente para no perder el lead.
+            await sendAdminLeadAlert({
+              nombre: formData.nombre,
+              email: formData.email,
+              telefono: formData.telefono,
+              servicio: service.name,
+              categoria: service.category,
+              precio: precioFinal === '0' ? 'Gratis' : precioFinal,
+              fecha: selectedDate,
+              hora: selectedTime,
+              tipoReunion: selectedMeetingType,
+              descripcion: formData.descripcion,
+              referencia: externalReference,
+              motivo: 'No se pudo guardar la reserva en la base de datos; contactar al cliente manualmente.',
+            });
             setError('Error al crear la consulta. Por favor intenta nuevamente.');
           }
+
         } else {
           const offlineBookingData: Omit<OfflineBookingData, 'id' | 'created_at' | 'updated_at'> = {
             nombre: formData.nombre,
@@ -328,6 +374,23 @@ const AgendamientoProviderInner: React.FC<{ children: ReactNode; initialService?
           
           const offlineResult = await createOfflineBookingWithEmail(offlineBookingData);
           console.log('💾 Reserva offline creada para consulta gratuita:', offlineResult);
+
+          // Sin base de datos no hay confirmación automática: avisar al admin.
+          await sendAdminLeadAlert({
+            nombre: formData.nombre,
+            email: formData.email,
+            telefono: formData.telefono,
+            servicio: service.name,
+            categoria: service.category,
+            precio: precioFinal === '0' ? 'Gratis' : precioFinal,
+            fecha: selectedDate,
+            hora: selectedTime,
+            tipoReunion: selectedMeetingType,
+            descripcion: formData.descripcion,
+            referencia: offlineResult.id,
+            motivo: 'Reserva registrada en modo offline (base de datos no disponible); contactar al cliente manualmente.',
+          });
+
 
           // Preparar datos mínimos para PaymentSuccessPage usando el fallback de localStorage
           const now = Date.now();
