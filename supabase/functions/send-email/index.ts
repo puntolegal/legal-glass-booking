@@ -29,23 +29,36 @@ serve(async (req) => {
     const MAIL_FROM = Deno.env.get('MAIL_FROM') || emailData.from;
     const ADMIN_EMAIL = Deno.env.get('ADMIN_EMAIL') || 'puntolegalelgolf@gmail.com';
 
-    // Llamada a Resend API desde el servidor
-    const response = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${RESEND_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        from: MAIL_FROM,
-        to: emailData.to,
-        subject: emailData.subject,
-        html: emailData.html,
-      }),
-    });
+    const sendWith = async (from: string) =>
+      await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${RESEND_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          from,
+          to: emailData.to,
+          subject: emailData.subject,
+          html: emailData.html,
+        }),
+      });
+
+    let response = await sendWith(MAIL_FROM);
+
+    // Fallback: si el dominio propio aún no está verificado en Resend,
+    // reintentar con el remitente de pruebas para no perder el aviso al admin.
+    if (!response.ok) {
+      const errorData = await response.clone().json().catch(() => ({}));
+      const msg = String(errorData?.message || '');
+      if (/domain is not verified|not verified/i.test(msg)) {
+        console.warn('⚠️ Dominio no verificado en Resend, usando onboarding@resend.dev');
+        response = await sendWith('Punto Legal <onboarding@resend.dev>');
+      }
+    }
 
     if (!response.ok) {
-      const errorData = await response.json();
+      const errorData = await response.json().catch(() => ({}));
       console.error('❌ Error de Resend API:', errorData);
       throw new Error(`Resend API Error: ${errorData.message || 'Error desconocido'}`);
     }
