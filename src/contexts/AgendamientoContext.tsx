@@ -375,6 +375,23 @@ const AgendamientoProviderInner: React.FC<{ children: ReactNode; initialService?
           const offlineResult = await createOfflineBookingWithEmail(offlineBookingData);
           console.log('💾 Reserva offline creada para consulta gratuita:', offlineResult);
 
+          // Sin base de datos no hay confirmación automática: avisar al admin.
+          await sendAdminLeadAlert({
+            nombre: formData.nombre,
+            email: formData.email,
+            telefono: formData.telefono,
+            servicio: service.name,
+            categoria: service.category,
+            precio: precioFinal === '0' ? 'Gratis' : precioFinal,
+            fecha: selectedDate,
+            hora: selectedTime,
+            tipoReunion: selectedMeetingType,
+            descripcion: formData.descripcion,
+            referencia: offlineResult.id,
+            motivo: 'Reserva registrada en modo offline (base de datos no disponible); contactar al cliente manualmente.',
+          });
+
+
           // Preparar datos mínimos para PaymentSuccessPage usando el fallback de localStorage
           const now = Date.now();
           const precioNumber = Number(String(precioFinal).replace(/[^0-9]/g, '')) || 0;
