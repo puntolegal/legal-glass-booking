@@ -16,17 +16,20 @@ export const checkSupabaseConnection = async (): Promise<boolean> => {
   try {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 3000);
-    
+
     const response = await fetch(`${SUPABASE_URL}/rest/v1/`, {
       method: 'HEAD',
       signal: controller.signal,
       headers: {
-        'apikey': SUPABASE_PUBLISHABLE_KEY
+        'apikey': SUPABASE_PUBLISHABLE_KEY,
+        'Authorization': `Bearer ${SUPABASE_PUBLISHABLE_KEY}`
       }
     });
-    
+
     clearTimeout(timeoutId);
-    return response.ok;
+    // PostgREST puede responder 401/404 al root aunque el servicio esté operativo.
+    // Sólo consideramos "no disponible" errores de servidor o de red.
+    return response.status < 500;
   } catch (error) {
     console.warn('Supabase no disponible:', error);
     return false;
